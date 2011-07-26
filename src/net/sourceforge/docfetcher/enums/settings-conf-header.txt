@@ -1,0 +1,14 @@
+# The internal program settings are stored here.
+# Only modify this file if you know what you're doing.
+# 
+# How to edit this file:
+# * The program loads this file on startup and overwrites it
+#   on closing. Thus, remember to close the program
+#   before editing this file, otherwise all your changes
+#   will get overwritten.
+# * To restore the default value of an entry, close the
+#   program, delete the entry, then restart the program. The
+#   program will now use the default value and write it to
+#   disk when it closes.
+# * Clear or delete the entire file to restore all default
+#   values.

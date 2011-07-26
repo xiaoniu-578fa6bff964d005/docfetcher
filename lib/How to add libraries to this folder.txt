@@ -1,0 +1,13 @@
+For more convenient development, this lib folder contains not only the project's jar dependencies, but also the source packages for the most important jar files, such as Lucene and PDFBox.
+Furthermore, the project has been configured so that each source package is associated with its corresponding jar file via the .classpath file in the root folder.
+This setup allows you to click on a certain type or method in Eclipse and:
+  * Press F2 to display its Javadoc in a popup window
+  * Press F3 to jump to the library source code
+
+For all of this to work, special steps have to be taken when a new library, let's say, "some-lib", is added to the lib folder:
+
+1) Create a new subfolder in the lib folder called "some-lib". Put the jar file(s), source package(s) and the license file (!!!) of some-lib in the some-lib folder.
+
+2) If the source packages contain additional files not needed for the Javadoc popups, remove those files from the archive and add a "-stripped" suffix to archive filename, e.g. "some-lib-src.zip" becomes "some-lib-src-stripped.zip". Unneeded files are: Javadoc HTML files, readme files, license files, examples, etc.
+
+3) In Eclipse, refresh the project folder and add the jars to the build path. To associate the source packages with the jar files, open the project's build path settings via Project > Properties > Java Build Path. On the 'Libraries' tab, you can define source attachments for each jar. When you get to the dialog where you have to select the source package, be sure to click on the "Workspace..." button, NOT on "External File..." or "External Folder...". Otherwise Eclipse would store an absolute path to the source package, which wouldn't work on other people's machines.
