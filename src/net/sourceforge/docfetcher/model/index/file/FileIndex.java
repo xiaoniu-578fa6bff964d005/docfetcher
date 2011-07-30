@@ -277,7 +277,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 					if (doc == null) {
 						doc = createFileDoc(folder, htmlFile);
 						doc.setHtmlFolder(createFileFolder(
-							context, htmlDir, null)); // may be null
+							context, htmlDir, null)); // folder may be null
 						AppendingContext subContext = new AppendingContext(
 							context);
 						if (!subContext.index(doc, htmlFile, true)) return;

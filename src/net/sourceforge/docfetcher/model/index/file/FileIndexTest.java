@@ -77,9 +77,11 @@ public final class FileIndexTest {
 		File htmlDir = new File(tempDir, "test_files");
 		File subFile1 = new File(htmlDir, "filename.unsupportedformat");
 		File subFile2 = new File(htmlDir, "filename.txt");
+		File subFile3 = new File(htmlDir, "simple.7z");
 		htmlDir.mkdirs();
 		subFile1.createNewFile();
 		subFile2.createNewFile();
+		Files.copy(new File(TestFiles.simple_7z), subFile3);
 		
 		final int[] counter = { 0 };
 		IndexingReporter reporter = new IndexingReporter() {
@@ -101,7 +103,8 @@ public final class FileIndexTest {
 		ListMap<File, Integer> fileMap = ListMap.<File, Integer> create()
 			.add(htmlFile, 1)
 			.add(subFile1, 0)
-			.add(subFile2, 1);
+			.add(subFile2, 1)
+			.add(subFile3, 1);
 		for (ListMap.Entry<File, Integer> entry : fileMap) {
 			counter[0] = 0;
 			

@@ -66,29 +66,40 @@ final class FileDocument extends Document<FileDocument, FileFolder> {
 		else if (newFolder == null)
 			return true;
 
-		File[] files = Util.listFiles(newFolder, new FileFilter() {
+		File[] newFiles = Util.listFiles(newFolder, new FileFilter() {
 			public boolean accept(File file) {
 				return !context.skip((TFile) file);
 			}
 		});
 		
-		if (files.length != oldFolder.getChildCount())
+		if (newFiles.length != oldFolder.getChildCount())
 			return true;
 
-		for (File fileOrDir : files) {
-			String name = fileOrDir.getName();
-			if (fileOrDir.isFile()) {
-				FileDocument doc = oldFolder.getDocument(name);
-				if (doc == null)
-					return true;
-				if (doc.getLastModified() != fileOrDir.lastModified())
-					return true;
+		for (File newFile : newFiles) {
+			String name = newFile.getName();
+			long newLastModified = newFile.lastModified();
+			
+			if (newFile.isFile()) {
+				if (context.getConfig().isSolidArchive(name)) {
+					FileFolder subFolder = oldFolder.getSubFolder(name);
+					if (subFolder == null)
+						return true;
+					if (subFolder.getLastModified() != newLastModified)
+						return true;
+				}
+				else {
+					FileDocument doc = oldFolder.getDocument(name);
+					if (doc == null)
+						return true;
+					if (doc.getLastModified() != newLastModified)
+						return true;
+				}
 			}
-			else if (fileOrDir.isDirectory()) {
+			else if (newFile.isDirectory()) {
 				FileFolder subFolder = oldFolder.getSubFolder(name);
 				if (subFolder == null)
 					return true;
-				if (isFolderModified(context, subFolder, fileOrDir))
+				if (isFolderModified(context, subFolder, newFile))
 					return true;
 			}
 		}
