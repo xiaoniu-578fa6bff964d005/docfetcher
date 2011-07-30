@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -28,6 +29,7 @@ import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TFile;
 
 /**
  * @author Tran Nam Quang
@@ -179,6 +181,21 @@ class FileContext {
 							TreeNode treeNode,
 							@Nullable Throwable cause) {
 		reporter.fail(type, treeNode, cause);
+	}
+	
+	/**
+	 * Returns the original path for the given file, taking into account virtual
+	 * files inside TrueZIP archives. The returned path depends on whether a
+	 * non-null original path for the given indexing context was set.
+	 */
+	@NotNull
+	public final String getDirOrZipPath(@NotNull File file) {
+		if (originalPath == null)
+			return config.getStorablePath(file);
+		TFile tzFile = (TFile) file;
+		TFile topArchive = tzFile.getTopLevelArchive();
+		String relativePath = UtilModel.getRelativePath(topArchive, tzFile);
+		return Util.joinPath(originalPath, relativePath);
 	}
 
 }

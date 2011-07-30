@@ -209,22 +209,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		return false;
 	}
 
-	/**
-	 * Returns the original path for the given file, taking into account virtual
-	 * files inside TrueZIP archives. The returned path depends on whether a
-	 * non-null original path for the given indexing context was set.
-	 */
-	@NotNull
-	private static String getDirOrZipPath(	@NotNull FileContext context,
-											@NotNull File file) {
-		if (context.getOriginalPath() == null)
-			return context.getConfig().getStorablePath(file);
-		TFile tzFile = (TFile) file;
-		TFile topArchive = tzFile.getTopLevelArchive();
-		String relativePath = UtilModel.getRelativePath(topArchive, tzFile);
-		return Util.joinPath(context.getOriginalPath(), relativePath);
-	}
-
 	@NotNull
 	private static FileDocument createFileDoc(	@NotNull FileFolder parentFolder,
 												@NotNull File file) {
@@ -237,7 +221,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 												@Nullable Long lastModified) {
 		if (file == null) return null;
 		return new FileFolder(
-			file.getName(), getDirOrZipPath(context, file), lastModified);
+			file.getName(), context.getDirOrZipPath(file), lastModified);
 	}
 
 	// Will clean up temporary zip files
@@ -364,7 +348,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			protected boolean skip(@NotNull File fileOrDir) {
 				assert fileOrDir instanceof TFile;
 				String filename = fileOrDir.getName();
-				String filepath = getDirOrZipPath(context, fileOrDir);
+				String filepath = context.getDirOrZipPath(fileOrDir);
 				boolean isFileOrSolidArchive = fileOrDir.isFile();
 				boolean isZipArchiveOrFolder = !isFileOrSolidArchive;
 				boolean isZipArchive = isZipArchiveOrFolder
