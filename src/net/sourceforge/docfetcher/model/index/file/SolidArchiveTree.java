@@ -242,9 +242,12 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				 * If the mime pattern matches, we'll check the mime pattern
 				 * again later, right before parsing.
 				 */
-				if (config.matchesMimePattern(name) || ParseService.canParseByName(config, name))
+				if (config.matchesMimePattern(name))
+					return false;
+				if (ParseService.canParseByName(config, name))
 					return false;
 				entryDataMap.remove(candidate.getPath());
+				
 				return true;
 			}
 		}, new Predicate<FileFolder>() {
@@ -304,6 +307,11 @@ abstract class SolidArchiveTree<E> implements Closeable {
 									@NotNull Predicate<FileFolder> folderPredicate) {
 		folder.removeDocuments(docPredicate);
 		folder.removeSubFolders(folderPredicate);
+		for (FileDocument doc : folder.getDocuments()) {
+			FileFolder htmlFolder = doc.getHtmlFolder();
+			if (htmlFolder != null)
+				applyFilter(htmlFolder, docPredicate, folderPredicate);
+		}
 		for (FileFolder subFolder : folder.getSubFolders())
 			applyFilter(subFolder, docPredicate, folderPredicate);
 	}

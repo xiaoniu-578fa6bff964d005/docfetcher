@@ -650,7 +650,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			 * HTML folder, just delete them.
 			 */
 			final AppendingContext subContext = new AppendingContext(context);
-			if (!subContext.indexAndDeleteFile(doc, mainFile, added)) {
+			if (!subContext.indexAndDeleteFile(doc, mainFile, true)) {
 				new FileFolderVisitor<Exception>(htmlFolder) {
 					protected void visitDocument(	FileFolder parent,
 													FileDocument fileDocument) {

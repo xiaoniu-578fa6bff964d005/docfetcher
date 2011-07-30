@@ -46,7 +46,7 @@ public final class FileIndexTest {
 	public void testNestedUpdate() throws Exception {
 		String[] paths = {
 				TestFiles.archive_zip_rar_7z,
-//				TestFiles.sfx_zip, // TODO won't work until ParseService supports zip archive entries
+				TestFiles.sfx_zip,
 				TestFiles.sfx_7z,
 				TestFiles.sfx_rar,
 		};
@@ -103,20 +103,19 @@ public final class FileIndexTest {
 			.add(subFile1, 0)
 			.add(subFile2, 1)
 			.add(subFile3, 1);
+		int i = 0;
 		for (ListMap.Entry<File, Integer> entry : fileMap) {
 			reporter.counter = 0;
 			
 			File file = entry.getKey();
 			int expectedCount = entry.getValue().intValue();
-			
-			long lastModified = file.lastModified();
-			while (lastModified == file.lastModified())
-				Files.touch(file);
+			file.setLastModified(System.currentTimeMillis() + (i + 1) * 1000);
 			
 			index.update(reporter, NullCancelable.getInstance());
 			
 			String msg = String.format("On '%s'.", file.getName());
 			assertEquals(msg, expectedCount, reporter.counter);
+			i++;
 		}
 		
 		// Index update must detect change when HTML folder is deleted
@@ -147,10 +146,12 @@ public final class FileIndexTest {
 			FileIndex index = new FileIndex(config, null, tempDir);
 			
 			Files.copy(originalFile, target);
+			target.setLastModified(System.currentTimeMillis() - 1000);
 			index.update(new IndexingReporter(), NullCancelable.getInstance());
 			
 			Files.copy(modifiedFile, target);
 			CountingReporter reporter2 = new CountingReporter();
+			
 			index.update(reporter2, NullCancelable.getInstance());
 			assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
 			
@@ -165,7 +166,8 @@ public final class FileIndexTest {
 		private int counter = 0;
 		
 		public void info(InfoType infoType, TreeNode treeNode) {
-			counter++;
+			if (infoType == InfoType.EXTRACTING)
+				counter++;
 		}
 	}
 	
