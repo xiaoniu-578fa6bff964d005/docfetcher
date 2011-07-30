@@ -140,23 +140,28 @@ public final class FileIndexTest {
 		int[] expectedCounts = { 1, 1, 1, 1, 1, 0 };
 		assertEquals(expectedCounts.length, files.size() - 1);
 		
-		int i = 0;
-		for (File modifiedFile : files.subList(1, files.size())) {
-			IndexingConfig config = new IndexingConfig();
-			FileIndex index = new FileIndex(config, null, tempDir);
-			
-			Files.copy(originalFile, target);
-			target.setLastModified(System.currentTimeMillis() - 1000);
-			index.update(new IndexingReporter(), NullCancelable.getInstance());
-			
-			Files.copy(modifiedFile, target);
-			CountingReporter reporter2 = new CountingReporter();
-			
-			index.update(reporter2, NullCancelable.getInstance());
-			assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
-			
-			Files.deleteDirectoryContents(tempDir);
-			i++;
+		for (boolean reversed : new boolean[] {false, true}) {
+			int i = 0;
+			for (File modifiedFile : files.subList(1, files.size())) {
+				IndexingConfig config = new IndexingConfig();
+				FileIndex index = new FileIndex(config, null, tempDir);
+				
+				File file1 = reversed ? modifiedFile : originalFile;
+				File file2 = reversed ? originalFile : modifiedFile;
+				
+				Files.copy(file1, target);
+				target.setLastModified(System.currentTimeMillis() - 1000);
+				index.update(new IndexingReporter(), NullCancelable.getInstance());
+				
+				Files.copy(file2, target);
+				CountingReporter reporter2 = new CountingReporter();
+				
+				index.update(reporter2, NullCancelable.getInstance());
+				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
+				
+				Files.deleteDirectoryContents(tempDir);
+				i++;
+			}
 		}
 		
 		Files.deleteRecursively(tempDir);
