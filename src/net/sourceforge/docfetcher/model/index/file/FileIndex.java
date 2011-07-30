@@ -32,8 +32,6 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter.InfoType;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
-import net.sourceforge.docfetcher.model.parse.ParseService;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -252,11 +250,13 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 						return;
 					}
 					FileDocument doc = unseenDocs.remove(file.getName());
-					if (doc == null) { // File added
+					// File added
+					if (doc == null) {
 						doc = createFileDoc(folder, file);
 						context.index(doc, file, true);
 					}
-					else if (doc.isModified(file, null)) { // File modified
+					// File modified
+					else if (doc.isModified(context, file, null)) {
 						doc.setLastModified(file.lastModified());
 						doc.setHtmlFolder(null);
 						if (!context.index(doc, file, false))
@@ -273,7 +273,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 				if (context.isStopped()) stop();
 				try {
 					FileDocument doc = unseenDocs.remove(htmlFile.getName());
-					if (doc == null) { // HTML pair added
+					// HTML pair added
+					if (doc == null) {
 						doc = createFileDoc(folder, htmlFile);
 						doc.setHtmlFolder(createFileFolder(
 							context, htmlDir, null)); // may be null
@@ -287,8 +288,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 						}
 						subContext.appendToOuter(doc, true);
 					}
-					else if (doc.isModified(htmlFile, htmlDir)) { // HTML pair
-																	// modified
+					// HTML pair modified
+					else if (doc.isModified(context, htmlFile, htmlDir)) {
 						doc.setLastModified(htmlFile.lastModified());
 						/*
 						 * Here, we replace any previous HTML folder with a new
@@ -346,27 +347,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			}
 
 			protected boolean skip(@NotNull File fileOrDir) {
-				assert fileOrDir instanceof TFile;
-				String filename = fileOrDir.getName();
-				String filepath = context.getDirOrZipPath(fileOrDir);
-				boolean isFileOrSolidArchive = fileOrDir.isFile();
-				boolean isZipArchiveOrFolder = !isFileOrSolidArchive;
-				boolean isZipArchive = isZipArchiveOrFolder
-					? UtilModel.isZipArchive((TFile) fileOrDir)
-					: false;
-				boolean isFileOrArchive = isFileOrSolidArchive || isZipArchive;
-				if (config.getFileFilter().matches(
-					filename, filepath, isFileOrArchive)) return true;
-				/*
-				 * If the mime pattern matches, we'll check the mime pattern
-				 * again later (right before parsing) in order to determine
-				 * whether to detect the filetype by filename or by mimetype.
-				 */
-				boolean isFile = isFileOrSolidArchive
-						&& !config.isSolidArchive(filename);
-				if (isFile && !config.matchesMimePattern(filename))
-					return !ParseService.canParseByName(config, filename);
-				return false;
+				return context.skip((TFile) fileOrDir);
 			}
 
 			protected void runFinally() {

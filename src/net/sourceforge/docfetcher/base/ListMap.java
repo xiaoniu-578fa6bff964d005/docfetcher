@@ -45,19 +45,32 @@ public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 		}
 	}
 	
+	@NotNull
+	public static <K, V> ListMap<K, V> create() {
+		return new ListMap<K, V>();
+	}
+	
+	@NotNull
+	public static <K, V> ListMap<K, V> create(int size) {
+		return new ListMap<K, V>(size);
+	}
+	
 	private final List<Entry<K, V>> list;
 	
-	public ListMap() {
+	private ListMap() {
 		list = new ArrayList<Entry<K, V>>();
 	}
 	
-	public ListMap(int size) {
+	private ListMap(int size) {
 		list = new ArrayList<Entry<K, V>>(size);
 	}
 	
-	public void add(@NotNull K key, @NotNull V value) {
+	// Returns itself for method chaining
+	@NotNull
+	public ListMap<K, V> add(@NotNull K key, @NotNull V value) {
 		Util.checkNotNull(key, value);
 		list.add(new Entry<K, V>(key, value));
+		return this;
 	}
 	
 	public int size() {

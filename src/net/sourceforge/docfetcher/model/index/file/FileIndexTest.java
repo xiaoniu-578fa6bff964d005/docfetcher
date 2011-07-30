@@ -14,8 +14,10 @@ package net.sourceforge.docfetcher.model.index.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.base.AppUtil;
+import net.sourceforge.docfetcher.base.ListMap;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
@@ -91,27 +93,34 @@ public final class FileIndexTest {
 		
 		// Index update should not detect any changes when nothing was modified
 		index.update(reporter, NullCancelable.getInstance());
-		assertEquals(0, counter[0]);
+		assertEquals(1, counter[0]);
 		index.update(reporter, NullCancelable.getInstance());
-		assertEquals(0, counter[0]);
+		assertEquals(1, counter[0]);
 		
 		// Index update must detect changes when files have been modified
-		for (File file : new File[] {htmlFile, subFile1, subFile2}) {
+		ListMap<File, Integer> fileMap = ListMap.<File, Integer> create()
+			.add(htmlFile, 1)
+			.add(subFile1, 0)
+			.add(subFile2, 1);
+		for (ListMap.Entry<File, Integer> entry : fileMap) {
 			counter[0] = 0;
 			
-			/*
-			 * Wait a little to ensure the file gets a last-modified value that
-			 * is different from the previous one.
-			 */
-			Thread.sleep(10);
+			File file = entry.getKey();
+			int expectedCount = entry.getValue().intValue();
 			
-			Files.touch(file);
+			long lastModified = file.lastModified();
+			while (lastModified == file.lastModified())
+				Files.touch(file);
+			
 			index.update(reporter, NullCancelable.getInstance());
-			assertEquals(1, counter[0]);
+			
+			String msg = String.format("On '%s'.", file.getName());
+			assertEquals(msg, expectedCount, counter[0]);
 		}
 		
 		// Index update must detect change when HTML folder is deleted
 		Files.deleteRecursively(htmlDir);
+		counter[0] = 0;
 		index.update(reporter, NullCancelable.getInstance());
 		assertEquals(1, counter[0]);
 		

@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.File;
+import java.io.FileFilter;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
@@ -19,6 +20,7 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.DocumentType;
+import de.schlichtherle.truezip.file.TFile;
 
 final class FileDocument extends Document<FileDocument, FileFolder> {
 	
@@ -46,39 +48,51 @@ final class FileDocument extends Document<FileDocument, FileFolder> {
 		this.htmlFolder = htmlFolder;
 	}
 	
-	public boolean isModified(	@NotNull File file,
+	public boolean isModified(	@NotNull FileContext context,
+	                          	@NotNull File file,
 								@Nullable File htmlFolder) {
 		Util.checkThat(getName().equals(file.getName()));
 		if (getLastModified() != file.lastModified())
 			return true;
-		return isFolderModified(this.htmlFolder, htmlFolder);
+		return isFolderModified(context, this.htmlFolder, htmlFolder);
 	}
 	
 	@RecursiveMethod
-	private static boolean isFolderModified(@Nullable FileFolder oldFolder,
+	private static boolean isFolderModified(@NotNull final FileContext context,
+											@Nullable FileFolder oldFolder,
 											@Nullable File newFolder) {
 		if (oldFolder == null)
 			return newFolder != null;
 		else if (newFolder == null)
 			return true;
+
+		File[] files = Util.listFiles(newFolder, new FileFilter() {
+			public boolean accept(File file) {
+				return !context.skip((TFile) file);
+			}
+		});
 		
-		File[] files = Util.listFiles(newFolder);
 		if (files.length != oldFolder.getChildCount())
 			return true;
-		
+
 		for (File fileOrDir : files) {
 			String name = fileOrDir.getName();
 			if (fileOrDir.isFile()) {
 				FileDocument doc = oldFolder.getDocument(name);
-				if (doc == null || doc.getLastModified() != fileOrDir.lastModified())
+				if (doc == null)
 					return true;
-			} else if (fileOrDir.isDirectory()) {
+				if (doc.getLastModified() != fileOrDir.lastModified())
+					return true;
+			}
+			else if (fileOrDir.isDirectory()) {
 				FileFolder subFolder = oldFolder.getSubFolder(name);
-				if (subFolder == null || isFolderModified(subFolder, fileOrDir))
+				if (subFolder == null)
+					return true;
+				if (isFolderModified(context, subFolder, fileOrDir))
 					return true;
 			}
 		}
-		
+
 		return false;
 	}
 	

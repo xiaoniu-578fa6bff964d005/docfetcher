@@ -87,7 +87,7 @@ public final class FileTypePanel {
 	@NotNull
 	public ListMap<Parser, Boolean> getParserStateMap() {
 		TableItem[] items = table.getItems();
-		ListMap<Parser, Boolean> map = new ListMap<Parser, Boolean>(items.length);
+		ListMap<Parser, Boolean> map = ListMap.create(items.length);
 		for (TableItem item : items) {
 			Parser parser = (Parser) item.getData();
 			map.add(parser, item.getChecked());

@@ -375,7 +375,7 @@ public final class Main {
 				// TODO Load parser states from file
 				// TODO Save parser states to file?
 				List<Parser> parsers = ParseService.getParsers();
-				ListMap<Parser, Boolean> map = new ListMap<Parser, Boolean>(parsers.size());
+				ListMap<Parser, Boolean> map = ListMap.create(parsers.size());
 				for (Parser parser : parsers)
 					map.add(parser, true);
 				fileTypePanel = new FileTypePanel(parent, map);

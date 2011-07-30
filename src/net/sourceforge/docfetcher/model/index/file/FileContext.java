@@ -197,5 +197,32 @@ class FileContext {
 		String relativePath = UtilModel.getRelativePath(topArchive, tzFile);
 		return Util.joinPath(originalPath, relativePath);
 	}
+	
+	/**
+	 * Returns whether the given TrueZIP file or directory should be skipped,
+	 * given the various settings of the receiver.
+	 */
+	public final boolean skip(@NotNull TFile fileOrDir) {
+		String filename = fileOrDir.getName();
+		String filepath = getDirOrZipPath(fileOrDir);
+		boolean isFileOrSolidArchive = fileOrDir.isFile();
+		boolean isZipArchiveOrFolder = !isFileOrSolidArchive;
+		boolean isZipArchive = isZipArchiveOrFolder
+			? UtilModel.isZipArchive(fileOrDir)
+			: false;
+		boolean isFileOrArchive = isFileOrSolidArchive || isZipArchive;
+		if (config.getFileFilter().matches(
+			filename, filepath, isFileOrArchive)) return true;
+		/*
+		 * If the mime pattern matches, we'll check the mime pattern again later
+		 * (right before parsing) in order to determine whether to detect the
+		 * filetype by filename or by mimetype.
+		 */
+		boolean isFile = isFileOrSolidArchive
+				&& !config.isSolidArchive(filename);
+		if (isFile && !config.matchesMimePattern(filename))
+			return !ParseService.canParseByName(config, filename);
+		return false;
+	}
 
 }
