@@ -448,7 +448,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			// Unpack added and modified files
 			context.info(InfoType.UNPACKING, newArchiveFolder);
 			archiveTree.unpack(unpackEntries, null);
-
 		}
 		catch (IOException e) {
 			archiveFolder.removeChildren();
@@ -468,7 +467,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			 * unpacked files.
 			 */
 			Closeables.closeQuietly(archiveTree);
-			if (context.isTempArchive()) archiveTree.getArchiveFile().delete();
+			if (context.isTempArchive())
+				archiveTree.getArchiveFile().delete();
 		}
 
 		// Process unpacked documents
@@ -499,7 +499,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		context.nestedArchives.clear();
 
 		// Clean up unprocessed temporary files
-		if (context.isStopped()) archiveTree.deleteUnpackedFiles();
+		if (context.isStopped())
+			archiveTree.deleteUnpackedFiles();
 	}
 
 	@RecursiveMethod
@@ -645,11 +646,19 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			}
 
 			/*
-			 * Don't index the files in the HTML folder if we fail on the HTML
-			 * file.
+			 * If indexing of the HTML file fails, don't index the files in the
+			 * HTML folder, just delete them.
 			 */
 			final AppendingContext subContext = new AppendingContext(context);
-			if (!subContext.indexAndDeleteFile(doc, mainFile, added)) continue;
+			if (!subContext.indexAndDeleteFile(doc, mainFile, added)) {
+				new FileFolderVisitor<Exception>(htmlFolder) {
+					protected void visitDocument(	FileFolder parent,
+													FileDocument fileDocument) {
+						archiveTree.getFile(fileDocument).delete();
+					}
+				}.runSilently();
+				continue;
+			}
 
 			subContext.setReporter(null);
 			new FileFolderVisitor<IndexingException>(htmlFolder) {

@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -618,9 +617,8 @@ public final class FileFactory {
 				} else { // HTML file with HTML folder
 					List<FileDocument> docsDeep = htmlFolder.getDocumentsDeep();
 					docsDeep.add(htmlDoc);
-					Iterable<TreeNode> unpackList = UtilGlobal.<TreeNode>convert(docsDeep);
 					File tempDir = Files.createTempDir();
-					archive.unpack(unpackList, tempDir);
+					archive.unpack(docsDeep, tempDir);
 					File htmlFile = archive.getFile(htmlDoc);
 					return unpackCache.putIfAbsent(cacheKey, htmlFile, tempDir);
 				}

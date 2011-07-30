@@ -28,6 +28,10 @@ class FileFolder extends Folder<FileDocument, FileFolder> {
 		public FileFolderVisitor(@NotNull FileFolder root) {
 			super(root);
 		}
+		
+		public FileFolderVisitor(@NotNull FileDocument doc) {
+			super(doc.getHtmlFolder()); // HTML folder might be null
+		}
 	}
 	
 	/**

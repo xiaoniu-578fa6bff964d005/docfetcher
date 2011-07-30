@@ -31,6 +31,7 @@ import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
+import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 
 import com.google.common.collect.Maps;
@@ -313,22 +314,36 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	}
 	
 	// Caller is responsible for deleting the files (can use deleteUnpackedFiles for that).
+	// If the given list of unpack entries contains HTML files, the files in the HTML folder will be unpacked as well
 	// If tempDir is given, the unpack operation preserves the inner directory structure, so
 	// that tempDir corresponds to archive root;
 	// otherwise the archive entries are unpacked to independently chosen temp files.
 	// If tempDir is given, caller is responsible for deleting it and everything underneath it.
 	// Tip: Use UtilGlobal.convert in case of incompatible Collection types
-	public final void unpack(	@NotNull Iterable<TreeNode> unpackEntries,
+	public final void unpack(	@NotNull Iterable<? extends TreeNode> unpackEntries,
 								@Nullable final File tempDir)
 			throws IOException, DiskSpaceException {
-		long requiredSpace = 0;
-		Map<Integer, TreeNode> unpackMap = Maps.newHashMap();
+		final long[] requiredSpace = { 0 };
+		final Map<Integer, TreeNode> unpackMap = Maps.newHashMap();
 		
 		// Collect entries to unpack, calculate required diskspace
 		for (TreeNode entry : unpackEntries) {
 			EntryData entryData = entryDataMap.getValue(entry.getPath());
 			unpackMap.put(entryData.index, entry);
-			requiredSpace += entryData.size;
+			requiredSpace[0] += entryData.size;
+			
+			// Unpack files under HTML folders if there are any
+			if (!hasHtmlFolder(entry))
+				continue;
+			new FileFolderVisitor<Exception>((FileDocument) entry) {
+				protected void visitDocument(	FileFolder parent,
+				                             	FileDocument fileDocument) {
+					String path = fileDocument.getPath();
+					EntryData entryData = entryDataMap.getValue(path);
+					unpackMap.put(entryData.index, fileDocument);
+					requiredSpace[0] += entryData.size;
+				}
+			}.runSilently();
 		}
 		
 		/*
@@ -338,7 +353,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		if (unpackMap.isEmpty()) return;
 		
 		// Fail if there's not enough disk space for unpacking
-		config.checkDiskSpaceInTempDir(requiredSpace);
+		config.checkDiskSpaceInTempDir(requiredSpace[0]);
 		
 		// Create temporary file factory
 		final TempFileFactory tempFileFactory;
@@ -363,14 +378,33 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		}
 		
 		// Unpack files
-		Map<Integer, File> indexFileMap = doUnpack(unpackMap, tempFileFactory);
+		final Map<Integer, File> indexFileMap = doUnpack(unpackMap, tempFileFactory);
 		
 		// Store the unpacked entries
 		for (TreeNode entry : unpackEntries) {
 			EntryData entryData = entryDataMap.getValue(entry.getPath());
 			entryData.file = indexFileMap.get(entryData.index);
 			assert entryData.file != null;
+			
+			// Store unpacked entries underneath HTML folders
+			if (!hasHtmlFolder(entry))
+				continue;
+			new FileFolderVisitor<Exception>((FileDocument) entry) {
+				protected void visitDocument(	FileFolder parent,
+				                             	FileDocument fileDocument) {
+					String path = fileDocument.getPath();
+					EntryData entryData = entryDataMap.getValue(path);
+					entryData.file = indexFileMap.get(entryData.index);
+					assert entryData.file != null;
+				}
+			}.runSilently();
 		}
+	}
+	
+	private static boolean hasHtmlFolder(@NotNull TreeNode treeNode) {
+		if (!(treeNode instanceof FileDocument))
+			return false;
+		return ((FileDocument) treeNode).getHtmlFolder() != null;
 	}
 	
 	// Subclasser should not report anything except failure on single archive entries

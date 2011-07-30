@@ -14,10 +14,14 @@ package net.sourceforge.docfetcher.model.index.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.ListMap;
+import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
@@ -34,10 +38,12 @@ import com.google.common.io.Files;
  */
 public final class FileIndexTest {
 	
+	static {
+		AppUtil.Const.autoInit();
+	}
+	
 	@Test
 	public void testNestedUpdate() throws Exception {
-		AppUtil.Const.autoInit();
-		
 		String[] paths = {
 				TestFiles.archive_zip_rar_7z,
 //				TestFiles.sfx_zip, // TODO won't work until ParseService supports zip archive entries
@@ -69,8 +75,6 @@ public final class FileIndexTest {
 	 */
 	@Test
 	public void testHtmlPairUpdate() throws Exception {
-		AppUtil.Const.autoInit();
-		
 		File tempDir = Files.createTempDir();
 		File htmlFile = new File(tempDir, "test.html");
 		Files.copy(new File(TestFiles.html), htmlFile);
@@ -83,21 +87,15 @@ public final class FileIndexTest {
 		subFile2.createNewFile();
 		Files.copy(new File(TestFiles.simple_7z), subFile3);
 		
-		final int[] counter = { 0 };
-		IndexingReporter reporter = new IndexingReporter() {
-			public void info(InfoType infoType, TreeNode treeNode) {
-				counter[0]++;
-			}
-		};
-		
 		IndexingConfig config = new IndexingConfig();
 		FileIndex index = new FileIndex(config, null, tempDir);
+		final CountingReporter reporter = new CountingReporter();
 		
 		// Index update should not detect any changes when nothing was modified
 		index.update(reporter, NullCancelable.getInstance());
-		assertEquals(1, counter[0]);
+		assertEquals(1, reporter.counter);
 		index.update(reporter, NullCancelable.getInstance());
-		assertEquals(1, counter[0]);
+		assertEquals(1, reporter.counter);
 		
 		// Index update must detect changes when files have been modified
 		ListMap<File, Integer> fileMap = ListMap.<File, Integer> create()
@@ -106,7 +104,7 @@ public final class FileIndexTest {
 			.add(subFile2, 1)
 			.add(subFile3, 1);
 		for (ListMap.Entry<File, Integer> entry : fileMap) {
-			counter[0] = 0;
+			reporter.counter = 0;
 			
 			File file = entry.getKey();
 			int expectedCount = entry.getValue().intValue();
@@ -118,16 +116,57 @@ public final class FileIndexTest {
 			index.update(reporter, NullCancelable.getInstance());
 			
 			String msg = String.format("On '%s'.", file.getName());
-			assertEquals(msg, expectedCount, counter[0]);
+			assertEquals(msg, expectedCount, reporter.counter);
 		}
 		
 		// Index update must detect change when HTML folder is deleted
 		Files.deleteRecursively(htmlDir);
-		counter[0] = 0;
+		reporter.counter = 0;
 		index.update(reporter, NullCancelable.getInstance());
-		assertEquals(1, counter[0]);
+		assertEquals(1, reporter.counter);
 		
 		Files.deleteRecursively(tempDir);
+	}
+	
+	@Test
+	public void testHtmlPairUpdateInSevenZip() throws Exception {
+		File testDir = new File(TestFiles.index_update_html_in_7z);
+		List<File> files = Arrays.asList(Util.listFiles(testDir));
+		Collections.sort(files);
+		
+		File originalFile = files.get(0);
+		File tempDir = Files.createTempDir();
+		File target = new File(tempDir, "target.7z");
+		
+		int[] expectedCounts = { 1, 1, 1, 1, 1, 0 };
+		assertEquals(expectedCounts.length, files.size() - 1);
+		
+		int i = 0;
+		for (File modifiedFile : files.subList(1, files.size())) {
+			IndexingConfig config = new IndexingConfig();
+			FileIndex index = new FileIndex(config, null, tempDir);
+			
+			Files.copy(originalFile, target);
+			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			
+			Files.copy(modifiedFile, target);
+			CountingReporter reporter2 = new CountingReporter();
+			index.update(reporter2, NullCancelable.getInstance());
+			assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
+			
+			Files.deleteDirectoryContents(tempDir);
+			i++;
+		}
+		
+		Files.deleteRecursively(tempDir);
+	}
+	
+	private static class CountingReporter extends IndexingReporter {
+		private int counter = 0;
+		
+		public void info(InfoType infoType, TreeNode treeNode) {
+			counter++;
+		}
 	}
 	
 	// TODO test: add more tests

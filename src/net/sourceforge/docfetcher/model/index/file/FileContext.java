@@ -160,15 +160,18 @@ class FileContext {
 			throws IndexingException {
 		try {
 			return index(doc, file, added);
-		} finally {
+		}
+		finally {
 			file.delete();
 		}
 	}
 	
-	public final void deleteFromIndex(@NotNull String uid) throws IndexingException {
+	public final void deleteFromIndex(@NotNull String uid)
+			throws IndexingException {
 		try {
 			writer.delete(uid);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IndexingException(e);
 		}
 	}

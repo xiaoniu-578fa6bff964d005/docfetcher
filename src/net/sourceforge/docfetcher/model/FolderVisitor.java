@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.model;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.model.index.Stoppable;
 
@@ -20,15 +20,16 @@ import net.sourceforge.docfetcher.model.index.Stoppable;
  */
 public class FolderVisitor<D extends Document<D, F>, F extends Folder<D, F>, T extends Throwable> extends Stoppable<T> {
 	
-	@NotNull
+	@Nullable
 	private final F root;
 
-	public FolderVisitor(@NotNull F root) {
+	public FolderVisitor(@Nullable F root) {
 		this.root = root;
 	}
 
 	protected final void doRun() {
-		visit(root);
+		if (root != null)
+			visit(root);
 	}
 
 	@RecursiveMethod

@@ -80,5 +80,8 @@ public final class TestFiles {
 	
 	public static final String multiple_dirs_rar =
 		create("multiple-dirs.rar");
+	
+	public static final String index_update_html_in_7z =
+		create("index-update-html-in-7z");
 
 }
