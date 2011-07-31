@@ -111,7 +111,7 @@ public final class ParseService {
 		}
 		Parser parser = findParser(config, file.getName());
 		if (parser == null)
-			throw new IllegalArgumentException(); // TODO make this a checked exception?
+			throw new ParseException(new ParserNotFoundException());
 		return doParse(config, parser, file, cancelable);
 	}
 
