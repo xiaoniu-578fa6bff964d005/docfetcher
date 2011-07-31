@@ -70,6 +70,26 @@ public final class IndexingQueue {
 							int reporterCapacity) {
 		this.indexRegistry = indexRegistry;
 		this.reporterCapacity = reporterCapacity;
+		
+		/*
+		 * In case of rebuild tasks, if a task is removed before it has entered
+		 * the indexing state, put the associated index back into the registry.
+		 * If the task has already entered the indexing state, putting the index
+		 * back into the registry is the responsibility of the worker thread.
+		 */
+		evtRemoved.add(new Event.Listener<Task>() {
+			public void update(Task task) {
+				if (!task.is(IndexAction.REBUILD))
+					return;
+				if (!task.is(TaskState.NOT_READY) && !task.is(TaskState.READY))
+					return;
+				LuceneIndex luceneIndex = task.getLuceneIndex();
+				assert !indexRegistry.getIndexes().contains(luceneIndex);
+				indexRegistry.addIndex(luceneIndex);
+				indexRegistry.save(luceneIndex);
+			}
+		});
+		
 		thread = new Thread(IndexingQueue.class.getName()) {
 			public void run() {
 				while (true) {
@@ -128,7 +148,7 @@ public final class IndexingQueue {
 							indexRegistry.save(luceneIndex);
 							boolean keep = task.is(CancelAction.KEEP);
 							boolean noErrors = true; // TODO
-							if (keep || noErrors)
+							if (keep || noErrors || shutdown)
 								remove(task);
 						}
 						task.set(TaskState.FINISHED);

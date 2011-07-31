@@ -48,7 +48,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.util.Version;
 
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 
 /**
  * @author Tran Nam Quang
@@ -149,10 +148,9 @@ public final class IndexRegistry {
 		int newPos = indexes.indexOf(index);
 		evtAdded.fire(new AddedEvent(index, newPos));
 	}
-
-	// Deletes the associated index directories
-	@VisibleForPackageGroup
-	public synchronized void removeIndexes(@NotNull Collection<LuceneIndex> indexesToRemove) {
+	
+	public synchronized void removeIndexes(	@NotNull Collection<LuceneIndex> indexesToRemove,
+											boolean deleteFiles) {
 		Util.checkNotNull(indexesToRemove);
 		if (indexesToRemove.isEmpty())
 			return; // Avoid firing event when given collection is empty
@@ -161,12 +159,8 @@ public final class IndexRegistry {
 		for (LuceneIndex index : indexesToRemove) {
 			if (!indexes.remove(index))
 				continue;
-			try {
-				Files.deleteRecursively(index.getIndexDir());
-			}
-			catch (IOException e) {
-				Util.printErr(e);
-			}
+			if (deleteFiles)
+				index.delete();
 			removed.add(index);
 		}
 		evtRemoved.fire(new RemovedEvent(removed));

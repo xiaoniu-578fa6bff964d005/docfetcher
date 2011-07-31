@@ -151,7 +151,10 @@ public final class IndexPanel {
 				IndexAction action = isUpdate
 					? IndexAction.UPDATE
 					: IndexAction.REBUILD;
-				for (LuceneIndex index : getSelectedIndexes())
+				List<LuceneIndex> sel = getSelectedIndexes();
+				if (!isUpdate)
+					indexRegistry.removeIndexes(sel, false);
+				for (LuceneIndex index : sel)
 					queue.addTask(index, action);
 				dialogFactory.open();
 			}
@@ -173,7 +176,7 @@ public final class IndexPanel {
 				int ans = AppUtil.showConfirmation(
 					"remove_orphaned_indexes_msg", false);
 				if (ans == SWT.OK)
-					indexRegistry.removeIndexes(selectedIndexes);
+					indexRegistry.removeIndexes(selectedIndexes, true);
 			}
 		});
 	}
