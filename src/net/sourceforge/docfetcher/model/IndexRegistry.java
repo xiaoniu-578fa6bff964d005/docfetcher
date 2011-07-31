@@ -59,28 +59,6 @@ public final class IndexRegistry {
 		public void handleExistingIndexes(@NotNull List<LuceneIndex> indexes);
 	}
 
-	public static final class AddedEvent {
-		public final LuceneIndex added;
-
-		/**
-		 * The new zero-based position of the index in its list.
-		 */
-		public final int newPos;
-
-		private AddedEvent(@NotNull LuceneIndex added, int newPos) {
-			this.added = added;
-			this.newPos = newPos;
-		}
-	}
-
-	public static final class RemovedEvent {
-		public final List<LuceneIndex> removed;
-
-		private RemovedEvent(@NotNull List<LuceneIndex> removed) {
-			this.removed = removed;
-		}
-	}
-
 	/*
 	 * TODO code convention: Don't access Version elsewhere, don't instantiate
 	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsehwere.
@@ -103,8 +81,8 @@ public final class IndexRegistry {
 	}
 
 	// These events must always be fired under lock!
-	private final Event<AddedEvent> evtAdded = new Event<AddedEvent>();
-	private final Event<RemovedEvent> evtRemoved = new Event<RemovedEvent>();
+	private final Event<LuceneIndex> evtAdded = new Event<LuceneIndex>();
+	private final Event<List<LuceneIndex>> evtRemoved = new Event<List<LuceneIndex>>();
 
 	private final File indexParentDir;
 	private final List<LuceneIndex> indexes = new ArrayList<LuceneIndex>();
@@ -145,8 +123,7 @@ public final class IndexRegistry {
 		if (indexes.contains(index)) return;
 		indexes.add(index);
 		Collections.sort(indexes, IndexComparator.instance);
-		int newPos = indexes.indexOf(index);
-		evtAdded.fire(new AddedEvent(index, newPos));
+		evtAdded.fire(index);
 	}
 	
 	public synchronized void removeIndexes(	@NotNull Collection<LuceneIndex> indexesToRemove,
@@ -163,7 +140,7 @@ public final class IndexRegistry {
 				index.delete();
 			removed.add(index);
 		}
-		evtRemoved.fire(new RemovedEvent(removed));
+		evtRemoved.fire(removed);
 	}
 
 	// Allows attaching a change listener and processing the existing indexes in
@@ -173,16 +150,16 @@ public final class IndexRegistry {
 	// Events may arrive from non-GUI threads; indexes handler runs in the same
 	// thread as the client
 	public synchronized void addListeners(	@NotNull ExistingIndexesHandler handler,
-											@NotNull Event.Listener<AddedEvent> addedListener,
-											@NotNull Event.Listener<RemovedEvent> removedListener) {
+											@NotNull Event.Listener<LuceneIndex> addedListener,
+											@NotNull Event.Listener<List<LuceneIndex>> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
 		handler.handleExistingIndexes(getIndexes());
 		evtAdded.add(addedListener);
 		evtRemoved.add(removedListener);
 	}
 	
-	public synchronized void removeListeners(	@NotNull Event.Listener<AddedEvent> addedListener,
-												@NotNull Event.Listener<RemovedEvent> removedListener) {
+	public synchronized void removeListeners(	@NotNull Event.Listener<LuceneIndex> addedListener,
+												@NotNull Event.Listener<List<LuceneIndex>> removedListener) {
 		Util.checkNotNull(addedListener, removedListener);
 		evtAdded.remove(addedListener);
 		evtRemoved.remove(removedListener);

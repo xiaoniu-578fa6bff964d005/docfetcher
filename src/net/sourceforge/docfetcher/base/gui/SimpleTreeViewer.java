@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.base.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ import com.google.common.collect.Maps;
  */
 public abstract class SimpleTreeViewer<E> {
 	
-	@Nullable private Iterable<E> rootElements;
+	private final List<E> rootElements = new ArrayList<E>();
 	private final Tree tree;
 	private final Map<E, TreeItem> elementToItemMap = Maps.newHashMap();
 	private final ItemDisposeListener itemDisposeListener = new ItemDisposeListener();
@@ -114,12 +114,16 @@ public abstract class SimpleTreeViewer<E> {
 		return (E) item.getData();
 	}
 	
-	public final void setRoots(@Nullable Iterable<E> rootElements) {
+	// elements that do not make it through the filter will be ignored
+	public final void setRoots(@NotNull Iterable<E> rootElements) {
+		Util.checkNotNull(rootElements);
 		tree.removeAll();
 		elementToItemMap.clear();
-		this.rootElements = rootElements;
-		if (rootElements == null) return;
-		for (E rootElement : filterAndSort(rootElements))
+		
+		this.rootElements.clear();
+		this.rootElements.addAll(filterAndSort(rootElements));
+		
+		for (E rootElement : this.rootElements)
 			createRootItemWithChildren(rootElement, -1);
 	}
 	
@@ -151,8 +155,12 @@ public abstract class SimpleTreeViewer<E> {
 		createChildItems(item, element);
 	}
 	
-	private TreeItem createItem(TreeItem parentItem, E element) {
-		TreeItem item = new TreeItem(parentItem, SWT.NONE);
+	private TreeItem createItem(TreeItem parentItem,
+								E element,
+								int insertionIndex) {
+		TreeItem item = insertionIndex < 0
+			? new TreeItem(parentItem, SWT.NONE)
+			: new TreeItem(parentItem, SWT.NONE, insertionIndex);
 		update(element, item);
 		item.addDisposeListener(itemDisposeListener);
 		elementToItemMap.put(element, item);
@@ -161,7 +169,7 @@ public abstract class SimpleTreeViewer<E> {
 
 	private void createChildItems(TreeItem parentItem, E parentElement) {
 		for (E child : getFilteredChildren(parentElement))
-			createItem(parentItem, child);
+			createItem(parentItem, child, -1);
 	}
 	
 	private void update(E element, TreeItem item) {
@@ -175,28 +183,41 @@ public abstract class SimpleTreeViewer<E> {
 		item.setData(element);
 	}
 	
-	private Collection<E> filterAndSort(Iterable<E> elements) {
-		List<E> newElements = new ArrayList<E> ();
-		for (E child : elements)
+	@NotNull
+	private List<E> filterAndSort(@Nullable Iterable<E> elements) {
+		if (elements == null)
+			return new ArrayList<E>(0); // must be mutable
+		Iterator<E> it = elements.iterator();
+		if (!it.hasNext())
+			return new ArrayList<E>(0); // must be mutable
+		List<E> newElements;
+		if (elements instanceof Collection) {
+			int size = ((Collection<?>) elements).size();
+			newElements = new ArrayList<E>(size);
+		}
+		else {
+			newElements = new ArrayList<E>();
+		}
+		do {
+			E child = it.next();
 			if (filter(child))
 				newElements.add(child);
+		} while (it.hasNext());
 		sort(newElements);
 		return newElements;
 	}
 
-	private Collection<E> getFilteredChildren(E parentElement) {
-		Iterable<E> elements = getChildren(parentElement);
-		if (elements == null)
-			elements = Collections.emptyList();
-		return filterAndSort(elements);
+	@NotNull
+	private List<E> getFilteredChildren(@NotNull E parentElement) {
+		return filterAndSort(getChildren(parentElement));
 	}
 	
 	/**
-	 * Returns the children of the given element, or null if there are no
+	 * Returns the children of the given element or null if there are no
 	 * children.
 	 */
 	@Nullable
-	protected abstract Iterable<E> getChildren(E element);
+	protected abstract Iterable<E> getChildren(@NotNull E element);
 	
 	@NotNull
 	protected abstract String getLabel(@NotNull E element);
@@ -231,8 +252,8 @@ public abstract class SimpleTreeViewer<E> {
 		return selection;
 	}
 	
-	public final void setSelection(@Nullable E... elements) {
-		if (elements == null) return;
+	public final void setSelection(@NotNull E... elements) {
+		Util.checkNotNull(elements);
 		TreeItem[] items = new TreeItem[elements.length];
 		for (int i = 0; i < elements.length; i++)
 			items[i] = elementToItemMap.get(elements[i]);
@@ -243,8 +264,8 @@ public abstract class SimpleTreeViewer<E> {
 		return tree.getSelectionCount();
 	}
 	
-	public final void update(@Nullable E element) {
-		if (element == null) return;
+	public final void update(@NotNull E element) {
+		Util.checkNotNull(element);
 		update(element, elementToItemMap.get(element));
 	}
 	
@@ -253,8 +274,8 @@ public abstract class SimpleTreeViewer<E> {
 			update(entry.getKey(), entry.getValue());
 	}
 	
-	public final void refreshChildren(@Nullable E element) {
-		if (element == null) return;
+	public final void refreshChildren(@NotNull E element) {
+		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
 		boolean expanded = item.getExpanded();
 		Map<E, Boolean> expandedStates = getExpandedStates(element);
@@ -271,21 +292,85 @@ public abstract class SimpleTreeViewer<E> {
 		setRoots(rootElements);
 	}
 	
-	public final void addRootItem(@Nullable E element, int index) {
-		if (element == null) return;
-		Util.checkThat(index >= 0);
+	public final void addRoot(@NotNull E element) {
+		Util.checkNotNull(element);
+		if (!filter(element))
+			return;
+		rootElements.add(element);
+		sort(rootElements);
+		int index = rootElements.indexOf(element);
 		createRootItemWithChildren(element, index);
 	}
 	
-	public final void remove(@Nullable E element) {
-		if (element == null) return;
-		TreeItem item = elementToItemMap.get(element);
-		item.removeAll();
-		item.dispose();
+	public final void add(@NotNull E parent, @NotNull E element) {
+		Util.checkNotNull(parent, element);
+		TreeItem parentItem = elementToItemMap.get(parent);
+		
+		if (parentItem == null) // Parent item is not visible yet
+			return;
+		
+		// Ignore add request if the given element is "out of range"
+		TreeItem parentParentItem = parentItem.getParentItem();
+		if (parentParentItem != null && !parentParentItem.getExpanded())
+			return;
+		
+		if (!filter(element)) // Ignore filtered elements
+			return;
+		
+		if (elementToItemMap.get(element) != null) // TreeItem already exists
+			return;
+		
+		// If there are no siblings, then just create a new TreeItem
+		Iterable<E> children = getChildren(parent);
+		if (children == null) {
+			createItem(parentItem, element, -1);
+			return;
+		}
+		Iterator<E> it = children.iterator();
+		if (!it.hasNext()) {
+			createItem(parentItem, element, -1);
+			return;
+		}
+		
+		/*
+		 * If the parent element has children, then check if the given element
+		 * is one of these children.
+		 */
+		
+		List<E> newChildren;
+		if (children instanceof Collection) {
+			int size = ((Collection<?>) children).size();
+			newChildren = new ArrayList<E>(size + 1);
+		}
+		else {
+			newChildren = new ArrayList<E>();
+		}
+		
+		boolean found = false;
+		do {
+			E next = it.next();
+			if (next == element)
+				found = true;
+			if (filter(next))
+				newChildren.add(next);
+		} while (it.hasNext());
+		
+		if (!found)
+			newChildren.add(element);
+		sort(newChildren);
+		int index = newChildren.indexOf(element);
+		createItem(parentItem, element, index);
 	}
 	
-	public final void remove(@Nullable Iterable<E> elements) {
-		if (elements == null) return;
+	public final void remove(@NotNull E element) {
+		Util.checkNotNull(element);
+		TreeItem item = elementToItemMap.get(element);
+		item.removeAll();
+		item.dispose(); // will remove element from map
+	}
+	
+	public final void remove(@NotNull Iterable<E> elements) {
+		Util.checkNotNull(elements);
 		tree.setRedraw(false);
 		for (E element : elements) {
 			TreeItem item = elementToItemMap.get(element);
@@ -296,7 +381,7 @@ public abstract class SimpleTreeViewer<E> {
 			 * methods are called.
 			 */
 			item.removeAll();
-			item.dispose();
+			item.dispose(); // will remove element from map
 		}
 		tree.setRedraw(true);
 	}
@@ -329,11 +414,11 @@ public abstract class SimpleTreeViewer<E> {
 	
 	@NotNull
 	public final List<E> getElements() {
-		return new ArrayList<E> (elementToItemMap.keySet());
+		return new ArrayList<E>(elementToItemMap.keySet());
 	}
 	
-	public final void expand(@Nullable E element) {
-		if (element == null) return;
+	public final void expand(@NotNull E element) {
+		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
 		if (item.getExpanded()) return;
 		for (E child : getFilteredChildren(element))
@@ -341,8 +426,8 @@ public abstract class SimpleTreeViewer<E> {
 		item.setExpanded(true);
 	}
 	
-	public final void collapse(@Nullable E element) {
-		if (element == null) return;
+	public final void collapse(@NotNull E element) {
+		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
 		if (! item.getExpanded()) return;
 		for (E child : getFilteredChildren(element))
@@ -355,13 +440,14 @@ public abstract class SimpleTreeViewer<E> {
 	 * element exists. The point is in the coordinate system of the receiver.
 	 */
 	@Nullable
-	public final E getElement(@Nullable Point point) {
+	public final E getElement(@NotNull Point point) {
+		Util.checkNotNull(point);
 		TreeItem item = tree.getItem(point);
 		return getElement(item);
 	}
 	
-	public final void showElement(@Nullable E element) {
-		if (element == null) return;
+	public final void showElement(@NotNull E element) {
+		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
 		tree.showItem(item);
 		tree.setSelection(item);

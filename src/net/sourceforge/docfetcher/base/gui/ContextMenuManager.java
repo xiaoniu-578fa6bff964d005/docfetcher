@@ -16,8 +16,10 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Control;
@@ -30,13 +32,16 @@ import org.eclipse.swt.widgets.Shell;
 public final class ContextMenuManager {
 	
 	public static void main(String[] args) {
-		Display display = new Display();
+		final Display display = new Display();
 		Shell shell = new Shell(display);
 		shell.setLayout(Util.createFillLayout(5));
 		Util.setCenteredBounds(shell, 400, 300);
 		
+		final int timeout = 2000;
+		
 		Label label = new Label(shell, SWT.CENTER);
-		label.setText("Right-click on the area below");
+		label.setText("Right-click on the area below to open the menu.\n" +
+				String.format("(It will automatically close after %d ms.)", timeout));
 		
 		class MyMenuAction extends MenuAction {
 			private final String label;
@@ -64,6 +69,17 @@ public final class ContextMenuManager {
 		menuManager.add(submenu, new MyMenuAction("sub-item 1", true));
 		menuManager.add(submenu, new MyMenuAction("sub-item 2", false));
 		menuManager.addSeparator(submenu);
+		
+		final Menu menu = label.getMenu();
+		menu.addMenuListener(new MenuAdapter() {
+			public void menuShown(MenuEvent e) {
+				display.timerExec(timeout, new Runnable() {
+					public void run() {
+						menu.setVisible(false);
+					}
+				});
+			}
+		});
 
 		shell.open();
 		while (!shell.isDisposed()) {
@@ -112,7 +128,13 @@ public final class ContextMenuManager {
 		item.setData(action);
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				action.run();
+				/*
+				 * The conditions required to execute the action might have
+				 * changed while the context menu was displayed, so we should
+				 * double-check before executing the action.
+				 */
+				if (action.isEnabled())
+					action.run();
 			}
 		});
 	}

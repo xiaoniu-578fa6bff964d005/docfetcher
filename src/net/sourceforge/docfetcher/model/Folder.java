@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.UtilGlobal;
+import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
@@ -41,8 +42,26 @@ public abstract class Folder
 		boolean matches(T candidate);
 	}
 	
+	public static final class FolderEvent {
+		public final Folder<?, ?> parent;
+		public final Folder<?, ?> folder;
+
+		@VisibleForPackageGroup
+		public FolderEvent(	@NotNull Folder<?, ?> parent,
+							@NotNull Folder<?, ?> folder) {
+			Util.checkNotNull(parent, folder);
+			this.parent = parent;
+			this.folder = folder;
+		}
+	}
+	
+	// Making these events non-static would lead to trouble with serialization
+	public static final Event<FolderEvent> evtFolderAdded = new Event<FolderEvent>();
+	public static final Event<FolderEvent> evtFolderRemoved = new Event<FolderEvent>();
+	
 	/*
-	 * The children are stored as maps for several reasons:
+	 * The children of instances of this class are stored as maps for the
+	 * following reasons:
 	 * 
 	 * (1) Running an index update involves computing a tree diff, which
 	 * requires quick access to the children using a string-valued identifier
@@ -53,11 +72,6 @@ public abstract class Folder
 	 * with the same identifier, since documents and subfolders are stored in
 	 * different maps.)
 	 * 
-	 * (3) Filtering the search results by location requires fast
-	 * identifier-based traversal of the tree in order to determine whether a
-	 * particular result item is checked in the tree viewer or not. TODO doc:
-	 * still relevant?
-	 * 
 	 * These maps are set to null when they're empty in order to avoid wasting
 	 * RAM when the tree is very large and has many empty leaf nodes.
 	 */
@@ -66,7 +80,8 @@ public abstract class Folder
 	/**
 	 * This field is only marked public because of limitations of Java's
 	 * visibility rules. Do not access this field directly, unless you know what
-	 * you are doing.
+	 * you are doing. (Hint: Set this field to null when the hash map is empty
+	 * and fire events of type Folder.evtFolder* when appropriate.)
 	 */
 	@Nullable public HashMap<String, F> subFolders;
 	
@@ -105,6 +120,7 @@ public abstract class Folder
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
 		subFolders.put(folder.getName(), folder);
+		evtFolderAdded.fire(new FolderEvent(this, folder));
 	}
 	
 	/**
@@ -128,8 +144,10 @@ public abstract class Folder
 			documents = null;
 		}
 		if (subFolders != null) {
-			subFolders.clear();
+			Collection<F> toNotify = subFolders.values();
 			subFolders = null;
+			for (F subFolder : toNotify)
+				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 		}
 	}
 	
@@ -143,6 +161,7 @@ public abstract class Folder
 		Util.checkThat(candidate == subFolder);
 		if (subFolders.isEmpty())
 			subFolders = null;
+		evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
 	
 	public final void removeDocuments(@NotNull Predicate<D> predicate) {
@@ -164,8 +183,10 @@ public abstract class Folder
 		Iterator<F> subFolderIt = subFolders.values().iterator();
 		while (subFolderIt.hasNext()) {
 			F subFolder = subFolderIt.next();
-			if (predicate.matches(subFolder))
+			if (predicate.matches(subFolder)) {
 				subFolderIt.remove();
+				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
+			}
 		}
 		if (subFolders.isEmpty())
 			subFolders = null;

@@ -208,13 +208,13 @@ public final class IndexingQueue {
 				 * file or directory and is in ready state.
 				 * 
 				 * This is not a bullet-proof way to avoid unnecessary updates
-				 * and ensure that any necessary updates are run: Going through
-				 * the queue, we could find a ready task with a matching target,
-				 * and reject the enqueue request based on that, but the user
-				 * could later cancel the ready task, thus skipping an update
-				 * that should have been run. However, the approach here should
-				 * work well enough, assuming that it is very unlikely that the
-				 * user will cancel ready tasks.
+				 * while ensuring that any necessary updates are run: Going
+				 * through the queue, we could find a ready task with a matching
+				 * target, and reject the enqueue request based on that, but the
+				 * user could later cancel the ready task, thus skipping an
+				 * update that should have been run. However, the approach here
+				 * should work well enough, assuming that it is very unlikely
+				 * that the user will cancel ready tasks.
 				 */
 				for (Task queueTask : tasks)
 					if (queueTask.is(TaskState.READY)

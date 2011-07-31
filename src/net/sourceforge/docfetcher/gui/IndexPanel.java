@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.gui;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.docfetcher.UtilGlobal;
@@ -28,10 +30,10 @@ import net.sourceforge.docfetcher.base.gui.SimpleTreeViewer;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.indexing.IndexingDialog;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory;
+import net.sourceforge.docfetcher.model.Folder;
+import net.sourceforge.docfetcher.model.Folder.FolderEvent;
 import net.sourceforge.docfetcher.model.IndexRegistry;
-import net.sourceforge.docfetcher.model.IndexRegistry.AddedEvent;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
-import net.sourceforge.docfetcher.model.IndexRegistry.RemovedEvent;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.ViewNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -42,9 +44,14 @@ import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 
@@ -70,10 +77,17 @@ public final class IndexPanel {
 		Util.checkNotNull(parent, indexRegistry);
 		this.indexRegistry = indexRegistry;
 
-		dialogFactory = new DialogFactory(
-			parent.getShell()) {
+		dialogFactory = new DialogFactory(parent.getShell()) {
 			protected IndexingDialog createDialog(Shell shell) {
 				return new IndexingDialog(shell, indexRegistry);
+			}
+		};
+		
+		final Comparator<ViewNode> viewNodeComparator = new Comparator<ViewNode>() {
+			public int compare(ViewNode o1, ViewNode o2) {
+				String name1 = o1.getDisplayName();
+				String name2 = o2.getDisplayName();
+				return name1.compareTo(name2); // TODO use alphanum comparator
 			}
 		};
 
@@ -95,26 +109,53 @@ public final class IndexPanel {
 				element.setChecked(checked);
 				evtCheckStatesChanged.fire(null);
 			}
+			
+			protected void sort(List<ViewNode> unsortedElements) {
+				Collections.sort(unsortedElements, viewNodeComparator);
+			}
 		};
 		tree = viewer.getControl();
+		
+		/*
+		 * Update the tree viewer when the internal tree structure changes. This
+		 * can be caused by an index update running in the background.
+		 */
+		Folder.evtFolderAdded.add(new Event.Listener<FolderEvent>() {
+			public void update(final FolderEvent eventData) {
+				Util.runSWTSafe(tree, new Runnable() {
+					public void run() {
+						viewer.add(eventData.parent, eventData.folder);
+					}
+				});
+			}
+		});
+		Folder.evtFolderRemoved.add(new Event.Listener<FolderEvent>() {
+			public void update(final FolderEvent eventData) {
+				Util.runSWTSafe(tree, new Runnable() {
+					public void run() {
+						viewer.remove(eventData.folder);
+					}
+				});
+			}
+		});
 
 		indexRegistry.addListeners(new ExistingIndexesHandler() {
 			public void handleExistingIndexes(final List<LuceneIndex> indexes) {
 				viewer.setRoots(UtilGlobal.<ViewNode> convert(indexes));
 			}
-		}, new Event.Listener<AddedEvent>() {
-			public void update(final AddedEvent eventData) {
+		}, new Event.Listener<LuceneIndex>() {
+			public void update(final LuceneIndex eventData) {
 				Util.runSWTSafe(tree, new Runnable() {
 					public void run() {
-						viewer.addRootItem(eventData.added, eventData.newPos);
+						viewer.addRoot(eventData);
 					}
 				});
 			}
-		}, new Event.Listener<RemovedEvent>() {
-			public void update(final RemovedEvent eventData) {
+		}, new Event.Listener<List<LuceneIndex>>() {
+			public void update(final List<LuceneIndex> eventData) {
 				Util.runSWTSafe(tree, new Runnable() {
 					public void run() {
-						viewer.remove(UtilGlobal.<ViewNode> convert(eventData.removed));
+						viewer.remove(UtilGlobal.<ViewNode> convert(eventData));
 					}
 				});
 			}
@@ -177,6 +218,40 @@ public final class IndexPanel {
 					"remove_orphaned_indexes_msg", false);
 				if (ans == SWT.OK)
 					indexRegistry.removeIndexes(selectedIndexes, true);
+			}
+		});
+		
+		/*
+		 * Hide the context menu if the tree element on which the user opened
+		 * the menu is removed by an index update running in the background.
+		 */
+		final Menu menu = tree.getMenu();
+		final ViewNode[] clickedNode = { null };
+		final Event.Listener<FolderEvent> menuHider = new Event.Listener<FolderEvent>() {
+			public void update(FolderEvent eventData) {
+				if (eventData == null)
+					return;
+				if (eventData.folder != clickedNode[0])
+					return;
+				Util.runSWTSafe(tree, new Runnable() {
+					public void run() {
+						menu.setVisible(false);
+					}
+				});
+			}
+		};
+		menu.addMenuListener(new MenuAdapter() {
+			public void menuShown(MenuEvent e) {
+				Display display = tree.getDisplay();
+				Point pos = display.getCursorLocation();
+				pos = display.map(null, tree, pos);
+				// TODO test on Windows that the model node is always found
+				clickedNode[0] = viewer.getElement(pos);
+				if (clickedNode[0] != null)
+					Folder.evtFolderRemoved.add(menuHider);
+			}
+			public void menuHidden(MenuEvent e) {
+				Folder.evtFolderRemoved.remove(menuHider);
 			}
 		});
 	}

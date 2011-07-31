@@ -26,9 +26,7 @@ import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Field;
 import net.sourceforge.docfetcher.model.IndexRegistry;
-import net.sourceforge.docfetcher.model.IndexRegistry.AddedEvent;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
-import net.sourceforge.docfetcher.model.IndexRegistry.RemovedEvent;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.UtilModel.QueryWrapper;
@@ -94,8 +92,8 @@ public final class WebSearcher {
 	private static final int PAGE_SIZE = Math.min(1, ProgramConf.Int.WebInterfacePageSize.get());
 	
 	private final IndexRegistry indexRegistry;
-	private final Event.Listener<AddedEvent> addedListener;
-	private final Event.Listener<RemovedEvent> removedListener;
+	private final Event.Listener<LuceneIndex> addedListener;
+	private final Event.Listener<List<LuceneIndex>> removedListener;
 	
 	@NotNull
 	private MultiSearcher searcher;
@@ -111,13 +109,13 @@ public final class WebSearcher {
 	public WebSearcher(@NotNull IndexRegistry indexRegistry) throws IOException {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
 		
-		addedListener = new Event.Listener<AddedEvent>() {
-			public void update(AddedEvent eventData) {
+		addedListener = new Event.Listener<LuceneIndex>() {
+			public void update(LuceneIndex eventData) {
 				replaceLuceneSearcher();
 			}
 		};
-		removedListener = new Event.Listener<RemovedEvent>() {
-			public void update(RemovedEvent eventData) {
+		removedListener = new Event.Listener<List<LuceneIndex>>() {
+			public void update(List<LuceneIndex> eventData) {
 				replaceLuceneSearcher();
 			}
 		};

@@ -25,6 +25,8 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.model.Folder;
+import net.sourceforge.docfetcher.model.Folder.FolderEvent;
 import net.sourceforge.docfetcher.model.Folder.Predicate;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
@@ -291,6 +293,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					continue; // not an HTML folder
 				htmlEntry.setHtmlFolder(subFolder); // attach HTML folder to HTML file
 				subFolderIt.remove(); // detach HTML folder from previous parent folder
+				Folder.evtFolderRemoved.fire(new FolderEvent(folder, subFolder));
 				isHtmlFolder = true;
 				break;
 			}

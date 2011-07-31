@@ -25,7 +25,8 @@ import java.lang.annotation.Target;
 @Target({
 	ElementType.TYPE,
 	ElementType.FIELD,
-	ElementType.METHOD
+	ElementType.METHOD,
+	ElementType.CONSTRUCTOR
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface VisibleForPackageGroup {
