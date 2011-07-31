@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 import com.sun.jna.platform.win32.Shell32Util;
 
@@ -106,8 +107,21 @@ public final class IndexPanel {
 			}
 			
 			protected void setChecked(ViewNode element, boolean checked) {
-				element.setChecked(checked);
+				setCheckedRecursively(element, checked);
+				setCheckedRecursively(viewer.getItem(element), checked);
 				evtCheckStatesChanged.fire(null);
+			}
+			
+			private void setCheckedRecursively(ViewNode element, boolean checked) {
+				element.setChecked(checked);
+				for (ViewNode child : element.getChildren())
+					setCheckedRecursively(child, checked);
+			}
+			
+			private void setCheckedRecursively(TreeItem item, boolean checked) {
+				item.setChecked(checked);
+				for (TreeItem child : item.getItems())
+					setCheckedRecursively(child, checked);
 			}
 			
 			protected void sort(List<ViewNode> unsortedElements) {

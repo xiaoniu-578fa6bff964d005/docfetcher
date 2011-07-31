@@ -448,6 +448,12 @@ public abstract class SimpleTreeViewer<E> {
 		return getElement(item);
 	}
 	
+	@Nullable
+	public final TreeItem getItem(@NotNull E element) {
+		Util.checkNotNull(element);
+		return elementToItemMap.get(element);
+	}
+	
 	public final void showElement(@NotNull E element) {
 		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
