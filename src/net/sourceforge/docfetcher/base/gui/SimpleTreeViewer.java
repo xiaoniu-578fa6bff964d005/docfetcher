@@ -443,6 +443,8 @@ public abstract class SimpleTreeViewer<E> {
 	public final E getElement(@NotNull Point point) {
 		Util.checkNotNull(point);
 		TreeItem item = tree.getItem(point);
+		if (item == null)
+			return null;
 		return getElement(item);
 	}
 	

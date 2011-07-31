@@ -205,7 +205,7 @@ public final class IndexPanel {
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction("Delete Index...") {
+		menuManager.add(new MenuAction("Remove Index...") {
 			public boolean isEnabled() {
 				return isOnlyIndexesSelected();
 			}
@@ -215,9 +215,29 @@ public final class IndexPanel {
 				assert !selectedIndexes.isEmpty();
 				// TODO i18n
 				int ans = AppUtil.showConfirmation(
-					"remove_orphaned_indexes_msg", false);
+					"remove_sel_indexes", false);
 				if (ans == SWT.OK)
 					indexRegistry.removeIndexes(selectedIndexes, true);
+			}
+		});
+		
+		menuManager.add(new MenuAction("Remove Orphaned Indexes...") {
+			public boolean isEnabled() {
+				return tree.getItemCount() > 0;
+			}
+			public void run() {
+				List<LuceneIndex> indexes = indexRegistry.getIndexes();
+				List<LuceneIndex> toRemove = new ArrayList<LuceneIndex>(indexes.size());
+				for (LuceneIndex index : indexes)
+					if (!index.getRootFile().exists())
+						toRemove.add(index);
+				if (toRemove.isEmpty())
+					return;
+				// TODO i18n; also display the indexes to be removed
+				int ans = AppUtil.showConfirmation(
+					"remove_orphaned_indexes_msg", false);
+				if (ans == SWT.OK)
+					indexRegistry.removeIndexes(toRemove, true);
 			}
 		});
 		
