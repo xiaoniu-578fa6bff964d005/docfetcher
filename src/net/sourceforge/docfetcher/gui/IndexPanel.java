@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.base.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.base.gui.InputLoop;
 import net.sourceforge.docfetcher.base.gui.MenuAction;
@@ -110,18 +111,6 @@ public final class IndexPanel {
 				setCheckedRecursively(element, checked);
 				setCheckedRecursively(viewer.getItem(element), checked);
 				evtCheckStatesChanged.fire(null);
-			}
-			
-			private void setCheckedRecursively(ViewNode element, boolean checked) {
-				element.setChecked(checked);
-				for (ViewNode child : element.getChildren())
-					setCheckedRecursively(child, checked);
-			}
-			
-			private void setCheckedRecursively(TreeItem item, boolean checked) {
-				item.setChecked(checked);
-				for (TreeItem child : item.getItems())
-					setCheckedRecursively(child, checked);
 			}
 			
 			protected void sort(List<ViewNode> unsortedElements) {
@@ -235,7 +224,7 @@ public final class IndexPanel {
 			}
 		});
 		
-		menuManager.add(new MenuAction("Remove Orphaned Indexes...") {
+		menuManager.add(new MenuAction("Remove Orphaned Indexes") {
 			public boolean isEnabled() {
 				return tree.getItemCount() > 0;
 			}
@@ -252,6 +241,49 @@ public final class IndexPanel {
 					"remove_orphaned_indexes_msg", false);
 				if (ans == SWT.OK)
 					indexRegistry.removeIndexes(toRemove, true);
+			}
+		});
+		
+		menuManager.addSeparator();
+		
+		class CheckAllAction extends MenuAction {
+			private final boolean checkAll;
+			public CheckAllAction(boolean checkAll) {
+				super(checkAll ? "Check All" : "Uncheck All");
+				this.checkAll = checkAll;
+			}
+			public boolean isEnabled() {
+				return tree.getItemCount() > 0;
+			}
+			public void run() {
+				for (ViewNode element : viewer.getRoots()) {
+					setCheckedRecursively(element, checkAll);
+					setCheckedRecursively(viewer.getItem(element), checkAll);
+				}
+				evtCheckStatesChanged.fire(null);
+			}
+		}
+		menuManager.add(new CheckAllAction(true));
+		menuManager.add(new CheckAllAction(false));
+		
+		menuManager.add(new MenuAction("Toggle Individual Check State") {
+			public boolean isEnabled() {
+				return !viewer.getSelection().isEmpty();
+			}
+			public void run() {
+				boolean allChecked = true;
+				List<ViewNode> selection = viewer.getSelection();
+				for (ViewNode element : selection) {
+					if (!element.isChecked()) {
+						allChecked = false;
+						break;
+					}
+				}
+				for (ViewNode element : selection) {
+					element.setChecked(!allChecked);
+					viewer.getItem(element).setChecked(!allChecked);
+				}
+				evtCheckStatesChanged.fire(null);
 			}
 		});
 		
@@ -309,6 +341,21 @@ public final class IndexPanel {
 			if (viewNode.isIndex())
 				rootSelection.add((LuceneIndex) viewNode);
 		return rootSelection;
+	}
+	
+	@RecursiveMethod
+	private void setCheckedRecursively(	@NotNull ViewNode element,
+										boolean checked) {
+		element.setChecked(checked);
+		for (ViewNode child : element.getChildren())
+			setCheckedRecursively(child, checked);
+	}
+	
+	@RecursiveMethod
+	private void setCheckedRecursively(@NotNull TreeItem item, boolean checked) {
+		item.setChecked(checked);
+		for (TreeItem child : item.getItems())
+			setCheckedRecursively(child, checked);
 	}
 
 	@NotNull
