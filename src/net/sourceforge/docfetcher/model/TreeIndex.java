@@ -39,12 +39,6 @@ public abstract class TreeIndex <
 	@NotNull private final F rootFolder;
 	@NotNull private C config;
 	
-	/*
-	 * This field is marked as volatile because it will be accessed from another
-	 * thread during search.
-	 */
-	private volatile boolean isChecked = true;
-	
 	// if indexDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir
 	protected TreeIndex(@NotNull C config,
@@ -131,11 +125,11 @@ public abstract class TreeIndex <
 	}
 	
 	public final boolean isChecked() {
-		return isChecked;
+		return rootFolder.isChecked();
 	}
 	
 	public final void setChecked(boolean isChecked) {
-		this.isChecked = isChecked;
+		rootFolder.setChecked(isChecked);
 	}
 	
 	@NotNull
