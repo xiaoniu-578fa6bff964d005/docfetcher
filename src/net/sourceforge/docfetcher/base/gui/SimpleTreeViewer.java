@@ -135,7 +135,10 @@ public abstract class SimpleTreeViewer<E> {
 	private class ItemDisposeListener implements DisposeListener {
 		public void widgetDisposed(DisposeEvent e) {
 			TreeItem item = (TreeItem) e.widget;
-			elementToItemMap.remove(getElement(item));
+			E element = getElement(item);
+			elementToItemMap.remove(element);
+			if (item.getParentItem() == null)
+				rootElements.remove(element);
 			
 			/*
 			 * This is not necessary because when an item is disposed, it will
@@ -296,7 +299,8 @@ public abstract class SimpleTreeViewer<E> {
 		Util.checkNotNull(element);
 		if (!filter(element))
 			return;
-		rootElements.add(element);
+		if (!rootElements.contains(element))
+			rootElements.add(element);
 		sort(rootElements);
 		int index = rootElements.indexOf(element);
 		createRootItemWithChildren(element, index);
