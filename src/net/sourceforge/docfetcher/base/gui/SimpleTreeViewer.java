@@ -366,18 +366,29 @@ public abstract class SimpleTreeViewer<E> {
 		createItem(parentItem, element, index);
 	}
 	
+	// Will do nothing if the element is not registered
 	public final void remove(@NotNull E element) {
 		Util.checkNotNull(element);
 		TreeItem item = elementToItemMap.get(element);
+		
+		// The tree item might have been disposed by another remove call
+		if (item == null)
+			return;
+		
 		item.removeAll();
 		item.dispose(); // will remove element from map
 	}
 	
+	// Will ignore elements that are not registered
 	public final void remove(@NotNull Iterable<E> elements) {
 		Util.checkNotNull(elements);
 		tree.setRedraw(false);
 		for (E element : elements) {
 			TreeItem item = elementToItemMap.get(element);
+			
+			// The tree item might have been disposed by another remove call
+			if (item == null)
+				continue;
 			
 			/*
 			 * No need to remove the element from the map, this will be done by
