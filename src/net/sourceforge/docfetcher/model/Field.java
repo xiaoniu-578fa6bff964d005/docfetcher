@@ -40,7 +40,7 @@ public enum Field {
 	 */
 	
 	// Fields available for files and emails
-	UID (Store.YES, Index.NO),
+	UID (Store.YES, Index.NOT_ANALYZED), // Index.NO will cause deletions to fail
 	CONTENT (Store.NO, Index.ANALYZED),
 	TYPE (Store.YES, Index.NO), // file extension or email type (outlook, imap, etc.)
 	// The following must be stored as a numeric field in order to enable

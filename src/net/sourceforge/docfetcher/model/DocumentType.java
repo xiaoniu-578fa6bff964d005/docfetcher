@@ -23,7 +23,7 @@ public enum DocumentType {
 	OUTLOOK (true),
 	;
 	
-	private final String prefix = name().toLowerCase() + ":///";
+	private final String prefix = name().toLowerCase() + "://";
 	private final boolean isEmail;
 	
 	private DocumentType(boolean isEmail) {

@@ -31,6 +31,7 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import org.apache.lucene.store.Directory;
 import org.junit.Test;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 /**
@@ -174,6 +175,35 @@ public final class FileIndexTest {
 			if (infoType == InfoType.EXTRACTING)
 				counter++;
 		}
+	}
+	
+	/**
+	 * Checks that the index update removes an old tree object and adds a new
+	 * tree object when a subfolder is renamed.
+	 */
+	@Test
+	public void testIndexUpdateAfterFolderRenaming() throws Exception {
+		File tempDir = Files.createTempDir();
+		
+		// Set up subfolder
+		File subDir1 = new File(tempDir, "Test1");
+		subDir1.mkdir();
+		File textFile = new File(subDir1, "test.txt");
+		Files.write("Hello World", textFile, Charsets.UTF_8);
+		
+		// Create index
+		IndexingConfig config = new IndexingConfig();
+		FileIndex index = new FileIndex(config, null, tempDir);
+		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		UtilModel.assertDocCount(index.getLuceneDir(), 1);
+		
+		// Rename subfolder, then update index
+		File subDir2 = new File(tempDir, "Test2");
+		subDir1.renameTo(subDir2);
+		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		UtilModel.assertDocCount(index.getLuceneDir(), 1);
+		
+		Files.deleteRecursively(tempDir);
 	}
 	
 	// TODO test: add more tests

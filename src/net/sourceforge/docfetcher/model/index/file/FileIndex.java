@@ -32,6 +32,7 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter.InfoType;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -374,7 +375,25 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			context.deleteFromIndex(doc.getUniqueId());
 		}
 		for (FileFolder subFolder : unseenSubFolders.values())
-			folder.removeSubFolder(subFolder);
+			detachMissingSubFolder(context, folder, subFolder);
+	}
+	
+	private static void detachMissingSubFolder(	@NotNull final FileContext context,
+												@NotNull final FileFolder parent,
+												@NotNull FileFolder missingFolder)
+			throws IndexingException {
+		parent.removeSubFolder(missingFolder);
+		new FileFolderVisitor<IndexingException>(missingFolder) {
+			public void visitDocument(	FileFolder parent,
+			                          	FileDocument fileDocument) {
+				try {
+					context.deleteFromIndex(fileDocument.getUniqueId());
+				}
+				catch (IndexingException e) {
+					stop(e); // stop visitor
+				}
+			}
+		}.run();
 	}
 
 	// Returns true if the caller can skip processing the given archive file
@@ -551,19 +570,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			oldFolder.getSubFolderMap(), newFolder.getSubFolderMap()) {
 			// Missing subfolders
 			protected void handleOnlyLeft(@NotNull FileFolder oldSubFolder) {
-				oldFolder.removeSubFolder(oldSubFolder);
 				try {
-					new FileFolderVisitor<IndexingException>(oldSubFolder) {
-						public void visitDocument(	FileFolder parent,
-													FileDocument fileDocument) {
-							try {
-								context.deleteFromIndex(fileDocument.getUniqueId());
-							}
-							catch (IndexingException e) {
-								stop(e); // stop visitor
-							}
-						}
-					}.run();
+					detachMissingSubFolder(context, oldFolder, oldSubFolder);
 				}
 				catch (IndexingException e) {
 					stop(e); // stop subfolder diff
