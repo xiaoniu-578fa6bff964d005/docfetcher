@@ -260,6 +260,12 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 					else if (doc.isModified(context, file, null)) {
 						doc.setLastModified(file.lastModified());
 						doc.setHtmlFolder(null);
+						
+						/*
+						 * Try to index the file. If this fails, remove it from
+						 * the Lucene index, but keep it in the tree so we won't
+						 * index it again on the next index update.
+						 */
 						if (!context.index(doc, file, false))
 							context.deleteFromIndex(doc.getUniqueId());
 					}
@@ -371,8 +377,14 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 
 		// Handle missing files and folders
 		for (FileDocument doc : unseenDocs.values()) {
-			folder.removeDocument(doc);
+			/*
+			 * Note: Deleting the document from the Lucene index requires
+			 * constructing the document's UID using the parent folder's path,
+			 * so we must do this before detaching the document from the parent
+			 * folder.
+			 */
 			context.deleteFromIndex(doc.getUniqueId());
+			folder.removeDocument(doc);
 		}
 		for (FileFolder subFolder : unseenSubFolders.values())
 			detachMissingSubFolder(context, folder, subFolder);
@@ -534,9 +546,11 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			oldFolder.getDocumentMap(), newFolder.getDocumentMap()) {
 			// Missing documents
 			protected void handleOnlyLeft(@NotNull FileDocument doc) {
+				// Must retrieve UID before detaching from parent
+				String uniqueId = doc.getUniqueId();
 				oldFolder.removeDocument(doc);
 				try {
-					context.deleteFromIndex(doc.getUniqueId());
+					context.deleteFromIndex(uniqueId);
 				}
 				catch (IndexingException e) {
 					stop(e);

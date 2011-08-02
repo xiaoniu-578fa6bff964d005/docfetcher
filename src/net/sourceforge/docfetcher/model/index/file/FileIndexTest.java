@@ -21,6 +21,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.ListMap;
+import net.sourceforge.docfetcher.base.ListMap.Entry;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.TreeNode;
@@ -178,8 +179,7 @@ public final class FileIndexTest {
 	}
 	
 	/**
-	 * Checks that the index update removes an old tree object and adds a new
-	 * tree object when a subfolder is renamed.
+	 * Checks that the index update works correctly after a folder is renamed.
 	 */
 	@Test
 	public void testIndexUpdateAfterFolderRenaming() throws Exception {
@@ -206,6 +206,61 @@ public final class FileIndexTest {
 		Files.deleteRecursively(tempDir);
 	}
 	
-	// TODO test: add more tests
-
+	/**
+	 * Checks that the index update works correctly after a file is renamed.
+	 */
+	@Test
+	public void testIndexUpdateAfterFileRenaming() throws Exception {
+		File tempDir = Files.createTempDir();
+		
+		File textFile = new File(tempDir, "test.txt");
+		Files.write("Hello World", textFile, Charsets.UTF_8);
+		
+		IndexingConfig config = new IndexingConfig();
+		FileIndex index = new FileIndex(config, null, tempDir);
+		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		UtilModel.assertDocCount(index.getLuceneDir(), 1);
+		
+		textFile.renameTo(new File(tempDir, "test2.txt"));
+		
+		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		UtilModel.assertDocCount(index.getLuceneDir(), 1);
+		
+		Files.deleteRecursively(tempDir);
+	}
+	
+	/**
+	 * Checks that the index update works correctly after an archive entry
+	 * (either a file or a folder) inside a 7z archive is renamed.
+	 */
+	@Test
+	public void testIndexUpdateAfterRenamingIn7z() throws Exception {
+		File tempDir = Files.createTempDir();
+		
+		ListMap<File, File> files = ListMap.create();
+		files.add(new File(TestFiles.index_update_rename_in_7z, "file1.7z"),
+			new File(TestFiles.index_update_rename_in_7z, "file2.7z"));
+		files.add(new File(TestFiles.index_update_rename_in_7z, "folder1.7z"),
+			new File(TestFiles.index_update_rename_in_7z, "folder2.7z"));
+		
+		for (Entry<File, File> entry : files) {
+			File oldFile = entry.getKey();
+			File newFile = entry.getValue();
+			
+			File target = new File(tempDir, "target.7z");
+			Files.copy(oldFile, target);
+			
+			IndexingConfig config = new IndexingConfig();
+			FileIndex index = new FileIndex(config, null, tempDir);
+			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			UtilModel.assertDocCount(index.getLuceneDir(), 1);
+			
+			Files.copy(newFile, target);
+			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			UtilModel.assertDocCount(index.getLuceneDir(), 1);
+		}
+		
+		Files.deleteRecursively(tempDir);
+	}
+	
 }

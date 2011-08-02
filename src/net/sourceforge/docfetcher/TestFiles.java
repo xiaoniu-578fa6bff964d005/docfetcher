@@ -83,5 +83,8 @@ public final class TestFiles {
 	
 	public static final String index_update_html_in_7z =
 		create("index-update-html-in-7z");
+	
+	public static final String index_update_rename_in_7z =
+		create("index-update-rename-in-7z");
 
 }
