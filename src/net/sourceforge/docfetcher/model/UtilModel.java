@@ -209,7 +209,7 @@ public final class UtilModel {
 		IndexSearcher searcher = new IndexSearcher(luceneDir, true);
 		QueryParser parser = new QueryParser(
 				IndexRegistry.LUCENE_VERSION,
-				Field.CONTENT.key(),
+				Fields.CONTENT.key(),
 				IndexRegistry.analyzer
 		);
 		Query queryObject = parser.parse(query);
@@ -311,7 +311,7 @@ public final class UtilModel {
 	public static QueryWrapper createQuery(@NotNull String queryString)
 			throws SearchException {
 		PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
-			IndexRegistry.LUCENE_VERSION, Field.CONTENT.key(), IndexRegistry.analyzer);
+			IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.analyzer);
 		queryParser.setAllowLeadingWildcard(true);
 		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE;
 		queryParser.setMultiTermRewriteMethod(rewriteMethod);

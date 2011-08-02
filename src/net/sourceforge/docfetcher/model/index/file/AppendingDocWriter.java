@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 
 import org.apache.lucene.document.Document;
@@ -40,7 +40,7 @@ final class AppendingDocWriter extends LuceneDocWriter {
 		if (this.luceneDoc == null)
 			this.luceneDoc = luceneDoc;
 		else
-			for (Fieldable field : luceneDoc.getFields(Field.CONTENT.key()))
+			for (Fieldable field : luceneDoc.getFields(Fields.CONTENT.key()))
 				this.luceneDoc.add(field);
 	}
 

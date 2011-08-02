@@ -18,7 +18,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 
@@ -77,13 +77,13 @@ public final class HighlightService {
 			 */
 			IndexWriterAdapter writer = new IndexWriterAdapter(directory);
 			Document doc = new Document();
-			doc.add(Field.createContent(text, true)); // must store token positions and offsets
+			doc.add(Fields.createContent(text, true)); // must store token positions and offsets
 			writer.add(doc);
 			Closeables.closeQuietly(writer); // flush unwritten documents into index
 			IndexReader indexReader = IndexReader.open(directory);
 			
 			FieldTermStack fieldTermStack = new FieldTermStack(
-					indexReader, 0, Field.CONTENT.key(), fieldQuery
+					indexReader, 0, Fields.CONTENT.key(), fieldQuery
 			);
 			FieldPhraseList fieldPhraseList = new FieldPhraseList(fieldTermStack, fieldQuery);
 			
@@ -126,7 +126,7 @@ public final class HighlightService {
 				return null;
 			}
 		};
-		String key = Field.CONTENT.key();
+		String key = Fields.CONTENT.key();
 		Highlighter highlighter = new Highlighter(nullFormatter, new QueryScorer(query, key));
 		highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
 		highlighter.setTextFragmenter(new NullFragmenter());

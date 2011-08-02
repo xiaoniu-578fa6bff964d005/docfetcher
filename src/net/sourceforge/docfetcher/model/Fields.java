@@ -15,6 +15,7 @@ import javolution.io.CharSequenceReader;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Field.TermVector;
@@ -24,7 +25,7 @@ import org.apache.lucene.document.NumericField;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
-public enum Field {
+public enum Fields {
 	
 	// TODO check correctness of usage of Store.XXX, Index.XXX options
 	// TODO check if storing the file extension is necessary
@@ -67,7 +68,7 @@ public enum Field {
 	@NotNull private final Store store;
 	@NotNull private final Index index;
 	
-	private Field(	@NotNull Store store,
+	private Fields(	@NotNull Store store,
 					@NotNull Index index) {
 		this.key = this.name().toLowerCase();
 		this.store = store;
@@ -81,10 +82,8 @@ public enum Field {
 	
 	// For long values, use create(long) instead
 	@NotNull
-	public org.apache.lucene.document.Field create(@NotNull String fieldValue) {
-		return new org.apache.lucene.document.Field(
-				key, fieldValue, store, index
-		);
+	public Field create(@NotNull String fieldValue) {
+		return new Field(key, fieldValue, store, index);
 	}
 	
 	// The field is always indexed
@@ -97,29 +96,26 @@ public enum Field {
 	// fieldValue is not a String
 	// does not store token positions and offsets
 	@NotNull
-	public static org.apache.lucene.document.Field createContent(@NotNull CharSequence fieldValue) {
+	public static Field createContent(@NotNull CharSequence fieldValue) {
 		return createContent(fieldValue, false);
 	}
 	
 	@NotNull
-	public static org.apache.lucene.document.Field createContent(	@NotNull CharSequence fieldValue,
-																	boolean withOffsets) {
-		// TermVector.WITH_POSITIONS_OFFSETS is required by the fast-vector highlighter
-		TermVector termVector = withOffsets ? TermVector.WITH_POSITIONS_OFFSETS : TermVector.NO;
+	public static Field createContent(	@NotNull CharSequence fieldValue,
+										boolean withOffsets) {
+		// TermVector.WITH_POSITIONS_OFFSETS is required by the fast-vector
+		// highlighter
+		TermVector termVector = withOffsets
+			? TermVector.WITH_POSITIONS_OFFSETS
+			: TermVector.NO;
 		if (fieldValue instanceof String) {
-			return new org.apache.lucene.document.Field(
-					CONTENT.key,
-					(String) fieldValue,
-					CONTENT.store,
-					CONTENT.index,
-					termVector
-			);
+			return new Field(
+				CONTENT.key, (String) fieldValue, CONTENT.store, CONTENT.index,
+				termVector);
 		}
-		return new org.apache.lucene.document.Field(
-				CONTENT.key,
-				new CharSequenceReader().setInput(fieldValue),
-				termVector
-		);
+		return new Field(
+			CONTENT.key, new CharSequenceReader().setInput(fieldValue),
+			termVector);
 	}
 
 }

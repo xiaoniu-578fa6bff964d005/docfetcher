@@ -24,7 +24,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.enums.ProgramConf;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -177,15 +177,15 @@ public final class WebSearcher {
 		// Add size filter to filter chain
 		if (webQuery.minSize != null || webQuery.maxSize != null) {
 			filters.add(NumericRangeFilter.newLongRange(
-				Field.SIZE.key(), webQuery.minSize, webQuery.maxSize, true,
+				Fields.SIZE.key(), webQuery.minSize, webQuery.maxSize, true,
 				true));
 		}
 		
 		// Add type filter to filter chain
 		if (webQuery.parsers != null) {
 			TermsFilter typeFilter = new TermsFilter();
-			String fieldName = Field.PARSER.key();
-			typeFilter.addTerm(new Term(fieldName, Field.EMAIL_PARSER));
+			String fieldName = Fields.PARSER.key();
+			typeFilter.addTerm(new Term(fieldName, Fields.EMAIL_PARSER));
 			for (Parser parser : webQuery.parsers) {
 				String parserName = parser.getClass().getSimpleName();
 				typeFilter.addTerm(new Term(fieldName, parserName));
@@ -200,7 +200,7 @@ public final class WebSearcher {
 			for (LuceneIndex index : webQuery.indexes) {
 				String path = index.getRootFile().getPath();
 				String uid = index.getDocumentType().createUniqueId(path);
-				Term prefix = new Term(Field.UID.key(), uid + "/");
+				Term prefix = new Term(Fields.UID.key(), uid + "/");
 				indexFilters[i++] = new PrefixFilter(prefix);
 			}
 			filters.add(new ChainedFilter(indexFilters, ChainedFilter.OR));

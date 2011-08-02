@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 
 import org.apache.lucene.document.Document;
@@ -35,7 +35,7 @@ import com.google.common.io.Closeables;
 @VisibleForPackageGroup
 public final class IndexWriterAdapter implements Closeable {
 	
-	public static final Term idTerm = new Term(Field.UID.key());
+	public static final Term idTerm = new Term(Fields.UID.key());
 	
 	@NotNull private IndexWriter writer;
 

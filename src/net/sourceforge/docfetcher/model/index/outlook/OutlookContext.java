@@ -9,7 +9,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -83,14 +83,14 @@ final class OutlookContext {
 		long date = email.getMessageDeliveryTime().getTime();
 		long size = body.length(); // assume every char takes up one byte
 		
-		luceneDoc.add(Field.UID.create(doc.getUniqueId()));
-		luceneDoc.add(Field.SUBJECT.create(subject));
-		luceneDoc.add(Field.TYPE.create("outlook")); //$NON-NLS-1$
-		luceneDoc.add(Field.SENDER.create(sender));
-		luceneDoc.add(Field.RECIPIENTS.create(recipients));
-		luceneDoc.add(Field.DATE.create(String.valueOf(date)));
-		luceneDoc.add(Field.SIZE.create(size));
-		luceneDoc.add(Field.PARSER.create(Field.EMAIL_PARSER));
+		luceneDoc.add(Fields.UID.create(doc.getUniqueId()));
+		luceneDoc.add(Fields.SUBJECT.create(subject));
+		luceneDoc.add(Fields.TYPE.create("outlook")); //$NON-NLS-1$
+		luceneDoc.add(Fields.SENDER.create(sender));
+		luceneDoc.add(Fields.RECIPIENTS.create(recipients));
+		luceneDoc.add(Fields.DATE.create(String.valueOf(date)));
+		luceneDoc.add(Fields.SIZE.create(size));
+		luceneDoc.add(Fields.PARSER.create(Fields.EMAIL_PARSER));
 		// TODO Store a more informative path to the email for display on the result panel
 		// TODO Fill in more fields as necessary
 		
@@ -101,7 +101,7 @@ final class OutlookContext {
 		contents.append(body).append(" ");
 		// TODO Fill in more fields as necessary
 		
-		luceneDoc.add(Field.createContent(contents));
+		luceneDoc.add(Fields.createContent(contents));
 		
 		// Parse and append attachments
 		new AttachmentVisitor(config, email, true) {
@@ -112,10 +112,10 @@ final class OutlookContext {
 				// TODO later: Maybe recurse into archive attachments
 				ParseResult parseResult = ParseService.parse(
 					config, filename, tempFile, cancelable);
-				luceneDoc.add(Field.createContent(parseResult.getContent()));
+				luceneDoc.add(Fields.createContent(parseResult.getContent()));
 				StringBuilder metadata = parseResult.getMetadata();
 				metadata.append(filename);
-				luceneDoc.add(Field.createContent(metadata));
+				luceneDoc.add(Fields.createContent(metadata));
 			}
 			protected void handleException(	String filename,
 											Exception e) {

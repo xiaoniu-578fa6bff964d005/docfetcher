@@ -17,7 +17,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 
 import org.apache.lucene.document.Document;
@@ -56,26 +56,26 @@ abstract class LuceneDocWriter {
 		
 		if (appendMetadata()) {
 			String extension = Util.getExtension(filename);
-			luceneDoc.add(Field.UID.create(doc.getUniqueId()));
-			luceneDoc.add(Field.FILENAME.create(filename));
-			luceneDoc.add(Field.TYPE.create(extension));
-			luceneDoc.add(Field.PARSER.create(parseResult.getParserName()));
+			luceneDoc.add(Fields.UID.create(doc.getUniqueId()));
+			luceneDoc.add(Fields.FILENAME.create(filename));
+			luceneDoc.add(Fields.TYPE.create(extension));
+			luceneDoc.add(Fields.PARSER.create(parseResult.getParserName()));
 			String title = parseResult.getTitle();
 			if (title != null)
-				luceneDoc.add(Field.TITLE.create(title));
-			luceneDoc.add(Field.SIZE.create(file.length()));
-			luceneDoc.add(Field.LAST_MODIFIED.create(String.valueOf(doc.getLastModified())));
+				luceneDoc.add(Fields.TITLE.create(title));
+			luceneDoc.add(Fields.SIZE.create(file.length()));
+			luceneDoc.add(Fields.LAST_MODIFIED.create(String.valueOf(doc.getLastModified())));
 			List<String> authors = parseResult.getAuthors();
 			if (authors != null)
 				for (String author : authors)
-					luceneDoc.add(Field.AUTHOR.create(author));
+					luceneDoc.add(Fields.AUTHOR.create(author));
 		}
 		
 		// Create content field with metadata appended to it
-		luceneDoc.add(Field.createContent(parseResult.getContent()));
+		luceneDoc.add(Fields.createContent(parseResult.getContent()));
 		StringBuilder metadata = parseResult.getMetadata();
 		metadata.append(filename);
-		luceneDoc.add(Field.createContent(metadata));
+		luceneDoc.add(Fields.createContent(metadata));
 		return luceneDoc;
 	}
 	

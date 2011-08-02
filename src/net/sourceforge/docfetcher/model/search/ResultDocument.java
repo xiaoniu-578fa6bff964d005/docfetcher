@@ -17,7 +17,7 @@ import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.model.DocumentType;
-import net.sourceforge.docfetcher.model.Field;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -80,7 +80,7 @@ public final class ResultDocument {
 		this.fileFactory = fileFactory;
 		this.mailFactory = mailFactory;
 		
-		uid = luceneDoc.get(Field.UID.key());
+		uid = luceneDoc.get(Fields.UID.key());
 		isEmail = DocumentType.isEmailType(uid);
 	}
 	
@@ -97,9 +97,9 @@ public final class ResultDocument {
 	// returns filename title or email subject
 	@NotNull
 	public String getTitle() {
-		String title = luceneDoc.get(Field.TITLE.key());
+		String title = luceneDoc.get(Fields.TITLE.key());
 		if (title == null)
-			title = luceneDoc.get(Field.SUBJECT.key());
+			title = luceneDoc.get(Fields.SUBJECT.key());
 		if (title != null)
 			return title;
 		return Util.splitFilename(getFilename())[0];
@@ -112,7 +112,7 @@ public final class ResultDocument {
 	
 	public long getSizeInKB() {
 		if (sizeInKB < 0) {
-			String sizeString = luceneDoc.get(Field.SIZE.key());
+			String sizeString = luceneDoc.get(Fields.SIZE.key());
 			assert sizeString != null;
 			long sizeInBytes = Long.valueOf(sizeString);
 			long extra = sizeInBytes % 1024 == 0 ? 0 : 1;
@@ -125,7 +125,7 @@ public final class ResultDocument {
 	@NotNull
 	public String getParserName() {
 		if (parserName == null)
-			parserName = luceneDoc.get(Field.PARSER.key());
+			parserName = luceneDoc.get(Fields.PARSER.key());
 		assert parserName != null;
 		return parserName;
 	}
@@ -133,19 +133,19 @@ public final class ResultDocument {
 	@NotNull
 	public String getFilename() {
 		onlyFiles();
-		return luceneDoc.get(Field.FILENAME.key());
+		return luceneDoc.get(Fields.FILENAME.key());
 	}
 	
 	@NotNull
 	public String getSender() {
 		onlyEmails();
-		return luceneDoc.get(Field.SENDER.key());
+		return luceneDoc.get(Fields.SENDER.key());
 	}
 	
 	// returns file extension or mail type (Outlook, IMAP, etc.)
 	@NotNull
 	public String getType() {
-		String type = luceneDoc.get(Field.TYPE.key());
+		String type = luceneDoc.get(Fields.TYPE.key());
 		assert type != null;
 		return type;
 	}
@@ -167,24 +167,24 @@ public final class ResultDocument {
 	// Returns authors for files, sender for emails
 	@NotNull
 	public String getAuthors() {
-		String[] authors = luceneDoc.getValues(Field.AUTHOR.key());
+		String[] authors = luceneDoc.getValues(Fields.AUTHOR.key());
 		if (authors.length > 0)
 			return Util.join(", ", authors);
-		String sender = luceneDoc.get(Field.SENDER.key());
+		String sender = luceneDoc.get(Fields.SENDER.key());
 		return sender == null ? "" : sender;
 	}
 	
 	@NotNull
 	public Date getLastModified() {
 		onlyFiles();
-		String lastModified = luceneDoc.get(Field.LAST_MODIFIED.key());
+		String lastModified = luceneDoc.get(Fields.LAST_MODIFIED.key());
 		return new Date(Long.valueOf(lastModified));
 	}
 	
 	@NotNull
 	public Date getDate() {
 		onlyEmails();
-		String sendDate = luceneDoc.get(Field.DATE.key());
+		String sendDate = luceneDoc.get(Fields.DATE.key());
 		return new Date(Long.valueOf(sendDate));
 	}
 	
@@ -201,7 +201,7 @@ public final class ResultDocument {
 	}
 	
 	private boolean wasParsedBy(Class<? extends Parser> parserClass) {
-		String parserName = luceneDoc.get(Field.PARSER.key());
+		String parserName = luceneDoc.get(Fields.PARSER.key());
 		return parserName.equals(parserClass.getSimpleName());
 	}
 	
@@ -210,7 +210,7 @@ public final class ResultDocument {
 	@NotNull
 	private String getText() throws ParseException {
 		onlyFiles();
-		String parserName = luceneDoc.get(Field.PARSER.key());
+		String parserName = luceneDoc.get(Fields.PARSER.key());
 		FileResource fileResource = null;
 		try {
 			fileResource = getFileResource();
