@@ -47,6 +47,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.util.Version;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Closeables;
 
 /**
@@ -149,11 +150,12 @@ public final class IndexRegistry {
 	// so that the IndexRegistry cannot change during the execution of the event handler
 	// Events may arrive from non-GUI threads; indexes handler runs in the same
 	// thread as the client
+	// The list of indexes given to the handler is an immutable copy
 	public synchronized void addListeners(	@NotNull ExistingIndexesHandler handler,
 											@NotNull Event.Listener<LuceneIndex> addedListener,
 											@NotNull Event.Listener<List<LuceneIndex>> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
-		handler.handleExistingIndexes(getIndexes());
+		handler.handleExistingIndexes(ImmutableList.copyOf(indexes));
 		evtAdded.add(addedListener);
 		evtRemoved.add(removedListener);
 	}
@@ -165,10 +167,15 @@ public final class IndexRegistry {
 		evtRemoved.remove(removedListener);
 	}
 
+	/**
+	 * Returns an immutable copy of the indexes. Since a copy is returned, it is
+	 * safe for the caller to iterate over it while other threads are adding or
+	 * removing indexes.
+	 */
 	@Immutable
 	@NotNull
 	public synchronized List<LuceneIndex> getIndexes() {
-		return Collections.unmodifiableList(indexes);
+		return ImmutableList.copyOf(indexes);
 	}
 
 	public synchronized void load(@NotNull Cancelable cancelable) {

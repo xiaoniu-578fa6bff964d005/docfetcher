@@ -12,7 +12,6 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,9 +19,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.common.collect.ImmutableList;
+
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -330,15 +330,9 @@ public final class IndexingQueue {
 		}
 	}
 
-	@Immutable
-	@NotNull
-	@NotThreadSafe
-	private List<Task> getTasks() {
-		return Collections.unmodifiableList(tasks);
-	}
-
 	// Event listeners are notified under lock and possibly from a non-GUI
 	// thread
+	// The list of tasks given to the handler is an immutable copy
 	@ThreadSafe
 	public void addListeners(	@NotNull ExistingTasksHandler handler,
 								@NotNull Event.Listener<Task> addedListener,
@@ -346,7 +340,7 @@ public final class IndexingQueue {
 		Util.checkNotNull(handler, addedListener, removedListener);
 		lock.lock();
 		try {
-			handler.handleExistingTasks(getTasks());
+			handler.handleExistingTasks(ImmutableList.copyOf(tasks));
 			evtAdded.add(addedListener);
 			evtRemoved.add(removedListener);
 		}

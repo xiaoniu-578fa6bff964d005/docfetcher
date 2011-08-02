@@ -203,12 +203,14 @@ public abstract class Folder
 		return documents.size();
 	}
 	
+	// Safely iterable
 	@Immutable
 	@NotNull
-	public final Collection<D> getDocuments() {
-		return UtilModel.nullSafeImmutableCol(documents);
+	public final List<D> getDocuments() {
+		return UtilModel.nullSafeImmutableList(documents);
 	}
 	
+	// Safely iterable
 	@Immutable
 	@NotNull
 	public final Map<String, D> getDocumentMap() {
@@ -238,12 +240,14 @@ public abstract class Folder
 		return subFolders.size();
 	}
 	
+	// Safely iterable
 	@Immutable
 	@NotNull
-	public final Collection<F> getSubFolders() {
-		return UtilModel.nullSafeImmutableCol(subFolders);
+	public final List<F> getSubFolders() {
+		return UtilModel.nullSafeImmutableList(subFolders);
 	}
 	
+	// Safely iterable
 	@Immutable
 	@NotNull
 	public final Map<String, F> getSubFolderMap() {
@@ -259,10 +263,11 @@ public abstract class Folder
 		return count;
 	}
 	
+	// Safely iterable
 	@Immutable
 	@NotNull
 	public final Iterable<ViewNode> getChildren() {
-		Collection<F> col = subFolders == null ? null : subFolders.values();
+		Collection<F> col = getSubFolders(); // returns a copy
 		return UtilGlobal.<ViewNode>convert(col);
 	}
 	

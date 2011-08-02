@@ -134,6 +134,7 @@ public final class OutlookIndex extends TreeIndex
 		return false;
 	}
 	
+	// TODO method currently not in use
 	@NotNull
 	public MailFolder getSimplifiedRootFolder() {
 		if (simplifiedRootFolder == null) // update method hasn't been called yet

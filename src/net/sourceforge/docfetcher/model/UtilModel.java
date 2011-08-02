@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +50,8 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Closeables;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -72,28 +73,27 @@ public final class UtilModel {
 	// move them to the call site.
 
 	/**
-	 * Returns an immutable collection that is backed by the values of the given
-	 * map. If the given map is null or empty, an immutable empty collection is
-	 * returned.
+	 * Returns an immutable list containing the values of the given map, or an
+	 * immutable empty list if null was given.
 	 */
 	@NotNull
 	@Immutable
-	static <K, V> Collection<V> nullSafeImmutableCol(@Nullable Map<K, V> map) {
+	static <K, V> List<V> nullSafeImmutableList(@Nullable Map<K, V> map) {
 		if (map == null || map.isEmpty())
 			return Collections.emptyList();
-		return Collections.unmodifiableCollection(map.values());
+		return ImmutableList.copyOf(map.values());
 	}
 
 	/**
-	 * Returns an immutable map that is backed by the given map. If the given
-	 * map is null or empty, an immutable empty map is returned.
+	 * Returns an immutable copy of the given map, or an immutable empty map if
+	 * null was given.
 	 */
 	@NotNull
 	@Immutable
 	static <K, V> Map<K, V> nullSafeImmutableMap(@Nullable Map<K, V> map) {
 		if (map == null || map.isEmpty())
 			return Collections.emptyMap();
-		return Collections.unmodifiableMap(map);
+		return ImmutableMap.copyOf(map);
 	}
 	
 	private static Pattern drivePattern = Pattern.compile("([a-zA-Z]):.*");
