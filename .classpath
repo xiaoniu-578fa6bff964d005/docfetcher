@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="lib/guava/guava-r07.jar" sourcepath="lib/guava/guava-src-r07.zip"/>
 	<classpathentry kind="lib" path="lib/guava/guava-src-r07.zip"/>
 	<classpathentry kind="lib" path="lib/J7zip/J7zip_4.43_alpha2.jar" sourcepath="lib/J7zip/J7zip_4.43_alpha2_src.zip"/>
-	<classpathentry kind="lib" path="lib/swt/swt-3.6.1-gtk-linux-x86.jar" sourcepath="lib/swt/swt-3.6.1-gtk-linux-x86-src.zip"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.8.2.jar" sourcepath="lib/junit/junit-4.8.2-src.jar"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.0.3.jar" sourcepath="lib/lucene/lucene-3.0.3-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.0.3.jar" sourcepath="lib/lucene/lucene-3.0.3-src-stripped.zip"/>
@@ -45,5 +44,6 @@
 	<classpathentry kind="lib" path="lib/poi/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-misc-3.0.3.jar" sourcepath="lib/lucene/lucene-misc-3.0.3-src.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.0.3.jar" sourcepath="lib/lucene/lucene-queries-3.0.3-src.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
