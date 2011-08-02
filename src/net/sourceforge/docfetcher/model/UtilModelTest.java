@@ -79,6 +79,7 @@ public final class UtilModelTest {
 		for (int i = 0; i < candidateNames.length; i++) {
 			String fullPath = parentPath + "/" + candidateNames[i];
 			TFile file = new TFile(fullPath);
+			assertTrue(file.exists());
 			boolean actualOutput = UtilModel.isZipArchive(file);
 			assertEquals(expectedOutputs[i], actualOutput);
 		}
