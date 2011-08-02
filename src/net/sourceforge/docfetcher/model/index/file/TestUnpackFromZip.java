@@ -65,8 +65,8 @@ public class TestUnpackFromZip {
 	
 	private static abstract class Checker {
 		private TFile entry;
-		public Checker(String filePath) {
-			entry = new TFile(filePath);
+		public Checker(TestFiles testFile) {
+			entry = new TFile(testFile.getPath());
 		}
 		public final void readUncompressed() throws Exception {
 			TFile tempTFile = new TFile(Util.createTempFile("test", ""));

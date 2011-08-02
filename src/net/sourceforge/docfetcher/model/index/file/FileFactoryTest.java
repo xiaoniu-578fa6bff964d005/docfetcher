@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
@@ -34,15 +35,19 @@ import com.google.common.io.Files;
  */
 public final class FileFactoryTest {
 	
+	static {
+		AppUtil.Const.autoInit();
+	}
+	
 	@Test
 	public void testUnpack() throws Exception {
-		String testFile = TestFiles.archive_entry_7z_zip_rar;
+		String testFile = TestFiles.archive_entry_7z_zip_rar.getPath();
 		String[] paths = {
 				testFile,
 				"./" + testFile,
 				"../" + Util.USER_DIR.getName() + "/" + testFile,
 				Util.getAbsPath(testFile),
-				TestFiles.archive_entry_zip_zip
+				TestFiles.archive_entry_zip_zip.getPath()
 		};
 		IndexingConfig config = new IndexingConfig();
 		for (String path : paths) {
@@ -61,7 +66,7 @@ public final class FileFactoryTest {
 		 * the fileFactory multiple times with the same argument must yield exactly
 		 * the same file.
 		 */
-		String testFile = TestFiles.archive_entry_7z_zip_rar;
+		String testFile = TestFiles.archive_entry_7z_zip_rar.getPath();
 		Set<File> files = new HashSet<File> ();
 		HotColdFileCache unpackCache = new HotColdFileCache(20);
 		FileFactory fileFactory = new FileFactory(unpackCache);
@@ -80,7 +85,7 @@ public final class FileFactoryTest {
 		HotColdFileCache unpackCache = new HotColdFileCache(cacheSize);
 		FileFactory fileFactory = new FileFactory(unpackCache);
 		IndexingConfig config = new IndexingConfig();
-		File archive = new File(TestFiles.simple_7z);
+		File archive = TestFiles.simple_7z.get();
 		for (int i = 0; i < cacheSize * 2; i++) {
 			File archiveCopy = Util.createDerivedTempFile("test.7z", Util.TEMP_DIR);
 			Files.copy(archive, archiveCopy);
@@ -101,8 +106,8 @@ public final class FileFactoryTest {
 		FileFactory fileFactory = new FileFactory(unpackCache);
 		IndexingConfig config = new IndexingConfig();
 		String[] paths = {
-				TestFiles.sfx_zip + "/test.txt",
-				TestFiles.sfx_7z + "/test.txt"
+				TestFiles.sfx_zip.getPath() + "/test.txt",
+				TestFiles.sfx_7z.getPath() + "/test.txt"
 		};
 		for (String path : paths)
 			assertTrue(fileFactory.createFile(config, path).getFile().isFile());

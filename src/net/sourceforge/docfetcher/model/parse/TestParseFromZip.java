@@ -151,8 +151,8 @@ public final class TestParseFromZip {
 	}
 	
 	private static abstract class ZipAndRun {
-		public ZipAndRun(String path) throws Exception {
-			TFile src = new TFile(path);
+		public ZipAndRun(TestFiles testFile) throws Exception {
+			TFile src = new TFile(testFile.getPath());
 			File dir = Files.createTempDir();
 			TFile archive = new TFile(dir, "archive.zip");
 			archive.mkdir();

@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.File;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -27,10 +28,14 @@ import org.junit.Test;
  */
 public final class OutlookIndexTest {
 
+	static {
+		AppUtil.Const.autoInit();
+	}
+	
 	@Test
 	public void testSimple() throws Exception {
 		IndexingConfig config = new IndexingConfig();
-		File pstFile = new File(TestFiles.outlook_test);
+		File pstFile = TestFiles.outlook_test.get();
 		
 		OutlookIndex index = new OutlookIndex(config, null, pstFile);
 		index.update(new IndexingReporter(), NullCancelable.getInstance());

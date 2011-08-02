@@ -46,18 +46,18 @@ public final class FileIndexTest {
 	
 	@Test
 	public void testNestedUpdate() throws Exception {
-		String[] paths = {
-				TestFiles.archive_zip_rar_7z,
-				TestFiles.sfx_zip,
-				TestFiles.sfx_7z,
-				TestFiles.sfx_rar,
+		File rarFile = TestFiles.sfx_rar.get();
+		File[] files = {
+				TestFiles.archive_zip_rar_7z.get(),
+				TestFiles.sfx_zip.get(),
+				TestFiles.sfx_7z.get(),
+				rarFile,
 		};
 		
-		for (String path : paths) {
+		for (File file : files) {
 			IndexingConfig config = new IndexingConfig();
-			File rootFile = new File(path);
 
-			FileIndex index = new FileIndex(config, null, rootFile);
+			FileIndex index = new FileIndex(config, null, file);
 			index.update(new IndexingReporter(), NullCancelable.getInstance());
 			Directory luceneDir = index.getLuceneDir();
 
@@ -65,7 +65,7 @@ public final class FileIndexTest {
 			 * JUnRar doesn't support SFX rar archives, so we're expecting zero
 			 * results for those.
 			 */
-			int expectedResultCount = path.equals(TestFiles.sfx_rar) ? 0 : 1;
+			int expectedResultCount = file == rarFile ? 0 : 1;
 			
 			UtilModel.assertDocCount(luceneDir, expectedResultCount);
 			UtilModel.assertResultCount(luceneDir, "test", expectedResultCount);
@@ -79,7 +79,7 @@ public final class FileIndexTest {
 	public void testHtmlPairUpdate() throws Exception {
 		File tempDir = Files.createTempDir();
 		File htmlFile = new File(tempDir, "test.html");
-		Files.copy(new File(TestFiles.html), htmlFile);
+		Files.copy(TestFiles.html.get(), htmlFile);
 		File htmlDir = new File(tempDir, "test_files");
 		File subFile1 = new File(htmlDir, "filename.unsupportedformat");
 		File subFile2 = new File(htmlDir, "filename.txt");
@@ -87,7 +87,7 @@ public final class FileIndexTest {
 		htmlDir.mkdirs();
 		subFile1.createNewFile();
 		subFile2.createNewFile();
-		Files.copy(new File(TestFiles.simple_7z), subFile3);
+		Files.copy(TestFiles.simple_7z.get(), subFile3);
 		
 		IndexingConfig config = new IndexingConfig();
 		FileIndex index = new FileIndex(config, null, tempDir);
@@ -131,7 +131,7 @@ public final class FileIndexTest {
 	
 	@Test
 	public void testHtmlPairUpdateInSevenZip() throws Exception {
-		File testDir = new File(TestFiles.index_update_html_in_7z);
+		File testDir = TestFiles.index_update_html_in_7z.get();
 		List<File> files = Arrays.asList(Util.listFiles(testDir));
 		Collections.sort(files);
 		
@@ -237,15 +237,14 @@ public final class FileIndexTest {
 	public void testIndexUpdateAfterRenamingIn7z() throws Exception {
 		File tempDir = Files.createTempDir();
 		
-		ListMap<File, File> files = ListMap.create();
-		files.add(new File(TestFiles.index_update_rename_in_7z, "file1.7z"),
-			new File(TestFiles.index_update_rename_in_7z, "file2.7z"));
-		files.add(new File(TestFiles.index_update_rename_in_7z, "folder1.7z"),
-			new File(TestFiles.index_update_rename_in_7z, "folder2.7z"));
+		ListMap<String, String> files = ListMap.create();
+		files.add("file1.7z", "file2.7z");
+		files.add("folder1.7z", "folder2.7z");
 		
-		for (Entry<File, File> entry : files) {
-			File oldFile = entry.getKey();
-			File newFile = entry.getValue();
+		for (Entry<String, String> entry : files) {
+			TestFiles parent = TestFiles.index_update_rename_in_7z;
+			File oldFile = parent.getChild(entry.getKey());
+			File newFile = parent.getChild(entry.getValue());
 			
 			File target = new File(tempDir, "target.7z");
 			Files.copy(oldFile, target);

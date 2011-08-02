@@ -62,7 +62,7 @@ public final class UtilModelTest {
 	
 	@Test
 	public void testArchiveDetection() {
-		String parentPath = TestFiles.archive_detection;
+		String parentPath = TestFiles.archive_detection.getPath();
 		String[] candidateNames = {
 			"real-zip.zip",
 			"fake-zip-is-file.zip",

@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.model.parse;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public final class PagingPdfParserTest {
 	@Test
 	public void testParse() throws ParseException {
 		final List<String> pages = new ArrayList<String> (3);
-		new PagingPdfParser(new File(TestFiles.multi_page_pdf)) {
+		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
 			protected void handlePage(String pageText) {
 				pages.add(pageText);
 			}
@@ -44,7 +43,7 @@ public final class PagingPdfParserTest {
 	@Test
 	public void testParseAndStop() throws ParseException {
 		final List<String> pages = new ArrayList<String> (2);
-		new PagingPdfParser(new File(TestFiles.multi_page_pdf)) {
+		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
 			protected void handlePage(String pageText) {
 				pages.add(pageText);
 				if (pages.size() >= 2) stop();

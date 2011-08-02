@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -36,15 +37,19 @@ import com.google.common.io.Files;
  */
 public final class SolidArchiveTreeTest {
 	
+	static {
+		AppUtil.Const.autoInit();
+	}
+	
 	@Test
 	public void testPreserveDirStructure() throws Exception  {
 		IndexingConfig config = new IndexingConfig();
 		List<SolidArchiveTree<?>> archives = Lists.newArrayList();
 		try {
-			File sevenZipFile = new File(TestFiles.multiple_dirs_7z);
+			File sevenZipFile = TestFiles.multiple_dirs_7z.get();
 			archives.add(new SevenZipTree(sevenZipFile, config, null, null));
 
-			File rarFile = new File(TestFiles.multiple_dirs_rar);
+			File rarFile = TestFiles.multiple_dirs_rar.get();
 			archives.add(new RarTree(rarFile, config, null, null));
 
 			for (SolidArchiveTree<?> archive : archives) {
