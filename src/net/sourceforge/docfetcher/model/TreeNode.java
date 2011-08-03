@@ -25,8 +25,8 @@ public abstract class TreeNode implements Serializable {
 	
 	private static final long serialVersionUID = -7806671503719389615L;
 	
-	@NotNull private String name;
-	@NotNull private String displayName;
+	private final String name;
+	private final String displayName;
 	
 	public TreeNode(@NotNull String name,
 					@NotNull String displayName) {
@@ -40,17 +40,9 @@ public abstract class TreeNode implements Serializable {
 		return name;
 	}
 	
-	protected final void setName(@NotNull String name) {
-		this.name = Util.checkNotNull(name);
-	}
-	
 	@NotNull
 	public final String getDisplayName() {
 		return displayName;
-	}
-
-	public final void setDisplayName(@NotNull String displayName) {
-		this.displayName = Util.checkNotNull(displayName);
 	}
 	
 	@NotNull

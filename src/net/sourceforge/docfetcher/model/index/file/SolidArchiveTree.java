@@ -273,13 +273,10 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	protected abstract ArchiveEntryReader<E> getArchiveEntryReader();
 	
 	public abstract void close() throws IOException;
-	
+
 	@RecursiveMethod
 	private static void applyHtmlPairing(@NotNull FileFolder folder) {
-		if (folder.subFolders == null) return;
-		Iterator<FileFolder> subFolderIt = folder.subFolders.values().iterator();
-		while (subFolderIt.hasNext()) {
-			FileFolder subFolder = subFolderIt.next();
+		for (FileFolder subFolder : folder.getSubFolders()) {
 			String basename = HtmlUtil.getHtmlDirBasename(subFolder.getName());
 			if (basename == null) {
 				applyHtmlPairing(subFolder);
@@ -290,9 +287,18 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				String filename = basename + "." + htmlExt;
 				FileDocument htmlEntry = folder.getDocument(filename);
 				if (htmlEntry == null)
-					continue; // not an HTML folder
-				htmlEntry.setHtmlFolder(subFolder); // attach HTML folder to HTML file
-				subFolderIt.remove(); // detach HTML folder from previous parent folder
+					continue; // current folder is not an HTML folder
+				
+				// Attach HTML folder to HTML file
+				htmlEntry.setHtmlFolder(subFolder);
+				
+				/*
+				 * Detach HTML folder from previous parent folder. This won't
+				 * throw a ConcurrentModificationException since we're iterating
+				 * over a copy of the subfolders.
+				 */
+				folder.removeSubFolder(subFolder);
+				
 				Folder.evtFolderRemoved.fire(new FolderEvent(folder, subFolder));
 				isHtmlFolder = true;
 				break;
@@ -300,8 +306,6 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			if (! isHtmlFolder)
 				applyHtmlPairing(subFolder);
 		}
-		if (folder.subFolders.isEmpty())
-			folder.subFolders = null;
 	}
 	
 	@RecursiveMethod

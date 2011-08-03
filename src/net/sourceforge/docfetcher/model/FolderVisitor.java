@@ -34,20 +34,16 @@ public class FolderVisitor<D extends Document<D, F>, F extends Folder<D, F>, T e
 
 	@RecursiveMethod
 	private void visit(F folder) {
-		if (folder.documents != null) {
-			for (D fileDocument : folder.documents.values()) {
-				if (isStopped())
-					return;
-				visitDocument(folder, fileDocument);
-			}
+		for (D fileDocument : folder.getDocuments()) {
+			if (isStopped())
+				return;
+			visitDocument(folder, fileDocument);
 		}
-		if (folder.subFolders != null) {
-			for (F subFolder : folder.subFolders.values()) {
-				if (isStopped())
-					return;
-				visitFolder(folder, subFolder);
-				visit(subFolder);
-			}
+		for (F subFolder : folder.getSubFolders()) {
+			if (isStopped())
+				return;
+			visitFolder(folder, subFolder);
+			visit(subFolder);
 		}
 	}
 
