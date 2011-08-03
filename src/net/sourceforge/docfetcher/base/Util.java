@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
@@ -289,9 +290,10 @@ public final class Util {
 	 * beginning of the returned list, while a (single) trailing path separator
 	 * won't.
 	 */
+	@MutableCopy
 	@NotNull
 	public static List<String> splitPath(@NotNull String path) {
-		List<String> parts = new ArrayList<String> ();
+		List<String> parts = new ArrayList<String>();
 		int lastStart = 0;
 		for (int i = 0; i < path.length(); i++) {
 			char c = path.charAt(i);

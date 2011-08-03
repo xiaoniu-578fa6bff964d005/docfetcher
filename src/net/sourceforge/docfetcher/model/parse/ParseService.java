@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -238,6 +239,7 @@ public final class ParseService {
 	}
 	
 	// accepts TrueZIP files, returns false on IOExceptions
+	@MutableCopy
 	@NotNull
 	private static List<String> getPossibleMimeTypes(@NotNull File file)
 			throws IOException {

@@ -3,10 +3,10 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Fields;
@@ -143,13 +143,14 @@ final class OutlookContext {
 		return senderName + " <" + senderEmailAddress + ">";
 	}
 	
+	@MutableCopy
 	@NotNull
 	static List<String> getRecipients(@NotNull PSTMessage email) {
 		try {
 			int n = email.getNumberOfRecipients();
 			if (n == 0)
-				return Collections.emptyList();
-			List<String> rs = new ArrayList<String> (n);
+				return new ArrayList<String>(0);
+			List<String> rs = new ArrayList<String>(n);
 			for (int i = 0; i < n; i++) {
 				PSTRecipient r = email.getRecipient(i);
 				String name = r.getDisplayName();
@@ -161,7 +162,7 @@ final class OutlookContext {
 			}
 			return rs;
 		} catch (Exception e) {
-			return Collections.emptyList();
+			return new ArrayList<String>(0);
 		}
 	}
 

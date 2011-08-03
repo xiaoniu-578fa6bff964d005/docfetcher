@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 /**
@@ -24,6 +25,7 @@ public final class TreeCheckState {
 	List<String> checkedPaths = new ArrayList<String>();
 	int folderCount = 0;
 	
+	@MutableCopy
 	@NotNull
 	public List<String> getCheckedPaths() {
 		return checkedPaths;

@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -118,6 +119,7 @@ public abstract class VirtualTableViewer<E> {
 		table.setItemCount(elements.size());
 	}
 	
+	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
 	public final List<E> getSelection() {

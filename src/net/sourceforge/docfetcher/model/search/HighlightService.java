@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Fields;
@@ -62,6 +63,7 @@ public final class HighlightService {
 		return new HighlightedString(text, ranges);
 	}
 	
+	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
 	private static List<Range> highlightPhrases(@NotNull Query query,
@@ -104,6 +106,7 @@ public final class HighlightService {
 		}
 	}
 	
+	@MutableCopy
 	@NotNull
 	private static List<Range> highlight(	@NotNull Query query,
 											@NotNull String text) {

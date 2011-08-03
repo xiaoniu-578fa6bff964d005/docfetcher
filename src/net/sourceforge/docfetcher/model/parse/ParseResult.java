@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -58,6 +59,7 @@ public final class ParseResult {
 		return this;
 	}
 	
+	@MutableCopy
 	@Nullable
 	public List<String> getAuthors() {
 		return authors;
@@ -73,6 +75,7 @@ public final class ParseResult {
 		return this;
 	}
 	
+	@MutableCopy
 	@Nullable
 	public List<String> getMiscMetadata() {
 		return miscMetadata;

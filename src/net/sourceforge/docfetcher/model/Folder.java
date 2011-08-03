@@ -21,7 +21,8 @@ import java.util.Map;
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
@@ -195,20 +196,19 @@ public abstract class Folder
 		return documents.size();
 	}
 	
-	// Safely iterable
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized final List<D> getDocuments() {
 		return UtilModel.nullSafeImmutableList(documents);
 	}
 	
-	// Safely iterable
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized final Map<String, D> getDocumentMap() {
 		return UtilModel.nullSafeImmutableMap(documents);
 	}
 	
+	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
 	public synchronized final List<D> getDocumentsDeep() {
@@ -232,15 +232,13 @@ public abstract class Folder
 		return subFolders.size();
 	}
 	
-	// Safely iterable
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized final List<F> getSubFolders() {
 		return UtilModel.nullSafeImmutableList(subFolders);
 	}
 	
-	// Safely iterable
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized final Map<String, F> getSubFolderMap() {
 		return UtilModel.nullSafeImmutableMap(subFolders);
@@ -255,8 +253,7 @@ public abstract class Folder
 		return count;
 	}
 	
-	// Safely iterable
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized final Iterable<ViewNode> getChildren() {
 		Collection<F> col = getSubFolders(); // returns a copy

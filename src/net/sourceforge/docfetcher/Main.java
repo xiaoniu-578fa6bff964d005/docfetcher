@@ -207,7 +207,7 @@ public final class Main {
 				StatusBarPart part2 = new StatusBarPart(statusBar);
 				part2.setContents(Img.INDEXING.get(), "Web Interface");
 
-				List<StatusBarPart> parts = new ArrayList<StatusBarPart>();
+				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
 				parts.add(part1);
 				parts.add(part2);
 				return parts;

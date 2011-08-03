@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -186,13 +187,14 @@ public abstract class SimpleTreeViewer<E> {
 		item.setData(element);
 	}
 	
+	@MutableCopy
 	@NotNull
 	private List<E> filterAndSort(@Nullable Iterable<E> elements) {
 		if (elements == null)
-			return new ArrayList<E>(0); // must be mutable
+			return new ArrayList<E>(0);
 		Iterator<E> it = elements.iterator();
 		if (!it.hasNext())
-			return new ArrayList<E>(0); // must be mutable
+			return new ArrayList<E>(0);
 		List<E> newElements;
 		if (elements instanceof Collection) {
 			int size = ((Collection<?>) elements).size();
@@ -246,6 +248,7 @@ public abstract class SimpleTreeViewer<E> {
 	
 	protected boolean filter(@NotNull E element) { return true; }
 	
+	@MutableCopy
 	@NotNull
 	public final List<E> getSelection() {
 		TreeItem[] selectedItems = tree.getSelection();
@@ -427,6 +430,7 @@ public abstract class SimpleTreeViewer<E> {
 		}
 	}
 	
+	@MutableCopy
 	@NotNull
 	public final List<E> getElements() {
 		return new ArrayList<E>(elementToItemMap.keySet());

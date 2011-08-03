@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
@@ -76,8 +76,8 @@ public final class UtilModel {
 	 * Returns an immutable list containing the values of the given map, or an
 	 * immutable empty list if null was given.
 	 */
+	@ImmutableCopy
 	@NotNull
-	@Immutable
 	static <K, V> List<V> nullSafeImmutableList(@Nullable Map<K, V> map) {
 		if (map == null || map.isEmpty())
 			return Collections.emptyList();
@@ -88,8 +88,8 @@ public final class UtilModel {
 	 * Returns an immutable copy of the given map, or an immutable empty map if
 	 * null was given.
 	 */
+	@ImmutableCopy
 	@NotNull
-	@Immutable
 	static <K, V> Map<K, V> nullSafeImmutableMap(@Nullable Map<K, V> map) {
 		if (map == null || map.isEmpty())
 			return Collections.emptyMap();

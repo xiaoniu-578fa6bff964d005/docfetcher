@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
@@ -67,6 +68,7 @@ public final class WebSearcher {
 	 */
 	public static class ResultPage {
 		/** The result documents for this page. */
+		@MutableCopy
 		public final List<ResultDocument> resultDocuments;
 		
 		/** The zero-based index of this page. */

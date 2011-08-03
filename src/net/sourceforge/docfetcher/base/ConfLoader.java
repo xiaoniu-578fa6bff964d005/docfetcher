@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 import com.google.common.collect.Lists;
@@ -64,6 +65,7 @@ public final class ConfLoader {
 	 * doesn't exist. Otherwise a {@link FileNotFoundException} is thrown.
 	 */
 	// TODO doc: containerClass must contain nested enums that implement Loadable or Storable
+	@MutableCopy
 	public static List<Loadable> load(	File propFile,
 										Class<?> containerClass,
 										boolean createIfMissing)
@@ -89,12 +91,14 @@ public final class ConfLoader {
 	 * not have the proper structure.
 	 */
 	// TODO doc: containerClass must contain nested enums that implement Loadable or Storable
+	@MutableCopy
+	@NotNull
 	public static List<Loadable> load(InputStream in, Class<?> containerClass)
 			throws IOException {
 		InputStreamReader inReader = new InputStreamReader(in, "utf-8");
 		Properties props = new Properties();
 		props.load(inReader);
-		List<Loadable> notLoaded = new ArrayList<Loadable> ();
+		List<Loadable> notLoaded = new ArrayList<Loadable>();
 		Set<String> seenEntries = new HashSet<String> ();
 		for (Class<? extends Loadable> clazz : ConfLoader.<Loadable>getEnums(containerClass)) {
 			for (Loadable entry : clazz.getEnumConstants()) {
@@ -125,6 +129,7 @@ public final class ConfLoader {
 	/**
 	 * Returns a list of all enums classes in the given class using reflection.
 	 */
+	@MutableCopy
 	@SuppressWarnings("unchecked")
 	private static <T> List<Class<? extends T>> getEnums(Class<?> enclosingClass) {
 		List<Class<? extends T>> enums = Lists.newArrayList();

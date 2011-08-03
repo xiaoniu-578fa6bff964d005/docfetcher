@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,7 +26,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
@@ -167,12 +168,7 @@ public final class IndexRegistry {
 		evtRemoved.remove(removedListener);
 	}
 
-	/**
-	 * Returns an immutable copy of the indexes. Since a copy is returned, it is
-	 * safe for the caller to iterate over it while other threads are adding or
-	 * removing indexes.
-	 */
-	@Immutable
+	@ImmutableCopy
 	@NotNull
 	public synchronized List<LuceneIndex> getIndexes() {
 		return ImmutableList.copyOf(indexes);
@@ -272,6 +268,7 @@ public final class IndexRegistry {
 	// take extra care with synchronization and index deletion!!!
 	// doc: Using read-only IndexSearcher for better concurrent performance
 
+	@ImmutableCopy
 	@NotNull
 	public List<ResultDocument> search(@NotNull String queryString)
 			throws SearchException {
@@ -289,7 +286,8 @@ public final class IndexRegistry {
 		}
 
 		// Abort if there's nothing to search in
-		if (localIndexes.isEmpty()) return Collections.emptyList();
+		if (localIndexes.isEmpty())
+			return Collections.emptyList();
 
 		// Check that all indexes still exist
 		for (LuceneIndex index : localIndexes) {
@@ -332,18 +330,17 @@ public final class IndexRegistry {
 			ScoreDoc[] scoreDocs = searcher.search(query, maxResults).scoreDocs;
 
 			// Create and return results
-			List<ResultDocument> results = new ArrayList<ResultDocument>(
-				scoreDocs.length);
+			ResultDocument[] results = new ResultDocument[scoreDocs.length];
 			for (int i = 0; i < scoreDocs.length; i++) {
 				Document doc = searcher.doc(scoreDocs[i].doc);
 				float score = scoreDocs[i].score;
 				LuceneIndex index = localIndexes.get(searcher.subSearcher(i));
 				IndexingConfig config = index.getConfig();
-				results.add(new ResultDocument(
+				results[i] = new ResultDocument(
 					doc, score, query, isPhraseQuery, config, fileFactory,
-					outlookMailFactory));
+					outlookMailFactory);
 			}
-			return results;
+			return Arrays.asList(results);
 		}
 		catch (IOException e) {
 			throw new SearchException(e.getMessage()); // TODO i18n

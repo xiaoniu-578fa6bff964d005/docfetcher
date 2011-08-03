@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
@@ -333,6 +334,7 @@ public final class IndexPanel {
 		return true;
 	}
 	
+	@MutableCopy
 	@NotNull
 	private List<LuceneIndex> getSelectedIndexes() {
 		List<ViewNode> selection = viewer.getSelection();

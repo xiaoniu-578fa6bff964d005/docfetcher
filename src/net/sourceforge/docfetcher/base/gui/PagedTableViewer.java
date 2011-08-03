@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Immutable;
+import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -195,8 +197,9 @@ public abstract class PagedTableViewer<E> {
 		item.setData(element);
 	}
 	
+	@MutableCopy
 	private List<E> filterAndSort(Collection<E> elements) {
-		List<E> newElements = new ArrayList<E> (elements.size());
+		List<E> newElements = new ArrayList<E>(elements.size());
 		for (E child : elements)
 			if (filter(child))
 				newElements.add(child);
@@ -221,21 +224,23 @@ public abstract class PagedTableViewer<E> {
 	
 	protected void onSelectionChanged(@NotNull E newSelection) {}
 	
+	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
 	public final List<E> getChecked() {
-		List<E> checkedElements = new ArrayList<E> ();
+		List<E> checkedElements = new ArrayList<E>();
 		for (TableItem item : table.getItems())
 			if (item.getChecked())
 				checkedElements.add((E) item.getData());
 		return checkedElements;
 	}
 	
+	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
 	public final List<E> getSelection() {
 		TableItem[] selection = table.getSelection();
-		List<E> selElements = new ArrayList<E> (selection.length);
+		List<E> selElements = new ArrayList<E>(selection.length);
 		for (TableItem item : selection)
 			selElements.add((E) item.getData());
 		return selElements;

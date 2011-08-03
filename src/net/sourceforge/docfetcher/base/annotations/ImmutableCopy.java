@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Tran Nam Quang.
+ * Copyright (c) 2011 Tran Nam Quang.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated Iterable is immutable.
+ * Indicates that the annotated Iterable is an immutable copy of another
+ * Iterable. This implies that the copy can be safely iterated over while the
+ * original Iterable is being modified (either by the same or by a different
+ * thread).
  * 
  * @author Tran Nam Quang
  */
@@ -26,6 +29,6 @@ import java.lang.annotation.Target;
 	ElementType.METHOD
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface Immutable {
+public @interface ImmutableCopy {
 
 }

@@ -11,9 +11,11 @@
 
 package net.sourceforge.docfetcher.model.search;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 /**
@@ -35,9 +37,10 @@ public final class HighlightedString {
 		return string;
 	}
 	
+	@Immutable
 	@NotNull
 	public List<Range> getRanges() {
-		return ranges;
+		return Collections.unmodifiableList(ranges);
 	}
 	
 	public int length() {
