@@ -228,6 +228,9 @@ public final class Main {
 				statusBar.getLeftPart().setContents(null, text);
 			}
 		});
+		
+		// Move focus to search text field
+		searchBar.setFocus();
 
 		// Global keyboard shortcuts
 		display.addFilter(SWT.KeyUp, new Listener() {

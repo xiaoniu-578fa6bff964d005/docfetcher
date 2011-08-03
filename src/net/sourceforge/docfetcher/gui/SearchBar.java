@@ -112,4 +112,8 @@ public final class SearchBar {
 		searchBt.setEnabled(enabled);
 	}
 
+	public boolean setFocus() {
+		return searchBox.setFocus();
+	}
+
 }
