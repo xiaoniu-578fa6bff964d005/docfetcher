@@ -204,6 +204,29 @@ public final class IndexingDialog implements Dialog {
 		// Handle closing of tabs by the user
 		tabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 			public void close(final CTabFolderEvent event) {
+				if (tabFolder.getItemCount() == 1) {
+					/*
+					 * Closing the last tab automatically triggers the closing
+					 * of the shell. However, there can be a considerable delay
+					 * between the former and the latter, allowing the user to
+					 * click on the close button of the shell before the shell
+					 * is closed automatically. If the user does that, there
+					 * will be the strange effect of DocFetcher asking for
+					 * keep/discard/cancel confirmation *twice*: First after
+					 * clicking the close button of the tab, then after clicking
+					 * the close button of the shell. To avoid this, when the
+					 * user tries to close the last tab, we'll close the shell
+					 * instead.
+					 * 
+					 * Note that event.doit must be set to false here: When the
+					 * shell is about to be closed and the confirmation dialog
+					 * shows up, the user could click on the 'Cancel' button, in
+					 * which case the tab should remain open.
+					 */
+					event.doit = false;
+					shell.close();
+					return;
+				}
 				Task task = (Task) event.item.getData();
 				task.remove(new CancelHandler() {
 					public CancelAction cancel() {
