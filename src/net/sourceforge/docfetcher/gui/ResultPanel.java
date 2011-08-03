@@ -199,6 +199,7 @@ public final class ResultPanel {
 		setActualHeaderMode(results); // TODO needs some refactoring
 		
 		viewer.setRoot(results);
+		viewer.scrollToTop();
 	}
 	
 	private void setActualHeaderMode(List<ResultDocument> elements) {

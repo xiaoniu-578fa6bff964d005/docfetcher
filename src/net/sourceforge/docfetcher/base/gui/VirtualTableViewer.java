@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -128,6 +129,12 @@ public abstract class VirtualTableViewer<E> {
 		for (TableItem item : selection)
 			selElements.add((E) item.getData());
 		return selElements;
+	}
+	
+	public final void scrollToTop() {
+		ScrollBar verticalBar = table.getVerticalBar();
+		if (verticalBar != null)
+			verticalBar.setSelection(0);
 	}
 	
 	@NotNull
