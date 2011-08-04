@@ -120,6 +120,9 @@ public final class IndexingQueue {
 						luceneIndex.clear();
 					boolean success = task.update(); // Long-running process
 
+					boolean doDelete = false;
+					boolean doSave = false;
+					
 					// Post-processing
 					lock.lock();
 					try {
@@ -133,19 +136,19 @@ public final class IndexingQueue {
 							 * time.
 							 */
 							assert !task.is(CancelAction.DISCARD);
-							indexRegistry.save(luceneIndex);
+							doSave = true;
 							remove(task);
 						}
 						else if (!success) {
-							luceneIndex.delete();
+							doDelete = true;
 						}
 						else if (task.is(CancelAction.DISCARD)) {
-							luceneIndex.delete();
+							doDelete = true;
 							remove(task);
 						}
 						else {
+							doSave = true;
 							indexRegistry.addIndex(luceneIndex);
-							indexRegistry.save(luceneIndex);
 							boolean keep = task.is(CancelAction.KEEP);
 							boolean noErrors = true; // TODO
 							if (keep || noErrors || shutdown)
@@ -156,6 +159,17 @@ public final class IndexingQueue {
 					finally {
 						lock.unlock();
 					}
+					
+					/*
+					 * Since saving and deleting the index can take a
+					 * significant amount of time to execute, these operations
+					 * are run without holding the lock so that blocking of
+					 * other threads is reduced.
+					 */
+					if (doSave)
+						indexRegistry.save(luceneIndex);
+					else if (doDelete)
+						luceneIndex.delete();
 				}
 			}
 		};
