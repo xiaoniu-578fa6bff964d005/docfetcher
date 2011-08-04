@@ -1,0 +1,1 @@
+This dummy file was placed here to work around the limitation that Git isn't capable of committing empty directories. This was tested against Git 1.7.1.
