@@ -14,9 +14,8 @@ package net.sourceforge.docfetcher.model.search;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 public final class SearchException extends Exception {
-	
-	static final long serialVersionUID = 1;
 	
 	public SearchException(String msg) {
 		super(msg);

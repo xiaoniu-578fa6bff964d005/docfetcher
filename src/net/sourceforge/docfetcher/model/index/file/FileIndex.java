@@ -44,9 +44,8 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 public final class FileIndex extends TreeIndex<FileDocument, FileFolder, IndexingConfig> {
-
-	private static final long serialVersionUID = 4865930775650906369L;
 
 	/*
 	 * General exception handling policy used here:

@@ -18,9 +18,8 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 final class ArchiveEncryptedException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
 	
 	private final File file;
 	private final String originalPath;

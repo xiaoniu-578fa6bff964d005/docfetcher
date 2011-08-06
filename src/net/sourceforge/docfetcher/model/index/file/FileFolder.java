@@ -19,9 +19,8 @@ import net.sourceforge.docfetcher.model.FolderVisitor;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 class FileFolder extends Folder<FileDocument, FileFolder> {
-
-	private static final long serialVersionUID = -901982674932899773L;
 
 	public static class FileFolderVisitor <T extends Throwable>
 			extends FolderVisitor<FileDocument, FileFolder, T> {

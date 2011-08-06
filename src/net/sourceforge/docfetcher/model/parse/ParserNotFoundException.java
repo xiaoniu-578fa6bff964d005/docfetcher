@@ -14,9 +14,8 @@ package net.sourceforge.docfetcher.model.parse;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 public final class ParserNotFoundException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
 	
 	ParserNotFoundException() {
 		super("Could not find suitable parser."); // TODO i18n

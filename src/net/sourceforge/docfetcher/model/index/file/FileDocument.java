@@ -22,9 +22,8 @@ import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.DocumentType;
 import de.schlichtherle.truezip.file.TFile;
 
+@SuppressWarnings("serial")
 final class FileDocument extends Document<FileDocument, FileFolder> {
-	
-	private static final long serialVersionUID = 6387439091828861893L;
 	
 	@Nullable private FileFolder htmlFolder;
 	

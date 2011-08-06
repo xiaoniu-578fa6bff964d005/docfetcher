@@ -18,10 +18,9 @@ import net.sourceforge.docfetcher.model.DocumentType;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 final class MailDocument extends Document<MailDocument, MailFolder> {
 	
-	private static final long serialVersionUID = -3259554000426136186L;
-
 	public MailDocument(@NotNull MailFolder parent,
 	                    @NotNull String name,
 	                    @NotNull String displayName,

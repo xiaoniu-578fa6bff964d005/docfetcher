@@ -30,13 +30,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public abstract class TreeIndex <
 	D extends Document<D, F>,
 	F extends Folder<D, F>,
 	C extends IndexingConfig> implements LuceneIndex {
 
-	private static final long serialVersionUID = -2096725378725915756L;
-	
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	@NotNull private final F rootFolder;

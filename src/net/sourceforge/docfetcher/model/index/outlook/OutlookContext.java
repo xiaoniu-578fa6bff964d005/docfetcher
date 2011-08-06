@@ -120,9 +120,8 @@ final class OutlookContext {
 			protected void handleException(	String filename,
 											Exception e) {
 				final String filepath = Util.joinPath(doc.getPath(), filename);
+				@SuppressWarnings("serial")
 				TreeNode attachNode = new TreeNode(filename, filename) {
-					private static final long serialVersionUID = 1L;
-
 					public String getPath() {
 						return filepath;
 					}

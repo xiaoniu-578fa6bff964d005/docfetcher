@@ -20,10 +20,9 @@ import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public class FileFilter implements Serializable {
 	
-	private static final long serialVersionUID = -583588615310831436L;
-
 	public boolean matches(	@NotNull String filename,
 							@NotNull String filepath,
 							boolean isFile) {

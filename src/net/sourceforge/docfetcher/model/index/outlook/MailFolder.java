@@ -21,9 +21,8 @@ import net.sourceforge.docfetcher.model.Folder;
  * 
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 final class MailFolder extends Folder<MailDocument, MailFolder> {
-	
-	private static final long serialVersionUID = 2438835223703631096L;
 	
 	private boolean hasDeepContent = false;
 	

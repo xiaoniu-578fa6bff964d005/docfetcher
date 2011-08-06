@@ -21,9 +21,8 @@ import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public abstract class TreeNode implements Serializable {
-	
-	private static final long serialVersionUID = -7806671503719389615L;
 	
 	private final String name;
 	private final String displayName;

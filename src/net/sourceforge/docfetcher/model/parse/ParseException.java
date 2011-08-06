@@ -14,9 +14,8 @@ package net.sourceforge.docfetcher.model.parse;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 public final class ParseException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
 	
 	public ParseException(Throwable cause) {
 		super(cause);

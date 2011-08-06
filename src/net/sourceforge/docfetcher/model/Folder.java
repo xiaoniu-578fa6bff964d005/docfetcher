@@ -36,12 +36,11 @@ import com.google.common.collect.Maps;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public abstract class Folder
 	<D extends Document<D, F>, F extends Folder<D, F>>
 		extends TreeNode implements ViewNode {
 	
-	private static final long serialVersionUID = -6239935045535752193L;
-
 	public interface Predicate<T> {
 		boolean matches(T candidate);
 	}

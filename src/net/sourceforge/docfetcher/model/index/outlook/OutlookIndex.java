@@ -39,10 +39,9 @@ import com.pff.PSTMessage;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 public final class OutlookIndex extends TreeIndex
 	<MailDocument, MailFolder, IndexingConfig> {
-	
-	private static final long serialVersionUID = -7853909990723136883L;
 	
 	/*
 	 * Tests indicate we can directly retrieve any message via its ID, but not

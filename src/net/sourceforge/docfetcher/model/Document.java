@@ -19,9 +19,8 @@ import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public abstract class Document<D extends Document<D, F>, F extends Folder<D, F>> extends TreeNode {
-	
-	private static final long serialVersionUID = 1L;
 	
 	@NotNull F parent;
 	private long lastModified = -1;

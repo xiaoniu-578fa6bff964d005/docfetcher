@@ -112,8 +112,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	 * class is useful in situations where it is very easy to use the wrong map
 	 * key, e.g. a File object instead of the file path.
 	 */
+	@SuppressWarnings("serial")
 	private static final class SafeKeyMap<K, V> extends HashMap<K, V> {
-		private static final long serialVersionUID = 1L;
 		public static <K, V> SafeKeyMap<K, V> create() {
 			return new SafeKeyMap<K, V> ();
 		}

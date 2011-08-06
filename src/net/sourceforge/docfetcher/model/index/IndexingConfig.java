@@ -33,9 +33,8 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
+@SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
-	
-	private static final long serialVersionUID = 8729189660394555000L;
 	
 	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO add more extensions
 	private static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
