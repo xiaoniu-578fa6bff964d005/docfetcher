@@ -11,6 +11,9 @@
 
 package net.sourceforge.docfetcher.model;
 
+import java.util.List;
+
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 /**
@@ -38,5 +41,9 @@ public interface ViewNode {
 	public Iterable<ViewNode> getChildren();
 	
 	public boolean isIndex();
+	
+	@ImmutableCopy
+	@NotNull
+	public List<String> getDocumentIds();
 
 }

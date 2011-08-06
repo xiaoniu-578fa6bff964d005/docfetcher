@@ -12,7 +12,9 @@
 package net.sourceforge.docfetcher.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -309,6 +311,20 @@ public abstract class Folder
 	
 	public final boolean isIndex() {
 		return false;
+	}
+	
+	@ImmutableCopy
+	@NotNull
+	public final List<String> getDocumentIds() {
+		if (documents == null)
+			return Collections.emptyList();
+		String[] uids = new String[documents.size()];
+		int i = 0;
+		for (D document : documents.values()) {
+			uids[i] = document.getUniqueId();
+			i++;
+		}
+		return Arrays.asList(uids);
 	}
 	
 }

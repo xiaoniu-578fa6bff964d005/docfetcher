@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ import net.sourceforge.docfetcher.model.index.IndexingQueue.Rejection;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -71,6 +73,7 @@ public final class IndexPanel {
 	}
 	
 	public final Event<Void> evtCheckStatesChanged = new Event<Void>();
+	public final Event<Set<String>> evtListDocuments = new Event<Set<String>>();
 
 	private final SimpleTreeViewer<ViewNode> viewer;
 	private final Tree tree;
@@ -349,6 +352,19 @@ public final class IndexPanel {
 					if (!success) // This is to be expected for PST files
 						Util.launch(Util.getParentFile(file));
 				}
+			}
+		});
+		
+		menuManager.add(new MenuAction("List Documents") {
+			public boolean isEnabled() {
+				return !viewer.getSelection().isEmpty();
+			}
+			public void run() {
+				List<ViewNode> selection = viewer.getSelection();
+				Set<String> uids = new HashSet<String>();
+				for (ViewNode viewNode : selection)
+					uids.addAll(viewNode.getDocumentIds());
+				evtListDocuments.fire(uids);
 			}
 		});
 		

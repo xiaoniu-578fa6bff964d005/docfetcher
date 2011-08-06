@@ -22,6 +22,9 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import org.apache.lucene.store.Directory;
 
 /**
+ * This interface is used for hiding the generic parameters of {@link TreeIndex}
+ * from clients.
+ * 
  * @author Tran Nam Quang
  */
 public interface LuceneIndex extends ViewNode, Serializable {
@@ -39,6 +42,9 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	 */
 	@NotNull
 	public File getRootFile();
+	
+	@NotNull
+	public Folder<?, ?> getRootFolder();
 	
 	public boolean update(IndexingReporter reporter, Cancelable cancelable);
 	

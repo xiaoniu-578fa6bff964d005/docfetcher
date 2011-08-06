@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
@@ -42,10 +43,13 @@ import net.sourceforge.docfetcher.model.search.SearchException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.util.Version;
 
 import com.google.common.collect.ImmutableList;
@@ -278,26 +282,12 @@ public final class IndexRegistry {
 		 * allows the user to re-check the unchecked indexes and see previously
 		 * hidden results without starting another search.
 		 */
-
-		// Make local copy of indexes for thread-safety
-		List<LuceneIndex> localIndexes;
-		synchronized (this) {
-			localIndexes = new ArrayList<LuceneIndex>(indexes);
-		}
+		
+		List<LuceneIndex> localIndexes = copyOfIndexes();
 
 		// Abort if there's nothing to search in
 		if (localIndexes.isEmpty())
 			return Collections.emptyList();
-
-		// Check that all indexes still exist
-		for (LuceneIndex index : localIndexes) {
-			File indexDir = index.getIndexDir();
-			if (indexDir != null && !indexDir.isDirectory()) {
-				String msg = "folders_not_found"; // TODO i18n
-				msg += "\n" + Util.getSystemAbsPath(indexDir);
-				throw new SearchException(msg);
-			}
-		}
 
 		// Create Lucene query
 		QueryWrapper queryWrapper = UtilModel.createQuery(queryString);
@@ -349,6 +339,86 @@ public final class IndexRegistry {
 			// This will close all searchables
 			Closeables.closeQuietly(searcher);
 		}
+	}
+	
+	@ImmutableCopy
+	@NotNull
+	public List<ResultDocument> list(@NotNull Set<String> uids)
+			throws SearchException {
+		List<LuceneIndex> localIndexes = copyOfIndexes();
+
+		// Abort if there's nothing to search in
+		if (localIndexes.isEmpty())
+			return Collections.emptyList();
+		
+		// Construct a filter that only matches documents with the given UIDs
+		TermsFilter uidFilter = new TermsFilter();
+		String fieldName = Fields.UID.key();
+		for (String uid : uids)
+			uidFilter.addTerm(new Term(fieldName, uid));
+		
+		MultiSearcher searcher = null;
+		try {
+			// TODO calling search can throw an OutOfMemoryError -> catch it
+			searcher = UtilModel.createLuceneSearcher(localIndexes);
+			int maxResults = ProgramConf.Int.MaxResultsTotal.get();
+			Query query = new MatchAllDocsQuery();
+			ScoreDoc[] scoreDocs = searcher.search(query, uidFilter, maxResults).scoreDocs;
+			
+			ResultDocument[] results = new ResultDocument[scoreDocs.length];
+			for (int i = 0; i < results.length; i++) {
+				Document doc = searcher.doc(scoreDocs[i].doc);
+				float score = scoreDocs[i].score;
+				LuceneIndex index = indexes.get(searcher.subSearcher(i));
+				IndexingConfig config = index.getConfig();
+				results[i] = new ResultDocument(
+					doc, score, query, true, config, fileFactory,
+					outlookMailFactory);
+			}
+			
+			// Sort results by title
+			Arrays.sort(results, new Comparator<ResultDocument>() {
+				public int compare(ResultDocument o1, ResultDocument o2) {
+					// TODO use alphanum comparator
+					return o1.getTitle().compareTo(o2.getTitle());
+				}
+			});
+			
+			return Arrays.asList(results);
+		}
+		catch (IOException e) {
+			throw new SearchException(e.getMessage()); // TODO i18n
+		}
+		finally {
+			// This will close all searchables
+			Closeables.closeQuietly(searcher);
+		}
+	}
+	
+	// Makes local copy of indexes for thread-safety and checks that all indexes
+	// still exist
+	@NotNull
+	private List<LuceneIndex> copyOfIndexes() throws SearchException {
+		List<LuceneIndex> localIndexes;
+		synchronized (this) {
+			localIndexes = new ArrayList<LuceneIndex>(indexes);
+		}
+
+		// Abort if there's nothing to search in
+		if (localIndexes.isEmpty())
+			return Collections.emptyList();
+
+		// Check that all indexes still exist
+		for (LuceneIndex index : localIndexes) {
+			File indexDir = index.getIndexDir();
+			if (indexDir != null && !indexDir.isDirectory()) {
+				String msg = "folders_not_found"; // TODO i18n
+				msg += "\n" + Util.getSystemAbsPath(indexDir);
+				throw new SearchException(msg);
+			}
+		}
+		
+		return localIndexes;
 	}
 	
 	private static class IndexComparator implements Comparator<LuceneIndex> {

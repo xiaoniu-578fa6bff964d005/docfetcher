@@ -46,7 +46,7 @@ import com.google.common.collect.Sets;
 public final class SearchQueue {
 	
 	private static enum GuiEvent {
-		SEARCH, SIZE, TYPE, LOCATION
+		SEARCH_OR_LIST, SIZE, TYPE, LOCATION
 	}
 
 	private final SearchBar searchBar;
@@ -61,6 +61,7 @@ public final class SearchQueue {
 	private final EnumSet<GuiEvent> queue = EnumSet.noneOf(GuiEvent.class);
 	
 	@Nullable private volatile String query;
+	@Nullable private volatile Set<String> listDocIds;
 	@Nullable private List<ResultDocument> results;
 	@Nullable private Set<String> checkedParsers;
 	@Nullable private Set<String> checkedLocations;
@@ -107,11 +108,12 @@ public final class SearchQueue {
 		searchBar.evtSearch.add(new Event.Listener<String>() {
 			public void update(String eventData) {
 				// TODO abort with message if there are no indexes
-				query = eventData;
-				searchBar.setEnabled(false);
+				// -> is the isEmpty check in IndexRegistry.search redundant?
 				lock.lock();
 				try {
-					queue.add(GuiEvent.SEARCH);
+					query = eventData;
+					searchBar.setEnabled(false);
+					queue.add(GuiEvent.SEARCH_OR_LIST);
 					queueNotEmpty.signal();
 				}
 				finally {
@@ -158,16 +160,40 @@ public final class SearchQueue {
 				}
 			}
 		});
+		
+		indexPanel.evtListDocuments.add(new Event.Listener<Set<String>>() {
+			public void update(Set<String> eventData) {
+				// TODO abort with message if there are no indexes
+				// -> is the isEmpty check in IndexRegistry.search redundant?
+				lock.lock();
+				try {
+					listDocIds = eventData;
+					queue.add(GuiEvent.SEARCH_OR_LIST);
+					queueNotEmpty.signal();
+				}
+				finally {
+					lock.unlock();
+				}
+			}
+		});
 	}
 	
 	private void threadLoop() throws InterruptedException {
 		final EnumSet<GuiEvent> queueCopy;
+		final String query;
+		final Set<String> listDocIds;
+		
 		lock.lock();
 		try {
 			while (queue.isEmpty())
 				queueNotEmpty.await();
+			
 			queueCopy = EnumSet.copyOf(queue);
 			queue.clear();
+			query = this.query;
+			listDocIds = this.listDocIds;
+			this.query = null;
+			this.listDocIds = null;
 		}
 		finally {
 			lock.unlock();
@@ -176,9 +202,14 @@ public final class SearchQueue {
 		IndexRegistry indexRegistry = indexPanel.getIndexRegistry();
 		
 		// Run search
-		if (queueCopy.contains(GuiEvent.SEARCH)) {
+		if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST)) {
 			try {
-				results = indexRegistry.search(query);
+				if (query != null)
+					results = indexRegistry.search(query);
+				else if (listDocIds != null)
+					results = indexRegistry.list(listDocIds);
+				else
+					throw new IllegalStateException();
 			}
 			catch (SearchException e) {
 				AppUtil.showError(e.getMessage(), true, true);

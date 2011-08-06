@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.search;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -20,7 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.MutableCopy;
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
@@ -68,7 +69,7 @@ public final class WebSearcher {
 	 */
 	public static class ResultPage {
 		/** The result documents for this page. */
-		@MutableCopy
+		@ImmutableCopy
 		public final List<ResultDocument> resultDocuments;
 		
 		/** The zero-based index of this page. */
@@ -239,23 +240,23 @@ public final class WebSearcher {
 			}
 
 			// Create and fill list of result documents to return
-			List<ResultDocument> results = new ArrayList<ResultDocument>(end
-					- start);
+			ResultDocument[] results = new ResultDocument[end - start];
 			for (int i = start; i < end; i++) {
 				Document doc = searcher.doc(scoreDocs[i].doc);
 				float score = scoreDocs[i].score;
 				LuceneIndex index = indexes.get(searcher.subSearcher(i));
 				IndexingConfig config = index.getConfig();
-				results.add(new ResultDocument(
+				results[i - start] = new ResultDocument(
 					doc, score, query, isPhraseQuery, config, fileFactory,
-					outlookMailFactory));
+					outlookMailFactory);
 			}
 			
 			int hitCount = topDocs.totalHits;
 			int newPageIndex = start / PAGE_SIZE;
 			int pageCount = (int) Math.ceil((float) hitCount / PAGE_SIZE);
 			
-			return new ResultPage(results, newPageIndex, pageCount, hitCount);
+			return new ResultPage(
+				Arrays.asList(results), newPageIndex, pageCount, hitCount);
 		}
 		finally {
 			readLock.unlock();

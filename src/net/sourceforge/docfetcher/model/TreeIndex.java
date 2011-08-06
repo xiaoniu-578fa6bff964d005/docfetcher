@@ -13,7 +13,10 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
@@ -84,7 +87,6 @@ public abstract class TreeIndex <
 	}
 	
 	@NotNull
-	@VisibleForTesting
 	public final F getRootFolder() {
 		return rootFolder;
 	}
@@ -139,6 +141,12 @@ public abstract class TreeIndex <
 	
 	public final boolean isIndex() {
 		return true;
+	}
+	
+	@ImmutableCopy
+	@NotNull
+	public List<String> getDocumentIds() {
+		return rootFolder.getDocumentIds();
 	}
 
 }
