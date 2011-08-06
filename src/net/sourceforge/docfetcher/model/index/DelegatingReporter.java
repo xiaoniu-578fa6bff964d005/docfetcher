@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.index;
 
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.BoundedList;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;

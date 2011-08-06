@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 
 import com.google.common.collect.Maps;
@@ -78,6 +79,7 @@ public abstract class Folder
 	 */
 	@Nullable private HashMap<String, D> documents;
 	@Nullable private HashMap<String, F> subFolders;
+	@Nullable private F parent;
 	private final String path;
 	
 	/*
@@ -89,6 +91,18 @@ public abstract class Folder
 	public Folder(@NotNull String name, @NotNull String path) {
 		super(name, name);
 		this.path = Util.checkNotNull(path).replace('\\', '/');
+	}
+	
+	@Nullable
+	public synchronized F getParent() {
+		return parent;
+	}
+	
+	@Nullable
+	@RecursiveMethod
+	@SuppressWarnings("unchecked")
+	public synchronized F getRoot() {
+		return parent == null ? (F) this : parent.getRoot();
 	}
 
 	@NotNull
@@ -109,9 +123,13 @@ public abstract class Folder
 	}
 	
 	// will replace folder with identical name
+	@SuppressWarnings("unchecked")
 	public synchronized final void putSubFolder(@NotNull F folder) {
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
+		if (folder.parent != null)
+			folder.parent.subFolders.remove(folder);
+		folder.parent = (F) this;
 		subFolders.put(folder.getName(), folder);
 		evtFolderAdded.fire(new FolderEvent(this, folder));
 	}
@@ -140,6 +158,8 @@ public abstract class Folder
 			Collection<F> toNotify = subFolders.values();
 			subFolders = null;
 			for (F subFolder : toNotify)
+				subFolder.parent = null;
+			for (F subFolder : toNotify)
 				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 		}
 	}
@@ -152,6 +172,7 @@ public abstract class Folder
 		if (subFolders == null || subFolder == null) return;
 		F candidate = subFolders.remove(subFolder.getName());
 		Util.checkThat(candidate == subFolder);
+		subFolder.parent = null;
 		if (subFolders.isEmpty())
 			subFolders = null;
 		evtFolderRemoved.fire(new FolderEvent(this, subFolder));
@@ -174,15 +195,19 @@ public abstract class Folder
 	public synchronized final void removeSubFolders(@NotNull Predicate<F> predicate) {
 		if (subFolders == null) return;
 		Iterator<F> subFolderIt = subFolders.values().iterator();
+		List<F> toNotify = new ArrayList<F>(subFolders.size());
 		while (subFolderIt.hasNext()) {
 			F subFolder = subFolderIt.next();
 			if (predicate.matches(subFolder)) {
 				subFolderIt.remove();
-				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
+				subFolder.parent = null;
+				toNotify.add(subFolder);
 			}
 		}
 		if (subFolders.isEmpty())
 			subFolders = null;
+		for (F subFolder : toNotify)
+			evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
 	
 	@Nullable

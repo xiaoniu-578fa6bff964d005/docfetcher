@@ -15,10 +15,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.base.AppUtil;
+import net.sourceforge.docfetcher.base.BoundedList;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.MutableCopy;
@@ -44,7 +47,6 @@ import net.sourceforge.docfetcher.model.index.IndexingQueue.Rejection;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -288,6 +290,68 @@ public final class IndexPanel {
 			}
 		});
 		
+		menuManager.addSeparator();
+		
+		menuManager.add(new MenuAction("Open Folder") {
+			public boolean isEnabled() {
+				return !viewer.getSelection().isEmpty();
+			}
+			public void run() {
+				final int limit = 10;
+				List<ViewNode> selection = viewer.getSelection();
+				BoundedList<File> files = new BoundedList<File>(limit, false);
+				Set<File> missing = new LinkedHashSet<File>();
+				
+				for (ViewNode element : selection) {
+					if (element instanceof LuceneIndex) {
+						LuceneIndex index = (LuceneIndex) element;
+						File rootFile = index.getRootFile();
+						if (!rootFile.exists()) {
+							missing.add(rootFile);
+						}
+						else {
+							if (!files.containsEq(rootFile))
+								files.add(rootFile);
+						}
+					}
+					else {
+						Folder<?, ?> folder = (Folder<?, ?>) element;
+						File rootFile = new File(folder.getRoot().getPath());
+						if (!rootFile.exists()) {
+							missing.add(rootFile);
+						}
+						else {
+							File dir = getNearestFile(folder);
+							if (!files.containsEq(dir))
+								files.add(dir);
+						}
+					}
+				}
+				
+				// Abort with an error message if any indexes are missing
+				if (!missing.isEmpty()) {
+					String items = Util.join("\n", missing);
+					String msg = "folders_not_found" + "\n" + items; // TODO i18n
+					AppUtil.showError(msg, true, false);
+					return;
+				}
+				
+				// Abort with an error message if the user tried to open too
+				// many files
+				if (files.getVirtualSize() > files.getCapacity()) {
+					AppUtil.showError("open_limit", true, true); // TODO i18n
+					return;
+				}
+				
+				// Open files or directories
+				for (File file : files) {
+					boolean success = Util.launch(file);
+					if (!success) // This is to be expected for PST files
+						Util.launch(Util.getParentFile(file));
+				}
+			}
+		});
+		
 		/*
 		 * Hide the context menu if the tree element on which the user opened
 		 * the menu is removed by an index update running in the background.
@@ -358,6 +422,20 @@ public final class IndexPanel {
 		item.setChecked(checked);
 		for (TreeItem child : item.getItems())
 			setCheckedRecursively(child, checked);
+	}
+	
+	// Returns nearest parent file that is an existing directory or the
+	// root file
+	@NotNull
+	@RecursiveMethod
+	private static File getNearestFile(@NotNull Folder<?, ?> folder) {
+		File file = new File(folder.getPath());
+		if (file.exists())
+			return file;
+		Folder<?, ?> parent = folder.getParent();
+		if (parent == null)
+			return file;
+		return getNearestFile(parent);
 	}
 
 	@NotNull

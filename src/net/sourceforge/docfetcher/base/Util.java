@@ -11,10 +11,12 @@
 
 package net.sourceforge.docfetcher.base;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,6 +56,8 @@ import org.eclipse.swt.widgets.Widget;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
@@ -903,17 +907,36 @@ public final class Util {
 	 * supported by SWT.
 	 */
 	@SuppressAjWarnings
-	public static boolean launch(String fileName) {
-		if (Program.launch(fileName))
+	public static boolean launch(@NotNull String filename) {
+		Util.checkNotNull(filename);
+		if (Program.launch(filename))
 			return true;
 		if (! IS_LINUX)
 			return false;
 		try {
-			Process p = Runtime.getRuntime().exec(new String[] {"xdg-open", fileName});
-			return p.waitFor() == 0;
+			String[] cmd = {"xdg-open", filename};
+			Process process = Runtime.getRuntime().exec(cmd);
+			
+			ByteArrayOutputStream errorOut = new ByteArrayOutputStream();
+			InputStream errorIn = process.getErrorStream();
+			
+			int exitValue = process.waitFor();
+			ByteStreams.copy(errorIn, errorOut);
+			Closeables.closeQuietly(errorIn);
+			Closeables.closeQuietly(errorOut);
+			
+			return exitValue == 0 && errorOut.size() == 0;
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	/**
+	 * @see #launch(String)
+	 */
+	public static boolean launch(@NotNull File fileOrDir) {
+		Util.checkNotNull(fileOrDir);
+		return launch(getSystemAbsPath(fileOrDir));
 	}
 
 	/**
