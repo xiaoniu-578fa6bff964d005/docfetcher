@@ -30,6 +30,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
@@ -148,10 +150,21 @@ final class EmailPreview extends Composite {
 	
 	@NotNull
 	private StyledText createHeaderField(@NotNull Composite parent) {
-		StyledText st = new StyledText(parent, SWT.SINGLE | SWT.READ_ONLY);
+		final StyledText st = new StyledText(parent, SWT.SINGLE | SWT.READ_ONLY);
 		st.setBackground(Col.WIDGET_BACKGROUND.get());
 		st.setForeground(Col.WIDGET_FOREGROUND.get());
 		Util.registerSelectAllKey(st);
+		
+		/*
+		 * Clear selection and reset caret position when the text field looses
+		 * focus.
+		 */
+		st.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent e) {
+				st.setSelection(0);
+			}
+		});
+		
 		return st;
 	}
 	
