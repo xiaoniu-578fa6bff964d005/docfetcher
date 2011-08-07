@@ -49,6 +49,7 @@ public class IndexingConfig implements Serializable {
 	private boolean useRelativePaths;
 	@NotNull private FileFilter fileFilter = defaultFileFilter;
 	private boolean htmlPairing = true;
+	private boolean watchFolders = true;
 	@NotNull private Collection<String> textExtensions = defaultTextExtensions;
 	@NotNull private Collection<String> zipExtensions = defaultZipExtensions;
 
@@ -134,10 +135,10 @@ public class IndexingConfig implements Serializable {
 	 */
 	@NotNull
 	public final String getStorablePath(@NotNull File file) {
-		if (! isPortable)
-			return Util.getAbsPath(file);
-		assert Util.USER_DIR.isAbsolute();
 		String absPath = Util.getAbsPath(file);
+		if (! isPortable)
+			return absPath;
+		assert Util.USER_DIR.isAbsolute();
 		String userDirPath = getUserDirPath();
 		if (absPath.equals(userDirPath))
 			return "";
@@ -145,11 +146,11 @@ public class IndexingConfig implements Serializable {
 			String d1 = UtilModel.getDriveLetter(userDirPath);
 			String d2 = UtilModel.getDriveLetter(absPath);
 			if (! d1.equals(d2))
-				return Util.getAbsPath(file);
+				return absPath;
 		}
 		if (useRelativePaths || Util.contains(userDirPath, absPath))
 			return UtilModel.getRelativePath(userDirPath, absPath);
-		return Util.getAbsPath(file);
+		return absPath;
 	}
 	
 	// throws exception if regex is malformed
@@ -262,6 +263,10 @@ public class IndexingConfig implements Serializable {
 	// Accepts filenames and filepaths
 	public boolean isSolidArchive(@NotNull String filename) {
 		return getSolidArchiveFactory(filename) != null;
+	}
+	
+	public boolean isWatchFolders() {
+		return watchFolders;
 	}
 
 }

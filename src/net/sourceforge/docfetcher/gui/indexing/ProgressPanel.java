@@ -73,7 +73,7 @@ public final class ProgressPanel {
 		display.dispose();
 	}
 
-	private final Lock lock = new ReentrantLock();
+	private final Lock lock = new ReentrantLock(true);
 	private final Condition notEmpty = lock.newCondition();
 	private final List<String> queue = new LinkedList<String>();
 	private final int itemLimit;

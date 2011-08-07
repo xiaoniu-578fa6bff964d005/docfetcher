@@ -325,5 +325,48 @@ public abstract class Folder
 		}
 		return Arrays.asList(uids);
 	}
+
+	/**
+	 * Returns the document underneath the receiver that has the given path, or
+	 * null if there is no such document. The search for the document is done
+	 * recursively. Trailing slashes in the given path will be ignored, and
+	 * backward slashes are automatically converted to forward slashes.
+	 * <p>
+	 * This method does not convert between absolute and relative paths, so if
+	 * the documents of the receiver have relative paths, the given path must
+	 * also be a relative path.
+	 */
+	@Nullable
+	public final D findDocument(@NotNull String targetPath) {
+		Util.checkNotNull(targetPath);
+		targetPath = Util.fileSepMatcher.trimTrailingFrom(targetPath);
+		targetPath = targetPath.replace("\\", "/");
+		return findDocumentUnchecked(targetPath);
+	}
+	
+	/**
+	 * Recursive helper method for {@link #findDocument(String)}.
+	 */
+	@Nullable
+	@RecursiveMethod
+	private D findDocumentUnchecked(@NotNull String targetPath) {
+		if (documents != null) {
+			for (D document : documents.values()) {
+				String path = document.getPath();
+				assert UtilModel.noTrailingSlash(path);
+				if (targetPath.equals(path))
+					return document;
+			}
+		}
+		if (subFolders != null) {
+			for (F subFolder : subFolders.values()) {
+				String path = subFolder.getPath();
+				assert UtilModel.noTrailingSlash(path);
+				if (targetPath.startsWith(path + "/"))
+					return subFolder.findDocumentUnchecked(targetPath);
+			}
+		}
+		return null;
+	}
 	
 }

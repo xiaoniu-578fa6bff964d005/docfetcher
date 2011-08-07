@@ -340,5 +340,13 @@ public final class UtilModel {
 			this.isPhraseQuery = isPhraseQuery;
 		}
 	}
+
+	// TODO also check preceding slashes?
+	public static boolean noTrailingSlash(@NotNull String path) {
+		int length = path.length();
+		if (length == 0) return true;
+		char lastChar = path.charAt(length - 1);
+		return lastChar != '/' && lastChar != '\\';
+	}
 	
 }

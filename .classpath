@@ -45,5 +45,10 @@
 	<classpathentry kind="lib" path="lib/lucene/lucene-misc-3.0.3.jar" sourcepath="lib/lucene/lucene-misc-3.0.3-src.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.0.3.jar" sourcepath="lib/lucene/lucene-queries-3.0.3-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
+	<classpathentry kind="lib" path="lib/jnotify/jnotify-0.93.jar" sourcepath="lib/jnotify/jnotify-0.93-src.zip">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/jnotify"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

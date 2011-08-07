@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Folder;
 import net.sourceforge.docfetcher.model.FolderVisitor;
 
@@ -20,7 +21,8 @@ import net.sourceforge.docfetcher.model.FolderVisitor;
  * @author Tran Nam Quang
  */
 @SuppressWarnings("serial")
-class FileFolder extends Folder<FileDocument, FileFolder> {
+@VisibleForPackageGroup
+public class FileFolder extends Folder<FileDocument, FileFolder> {
 
 	public static class FileFolderVisitor <T extends Throwable>
 			extends FolderVisitor<FileDocument, FileFolder, T> {

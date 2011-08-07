@@ -62,7 +62,7 @@ public final class IndexingQueue {
 	private final LinkedList<Task> tasks = new LinkedList<Task>();
 
 	private volatile boolean shutdown = false;
-	final Lock lock = new ReentrantLock();
+	final Lock lock = new ReentrantLock(true);
 	final Condition readyTaskAvailable = lock.newCondition();
 	final int reporterCapacity;
 
@@ -93,87 +93,90 @@ public final class IndexingQueue {
 		thread = new Thread(IndexingQueue.class.getName()) {
 			public void run() {
 				while (true) {
-					// Wait for next task
-					Task task;
-					lock.lock();
 					try {
-						task = getReadyTask();
-						while (task == null) {
-							readyTaskAvailable.await();
-							task = getReadyTask();
-						}
+						threadLoop();
 					}
 					catch (InterruptedException e) {
 						// Program shutdown; get out of the loop
 						break;
 					}
-					finally {
-						lock.unlock();
-					}
-
-					assert isValidRegistryState(indexRegistry, task);
-
-					// Indexing
-					task.set(TaskState.INDEXING);
-					LuceneIndex luceneIndex = task.getLuceneIndex();
-					if (task.is(IndexAction.REBUILD))
-						luceneIndex.clear();
-					boolean success = task.update(); // Long-running process
-
-					boolean doDelete = false;
-					boolean doSave = false;
-					
-					// Post-processing
-					lock.lock();
-					try {
-						if (task.is(IndexAction.UPDATE)) {
-							/*
-							 * In case of index updates, save to disk even if
-							 * the indexing fails. An alternative is to
-							 * automatically discard the index, which would
-							 * probably confuse and/or annoy the user, because
-							 * then indexes could magically disappear at any
-							 * time.
-							 */
-							assert !task.is(CancelAction.DISCARD);
-							doSave = true;
-							remove(task);
-						}
-						else if (!success) {
-							doDelete = true;
-						}
-						else if (task.is(CancelAction.DISCARD)) {
-							doDelete = true;
-							remove(task);
-						}
-						else {
-							doSave = true;
-							indexRegistry.addIndex(luceneIndex);
-							boolean keep = task.is(CancelAction.KEEP);
-							boolean noErrors = true; // TODO
-							if (keep || noErrors || shutdown)
-								remove(task);
-						}
-						task.set(TaskState.FINISHED);
-					}
-					finally {
-						lock.unlock();
-					}
-					
-					/*
-					 * Since saving and deleting the index can take a
-					 * significant amount of time to execute, these operations
-					 * are run without holding the lock so that blocking of
-					 * other threads is reduced.
-					 */
-					if (doSave)
-						indexRegistry.save(luceneIndex);
-					else if (doDelete)
-						luceneIndex.delete();
 				}
 			}
 		};
 		thread.start();
+	}
+	
+	private void threadLoop() throws InterruptedException {
+		// Wait for next task
+		Task task;
+		lock.lock();
+		try {
+			task = getReadyTask();
+			while (task == null) {
+				readyTaskAvailable.await();
+				task = getReadyTask();
+			}
+		}
+		finally {
+			lock.unlock();
+		}
+
+		assert isValidRegistryState(indexRegistry, task);
+
+		// Indexing
+		task.set(TaskState.INDEXING);
+		LuceneIndex luceneIndex = task.getLuceneIndex();
+		if (task.is(IndexAction.REBUILD))
+			luceneIndex.clear();
+		boolean success = task.update(); // Long-running process
+
+		boolean doDelete = false;
+		boolean doSave = false;
+		
+		// Post-processing
+		lock.lock();
+		try {
+			if (task.is(IndexAction.UPDATE)) {
+				/*
+				 * In case of index updates, save to disk even if the indexing
+				 * fails. An alternative is to automatically discard the index,
+				 * which would probably confuse and/or annoy the user, because
+				 * then indexes could magically disappear at any time.
+				 */
+				assert !task.is(CancelAction.DISCARD);
+				doSave = true;
+				remove(task);
+			}
+			else if (!success) {
+				doDelete = true;
+			}
+			else if (task.is(CancelAction.DISCARD)) {
+				doDelete = true;
+				remove(task);
+			}
+			else {
+				doSave = true;
+				indexRegistry.addIndex(luceneIndex);
+				boolean keep = task.is(CancelAction.KEEP);
+				boolean noErrors = true; // TODO
+				if (keep || noErrors || shutdown)
+					remove(task);
+			}
+			task.set(TaskState.FINISHED);
+		}
+		finally {
+			lock.unlock();
+		}
+		
+		/*
+		 * Since saving and deleting the index can take a significant amount of
+		 * time to execute, these operations are run without holding the lock so
+		 * that blocking of other threads is reduced.
+		 */
+		if (doSave)
+			indexRegistry.save(luceneIndex);
+		else if (doDelete)
+			luceneIndex.delete();
 	}
 
 	@NotThreadSafe
@@ -416,11 +419,11 @@ public final class IndexingQueue {
 	 */
 	@ThreadSafe
 	public boolean shutdown(@NotNull final CancelHandler handler) {
-		if (shutdown)
-			throw new UnsupportedOperationException();
-
 		lock.lock();
 		try {
+			if (shutdown)
+				throw new UnsupportedOperationException();
+			
 			// Cancel active task if there is one
 			final boolean[] doShutdown = { true };
 			for (Task task : tasks) {

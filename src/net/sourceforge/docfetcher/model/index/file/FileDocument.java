@@ -18,12 +18,14 @@ import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.DocumentType;
 import de.schlichtherle.truezip.file.TFile;
 
 @SuppressWarnings("serial")
-final class FileDocument extends Document<FileDocument, FileFolder> {
+@VisibleForPackageGroup
+public final class FileDocument extends Document<FileDocument, FileFolder> {
 	
 	@Nullable private FileFolder htmlFolder;
 	

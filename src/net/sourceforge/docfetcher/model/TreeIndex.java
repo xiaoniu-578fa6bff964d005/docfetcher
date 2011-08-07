@@ -147,5 +147,9 @@ public abstract class TreeIndex <
 	public List<String> getDocumentIds() {
 		return rootFolder.getDocumentIds();
 	}
+	
+	public boolean isWatchFolders() {
+		return config.isWatchFolders();
+	}
 
 }

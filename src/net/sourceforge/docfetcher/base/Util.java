@@ -773,19 +773,6 @@ public final class Util {
 		if (size == 0) return null;
 		return list.get(size - 1);
 	}
-
-//	/**
-//	 * Runs the given {@code Runnable} in a way that avoids throwing errors of
-//	 * the type {@link SWT#ERROR_THREAD_INVALID_ACCESS}. This is useful for
-//	 * running GUI-accessing code from non-GUI threads.
-//	 */
-//	@Deprecated
-//	public static void runSWTSafe(@NotNull Runnable runnable) {
-//		if (Display.getCurrent() != null)
-//			runnable.run();
-//		else
-//			Display.getDefault().syncExec(runnable);
-//	}
 	
 	/**
 	 * Runs the given {@code Runnable} in a way that avoids throwing errors of

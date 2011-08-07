@@ -56,7 +56,7 @@ public final class SearchQueue {
 	private final ResultPanel resultPanel;
 	
 	private final Thread thread;
-	private final Lock lock = new ReentrantLock();
+	private final Lock lock = new ReentrantLock(true);
 	private final Condition queueNotEmpty = lock.newCondition();
 	private final EnumSet<GuiEvent> queue = EnumSet.noneOf(GuiEvent.class);
 	

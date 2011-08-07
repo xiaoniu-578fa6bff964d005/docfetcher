@@ -214,8 +214,8 @@ class FileContext {
 			? UtilModel.isZipArchive(fileOrDir)
 			: false;
 		boolean isFileOrArchive = isFileOrSolidArchive || isZipArchive;
-		if (config.getFileFilter().matches(
-			filename, filepath, isFileOrArchive)) return true;
+		if (config.getFileFilter().matches(filename, filepath, isFileOrArchive))
+			return true;
 		/*
 		 * If the mime pattern matches, we'll check the mime pattern again later
 		 * (right before parsing) in order to determine whether to detect the

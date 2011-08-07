@@ -65,5 +65,7 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	
 	@NotNull
 	public DocumentType getDocumentType();
+	
+	public boolean isWatchFolders();
 
 }
