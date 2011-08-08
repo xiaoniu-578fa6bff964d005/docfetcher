@@ -14,7 +14,10 @@ package net.sourceforge.docfetcher.build;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -61,24 +64,20 @@ public final class BuildMain {
 			mainPath + "/program.conf",
 			LineSep.WINDOWS);
 		
-		String licensePatterns = Util.join(", ",
-			"**/*LICENSE*",
-			"**/*license*",
-			"**/*LICENCE*",
-			"**/*licence*",
-			"**/about.htm*",
-			"**/*_files/*", // HTML folders
-			"**/*COPYING*",
-			"**/*copying*",
-			"**/*LGPL*",
-			"**/*lgpl*",
-			"**/*CPL*.htm*",
-			"**/*cpl*.htm*",
-			"**/*EPL*.htm*",
-			"**/*epl*.htm"
-		);
+		// Licenses
+		File lpFile = new File("lib/license_patterns.txt");
+		List<String> lpList = new ArrayList<String>();
+		for (String line : Files.readLines(lpFile, Charsets.UTF_8)) {
+			line = line.trim();
+			if (line.length() == 0 || line.startsWith("#"))
+				continue;
+			lpList.add(line);
+		}
+		String licensePatterns = Util.join(", ", lpList);
 		String eplFilename = "epl-v10.html";
-		copyDir("lib", "build/tmp/licenses", licensePatterns, null);
+		copyDir(
+			"lib", "build/tmp/licenses", licensePatterns,
+			"**/license_patterns.txt");
 		copyBinaryFile("dist/" + eplFilename, "build/tmp/licenses/docfetcher/"
 				+ eplFilename);
 		zipDir("build/tmp/licenses", "build/tmp/licenses.zip");

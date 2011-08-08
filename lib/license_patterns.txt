@@ -1,0 +1,19 @@
+# List of filename patterns that match the license files in this folder.
+# Warning: This file will be read by the Java builder, so modify with caution.
+
+**/*LICENSE*
+**/*license*
+**/*LICENCE*
+**/*licence*
+**/about.htm*
+**/*COPYING*
+**/*copying*
+**/*LGPL*
+**/*lgpl*
+**/*CPL*.htm*
+**/*cpl*.htm*
+**/*EPL*.htm*
+**/*epl*.htm
+
+# HTML folders
+**/*_files/*
