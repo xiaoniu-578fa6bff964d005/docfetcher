@@ -65,15 +65,7 @@ public final class BuildMain {
 			LineSep.WINDOWS);
 		
 		// Licenses
-		File lpFile = new File("lib/license_patterns.txt");
-		List<String> lpList = new ArrayList<String>();
-		for (String line : Files.readLines(lpFile, Charsets.UTF_8)) {
-			line = line.trim();
-			if (line.length() == 0 || line.startsWith("#"))
-				continue;
-			lpList.add(line);
-		}
-		String licensePatterns = Util.join(", ", lpList);
+		String licensePatterns = readPatterns("lib/license_patterns.txt");
 		String eplFilename = "epl-v10.html";
 		copyDir(
 			"lib", "build/tmp/licenses", licensePatterns,
@@ -110,19 +102,13 @@ public final class BuildMain {
 		
 		createPortableBuild(mainJarFile);
 	}
-
+	
 	private static void createPortableBuild(File tmpMainJar) throws Exception {
 		Util.println("Creating portable build...");
 		String releaseDir = format("build/%s-%s", appName, version);
 		copyDir("dist/img", releaseDir + "/img");
 		
-		String excludedLibs = Util.join(", ",
-			"**/ant-?.?.?.jar",
-			"**/aspectjrt-*.jar",
-			"**/*-sources.jar",
-			"**/*-src.jar",
-			"**/swt*.jar"
-		);
+		String excludedLibs = readPatterns("lib/excluded_jar_patterns.txt");
 		copyFlatten("lib", releaseDir + "/lib", "**/*.jar", excludedLibs);
 		copyFlatten("lib", releaseDir + "/lib/windows", "**/swt*win32*.jar", null);
 		copyFlatten("lib", releaseDir + "/lib/linux", "**/swt*linux*.jar", null);
@@ -158,6 +144,18 @@ public final class BuildMain {
 	}
 	
 	// --------------- Helper methods below ------------------------------------
+	
+	private static String readPatterns(String filepath) throws Exception {
+		File file = new File(filepath);
+		List<String> list = new ArrayList<String>();
+		for (String line : Files.readLines(file, Charsets.UTF_8)) {
+			line = line.trim();
+			if (line.length() == 0 || line.startsWith("#"))
+				continue;
+			list.add(line);
+		}
+		return Util.join(", ", list);
+	}
 	
 	private static String format(String format, Object... args) {
 		return String.format(format, args);

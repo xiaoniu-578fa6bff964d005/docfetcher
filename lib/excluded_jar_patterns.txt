@@ -1,0 +1,10 @@
+# List of filename patterns matching the jar files that should be excluded from
+# the releases.
+# Warning: This file will be read by the Java builder, so modify with caution.
+
+**/ant-?.?.?.jar
+**/aspectjrt-*.jar
+**/*-sources.jar
+**/*-src.jar
+**/swt*.jar
+**/junit*.jar

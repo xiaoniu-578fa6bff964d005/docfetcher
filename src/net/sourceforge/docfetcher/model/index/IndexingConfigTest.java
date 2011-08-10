@@ -13,12 +13,18 @@ package net.sourceforge.docfetcher.model.index;
 
 import static org.junit.Assert.assertTrue;
 
+import net.sourceforge.docfetcher.base.AppUtil;
+
 import org.junit.Test;
 
 /**
  * @author Tran Nam Quang
  */
 public final class IndexingConfigTest {
+	
+	static {
+		AppUtil.Const.autoInit();
+	}
 	
 	@Test
 	public void testCreateCustomTempFile() throws Exception {
