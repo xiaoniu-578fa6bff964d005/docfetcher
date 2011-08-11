@@ -40,12 +40,23 @@ for root, dirs, files in os.walk('lib'):
 		jars.append(join(root, filename))
 
 print 'Compiling sources...'
+compile_paths = [
+	join('build/tmp/src-builder',\
+	package_path, 'build/BuildMain.java')
+]
+for root, dirs, files in os.walk('build/tmp/src-builder'):
+	for filename in files:
+		if not filename.endswith('.java'):
+			continue
+		if filename.startswith('Test') or filename.endswith('Test.java'):
+			path = join(root, filename)
+			compile_paths.append(path)
 execute([
 	'javac',
 	'-sourcepath build/tmp/src-builder',
 	'-classpath \"%s\"' % ':'.join(jars),
 	'-nowarn',
-	join('build/tmp/src-builder', package_path, 'build/BuildMain.java')
+	' '.join(compile_paths)
 ])
 
 jar_path = 'build/tmp/docfetcher-builder.jar'

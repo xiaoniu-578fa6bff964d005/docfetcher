@@ -15,10 +15,13 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
+import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -28,8 +31,12 @@ import org.apache.tools.ant.taskdefs.Javac;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.Manifest.Attribute;
 import org.apache.tools.ant.taskdefs.Zip;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 /**
@@ -101,8 +108,9 @@ public final class BuildMain {
 		jar.execute();
 		
 		createPortableBuild(mainJarFile);
+		runTests();
 	}
-	
+
 	private static void createPortableBuild(File tmpMainJar) throws Exception {
 		Util.println("Creating portable build...");
 		String releaseDir = format("build/%s-%s", appName, version);
@@ -141,6 +149,56 @@ public final class BuildMain {
 		
 		copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");
+	}
+	
+	private static void runTests() {
+		Util.println("Running tests...");
+		final List<String> classNames = new ArrayList<String>();
+		new FileWalker() {
+			protected void handleFile(File file) {
+				String name = file.getName();
+				if (!name.endsWith(".java"))
+					return;
+				name = Util.splitFilename(name)[0];
+				if (!name.startsWith("Test") && !name.endsWith("Test"))
+					return;
+				String path = file.getPath();
+				int start = "src/".length();
+				int end = path.length() - ".java".length();
+				path = path.substring(start, end);
+				path = path.replace("/", ".").replace("\\", ".");
+				if (path.equals(TestFiles.class.getName()))
+					return;
+				classNames.add(path);
+			}
+		}.run(new File("src"));
+		
+		Collections.sort(classNames);
+		
+		JUnitCore junit = new JUnitCore();
+		junit.addListener(new RunListener() {
+			public void testFailure(Failure failure) throws Exception {
+				Util.printErr(Strings.repeat(" ", 8) + "FAILED");
+			}
+		});
+		
+		for (String className : classNames) {
+			/*
+			 * AppUtil.Const must be cleared before each test, otherwise one
+			 * test class could load AppUtil.Const and thereby hide
+			 * AppUtil.Const loading failures in subsequent tests.
+			 */
+			AppUtil.Const.clear();
+			try {
+				Class<?> clazz = Class.forName(className);
+				Util.println(Strings.repeat(" ", 4) + className);
+				junit.run(clazz);
+			}
+			catch (ClassNotFoundException e) {
+				Util.printErr(e);
+			}
+		}
+		AppUtil.Const.clear();
 	}
 	
 	// --------------- Helper methods below ------------------------------------

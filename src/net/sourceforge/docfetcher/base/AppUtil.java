@@ -104,6 +104,12 @@ public final class AppUtil {
 			
 			initialized = true;
 		}
+		
+		public static void clear() {
+			for (Const c : Const.values())
+				c.value = null;
+			initialized = false;
+		}
 	}
 	
 	public static enum Msg {
