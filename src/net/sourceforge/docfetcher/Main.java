@@ -127,31 +127,10 @@ public final class Main {
 		// TODO load settings after starting the index registry thread ->
 		// values for index registry constructor can be set later
 		
-		// Load program configuration and preferences
+		// Load program configuration and preferences; load index registry
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
-		
-		// Load index registry in the background while constructing the user
-		// interface
-		File indexParentDir;
-		if (SystemConf.Bool.IsDevelopmentVersion.get())
-			indexParentDir = new File("bin", "indexes");
-		else if (SystemConf.Bool.IsPortable.get())
-			indexParentDir = new File("indexes");
-		else
-			indexParentDir = AppUtil.getAppDataDir();
-		// TODO make cache capacity customizable
-		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
-		indexRegistry = new IndexRegistry(indexParentDir, 20, reporterCapacity);
-		new Thread(Main.class.getName() + " (load index registry)") {
-			public void run() {
-				indexRegistry.load(new Cancelable() {
-					public boolean isCanceled() {
-						return display != null && display.isDisposed();
-					}
-				});
-			}
-		}.start();
+		loadIndexRegistry();
 
 		display = new Display();
 		shell = new Shell(display);
@@ -281,6 +260,46 @@ public final class Main {
 				AppUtil.showStackTraceInOwnDisplay(e);
 			}
 		}
+	}
+
+	private static void loadIndexRegistry() {
+		File indexParentDir;
+		if (SystemConf.Bool.IsDevelopmentVersion.get())
+			indexParentDir = new File("bin", "indexes");
+		else if (SystemConf.Bool.IsPortable.get())
+			indexParentDir = new File("indexes");
+		else
+			indexParentDir = AppUtil.getAppDataDir();
+		
+		// TODO make cache capacity customizable
+		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
+		indexRegistry = new IndexRegistry(indexParentDir, 20, reporterCapacity);
+		
+		new Thread(Main.class.getName() + " (load index registry)") {
+			public void run() {
+				try {
+					indexRegistry.load(new Cancelable() {
+						public boolean isCanceled() {
+							return display != null && display.isDisposed();
+						}
+					});
+				}
+				catch (IOException e) {
+					// Wait until the display is available
+					int tries = 0;
+					while (display == null && tries < 100) {
+						tries++;
+						try {
+							Thread.sleep(100);
+						}
+						catch (InterruptedException e1) {
+							break;
+						}
+					}
+					AppUtil.showStackTrace(e);
+				}
+			}
+		}.start();
 	}
 
 	private static void loadProgramConf() {

@@ -1,3 +1,4 @@
 bin/
 build/
+!src/net/sourceforge/docfetcher/build/
 .settings/

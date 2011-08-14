@@ -35,12 +35,12 @@ public final class WebQuery {
 	/**
 	 * Constructs a new query object for the given query string. The given
 	 * zero-based page index specifies which page from the full set of results
-	 * will be returned by the {@link WebSearcher} instance this query will be
+	 * will be returned by the {@link Searcher} instance this query will be
 	 * submitted to.
 	 * <p>
 	 * If the specified page index is out of range, it will be clamped. The
 	 * clamped page index (i.e. the "actual" page index) can be retrieved from
-	 * the result object via {@link WebSearcher.ResultPage#pageIndex}.
+	 * the result object via {@link Searcher.ResultPage#pageIndex}.
 	 * <p>
 	 * If the caller does not know in advance how many pages will be available
 	 * (this is usually the case when the initial query is submitted), a page

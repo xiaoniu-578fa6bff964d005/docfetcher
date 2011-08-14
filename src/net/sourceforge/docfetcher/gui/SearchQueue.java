@@ -34,6 +34,7 @@ import net.sourceforge.docfetcher.model.TreeCheckState;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.model.search.SearchException;
+import net.sourceforge.docfetcher.model.search.Searcher;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -200,14 +201,21 @@ public final class SearchQueue {
 		}
 		
 		IndexRegistry indexRegistry = indexPanel.getIndexRegistry();
+		Searcher searcher = indexRegistry.getSearcher();
 		
 		// Run search
 		if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST)) {
 			try {
-				if (query != null)
-					results = indexRegistry.search(query);
+				if (searcher == null)
+					/*
+					 * If the index registry hasn't been loaded yet, the
+					 * searcher it returned will be null.
+					 */
+					results = null;
+				else if (query != null)
+					results = searcher.search(query);
 				else if (listDocIds != null)
-					results = indexRegistry.list(listDocIds);
+					results = searcher.list(listDocIds);
 				else
 					throw new IllegalStateException();
 			}

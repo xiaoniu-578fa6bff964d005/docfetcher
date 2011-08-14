@@ -30,22 +30,13 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
-import net.sourceforge.docfetcher.model.search.PhraseDetectingQueryParser;
-import net.sourceforge.docfetcher.model.search.SearchException;
-
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.MultiTermQuery;
-import org.apache.lucene.search.MultiTermQuery.RewriteMethod;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 
@@ -291,54 +282,6 @@ public final class UtilModel {
 			return splitAtExisting(leftParts[0], leftParts[1]);
 		String newRight = Util.joinPath(leftParts[1], right);
 		return splitAtExisting(leftParts[0], newRight);
-	}
-
-	// Caller must close returned searcher
-	@NotNull
-	@VisibleForPackageGroup
-	public static MultiSearcher createLuceneSearcher(@NotNull List<LuceneIndex> indexes)
-			throws IOException {
-		Searchable[] searchables = new Searchable[indexes.size()];
-		for (int i = 0; i < searchables.length; i++) {
-			Directory luceneDir = indexes.get(i).getLuceneDir();
-			searchables[i] = new IndexSearcher(luceneDir);
-		}
-		return new MultiSearcher(searchables);
-	}
-
-	@NotNull
-	@VisibleForPackageGroup
-	public static QueryWrapper createQuery(@NotNull String queryString)
-			throws SearchException {
-		PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
-			IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.analyzer);
-		queryParser.setAllowLeadingWildcard(true);
-		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE;
-		queryParser.setMultiTermRewriteMethod(rewriteMethod);
-		if (!SettingsConf.Bool.UseOrOperator.get())
-			queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
-		
-		try {
-			Query query = queryParser.parse(queryString);
-			boolean isPhraseQuery = queryParser.isPhraseQuery();
-			return new QueryWrapper(query, isPhraseQuery);
-		}
-		catch (ParseException e) {
-			// TODO i18n
-			throw new SearchException("invalid_query.value" + "\n"
-					+ e.getMessage());
-		}
-	}
-	
-	@VisibleForPackageGroup
-	public static class QueryWrapper {
-		public final Query query;
-		public final boolean isPhraseQuery;
-		
-		private QueryWrapper(@NotNull Query query, boolean isPhraseQuery) {
-			this.query = Util.checkNotNull(query);
-			this.isPhraseQuery = isPhraseQuery;
-		}
 	}
 
 	// TODO also check preceding slashes?

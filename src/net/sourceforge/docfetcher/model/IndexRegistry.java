@@ -18,38 +18,26 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.enums.ProgramConf;
-import net.sourceforge.docfetcher.model.UtilModel.QueryWrapper;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
-import net.sourceforge.docfetcher.model.search.ResultDocument;
-import net.sourceforge.docfetcher.model.search.SearchException;
+import net.sourceforge.docfetcher.model.search.Searcher;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.util.Version;
 
 import com.google.common.collect.ImmutableList;
@@ -96,6 +84,8 @@ public final class IndexRegistry {
 	private final HotColdFileCache unpackCache;
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
+	
+	@Nullable private Searcher searcher;
 
 	public IndexRegistry(	@NotNull File indexParentDir,
 							int cacheSize,
@@ -120,6 +110,12 @@ public final class IndexRegistry {
 	@NotNull
 	public IndexingQueue getQueue() {
 		return queue;
+	}
+	
+	// will return null until load(...) is called
+	@Nullable
+	public Searcher getSearcher() {
+		return searcher;
 	}
 
 	@NotNull
@@ -178,7 +174,10 @@ public final class IndexRegistry {
 		return ImmutableList.copyOf(indexes);
 	}
 
-	public synchronized void load(@NotNull Cancelable cancelable) {
+	// should only be called once
+	public synchronized void load(@NotNull Cancelable cancelable)
+			throws IOException {
+		Util.checkThat(searcher == null);
 		for (File indexDir : Util.listFiles(indexParentDir)) {
 			if (cancelable.isCanceled()) break;
 			if (!indexDir.isDirectory()) continue;
@@ -197,6 +196,7 @@ public final class IndexRegistry {
 				Closeables.closeQuietly(stream);
 			}
 		}
+		searcher = new Searcher(this, fileFactory, outlookMailFactory);
 	}
 
 	public synchronized void save() {
@@ -254,173 +254,7 @@ public final class IndexRegistry {
 		}
 		return totalState;
 	}
-	
-	@NotNull
-	@VisibleForPackageGroup
-	public FileFactory getFileFactory() {
-		return fileFactory;
-	}
-	
-	@NotNull
-	@VisibleForPackageGroup
-	public OutlookMailFactory getOutlookMailFactory() {
-		return outlookMailFactory;
-	}
 
-	// TODO provide search method for web interface (must be callable from many
-	// threads simultaneously!)
-	// take extra care with synchronization and index deletion!!!
-	// doc: Using read-only IndexSearcher for better concurrent performance
-
-	@ImmutableCopy
-	@NotNull
-	public List<ResultDocument> search(@NotNull String queryString)
-			throws SearchException {
-		/*
-		 * Note: For the desktop interface, we'll always search in all available
-		 * indexes, even those which are unchecked on the filter panel. This
-		 * allows the user to re-check the unchecked indexes and see previously
-		 * hidden results without starting another search.
-		 */
-		
-		List<LuceneIndex> localIndexes = copyOfIndexes();
-
-		// Abort if there's nothing to search in
-		if (localIndexes.isEmpty())
-			return Collections.emptyList();
-
-		// Create Lucene query
-		QueryWrapper queryWrapper = UtilModel.createQuery(queryString);
-		Query query = queryWrapper.query;
-		boolean isPhraseQuery = queryWrapper.isPhraseQuery;
-
-		/*
-		 * Notes regarding the following code:
-		 * 
-		 * 1) Lucene will throw an IOException if the user deletes one or more
-		 * indexes while a search is running over the affected indexes. The
-		 * IOException is the expected behavior here, and we'll just let it
-		 * happen, rather than try hard to avoid it. Avoidance may in fact be
-		 * very difficult, if not impossible, when multiple DocFetcher instances
-		 * are involved (e.g. one instance deleting an index, the others running
-		 * searches), because in that case in-memory locks won't help.
-		 * 
-		 * 2) All the information needed for displaying the results must be
-		 * loaded and returned immediately rather than lazily, because after the
-		 * search the user might delete one or more indexes. This also means the
-		 * result documents must not access the indexes later on.
-		 */
-
-		MultiSearcher searcher = null;
-		try {
-			// Perform search
-			// TODO calling search can throw an OutOfMemoryError -> catch it
-			searcher = UtilModel.createLuceneSearcher(localIndexes);
-			int maxResults = ProgramConf.Int.MaxResultsTotal.get();
-			ScoreDoc[] scoreDocs = searcher.search(query, maxResults).scoreDocs;
-
-			// Create and return results
-			ResultDocument[] results = new ResultDocument[scoreDocs.length];
-			for (int i = 0; i < scoreDocs.length; i++) {
-				Document doc = searcher.doc(scoreDocs[i].doc);
-				float score = scoreDocs[i].score;
-				LuceneIndex index = localIndexes.get(searcher.subSearcher(i));
-				IndexingConfig config = index.getConfig();
-				results[i] = new ResultDocument(
-					doc, score, query, isPhraseQuery, config, fileFactory,
-					outlookMailFactory);
-			}
-			return Arrays.asList(results);
-		}
-		catch (IOException e) {
-			throw new SearchException(e.getMessage()); // TODO i18n
-		}
-		finally {
-			// This will close all searchables
-			Closeables.closeQuietly(searcher);
-		}
-	}
-	
-	@ImmutableCopy
-	@NotNull
-	public List<ResultDocument> list(@NotNull Set<String> uids)
-			throws SearchException {
-		List<LuceneIndex> localIndexes = copyOfIndexes();
-
-		// Abort if there's nothing to search in
-		if (localIndexes.isEmpty())
-			return Collections.emptyList();
-		
-		// Construct a filter that only matches documents with the given UIDs
-		TermsFilter uidFilter = new TermsFilter();
-		String fieldName = Fields.UID.key();
-		for (String uid : uids)
-			uidFilter.addTerm(new Term(fieldName, uid));
-		
-		MultiSearcher searcher = null;
-		try {
-			// TODO calling search can throw an OutOfMemoryError -> catch it
-			searcher = UtilModel.createLuceneSearcher(localIndexes);
-			int maxResults = ProgramConf.Int.MaxResultsTotal.get();
-			Query query = new MatchAllDocsQuery();
-			ScoreDoc[] scoreDocs = searcher.search(query, uidFilter, maxResults).scoreDocs;
-			
-			ResultDocument[] results = new ResultDocument[scoreDocs.length];
-			for (int i = 0; i < results.length; i++) {
-				Document doc = searcher.doc(scoreDocs[i].doc);
-				float score = scoreDocs[i].score;
-				LuceneIndex index = indexes.get(searcher.subSearcher(i));
-				IndexingConfig config = index.getConfig();
-				results[i] = new ResultDocument(
-					doc, score, query, true, config, fileFactory,
-					outlookMailFactory);
-			}
-			
-			// Sort results by title
-			Arrays.sort(results, new Comparator<ResultDocument>() {
-				public int compare(ResultDocument o1, ResultDocument o2) {
-					// TODO use alphanum comparator
-					return o1.getTitle().compareTo(o2.getTitle());
-				}
-			});
-			
-			return Arrays.asList(results);
-		}
-		catch (IOException e) {
-			throw new SearchException(e.getMessage()); // TODO i18n
-		}
-		finally {
-			// This will close all searchables
-			Closeables.closeQuietly(searcher);
-		}
-	}
-	
-	// Makes local copy of indexes for thread-safety and checks that all indexes
-	// still exist
-	@NotNull
-	private List<LuceneIndex> copyOfIndexes() throws SearchException {
-		List<LuceneIndex> localIndexes;
-		synchronized (this) {
-			localIndexes = new ArrayList<LuceneIndex>(indexes);
-		}
-
-		// Abort if there's nothing to search in
-		if (localIndexes.isEmpty())
-			return Collections.emptyList();
-
-		// Check that all indexes still exist
-		for (LuceneIndex index : localIndexes) {
-			File indexDir = index.getIndexDir();
-			if (indexDir != null && !indexDir.isDirectory()) {
-				String msg = "folders_not_found"; // TODO i18n
-				msg += "\n" + Util.getSystemAbsPath(indexDir);
-				throw new SearchException(msg);
-			}
-		}
-		
-		return localIndexes;
-	}
-	
 	private static class IndexComparator implements Comparator<LuceneIndex> {
 		private static final IndexComparator instance = new IndexComparator();
 

@@ -157,6 +157,12 @@ public final class AppUtil {
 		Util.checkNotNull(display);
 		Util.checkThat(AppUtil.display == null);
 		AppUtil.display = display;
+		
+		display.disposeExec(new Runnable() {
+			public void run() {
+				AppUtil.display = null;
+			}
+		});
 	}
 	
 	private static void checkConstInitialized() {
