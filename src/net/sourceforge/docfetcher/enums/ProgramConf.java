@@ -59,22 +59,31 @@ public final class ProgramConf {
 	}
 
 	public static enum Int implements Loadable {
-		SearchHistorySize (20),
-		MaxLinesInProgressPanel (1000),
-		SearchBoxMaxWidth (200),
-		MaxResultsTotal (10000),
-		WebInterfacePageSize (50),
+		SearchHistorySize (20, 1),
+		MaxLinesInProgressPanel (1000, 2),
+		SearchBoxMaxWidth (200, 0),
+		MaxResultsTotal (10000, 1),
+		WebInterfacePageSize (50, 1),
 		;
 
 		private int value;
-		Int(int value) {
+		private final int min;
+		private final int max;
+		
+		Int(int value, int min, int max) {
 			this.value = value;
+			this.min = min;
+			this.max = max;
 		}
+		Int(int value, int min) {
+			this(value, min, Integer.MAX_VALUE);
+		}
+		
 		public int get() {
 			return value;
 		}
 		public void load(String str) {
-			value = Integer.parseInt(str);
+			value = Util.clamp(Integer.parseInt(str), min, max);
 		}
 	}
 

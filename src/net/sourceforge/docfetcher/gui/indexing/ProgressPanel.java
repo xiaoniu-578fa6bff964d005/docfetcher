@@ -81,7 +81,8 @@ public final class ProgressPanel {
 	private final LinkedList<String> tableItems = new LinkedList<String>();
 
 	public ProgressPanel(@NotNull Composite parent, final int itemLimit) {
-		this.itemLimit = Math.max(2, itemLimit);
+		Util.checkThat(itemLimit >= 2);
+		this.itemLimit = itemLimit;
 		table = new Table(parent, SWT.V_SCROLL | SWT.BORDER | SWT.VIRTUAL);
 		
 		table.addListener(SWT.SetData, new Listener() {
