@@ -175,14 +175,27 @@ public final class IndexRegistry {
 	}
 
 	// should only be called once
-	public synchronized void load(@NotNull Cancelable cancelable)
-			throws IOException {
-		Util.checkThat(searcher == null);
+	@ThreadSafe
+	public void load(@NotNull Cancelable cancelable) throws IOException {
+		/*
+		 * Note: To allow running this method in parallel with other operations,
+		 * it is important not to lock the entire method. Otherwise, if a client
+		 * tried to attach listeners to the registry after this method has been
+		 * called, the former would block until the latter has finished,
+		 * resulting in a serialization of both operations.
+		 */
+		synchronized (this) {
+			Util.checkThat(searcher == null);
+		}
+		
 		for (File indexDir : Util.listFiles(indexParentDir)) {
-			if (cancelable.isCanceled()) break;
-			if (!indexDir.isDirectory()) continue;
+			if (cancelable.isCanceled())
+				break;
+			if (!indexDir.isDirectory())
+				continue;
 			File serFile = new File(indexDir, SER_FILENAME);
-			if (!serFile.isFile()) continue;
+			if (!serFile.isFile())
+				continue;
 			ObjectInputStream stream = null;
 			try {
 				stream = new ObjectInputStream(new FileInputStream(serFile));
@@ -196,7 +209,10 @@ public final class IndexRegistry {
 				Closeables.closeQuietly(stream);
 			}
 		}
-		searcher = new Searcher(this, fileFactory, outlookMailFactory);
+		
+		synchronized (this) {
+			searcher = new Searcher(this, fileFactory, outlookMailFactory);
+		}
 	}
 
 	public synchronized void save() {
