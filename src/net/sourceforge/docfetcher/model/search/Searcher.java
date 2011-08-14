@@ -69,7 +69,7 @@ import com.google.common.io.Closeables;
  * concurrent search requests.
  * <p>
  * <b>Important</b>: Instances of this class must be disposed after usage by
- * calling {@link #dispose()}.
+ * calling {@link #shutdown()}.
  * 
  * @author Tran Nam Quang
  */
@@ -322,7 +322,7 @@ public final class Searcher {
 	
 	/**
 	 * For the given query, returns the requested page of results. This method
-	 * should not be called anymore after {@link #dispose()} has been called,
+	 * should not be called anymore after {@link #shutdown()} has been called,
 	 * otherwise an IOException will be thrown.
 	 */
 	@NotNull
@@ -448,7 +448,7 @@ public final class Searcher {
 	 * requests are submitted to the receiver after this method is called.
 	 */
 	@ThreadSafe
-	public void dispose() {
+	public void shutdown() {
 		if (ioException != null)
 			Util.printErr(ioException);
 		

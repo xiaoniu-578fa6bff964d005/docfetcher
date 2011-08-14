@@ -228,6 +228,9 @@ public final class Main {
 						return null;
 					}
 				});
+				
+				if (e.doit)
+					indexRegistry.getSearcher().shutdown();
 			}
 		});
 
