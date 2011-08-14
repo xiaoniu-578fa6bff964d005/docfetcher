@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesProvider;
 
@@ -53,11 +54,10 @@ public final class Task {
 	private final IndexingQueue queue;
 	private final LuceneIndex index;
 	private final IndexAction indexAction;
-	@NotNull
-	private volatile TaskState state;
+	@NotNull private volatile TaskState state;
+	@Nullable private volatile PendingDeletion deletion;
 	private final DelegatingReporter reporter;
-	@Nullable
-	volatile CancelAction cancelAction;
+	@Nullable volatile CancelAction cancelAction;
 
 	Task(	@NotNull IndexingQueue queue,
 			@NotNull LuceneIndex index,
@@ -179,6 +179,29 @@ public final class Task {
 		queue.lock.lock();
 		try {
 			this.state = Util.checkNotNull(state);
+		}
+		finally {
+			queue.lock.unlock();
+		}
+	}
+	
+	@ThreadSafe
+	void setDeletion(@NotNull PendingDeletion deletion) {
+		queue.lock.lock();
+		try {
+			this.deletion = Util.checkNotNull(deletion);
+		}
+		finally {
+			queue.lock.unlock();
+		}
+	}
+	
+	@Nullable
+	@ThreadSafe
+	PendingDeletion getDeletion() {
+		queue.lock.lock();
+		try {
+			return deletion;
 		}
 		finally {
 			queue.lock.unlock();

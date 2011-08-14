@@ -19,22 +19,24 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.common.collect.ImmutableList;
-
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
 import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.Task.TaskState;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Tran Nam Quang
@@ -144,7 +146,10 @@ public final class IndexingQueue {
 				 * then indexes could magically disappear at any time.
 				 */
 				assert !task.is(CancelAction.DISCARD);
-				doSave = true;
+				if (task.getDeletion() == null)
+					doSave = true;
+				else
+					doDelete = true;
 				remove(task);
 			}
 			else if (!success) {
@@ -168,15 +173,28 @@ public final class IndexingQueue {
 			lock.unlock();
 		}
 		
-		/*
-		 * Since saving and deleting the index can take a significant amount of
-		 * time to execute, these operations are run without holding the lock so
-		 * that blocking of other threads is reduced.
-		 */
-		if (doSave)
+		// Save or delete index; this can be done without holding the lock
+		if (doSave) {
 			indexRegistry.save(luceneIndex);
-		else if (doDelete)
-			luceneIndex.delete();
+		}
+		else if (doDelete) {
+			/*
+			 * Note: This is a typical check-then-act situation that would
+			 * normally require holding the lock. However, in this case the lock
+			 * is not needed: The task must either have been removed from the
+			 * task queue when the lock was held, or it was not an update task.
+			 * In both cases, changing the deletion field at this point should
+			 * not be not possible.
+			 */
+			PendingDeletion deletion = task.getDeletion();
+			if (deletion == null) {
+				luceneIndex.delete();
+			}
+			else {
+				assert task.is(IndexAction.UPDATE);
+				deletion.setApprovedByQueue();
+			}
+		}
 	}
 
 	@NotThreadSafe
@@ -408,6 +426,45 @@ public final class IndexingQueue {
 				evtRemoved.fire(lastElement);
 			}
 		};
+	}
+	
+	// should only be called with indexes that are currently in the registry
+	// approves immediately if no matching task is found
+	// if matching inactive task is found, approval is given after removing the
+	// task from the queue
+	// if matching active task is found, the task is canceled, and the approval
+	// is given after the indexing operation has finished
+	@ThreadSafe
+	@VisibleForPackageGroup
+	public void approveDeletions(@NotNull List<PendingDeletion> deletions) {
+		Util.checkNotNull(deletions);
+		lock.lock();
+		try {
+			for (PendingDeletion deletion : deletions) {
+				Iterator<Task> it = tasks.iterator();
+				boolean approveImmediately = true;
+				while (it.hasNext()) {
+					Task task = it.next();
+					if (task.getLuceneIndex() != deletion.getLuceneIndex())
+						continue;
+					if (task.is(TaskState.INDEXING)) {
+						Util.checkThat(task.is(IndexAction.UPDATE));
+						approveImmediately = false;
+						task.setDeletion(deletion);
+						task.cancelAction = CancelAction.KEEP;
+					}
+					else {
+						it.remove();
+						evtRemoved.fire(task);
+					}
+				}
+				if (approveImmediately)
+					deletion.setApprovedByQueue();
+			}
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	// TODO call shutdown

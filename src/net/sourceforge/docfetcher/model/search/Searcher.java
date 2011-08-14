@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -36,6 +38,7 @@ import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
@@ -51,6 +54,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.MultiTermQuery;
+import org.apache.lucene.search.MultiTermQuery.RewriteMethod;
 import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.PrefixFilter;
 import org.apache.lucene.search.Query;
@@ -58,7 +62,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.MultiTermQuery.RewriteMethod;
 import org.apache.lucene.store.Directory;
 
 import com.google.common.io.Closeables;
@@ -110,12 +113,12 @@ public final class Searcher {
 	private final IndexRegistry indexRegistry;
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
-	
+	private final BlockingQueue<List<PendingDeletion>> deletionQueue = new LinkedBlockingQueue<List<PendingDeletion>>();
+	private final Thread deletionThread;
 	private final Event.Listener<LuceneIndex> addedListener;
-	private final Event.Listener<List<LuceneIndex>> removedListener;
 	
-	@NotNull private MultiSearcher luceneSearcher; // guarded by lock
-	@NotNull private List<LuceneIndex> indexes; // guarded by lock
+	@NotNull private MultiSearcher luceneSearcher; // guarded by read-write lock
+	@NotNull private List<LuceneIndex> indexes; // guarded by read-write lock
 	@Nullable private volatile IOException ioException;
 	
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
@@ -142,12 +145,6 @@ public final class Searcher {
 			}
 		};
 		
-		removedListener = new Event.Listener<List<LuceneIndex>>() {
-			public void update(List<LuceneIndex> eventData) {
-				replaceLuceneSearcher();
-			}
-		};
-		
 		indexRegistry.addListeners(new ExistingIndexesHandler() {
 			public void handleExistingIndexes(List<LuceneIndex> indexes) {
 				try {
@@ -157,10 +154,27 @@ public final class Searcher {
 					ioException = e;
 				}
 			}
-		}, addedListener, removedListener);
+		}, addedListener, null);
 		
 		if (ioException != null)
 			throw ioException;
+		
+		deletionThread = new Thread(Searcher.class.getName() + " (Approve pending deletions)") {
+			public void run() {
+				while (true) {
+					try {
+						List<PendingDeletion> deletions = deletionQueue.take();
+						replaceLuceneSearcher();
+						for (PendingDeletion deletion : deletions)
+							deletion.setApprovedBySearcher();
+					}
+					catch (InterruptedException e) {
+						break;
+					}
+				}
+			}
+		};
+		deletionThread.start();
 	}
 	
 	/**
@@ -443,6 +457,15 @@ public final class Searcher {
 		}
 	}
 	
+	// Given deletions should not be in the registry anymore, since the receiver
+	// will retrieve a fresh set of indexes from the registry before approval
+	@ThreadSafe
+	@VisibleForPackageGroup
+	public void approveDeletions(@NotNull List<PendingDeletion> deletions) {
+		Util.checkNotNull(deletions);
+		deletionQueue.add(deletions);
+	}
+	
 	/**
 	 * Disposes of the receiver. The caller should make sure that no more search
 	 * requests are submitted to the receiver after this method is called.
@@ -452,9 +475,11 @@ public final class Searcher {
 		if (ioException != null)
 			Util.printErr(ioException);
 		
+		deletionThread.interrupt();
+		
 		writeLock.lock();
 		try {
-			indexRegistry.removeListeners(addedListener, removedListener);
+			indexRegistry.removeListeners(addedListener, null);
 			Closeables.closeQuietly(luceneSearcher);
 		}
 		finally {

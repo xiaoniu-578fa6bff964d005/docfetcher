@@ -85,11 +85,12 @@ public final class IndexRegistry {
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
 	
-	@Nullable private Searcher searcher;
+	@Nullable private Searcher searcher; // guarded by 'this' lock
 
 	public IndexRegistry(	@NotNull File indexParentDir,
 							int cacheSize,
 							int reporterCapacity) {
+		Util.checkNotNull(indexParentDir);
 		this.indexParentDir = indexParentDir;
 		this.unpackCache = new HotColdFileCache(cacheSize);
 		this.fileFactory = new FileFactory(unpackCache);
@@ -114,7 +115,7 @@ public final class IndexRegistry {
 	
 	// will return null until load(...) is called
 	@Nullable
-	public Searcher getSearcher() {
+	public synchronized Searcher getSearcher() {
 		return searcher;
 	}
 
@@ -133,16 +134,23 @@ public final class IndexRegistry {
 		Util.checkNotNull(indexesToRemove);
 		if (indexesToRemove.isEmpty())
 			return; // Avoid firing event when given collection is empty
-		List<LuceneIndex> removed = new ArrayList<LuceneIndex>(
-			indexesToRemove.size());
+		
+		int size = indexesToRemove.size();
+		List<LuceneIndex> removed = new ArrayList<LuceneIndex>(size);
+		List<PendingDeletion> deletions = new ArrayList<PendingDeletion>(size);
+		
 		for (LuceneIndex index : indexesToRemove) {
 			if (!indexes.remove(index))
 				continue;
 			if (deleteFiles)
-				index.delete();
+				deletions.add(new PendingDeletion(index));
 			removed.add(index);
 		}
+		
 		evtRemoved.fire(removed);
+		queue.approveDeletions(deletions);
+		if (searcher != null)
+			searcher.approveDeletions(deletions);
 	}
 
 	// Allows attaching a change listener and processing the existing indexes in
@@ -152,20 +160,23 @@ public final class IndexRegistry {
 	// Events may arrive from non-GUI threads; indexes handler runs in the same
 	// thread as the client
 	// The list of indexes given to the handler is an immutable copy
-	public synchronized void addListeners(	@NotNull ExistingIndexesHandler handler,
-											@NotNull Event.Listener<LuceneIndex> addedListener,
-											@NotNull Event.Listener<List<LuceneIndex>> removedListener) {
-		Util.checkNotNull(handler, addedListener, removedListener);
-		handler.handleExistingIndexes(ImmutableList.copyOf(indexes));
-		evtAdded.add(addedListener);
-		evtRemoved.add(removedListener);
+	public synchronized void addListeners(	@Nullable ExistingIndexesHandler handler,
+											@Nullable Event.Listener<LuceneIndex> addedListener,
+											@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
+		if (handler != null)
+			handler.handleExistingIndexes(ImmutableList.copyOf(indexes));
+		if (addedListener != null)
+			evtAdded.add(addedListener);
+		if (removedListener != null)
+			evtRemoved.add(removedListener);
 	}
 	
-	public synchronized void removeListeners(	@NotNull Event.Listener<LuceneIndex> addedListener,
-												@NotNull Event.Listener<List<LuceneIndex>> removedListener) {
-		Util.checkNotNull(addedListener, removedListener);
-		evtAdded.remove(addedListener);
-		evtRemoved.remove(removedListener);
+	public synchronized void removeListeners(	@Nullable Event.Listener<LuceneIndex> addedListener,
+												@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
+		if (addedListener != null)
+			evtAdded.remove(addedListener);
+		if (removedListener != null)
+			evtRemoved.remove(removedListener);
 	}
 
 	@ImmutableCopy
