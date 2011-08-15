@@ -11,9 +11,9 @@
 
 package net.sourceforge.docfetcher.model;
 
+import net.sourceforge.docfetcher.base.Stoppable;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
-import net.sourceforge.docfetcher.model.index.Stoppable;
 
 /**
  * @author Tran Nam Quang

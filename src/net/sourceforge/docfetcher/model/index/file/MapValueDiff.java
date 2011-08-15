@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import java.util.Map;
 
-import net.sourceforge.docfetcher.model.index.Stoppable;
+import net.sourceforge.docfetcher.base.Stoppable;
 
 import com.google.common.collect.Maps;
 

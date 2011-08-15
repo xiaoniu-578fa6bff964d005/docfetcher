@@ -14,9 +14,9 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.io.File;
 import java.util.Collection;
 
+import net.sourceforge.docfetcher.base.Stoppable;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.model.index.Stoppable;
 
 /**
  * @author Tran Nam Quang

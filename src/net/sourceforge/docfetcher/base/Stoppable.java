@@ -9,15 +9,13 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.model.index;
+package net.sourceforge.docfetcher.base;
 
 import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang
  */
-@VisibleForPackageGroup
 public abstract class Stoppable <T extends Throwable> {
 	
 	private boolean stopped = false;

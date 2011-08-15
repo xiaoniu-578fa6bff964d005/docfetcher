@@ -18,10 +18,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.Stoppable;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.model.index.Stoppable;
 
 /**
  * @author Tran Nam Quang
