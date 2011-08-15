@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.BlockingWrapper;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
@@ -84,8 +85,7 @@ public final class IndexRegistry {
 	private final HotColdFileCache unpackCache;
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
-	
-	@Nullable private Searcher searcher; // guarded by 'this' lock
+	private final BlockingWrapper<Searcher> searcher = new BlockingWrapper<Searcher>();
 
 	public IndexRegistry(	@NotNull File indexParentDir,
 							int cacheSize,
@@ -113,10 +113,11 @@ public final class IndexRegistry {
 		return queue;
 	}
 	
-	// will return null until load(...) is called
+	// Will block until the searcher is available (i.e. after load(...) has finished)
+	// May return null if the calling thread was interrupted
 	@Nullable
 	public synchronized Searcher getSearcher() {
-		return searcher;
+		return searcher.get();
 	}
 
 	@NotNull
@@ -149,8 +150,7 @@ public final class IndexRegistry {
 		
 		evtRemoved.fire(removed);
 		queue.approveDeletions(deletions);
-		if (searcher != null)
-			searcher.approveDeletions(deletions);
+		searcher.get().approveDeletions(deletions);
 	}
 
 	// Allows attaching a change listener and processing the existing indexes in
@@ -195,9 +195,7 @@ public final class IndexRegistry {
 		 * called, the former would block until the latter has finished,
 		 * resulting in a serialization of both operations.
 		 */
-		synchronized (this) {
-			Util.checkThat(searcher == null);
-		}
+		Util.checkThat(searcher.isNull());
 		
 		for (File indexDir : Util.listFiles(indexParentDir)) {
 			if (cancelable.isCanceled())
@@ -221,9 +219,7 @@ public final class IndexRegistry {
 			}
 		}
 		
-		synchronized (this) {
-			searcher = new Searcher(this, fileFactory, outlookMailFactory);
-		}
+		searcher.set(new Searcher(this, fileFactory, outlookMailFactory));
 	}
 
 	public synchronized void save() {
