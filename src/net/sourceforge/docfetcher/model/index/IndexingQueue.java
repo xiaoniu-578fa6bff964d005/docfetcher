@@ -143,6 +143,7 @@ public final class IndexingQueue {
 
 		boolean doDelete = false;
 		boolean doSave = false;
+		boolean doUpdateSearcher = false;
 		
 		// Post-processing
 		lock.lock();
@@ -155,10 +156,13 @@ public final class IndexingQueue {
 				 * then indexes could magically disappear at any time.
 				 */
 				assert !task.is(CancelAction.DISCARD);
-				if (task.getDeletion() == null)
+				if (task.getDeletion() == null) {
 					doSave = true;
-				else
+					doUpdateSearcher = true;
+				}
+				else {
 					doDelete = true;
+				}
 				remove(task);
 			}
 			else if (!success) {
@@ -204,6 +208,10 @@ public final class IndexingQueue {
 				deletion.setApprovedByQueue();
 			}
 		}
+		
+		// If the task was an update, refresh the Lucene searcher
+		if (doUpdateSearcher)
+			indexRegistry.getSearcher().replaceLuceneSearcher();
 	}
 
 	@NotThreadSafe
