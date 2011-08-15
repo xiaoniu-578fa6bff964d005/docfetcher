@@ -113,9 +113,10 @@ public final class Searcher {
 	private final IndexRegistry indexRegistry;
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
-	private final BlockingQueue<List<PendingDeletion>> deletionQueue = new LinkedBlockingQueue<List<PendingDeletion>>();
-	private final Thread deletionThread;
 	private final Event.Listener<LuceneIndex> addedListener;
+	
+	private final BlockingQueue<List<PendingDeletion>> deletionQueue = new LinkedBlockingQueue<List<PendingDeletion>>(); // guarded by 'this' lock
+	private final Thread deletionThread; // guarded by 'this' lock
 	
 	@NotNull private MultiSearcher luceneSearcher; // guarded by read-write lock
 	@NotNull private List<LuceneIndex> indexes; // guarded by read-write lock
@@ -463,7 +464,22 @@ public final class Searcher {
 	@VisibleForPackageGroup
 	public void approveDeletions(@NotNull List<PendingDeletion> deletions) {
 		Util.checkNotNull(deletions);
-		deletionQueue.add(deletions);
+		
+		/*
+		 * If the deletion thread is not available anymore, approve of deletions
+		 * immediately. - Otherwise the given deletion objects would just hang
+		 * around in the queue until program shutdown and never receive
+		 * approval, thus the associated indexes would never get deleted.
+		 */
+		synchronized (this) {
+			if (deletionThread.isInterrupted()) {
+				for (PendingDeletion pendingDeletion : deletions)
+					pendingDeletion.setApprovedBySearcher();
+			}
+			else {
+				deletionQueue.add(deletions);
+			}
+		}
 	}
 	
 	/**
@@ -475,8 +491,6 @@ public final class Searcher {
 		if (ioException != null)
 			Util.printErr(ioException);
 		
-		deletionThread.interrupt();
-		
 		writeLock.lock();
 		try {
 			indexRegistry.removeListeners(addedListener, null);
@@ -484,6 +498,15 @@ public final class Searcher {
 		}
 		finally {
 			writeLock.unlock();
+		}
+		
+		/*
+		 * This should be done after closing the Lucene searcher in order to
+		 * ensure that no indexes will be deleted outside the deletion queue
+		 * while the Lucene searcher is still open.
+		 */
+		synchronized (this) {
+			deletionThread.interrupt();
 		}
 	}
 	
