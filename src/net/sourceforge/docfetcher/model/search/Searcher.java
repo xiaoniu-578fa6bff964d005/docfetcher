@@ -183,7 +183,8 @@ public final class Searcher {
 	 * a new one.
 	 */
 	@ThreadSafe
-	private void replaceLuceneSearcher() {
+	@VisibleForPackageGroup
+	public void replaceLuceneSearcher() {
 		writeLock.lock();
 		try {
 			Closeables.close(luceneSearcher, false);
@@ -202,7 +203,7 @@ public final class Searcher {
 	@NotThreadSafe
 	private void setLuceneSearcher(@NotNull List<LuceneIndex> indexes)
 			throws IOException {
-		this.indexes = indexes;
+		this.indexes = Util.checkNotNull(indexes);
 		Searchable[] searchables = new Searchable[indexes.size()];
 		for (int i = 0; i < searchables.length; i++) {
 			Directory luceneDir = indexes.get(i).getLuceneDir();

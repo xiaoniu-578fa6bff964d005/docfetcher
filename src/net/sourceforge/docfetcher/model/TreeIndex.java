@@ -112,8 +112,10 @@ public abstract class TreeIndex <
 		rootFolder.removeChildren();
 		if (fileIndexDir != null) {
 			try {
-				Files.deleteDirectoryContents(fileIndexDir);
-				if (removeTopLevel) fileIndexDir.delete();
+				if (removeTopLevel)
+					Files.deleteRecursively(fileIndexDir);
+				else
+					Files.deleteDirectoryContents(fileIndexDir);
 			}
 			catch (IOException e) {
 				Util.printErr(e);

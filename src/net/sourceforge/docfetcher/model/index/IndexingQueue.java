@@ -128,8 +128,17 @@ public final class IndexingQueue {
 		// Indexing
 		task.set(TaskState.INDEXING);
 		LuceneIndex luceneIndex = task.getLuceneIndex();
-		if (task.is(IndexAction.REBUILD))
+		if (task.is(IndexAction.REBUILD)) {
+			/*
+			 * If the task is a rebuild, the searcher will be holding on to the
+			 * underlying index at this point, since it doesn't care whether the
+			 * index was removed from the registry or not. Therefore, before
+			 * clearing the index, we must signal the searcher to let go of it
+			 * by refreshing the searcher's internal Lucene searcher.
+			 */
+			indexRegistry.getSearcher().replaceLuceneSearcher();
 			luceneIndex.clear();
+		}
 		boolean success = task.update(); // Long-running process
 
 		boolean doDelete = false;
