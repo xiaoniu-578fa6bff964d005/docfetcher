@@ -465,6 +465,8 @@ public final class Searcher {
 	@VisibleForPackageGroup
 	public void approveDeletions(@NotNull List<PendingDeletion> deletions) {
 		Util.checkNotNull(deletions);
+		if (deletions.isEmpty())
+			return;
 		
 		/*
 		 * If the deletion thread is not available anymore, approve of deletions

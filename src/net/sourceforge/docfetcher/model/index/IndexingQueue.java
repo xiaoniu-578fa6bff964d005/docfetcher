@@ -455,6 +455,9 @@ public final class IndexingQueue {
 	@VisibleForPackageGroup
 	public void approveDeletions(@NotNull List<PendingDeletion> deletions) {
 		Util.checkNotNull(deletions);
+		if (deletions.isEmpty())
+			return;
+		
 		lock.lock();
 		try {
 			for (PendingDeletion deletion : deletions) {

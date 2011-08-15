@@ -201,18 +201,12 @@ public final class SearchQueue {
 		}
 		
 		IndexRegistry indexRegistry = indexPanel.getIndexRegistry();
-		Searcher searcher = indexRegistry.getSearcher();
 		
 		// Run search
 		if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST)) {
 			try {
-				if (searcher == null)
-					/*
-					 * If the index registry hasn't been loaded yet, the
-					 * searcher it returned will be null.
-					 */
-					results = null;
-				else if (query != null)
+				Searcher searcher = indexRegistry.getSearcher(); // might block
+				if (query != null)
 					results = searcher.search(query);
 				else if (listDocIds != null)
 					results = searcher.list(listDocIds);

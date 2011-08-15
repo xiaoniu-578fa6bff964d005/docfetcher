@@ -219,7 +219,6 @@ public final class IndexPanel {
 				return isOnlyIndexesSelected();
 			}
 			public void run() {
-				// TODO deactivate index removal if a search is running?
 				List<LuceneIndex> selectedIndexes = getSelectedIndexes();
 				assert !selectedIndexes.isEmpty();
 				// TODO i18n
