@@ -417,9 +417,8 @@ public final class IndexingQueue {
 	@NotThreadSafe
 	void remove(@NotNull Task task) {
 		Util.checkNotNull(task);
-		boolean removed = tasks.remove(task);
-		assert removed;
-		evtRemoved.fire(task);
+		if (tasks.remove(task))
+			evtRemoved.fire(task);
 	}
 
 	// Iterator supports removal of elements
@@ -473,10 +472,14 @@ public final class IndexingQueue {
 						task.setDeletion(deletion);
 						task.cancelAction = CancelAction.KEEP;
 					}
-					else {
-						it.remove();
-						evtRemoved.fire(task);
-					}
+					/*
+					 * Remove the task from the queue even if it was in indexing
+					 * state - we don't want any ghost tasks to linger in the
+					 * queue, since they might (theoretically) cause subsequent
+					 * task addition request to fail due to directory overlaps.
+					 */
+					it.remove();
+					evtRemoved.fire(task);
 				}
 				if (approveImmediately)
 					deletion.setApprovedByQueue();

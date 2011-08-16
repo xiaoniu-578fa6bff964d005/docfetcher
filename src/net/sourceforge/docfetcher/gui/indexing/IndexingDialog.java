@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.base.gui.TabFolderFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.gui.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
@@ -80,7 +81,10 @@ public final class IndexingDialog implements Dialog {
 //		}
 
 		// Create shell
-		shell = new Shell(parentShell, SWT.SHELL_TRIM | SWT.PRIMARY_MODAL);
+		int style = SWT.SHELL_TRIM;
+		if (!SystemConf.Bool.IsDevelopmentVersion.get())
+			style |= SWT.PRIMARY_MODAL;
+		shell = new Shell(parentShell, style);
 		shell.setText("index_management"); // TODO i18n
 		shell.setImage(Img.INDEXING_DIALOG.get());
 		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
