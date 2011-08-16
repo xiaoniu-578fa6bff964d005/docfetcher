@@ -204,8 +204,14 @@ public final class IndexPanel {
 				List<LuceneIndex> sel = getSelectedIndexes();
 				if (!isUpdate)
 					indexRegistry.removeIndexes(sel, false);
-				for (LuceneIndex index : sel)
-					queue.addTask(index, action);
+				for (LuceneIndex index : sel) {
+					Rejection rejection = queue.addTask(index, action);
+					
+					// Assert that rebuild tasks are never rejected
+					assert action == IndexAction.REBUILD
+						? rejection == null
+						: true;
+				}
 				dialogFactory.open();
 			}
 		}

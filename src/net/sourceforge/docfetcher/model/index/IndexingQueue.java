@@ -246,87 +246,134 @@ public final class IndexingQueue {
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		Util.checkThat(Util.equals(taskParentIndexDir, indexParentDir));
 
-		lock.lock();
-		try {
-			assert task.cancelAction == null;
-			assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
-			if (shutdown)
-				return Rejection.SHUTDOWN;
+		synchronized (indexRegistry) {
+			lock.lock();
+			try {
+				assert task.cancelAction == null;
+				assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
+				if (shutdown)
+					return Rejection.SHUTDOWN;
 
-			if (task.is(IndexAction.UPDATE)) {
-				/*
-				 * Here, we reject a request to enqueue an update task if there
-				 * is already another task in the queue that has the same target
-				 * file or directory and is in ready state.
-				 * 
-				 * This is not a bullet-proof way to avoid unnecessary updates
-				 * while ensuring that any necessary updates are run: Going
-				 * through the queue, we could find a ready task with a matching
-				 * target, and reject the enqueue request based on that, but the
-				 * user could later cancel the ready task, thus skipping an
-				 * update that should have been run. However, the approach here
-				 * should work well enough, assuming that it is very unlikely
-				 * that the user will cancel ready tasks.
-				 */
-				for (Task queueTask : tasks)
-					if (queueTask.is(TaskState.READY)
-							&& sameTarget(queueTask, task))
-						return Rejection.REDUNDANT_UPDATE;
-			}
-			else if (task.getLuceneIndex() instanceof OutlookIndex) {
-				/*
-				 * Reject a request to create or rebuild an Outlook index for a
-				 * certain PST file if the latter was already indexed or is
-				 * already lined up in the queue.
-				 */
-				for (LuceneIndex index0 : indexRegistry.getIndexes())
-					if (index0 instanceof OutlookIndex
-							&& sameTarget(index0, task))
-						return Rejection.SAME_IN_REGISTRY;
-				for (Task queueTask : tasks) {
-					assert queueTask != task;
-					if (queueTask.getLuceneIndex() instanceof OutlookIndex
-							&& sameTarget(queueTask, task))
-						return Rejection.SAME_IN_QUEUE;
+				if (task.is(IndexAction.UPDATE)) {
+					/*
+					 * Here, we reject a request to enqueue an update task if there
+					 * is already another task in the queue that has the same target
+					 * file or directory and is in ready state.
+					 * 
+					 * This is not a bullet-proof way to avoid unnecessary updates
+					 * while ensuring that any necessary updates are run: Going
+					 * through the queue, we could find a ready task with a matching
+					 * target, and reject the enqueue request based on that, but the
+					 * user could later cancel the ready task, thus skipping an
+					 * update that should have been run. However, the approach here
+					 * should work well enough, assuming that it is very unlikely
+					 * that the user will cancel ready tasks.
+					 */
+					for (Task queueTask : tasks)
+						if (queueTask.is(TaskState.READY)
+								&& sameTarget(queueTask, task))
+							return Rejection.REDUNDANT_UPDATE;
 				}
-			}
-			else {
-				/*
-				 * Reject a request to create or rebuild a file index if it
-				 * overlaps with a file index in the registry or in the queue.
-				 */
-				assert task.getLuceneIndex() instanceof FileIndex;
-				for (LuceneIndex index0 : indexRegistry.getIndexes()) {
-					if (index0 instanceof OutlookIndex)
-						continue;
-					File f1 = index0.getRootFile();
-					File f2 = task.getLuceneIndex().getRootFile();
-					if (Util.equals(f1, f2))
-						return Rejection.SAME_IN_REGISTRY;
-					if (isOverlapping(f1, f2))
-						return Rejection.OVERLAP_WITH_REGISTRY;
-				}
-				for (Task queueTask : tasks) {
-					assert queueTask != task;
-					if (queueTask.getLuceneIndex() instanceof OutlookIndex)
-						continue;
-					File f1 = queueTask.getLuceneIndex().getRootFile();
-					File f2 = task.getLuceneIndex().getRootFile();
-					if (Util.equals(f1, f2))
-						return Rejection.SAME_IN_QUEUE;
-					if (isOverlapping(f1, f2))
-						return Rejection.OVERLAP_WITH_QUEUE;
-				}
-			}
+				else if (task.getLuceneIndex() instanceof OutlookIndex) {
+					/*
+					 * Reject a request to create or rebuild an Outlook index if
+					 * it has the same PST file as another Outlook index in the
+					 * registry.
+					 */
+					for (LuceneIndex index0 : indexRegistry.getIndexes())
+						if (index0 instanceof OutlookIndex
+								&& sameTarget(index0, task))
+							return Rejection.SAME_IN_REGISTRY;
+					
+					/*
+					 * Reject a request to create or rebuild an Outlook index if
+					 * it has the same PST file as an Outlook index in the
+					 * queue. Exception: Rebuild tasks may replace existing
+					 * update tasks on the same PST file, causing the update
+					 * tasks to be cancelled.
+					 */
+					Iterator<Task> it = tasks.iterator();
+					while (it.hasNext()) {
+						Task queueTask = it.next();
+						assert queueTask != task;
+						if (!(queueTask.getLuceneIndex() instanceof OutlookIndex))
+							continue;
 
-			tasks.add(task);
-			evtAdded.fire(task);
-			if (task.is(TaskState.READY))
-				readyTaskAvailable.signal();
-			return null;
-		}
-		finally {
-			lock.unlock();
+						if (task.is(IndexAction.REBUILD)
+								&& queueTask.is(IndexAction.UPDATE)) {
+							if (sameTarget(queueTask, task)) {
+								assert task.getLuceneIndex() == queueTask.getLuceneIndex();
+								if (queueTask.is(TaskState.INDEXING))
+									queueTask.cancelAction = CancelAction.KEEP;
+								it.remove();
+								evtRemoved.fire(queueTask);
+							}
+						}
+						else if (sameTarget(queueTask, task)) {
+							return Rejection.SAME_IN_QUEUE;
+						}
+					}
+				}
+				else {
+					/*
+					 * Reject a request to create or rebuild a file index if it
+					 * overlaps with a file index in the registry.
+					 */
+					assert task.getLuceneIndex() instanceof FileIndex;
+					for (LuceneIndex index0 : indexRegistry.getIndexes()) {
+						if (index0 instanceof OutlookIndex)
+							continue;
+						File f1 = index0.getRootFile();
+						File f2 = task.getLuceneIndex().getRootFile();
+						if (Util.equals(f1, f2))
+							return Rejection.SAME_IN_REGISTRY;
+						if (isOverlapping(f1, f2))
+							return Rejection.OVERLAP_WITH_REGISTRY;
+					}
+
+					/*
+					 * Reject a request to create or rebuild a file index if it
+					 * overlaps with a file index in the queue. Exception:
+					 * Rebuild tasks may replace existing update tasks on the
+					 * same index, causing the update tasks to be cancelled.
+					 */
+					Iterator<Task> it = tasks.iterator();
+					while (it.hasNext()) {
+						Task queueTask = it.next();
+						assert queueTask != task;
+						if (!(queueTask.getLuceneIndex() instanceof FileIndex))
+							continue;
+
+						File f1 = queueTask.getLuceneIndex().getRootFile();
+						File f2 = task.getLuceneIndex().getRootFile();
+
+						if (isOverlapping(f1, f2))
+							return Rejection.OVERLAP_WITH_QUEUE;
+
+						if (task.is(IndexAction.REBUILD)
+								&& queueTask.is(IndexAction.UPDATE)) {
+							if (Util.equals(f1, f2)) {
+								if (queueTask.is(TaskState.INDEXING))
+									queueTask.cancelAction = CancelAction.KEEP;
+								it.remove();
+								evtRemoved.fire(queueTask);
+							}
+						}
+						else if (Util.equals(f1, f2)) {
+							return Rejection.SAME_IN_QUEUE;
+						}
+					}
+				}
+
+				tasks.add(task);
+				evtAdded.fire(task);
+				if (task.is(TaskState.READY))
+					readyTaskAvailable.signal();
+				return null;
+			}
+			finally {
+				lock.unlock();
+			}
 		}
 	}
 

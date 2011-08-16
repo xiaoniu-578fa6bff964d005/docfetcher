@@ -74,6 +74,12 @@ public final class IndexRegistry {
 	static {
 		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
 	}
+	
+	/*
+	 * Note: The indexing queue assumes this class uses itself as lock, so the
+	 * indexing queue must be modified accordingly when switching to another
+	 * lock.
+	 */
 
 	// These events must always be fired under lock!
 	private final Event<LuceneIndex> evtAdded = new Event<LuceneIndex>();
@@ -233,7 +239,6 @@ public final class IndexRegistry {
 	@VisibleForPackageGroup
 	public synchronized void save(@NotNull LuceneIndex index) {
 		Util.checkNotNull(index);
-		Util.checkThat(indexes.contains(index));
 		saveUnchecked(index);
 	}
 	
