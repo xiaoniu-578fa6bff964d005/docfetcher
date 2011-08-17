@@ -122,7 +122,11 @@ public final class IndexRegistry {
 	// Will block until the searcher is available (i.e. after load(...) has finished)
 	// May return null if the calling thread was interrupted
 	@Nullable
-	public synchronized Searcher getSearcher() {
+	public Searcher getSearcher() {
+		/*
+		 * This method must not be synchronized, otherwise we'll get a deadlock
+		 * when this method is called while the load method is running.
+		 */
 		return searcher.get();
 	}
 
