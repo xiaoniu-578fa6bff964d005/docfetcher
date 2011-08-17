@@ -49,6 +49,7 @@ public final class IndexingQueue {
 	}
 
 	public enum Rejection {
+		INVALID_UPDATE,
 		OVERLAP_WITH_REGISTRY,
 		OVERLAP_WITH_QUEUE,
 		SAME_IN_REGISTRY,
@@ -254,8 +255,18 @@ public final class IndexingQueue {
 				assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
 				if (shutdown)
 					return Rejection.SHUTDOWN;
+				
+				List<LuceneIndex> indexesInRegistry = indexRegistry.getIndexes();
 
 				if (task.is(IndexAction.UPDATE)) {
+					/*
+					 * Reject update requests for indexes that are not (or no
+					 * longer) in the registry. Such requests may be caused by
+					 * obsolete folder watching events.
+					 */
+					if (!indexesInRegistry.contains(index))
+						return Rejection.INVALID_UPDATE;
+					
 					/*
 					 * Here, we reject a request to enqueue an update task if there
 					 * is already another task in the queue that has the same target
@@ -275,13 +286,13 @@ public final class IndexingQueue {
 								&& sameTarget(queueTask, task))
 							return Rejection.REDUNDANT_UPDATE;
 				}
-				else if (task.getLuceneIndex() instanceof OutlookIndex) {
+				else if (index instanceof OutlookIndex) {
 					/*
 					 * Reject a request to create or rebuild an Outlook index if
 					 * it has the same PST file as another Outlook index in the
 					 * registry.
 					 */
-					for (LuceneIndex index0 : indexRegistry.getIndexes())
+					for (LuceneIndex index0 : indexesInRegistry)
 						if (index0 instanceof OutlookIndex
 								&& sameTarget(index0, task))
 							return Rejection.SAME_IN_REGISTRY;
@@ -303,7 +314,7 @@ public final class IndexingQueue {
 						if (task.is(IndexAction.REBUILD)
 								&& queueTask.is(IndexAction.UPDATE)) {
 							if (sameTarget(queueTask, task)) {
-								assert task.getLuceneIndex() == queueTask.getLuceneIndex();
+								assert index == queueTask.getLuceneIndex();
 								if (queueTask.is(TaskState.INDEXING))
 									queueTask.cancelAction = CancelAction.KEEP;
 								it.remove();
@@ -320,8 +331,8 @@ public final class IndexingQueue {
 					 * Reject a request to create or rebuild a file index if it
 					 * overlaps with a file index in the registry.
 					 */
-					assert task.getLuceneIndex() instanceof FileIndex;
-					for (LuceneIndex index0 : indexRegistry.getIndexes()) {
+					assert index instanceof FileIndex;
+					for (LuceneIndex index0 : indexesInRegistry) {
 						if (index0 instanceof OutlookIndex)
 							continue;
 						File f1 = index0.getRootFile();
@@ -346,7 +357,7 @@ public final class IndexingQueue {
 							continue;
 
 						File f1 = queueTask.getLuceneIndex().getRootFile();
-						File f2 = task.getLuceneIndex().getRootFile();
+						File f2 = index.getRootFile();
 
 						if (isOverlapping(f1, f2))
 							return Rejection.OVERLAP_WITH_QUEUE;
