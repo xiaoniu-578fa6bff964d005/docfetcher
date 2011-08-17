@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -414,10 +415,8 @@ public final class IndexingQueue {
 					else
 						task.cancelAction = handler.cancel(); // May return null
 				}
-				else {
-					it.remove();
-					evtRemoved.fire(task);
-				}
+				it.remove();
+				evtRemoved.fire(task);
 			}
 
 			// Must be done *after* firing the removed events
@@ -570,15 +569,11 @@ public final class IndexingQueue {
 			if (!doShutdown[0])
 				return false;
 
-			// Cancel all inactive tasks
-			Iterator<Task> it = tasks.iterator();
-			while (it.hasNext()) {
-				Task task = it.next();
-				if (task.is(TaskState.INDEXING))
-					continue;
-				it.remove();
+			// Remove all tasks (including active task)
+			List<Task> tasksCopy = new ArrayList<Task>(tasks);
+			tasks.clear();
+			for (Task task : tasksCopy)
 				evtRemoved.fire(task);
-			}
 
 			shutdown = true;
 		}

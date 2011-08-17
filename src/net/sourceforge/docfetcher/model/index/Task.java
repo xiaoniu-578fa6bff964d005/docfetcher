@@ -87,9 +87,7 @@ public final class Task {
 				else
 					cancelAction = handler.cancel(); // May return null
 			}
-			else {
-				queue.remove(this);
-			}
+			queue.remove(this);
 		}
 		finally {
 			queue.lock.unlock();
