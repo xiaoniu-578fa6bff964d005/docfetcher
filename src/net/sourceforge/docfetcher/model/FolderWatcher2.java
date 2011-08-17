@@ -14,9 +14,6 @@ package net.sourceforge.docfetcher.model;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
+import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.ListMap;
 import net.sourceforge.docfetcher.base.Util;
@@ -50,11 +48,11 @@ public final class FolderWatcher2 {
 	 */
 	private final Map<LuceneIndex, Boolean> watchQueue = Maps.newLinkedHashMap();
 	private final Map<LuceneIndex, Integer> watchIdMap = Maps.newHashMap();
+	private final Map<Integer, DelayedExecutor> idsToExecutorsMap = Maps.newHashMap();
 	
 	private final Lock lock = new ReentrantLock(true);
 	private final Condition needsUpdate = lock.newCondition();
 	private final Thread thread;
-	private final ScheduledExecutorService delayedExecutor = Executors.newScheduledThreadPool(1);
 	private volatile boolean shutdown = false;
 	
 	private final IndexRegistry indexRegistry;
@@ -158,6 +156,7 @@ public final class FolderWatcher2 {
 		 */
 		if (shutdown) {
 			for (Integer id : watchIdMap.values()) {
+				idsToExecutorsMap.remove(id).shutdown();
 				try {
 					JNotify.removeWatch(id);
 				}
@@ -165,6 +164,7 @@ public final class FolderWatcher2 {
 					Util.printErr(e);
 				}
 			}
+			assert idsToExecutorsMap.isEmpty();
 			watchIdMap.clear();
 			throw new InterruptedException();
 		}
@@ -211,12 +211,14 @@ public final class FolderWatcher2 {
 					int id = JNotify.addWatch(
 						path, JNotify.FILE_ANY, true, listener);
 					watchIdMap.put(index, id);
+					idsToExecutorsMap.put(id, listener.delayedExecutor);
 				}
 				// Remove watch
 				else {
 					Integer id = watchIdMap.remove(index);
 					if (id == null)
 						continue;
+					idsToExecutorsMap.remove(id).shutdown();
 					if (!rootFile.exists()) {
 						// Remove ID from map even if root file doesn't exist
 						continue;
@@ -244,7 +246,6 @@ public final class FolderWatcher2 {
 				return;
 			shutdown = true;
 			indexRegistry.removeListeners(addedListener, removedListener);
-			delayedExecutor.shutdown();
 			needsUpdate.signal(); // Might need to wake up the worker thread
 		}
 		finally {
@@ -254,6 +255,7 @@ public final class FolderWatcher2 {
 	
 	private final class JNotifyListenerImpl implements JNotifyListener {
 		private final LuceneIndex watchedIndex;
+		private final DelayedExecutor delayedExecutor = new DelayedExecutor(1000);
 		
 		private JNotifyListenerImpl(@NotNull LuceneIndex watchedIndex) {
 			this.watchedIndex = Util.checkNotNull(watchedIndex);
@@ -283,7 +285,7 @@ public final class FolderWatcher2 {
 					indexRegistry.getQueue().addTask(
 						watchedIndex, IndexAction.UPDATE);
 				}
-			}, 1, TimeUnit.SECONDS);
+			});
 		}
 		private boolean accept(@NotNull File target) {
 			String name = target.getName();
