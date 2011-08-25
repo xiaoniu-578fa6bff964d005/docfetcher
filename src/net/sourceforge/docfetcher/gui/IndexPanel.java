@@ -53,6 +53,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -66,7 +67,7 @@ import com.sun.jna.platform.win32.Shell32Util;
 
 public final class IndexPanel {
 	
-	public static abstract class DialogFactory extends SingletonDialogFactory<IndexingDialog> {
+	private static abstract class DialogFactory extends SingletonDialogFactory<IndexingDialog> {
 		public DialogFactory(Shell shell) {
 			super(shell);
 		}
@@ -74,6 +75,7 @@ public final class IndexPanel {
 	
 	public final Event<Void> evtCheckStatesChanged = new Event<Void>();
 	public final Event<Set<String>> evtListDocuments = new Event<Set<String>>();
+	public final Event<Rectangle> evtIndexingDialogMinimized = new Event<Rectangle>();
 
 	private final SimpleTreeViewer<ViewNode> viewer;
 	private final Tree tree;
@@ -87,7 +89,13 @@ public final class IndexPanel {
 
 		dialogFactory = new DialogFactory(parent.getShell()) {
 			protected IndexingDialog createDialog(Shell shell) {
-				return new IndexingDialog(shell, indexRegistry);
+				IndexingDialog indexingDialog = new IndexingDialog(shell, indexRegistry);
+				indexingDialog.evtDialogMinimized.add(new Event.Listener<Rectangle>() {
+					public void update(Rectangle eventData) {
+						evtIndexingDialogMinimized.fire(eventData);
+					}
+				});
+				return indexingDialog;
 			}
 		};
 		

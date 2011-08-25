@@ -20,9 +20,11 @@ import net.sourceforge.docfetcher.base.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * A status bar widget consisting of multiple parts with the following
@@ -107,6 +109,24 @@ public class StatusBar extends Composite {
 		@NotNull
 		public String getText() {
 			return textLabel.getText();
+		}
+		
+		/**
+		 * Returns a rectangle describing the bounds of the receiver relative to
+		 * containing shell, or null if the receiver is not visible.
+		 */
+		@Nullable
+		public Rectangle getBounds() {
+			if (!imageLabel.isVisible() || !textLabel.isVisible())
+				return null;
+			Rectangle b1 = imageLabel.getBounds();
+			Rectangle b2 = textLabel.getBounds();
+			final int s = INNER_PART_SPACING;
+			int width = b1.width + b2.width	+ s;
+			int height = Math.max(b1.height, b2.height);
+			Rectangle bounds = new Rectangle(b1.x, b1.y, width, height);
+			Shell shell = imageLabel.getShell();
+			return shell.getDisplay().map(statusBar, shell, bounds);
 		}
 	}
 	

@@ -55,6 +55,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -63,12 +64,22 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 @VisibleForPackageGroup
 public final class IndexingDialog implements Dialog {
+	
+	/**
+	 * This event is fired when the user clicks on the "Minimize To Status Bar"
+	 * button. The event data is a rectangle describing the last bounds of the
+	 * shell before it was disposed. The bounds are relative to the display.
+	 */
+	public final Event<Rectangle> evtDialogMinimized = new Event<Rectangle>();
 
 	private final Shell shell;
 	private final CTabFolder tabFolder;
 	private final IndexRegistry indexRegistry;
+	
+	@NotNull private Event.Listener<Task> addedListener;
+	@NotNull private Event.Listener<Task> removedListener;
 
-	public IndexingDialog(	@NotNull Shell parentShell,
+	public IndexingDialog(	@NotNull final Shell parentShell,
 							@NotNull final IndexRegistry indexRegistry) {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
 
@@ -82,7 +93,7 @@ public final class IndexingDialog implements Dialog {
 
 		// Create shell
 		int style = SWT.SHELL_TRIM;
-		if (!SystemConf.Bool.IsDevelopmentVersion.get())
+		if (!SystemConf.Bool.IsDevelopmentVersion.get()) // TODO remove after testing
 			style |= SWT.PRIMARY_MODAL;
 		shell = new Shell(parentShell, style);
 		shell.setText("index_management"); // TODO i18n
@@ -120,6 +131,16 @@ public final class IndexingDialog implements Dialog {
 						shell, indexRegistry, null);
 				}
 			});
+		
+		Util.createToolItem(toolBar, Img.HIDE.get(), null, "Minimize To Status Bar", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// TODO save all indexing config modifications
+				indexRegistry.getQueue().removeListeners(addedListener, removedListener);
+				Rectangle bounds = shell.getBounds();
+				shell.dispose();
+				evtDialogMinimized.fire(bounds);
+			}
+		});
 
 		// TODO maybe try computeSize() instead of getSize()?
 //		tabFolder.setTabHeight((int) (toolBar.getSize().y * 1.5)); // A factor of 1.0 would crop the add button image.
@@ -135,8 +156,7 @@ public final class IndexingDialog implements Dialog {
 	}
 	
 	private void initEventHandlers() {
-		// Handler for task addition events
-		final Event.Listener<Task> addedListener = new Event.Listener<Task>() {
+		addedListener = new Event.Listener<Task>() {
 			public void update(final Task task) {
 				assert !shell.isDisposed();
 				Util.runSWTSafe(tabFolder, new Runnable() {
@@ -147,8 +167,7 @@ public final class IndexingDialog implements Dialog {
 			}
 		};
 		
-		// Handler for task removal events
-		final Event.Listener<Task> removedListener = new Event.Listener<Task>() {
+		removedListener = new Event.Listener<Task>() {
 			public void update(final Task task) {
 				assert !shell.isDisposed();
 				Util.runSWTSafe(tabFolder, new Runnable() {

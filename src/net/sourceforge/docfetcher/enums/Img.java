@@ -41,6 +41,7 @@ public enum Img implements FilenameProvider {
 	INDEXING ("indexing.gif"),
 	MINIMIZE ("minimize.gif"),
 	MAXIMIZE ("maximize.gif"),
+	HIDE ("hide.gif"),
 	RESTORE ("restore.png"),
 	INDEXING_DIALOG ("indexing_dialog.gif"),
 	ARROW_LEFT ("arrow_left.gif"), // TODO image still used?

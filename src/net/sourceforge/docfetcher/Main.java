@@ -19,12 +19,14 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.ConfLoader;
 import net.sourceforge.docfetcher.base.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.ListMap;
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.gui.FormDataFactory;
 import net.sourceforge.docfetcher.base.gui.LazyImageCache;
 import net.sourceforge.docfetcher.base.gui.StatusManager;
@@ -36,10 +38,12 @@ import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.gui.FileTypePanel;
 import net.sourceforge.docfetcher.gui.FilesizePanel;
 import net.sourceforge.docfetcher.gui.IndexPanel;
+import net.sourceforge.docfetcher.gui.MovingBox;
 import net.sourceforge.docfetcher.gui.ResultPanel;
 import net.sourceforge.docfetcher.gui.SearchBar;
 import net.sourceforge.docfetcher.gui.SearchQueue;
 import net.sourceforge.docfetcher.gui.StatusBar;
+import net.sourceforge.docfetcher.gui.StatusBar.StatusBarPart;
 import net.sourceforge.docfetcher.gui.ThreePanelForm;
 import net.sourceforge.docfetcher.gui.ToolBarForm;
 import net.sourceforge.docfetcher.gui.TwoFormExpander;
@@ -58,6 +62,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -87,6 +92,7 @@ public final class Main {
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
+	private static StatusBarPart indexingDialogStatusBarPart;
 
 	private Main() {
 		throw new UnsupportedOperationException();
@@ -181,13 +187,15 @@ public final class Main {
 
 		final StatusBar statusBar = new StatusBar(shell) {
 			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
-				StatusBarPart part1 = new StatusBarPart(statusBar);
-				part1.setContents(Img.INDEXING.get(), "Indexing...");
+				indexingDialogStatusBarPart = new StatusBarPart(statusBar);
+				indexingDialogStatusBarPart.setContents(Img.INDEXING.get(), "Indexing...");
+				indexingDialogStatusBarPart.setVisible(false);
+				
 				StatusBarPart part2 = new StatusBarPart(statusBar);
 				part2.setContents(Img.INDEXING.get(), "Web Interface");
 
 				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
-				parts.add(part1);
+				parts.add(indexingDialogStatusBarPart);
 				parts.add(part2);
 				return parts;
 			}
@@ -409,6 +417,11 @@ public final class Main {
 
 			protected Control createSecondContents(Composite parent) {
 				indexPanel = new IndexPanel(parent, indexRegistry);
+				indexPanel.evtIndexingDialogMinimized.add(new Event.Listener<Rectangle>() {
+					public void update(Rectangle eventData) {
+						moveIndexingDialogToStatusBar(eventData);
+					}
+				});
 				return indexPanel.getControl();
 			}
 		};
@@ -444,6 +457,14 @@ public final class Main {
 		});
 
 		return comp;
+	}
+	
+	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
+		indexingDialogStatusBarPart.setVisible(true);
+		Rectangle dest = indexingDialogStatusBarPart.getBounds();
+		dest = display.map(shell, null, dest);
+		MovingBox movingBox = new MovingBox(shell, src, dest, 0.2, 40);
+		movingBox.start();
 	}
 
 }
