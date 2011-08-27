@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
+import java.util.Map;
 import net.sourceforge.docfetcher.base.BlockingWrapper;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
@@ -42,6 +42,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.util.Version;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
 /**
@@ -85,8 +86,14 @@ public final class IndexRegistry {
 	private final Event<LuceneIndex> evtAdded = new Event<LuceneIndex>();
 	private final Event<List<LuceneIndex>> evtRemoved = new Event<List<LuceneIndex>>();
 
+	/**
+	 * A map for storing the indexes, along with the last-modified values of the
+	 * indexes' ser files. A last-modified value may be null, which indicates
+	 * that the corresponding index hasn't been saved yet.
+	 */
+	private final Map<LuceneIndex, Long> indexes = Maps.newTreeMap(IndexComparator.instance);
+	
 	private final File indexParentDir;
-	private final List<LuceneIndex> indexes = new ArrayList<LuceneIndex>();
 	private final IndexingQueue queue;
 	private final HotColdFileCache unpackCache;
 	private final FileFactory fileFactory;
@@ -130,13 +137,19 @@ public final class IndexRegistry {
 		return searcher.get();
 	}
 
-	@NotNull
+	@ThreadSafe
 	@VisibleForPackageGroup
-	public synchronized void addIndex(@NotNull LuceneIndex index) {
+	public void addIndex(@NotNull LuceneIndex index) {
+		addIndex(index, null);
+	}
+	
+	private synchronized void addIndex(	@NotNull LuceneIndex index,
+										@Nullable Long lastModified) {
 		Util.checkNotNull(index);
-		if (indexes.contains(index)) return;
-		indexes.add(index);
-		Collections.sort(indexes, IndexComparator.instance);
+		Util.checkNotNull(index.getIndexDir()); // RAM indexes not allowed
+		if (indexes.containsKey(index))
+			return;
+		indexes.put(index, lastModified);
 		evtAdded.fire(index);
 	}
 	
@@ -151,8 +164,9 @@ public final class IndexRegistry {
 		List<PendingDeletion> deletions = new ArrayList<PendingDeletion>(size);
 		
 		for (LuceneIndex index : indexesToRemove) {
-			if (!indexes.remove(index))
+			if (!indexes.containsKey(index))
 				continue;
+			indexes.remove(index);
 			if (deleteFiles)
 				deletions.add(new PendingDeletion(index));
 			removed.add(index);
@@ -174,7 +188,7 @@ public final class IndexRegistry {
 											@Nullable Event.Listener<LuceneIndex> addedListener,
 											@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
 		if (handler != null)
-			handler.handleExistingIndexes(ImmutableList.copyOf(indexes));
+			handler.handleExistingIndexes(getIndexes());
 		if (addedListener != null)
 			evtAdded.add(addedListener);
 		if (removedListener != null)
@@ -192,7 +206,7 @@ public final class IndexRegistry {
 	@ImmutableCopy
 	@NotNull
 	public synchronized List<LuceneIndex> getIndexes() {
-		return ImmutableList.copyOf(indexes);
+		return ImmutableList.copyOf(indexes.keySet());
 	}
 
 	// should only be called once
@@ -201,8 +215,8 @@ public final class IndexRegistry {
 		/*
 		 * Note: To allow running this method in parallel with other operations,
 		 * it is important not to lock the entire method. Otherwise, if a client
-		 * tried to attach listeners to the registry after this method has been
-		 * called, the former would block until the latter has finished,
+		 * tries to attach listeners to the registry while this method is
+		 * running, the former would block until the latter has finished,
 		 * resulting in a serialization of both operations.
 		 */
 		Util.checkThat(searcher.isNull());
@@ -215,38 +229,27 @@ public final class IndexRegistry {
 			File serFile = new File(indexDir, SER_FILENAME);
 			if (!serFile.isFile())
 				continue;
-			ObjectInputStream stream = null;
+			ObjectInputStream in = null;
 			try {
-				stream = new ObjectInputStream(new FileInputStream(serFile));
-				LuceneIndex index = (LuceneIndex) stream.readObject();
-				addIndex(index);
+				in = new ObjectInputStream(new FileInputStream(serFile));
+				LuceneIndex index = (LuceneIndex) in.readObject();
+				addIndex(index, serFile.lastModified());
 			}
 			catch (Exception e) {
 				Util.printErr(e); // The average user doesn't need to know
 			}
 			finally {
-				Closeables.closeQuietly(stream);
+				Closeables.closeQuietly(in);
 			}
 		}
 		
 		searcher.set(new Searcher(this, fileFactory, outlookMailFactory));
 	}
-
-	public synchronized void save() {
-		for (LuceneIndex index : indexes)
-			saveUnchecked(index);
-
-		// TODO Write indexes.txt file used by the daemon
-		// TODO Method is currently not in use
-	}
 	
 	@VisibleForPackageGroup
 	public synchronized void save(@NotNull LuceneIndex index) {
 		Util.checkNotNull(index);
-		saveUnchecked(index);
-	}
-	
-	private void saveUnchecked(@NotNull LuceneIndex index) {
+		
 		File indexDir = index.getIndexDir();
 		indexDir.mkdirs();
 		File serFile = new File(indexDir, SER_FILENAME);
@@ -255,29 +258,34 @@ public final class IndexRegistry {
 		 * DocFetcher might have been burned onto a CD-ROM; if so, then just
 		 * ignore it.
 		 */
-		if (serFile.exists() && !serFile.canWrite()) return;
+		if (serFile.exists() && !serFile.canWrite())
+			return;
 
-		ObjectOutputStream stream = null;
+		ObjectOutputStream out = null;
 		try {
 			serFile.createNewFile();
-			stream = new ObjectOutputStream(new FileOutputStream(serFile));
-			stream.writeObject(index);
+			out = new ObjectOutputStream(new FileOutputStream(serFile));
+			out.writeObject(index);
 		}
 		catch (IOException e) {
 			Util.printErr(e); // The average user doesn't need to know
 		}
 		finally {
-			Closeables.closeQuietly(stream);
+			Closeables.closeQuietly(out);
 		}
+		
+		// Update cached last-modified value of index
+		indexes.put(index, serFile.lastModified());
+		
+		// TODO Write indexes.txt file used by the daemon
 	}
 	
 	@NotNull
 	@ThreadSafe
 	public TreeCheckState getTreeCheckState() {
-		List<LuceneIndex> localIndexes;
-		synchronized (this) {
-			localIndexes = new ArrayList<LuceneIndex>(indexes);
-		}
+		// Make local copy of indexes for thread-safety
+		List<LuceneIndex> localIndexes = getIndexes();
+		
 		TreeCheckState totalState = new TreeCheckState();
 		for (LuceneIndex index : localIndexes) {
 			TreeCheckState indexState = index.getTreeCheckState();
