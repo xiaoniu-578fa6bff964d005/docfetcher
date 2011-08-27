@@ -330,8 +330,6 @@ public final class FolderWatcher {
 					&& !ParseService.canParseByName(config, name))
 				return false;
 			
-			// TODO test: does the findDocument method actually work?
-			
 			// Check if the file was *really* modified (JNotify tends to fire
 			// even when files have only been accessed)
 			if (watchedIndex instanceof FileIndex) {
