@@ -87,7 +87,7 @@ privileged aspect CodeConventions {
 	
 	declare warning: (call(* Display.syncExec(Runnable))
 			|| call(* Display.asyncExec(Runnable)))
-	&& !withincode(boolean Util.run*(..)):
+	&& !withincode(* Util.run*(..)):
 		"Use the Util.run* methods instead.";
 	
 }

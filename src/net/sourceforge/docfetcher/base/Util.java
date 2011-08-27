@@ -831,9 +831,9 @@ public final class Util {
 		if (widget == null || widget.isDisposed())
 			return false;
 		final boolean[] wasRun = { false };
-		Display.getDefault().syncExec(new Runnable() {
+		widget.getDisplay().syncExec(new Runnable() {
 			public void run() {
-				wasRun[0] = widget != null && !widget.isDisposed();
+				wasRun[0] = !widget.isDisposed();
 				if (wasRun[0])
 					runnable.run();
 			}
@@ -849,9 +849,9 @@ public final class Util {
 		if (display == null || display.isDisposed())
 			return false;
 		final boolean[] wasRun = { false };
-		Display.getDefault().syncExec(new Runnable() {
+		display.syncExec(new Runnable() {
 			public void run() {
-				wasRun[0] = display != null && !display.isDisposed();
+				wasRun[0] = !display.isDisposed();
 				if (wasRun[0])
 					runnable.run();
 			}
@@ -866,23 +866,22 @@ public final class Util {
 	 * The given Runnable is <b>not</b> run if the given given widget is null or
 	 * disposed. This helps avoid the common pitfall of trying to access widgets
 	 * from a non-GUI thread when these widgets have already been disposed.
-	 * <p>
-	 * The returned Boolean indicates whether the Runnable was run (true) or not
-	 * (false).
 	 */
-	public static boolean runAsyncExec(	@Nullable final Widget widget,
-										@NotNull final Runnable runnable) {
+	public static void runAsyncExec(@Nullable final Widget widget,
+									@NotNull final Runnable runnable) {
+		/*
+		 * Note: Unlike the syncExec variant, here it's not possible to return a
+		 * boolean flag that indicates whether the Runnable was run, since
+		 * asyncExec may not execute the Runnable immediately.
+		 */
 		if (widget == null || widget.isDisposed())
-			return false;
-		final boolean[] wasRun = { false };
-		Display.getDefault().asyncExec(new Runnable() {
+			return;
+		widget.getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				wasRun[0] = widget != null && !widget.isDisposed();
-				if (wasRun[0])
+				if (!widget.isDisposed())
 					runnable.run();
 			}
 		});
-		return wasRun[0];
 	}
 
 	/**
