@@ -39,7 +39,7 @@ import com.google.common.collect.Maps;
 /**
  * @author Tran Nam Quang
  */
-public final class FolderWatcher2 {
+public final class FolderWatcher {
 	
 	/**
 	 * The watch queue is a collection of indexes to be processed by the worker
@@ -62,7 +62,7 @@ public final class FolderWatcher2 {
 	private Event.Listener<List<LuceneIndex>> removedListener;
 	private Event.Listener<LuceneIndex> watchChangedListener;
 	
-	public FolderWatcher2(@NotNull IndexRegistry indexRegistry) {
+	public FolderWatcher(@NotNull IndexRegistry indexRegistry) {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
 		
 		initListeners();
@@ -72,7 +72,7 @@ public final class FolderWatcher2 {
 		 * adding watches can be a time-consuming operation, depending on the
 		 * depth of the tree to watch.
 		 */
-		thread = new Thread(FolderWatcher2.class.getName()) {
+		thread = new Thread(FolderWatcher.class.getName()) {
 			public void run() {
 				while (true) {
 					try {

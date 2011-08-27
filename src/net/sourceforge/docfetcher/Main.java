@@ -49,7 +49,7 @@ import net.sourceforge.docfetcher.gui.ToolBarForm;
 import net.sourceforge.docfetcher.gui.TwoFormExpander;
 import net.sourceforge.docfetcher.gui.preview.PreviewPanel;
 import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.FolderWatcher2;
+import net.sourceforge.docfetcher.model.FolderWatcher;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
 import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
@@ -86,7 +86,7 @@ public final class Main {
 	private static Shell shell;
 	
 	private static volatile IndexRegistry indexRegistry;
-	private static volatile FolderWatcher2 folderWatcher;
+	private static volatile FolderWatcher folderWatcher;
 	
 	private static FilesizePanel filesizePanel;
 	private static FileTypePanel fileTypePanel;
@@ -302,7 +302,7 @@ public final class Main {
 					
 					// Start watching folders after index registry is fully
 					// loaded
-					folderWatcher = new FolderWatcher2(indexRegistry);
+					folderWatcher = new FolderWatcher(indexRegistry);
 				}
 				catch (IOException e) {
 					// Wait until the display is available
