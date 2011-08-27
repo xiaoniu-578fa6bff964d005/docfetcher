@@ -127,9 +127,10 @@ public final class FolderWatcher {
 		indexRegistry.addListeners(new ExistingIndexesHandler() {
 			public void handleExistingIndexes(List<LuceneIndex> indexes) {
 				/*
-				 * No locking needed here because the worker thread hasn't been
-				 * started yet.
+				 * Neither locking nor signalling are needed here because the
+				 * worker thread hasn't been started yet.
 				 */
+				assert thread == null;
 				for (LuceneIndex index : indexes)
 					if (index.isWatchFolders())
 						watchQueue.put(index, true);
