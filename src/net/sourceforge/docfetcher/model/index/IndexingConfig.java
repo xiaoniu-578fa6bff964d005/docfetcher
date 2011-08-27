@@ -268,5 +268,9 @@ public class IndexingConfig implements Serializable {
 	public boolean isWatchFolders() {
 		return watchFolders;
 	}
+	
+	public void setWatchFolders(boolean watchFolders) {
+		this.watchFolders = watchFolders;
+	}
 
 }

@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
@@ -35,7 +36,7 @@ public abstract class TreeIndex <
 	D extends Document<D, F>,
 	F extends Folder<D, F>,
 	C extends IndexingConfig> implements LuceneIndex {
-
+	
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	@NotNull private final F rootFolder;
@@ -146,12 +147,19 @@ public abstract class TreeIndex <
 	
 	@ImmutableCopy
 	@NotNull
-	public List<String> getDocumentIds() {
+	public final List<String> getDocumentIds() {
 		return rootFolder.getDocumentIds();
 	}
 	
-	public boolean isWatchFolders() {
+	public final boolean isWatchFolders() {
 		return config.isWatchFolders();
+	}
+	
+	public final void setWatchFolders(boolean watchFolders) {
+		if (config.isWatchFolders() == watchFolders)
+			return;
+		config.setWatchFolders(watchFolders);
+		LuceneIndex.evtWatchFoldersChanged.fire(this);
 	}
 
 }

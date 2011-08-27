@@ -46,7 +46,9 @@ public final class FolderWatcher2 {
 	 * thread. The boolean map value indicates whether the index should be
 	 * watched or unwatched.
 	 */
-	private final Map<LuceneIndex, Boolean> watchQueue = Maps.newLinkedHashMap();
+	private final Map<LuceneIndex, Boolean> watchQueue = Maps.newLinkedHashMap(); // guarded by lock
+	
+	// These two fields should only be accessed from the worker thread
 	private final Map<LuceneIndex, Integer> watchIdMap = Maps.newHashMap();
 	private final Map<Integer, DelayedExecutor> idsToExecutorsMap = Maps.newHashMap();
 	
@@ -58,11 +60,10 @@ public final class FolderWatcher2 {
 	private final IndexRegistry indexRegistry;
 	private Event.Listener<LuceneIndex> addedListener;
 	private Event.Listener<List<LuceneIndex>> removedListener;
+	private Event.Listener<LuceneIndex> watchChangedListener;
 	
 	public FolderWatcher2(@NotNull IndexRegistry indexRegistry) {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
-		
-		// TODO handle change of 'watchFolders' flag
 		
 		initListeners();
 		
@@ -135,6 +136,21 @@ public final class FolderWatcher2 {
 						watchQueue.put(index, true);
 			}
 		}, addedListener, removedListener);
+		
+		// React to changes to the indexes' watch flags
+		watchChangedListener = new Event.Listener<LuceneIndex>() {
+			public void update(LuceneIndex index) {
+				lock.lock();
+				try {
+					watchQueue.put(index, index.isWatchFolders());
+					needsUpdate.signal();
+				}
+				finally {
+					lock.unlock();
+				}
+			}
+		};
+		LuceneIndex.evtWatchFoldersChanged.add(watchChangedListener);
 	}
 
 	private void threadLoop() throws InterruptedException {
@@ -166,6 +182,7 @@ public final class FolderWatcher2 {
 			}
 			assert idsToExecutorsMap.isEmpty();
 			watchIdMap.clear();
+			LuceneIndex.evtWatchFoldersChanged.remove(watchChangedListener);
 			throw new InterruptedException();
 		}
 		

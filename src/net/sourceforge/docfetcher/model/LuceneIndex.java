@@ -14,6 +14,8 @@ package net.sourceforge.docfetcher.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+
+import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -28,6 +30,8 @@ import org.apache.lucene.store.Directory;
  * @author Tran Nam Quang
  */
 public interface LuceneIndex extends ViewNode, Serializable {
+	
+	public static final Event<LuceneIndex> evtWatchFoldersChanged = new Event<LuceneIndex>();
 	
 	/**
 	 * Returns the directory where the Lucene index files are kept. Returns null
@@ -67,5 +71,7 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public DocumentType getDocumentType();
 	
 	public boolean isWatchFolders();
+	
+	public void setWatchFolders(boolean watchFolders);
 
 }
