@@ -252,13 +252,17 @@ public final class Event<T> {
 		cachedListeners = null;
 	}
 	
-	// TODO doc
-	public static <S> void redirect(Event<S> e1, final Event<S> e2) {
-		e1.add(new Listener<S> () {
+	/**
+	 * Helper method for redirecting events from one event object to another,
+	 * i.e. {@code destination} will be fired when {@code source} is fired.
+	 */
+	public static <S> void redirect(@NotNull Event<S> source,
+									@NotNull final Event<S> destination) {
+		source.add(new Listener<S> () {
 			public void update(S eventData) {
-				e2.fire(eventData);
+				destination.fire(eventData);
 			}
 		});
 	}
-
+	
 }
