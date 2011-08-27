@@ -11,11 +11,6 @@
 
 package net.sourceforge.docfetcher.base;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -24,44 +19,56 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
  */
 public final class DelayedExecutor {
 	
-	private final ScheduledExecutorService executor;
-	private final int delay;
+	private final long delay;
 	private final Object lock = new Object();
 	
-	@Nullable private ScheduledFuture<?> lastFuture; // guarded by lock
-	@Nullable private Object lastId; // guarded by lock
-
-	public DelayedExecutor(int delay) {
+	// Fields below guarded by lock
+	@Nullable private Thread thread;
+	@Nullable private Runnable lastRunnable;
+	private long lastTimestamp = 0;
+	
+	public DelayedExecutor(long delay) {
 		Util.checkThat(delay >= 0);
 		this.delay = delay;
-		executor = Executors.newScheduledThreadPool(1);
 	}
 	
-	public void schedule(@NotNull final Runnable runnable) {
+	// Discards the previously scheduled runnable if the time passed since the
+	// last scheduling is less than the delay
+	public void schedule(@NotNull Runnable runnable) {
 		Util.checkNotNull(runnable);
 		synchronized (lock) {
-			if (lastFuture != null) {
-				assert lastId != null;
-				lastFuture.cancel(false);
-			}
-			final Object id = new Object();
-			lastFuture = executor.schedule(new Runnable() {
+			lastRunnable = runnable;
+			lastTimestamp = System.currentTimeMillis();
+			if (thread != null)
+				return;
+			
+			thread = new Thread() {
 				public void run() {
-					runnable.run();
-					synchronized (lock) {
-						if (id == lastId) {
-							lastId = null;
-							lastFuture = null;
+					long sleepTime = delay;
+					while (true) {
+						try {
+							Thread.sleep(sleepTime);
+						}
+						catch (InterruptedException e) {
+							break;
+						}
+						synchronized (lock) {
+							long timePassed = System.currentTimeMillis() - lastTimestamp;
+							if (timePassed > delay) {
+								lastRunnable.run();
+								lastRunnable = null;
+								thread = null;
+								break;
+							}
+							else {
+								sleepTime = delay - timePassed;
+							}
 						}
 					}
 				}
-			}, delay, TimeUnit.MILLISECONDS);
-			lastId = id;
+			};
+			thread.start();
 		}
-	}
-	
-	public void shutdown() {
-		executor.shutdown();
 	}
 
 }

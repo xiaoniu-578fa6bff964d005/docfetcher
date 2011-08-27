@@ -23,9 +23,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import net.contentobjects.jnotify.JNotify;
+import net.contentobjects.jnotify.JNotifyException;
 import net.sourceforge.docfetcher.base.BlockingWrapper;
+import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.CallOnce;
 import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -161,7 +166,9 @@ public final class IndexRegistry {
 		
 		int size = indexesToRemove.size();
 		List<LuceneIndex> removed = new ArrayList<LuceneIndex>(size);
-		List<PendingDeletion> deletions = new ArrayList<PendingDeletion>(size);
+		List<PendingDeletion> deletions = deleteFiles
+			? new ArrayList<PendingDeletion>(size)
+			: null;
 		
 		for (LuceneIndex index : indexesToRemove) {
 			if (!indexes.containsKey(index))
@@ -173,8 +180,10 @@ public final class IndexRegistry {
 		}
 		
 		evtRemoved.fire(removed);
-		queue.approveDeletions(deletions);
-		searcher.get().approveDeletions(deletions);
+		if (deletions != null) {
+			queue.approveDeletions(deletions);
+			searcher.get().approveDeletions(deletions);
+		}
 	}
 
 	// Allows attaching a change listener and processing the existing indexes in
@@ -209,7 +218,7 @@ public final class IndexRegistry {
 		return ImmutableList.copyOf(indexes.keySet());
 	}
 
-	// should only be called once
+	@CallOnce
 	@ThreadSafe
 	public void load(@NotNull Cancelable cancelable) throws IOException {
 		/*
@@ -219,7 +228,11 @@ public final class IndexRegistry {
 		 * running, the former would block until the latter has finished,
 		 * resulting in a serialization of both operations.
 		 */
+		
+		// Ensure this method can only called once
 		Util.checkThat(searcher.isNull());
+		
+		indexParentDir.mkdirs(); // Needed for the folder watching
 		
 		for (File indexDir : Util.listFiles(indexParentDir)) {
 			if (cancelable.isCanceled())
@@ -229,21 +242,102 @@ public final class IndexRegistry {
 			File serFile = new File(indexDir, SER_FILENAME);
 			if (!serFile.isFile())
 				continue;
-			ObjectInputStream in = null;
-			try {
-				in = new ObjectInputStream(new FileInputStream(serFile));
-				LuceneIndex index = (LuceneIndex) in.readObject();
-				addIndex(index, serFile.lastModified());
-			}
-			catch (Exception e) {
-				Util.printErr(e); // The average user doesn't need to know
-			}
-			finally {
-				Closeables.closeQuietly(in);
-			}
+			loadIndex(serFile);
 		}
 		
 		searcher.set(new Searcher(this, fileFactory, outlookMailFactory));
+		
+		// Watch index directory for changes
+		try {
+			final DelayedExecutor executor = new DelayedExecutor(1000);
+			
+			final int watchId = new SimpleJNotifyListener() {
+				protected void handleEvent(File targetFile) {
+					if (!targetFile.getName().equals(SER_FILENAME))
+						return;
+					executor.schedule(new Runnable() {
+						public void run() {
+							reload();
+						}
+					});
+				}
+			}.addWatch(indexParentDir);
+			
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				public void run() {
+					try {
+						JNotify.removeWatch(watchId);
+					}
+					catch (JNotifyException e) {
+						Util.printErr(e);
+					}
+				}
+			});
+		}
+		catch (JNotifyException e) {
+			Util.printErr(e);
+		}
+	}
+	
+	@ThreadSafe
+	private void loadIndex(@NotNull File serFile) {
+		ObjectInputStream in = null;
+		try {
+			in = new ObjectInputStream(new FileInputStream(serFile));
+			LuceneIndex index = (LuceneIndex) in.readObject();
+			addIndex(index, serFile.lastModified());
+		}
+		catch (Exception e) {
+			Util.printErr(e); // The average user doesn't need to know
+		}
+		finally {
+			Closeables.closeQuietly(in);
+		}
+	}
+	
+	private synchronized void reload() {
+		Map<File, LuceneIndex> indexDirMap = Maps.newHashMap();
+		for (LuceneIndex index : indexes.keySet())
+			indexDirMap.put(index.getIndexDir(), index);
+		
+		/*
+		 * The code below is pretty inefficient if many indexes are added,
+		 * modified and/or removed. However, we can assume that these operations
+		 * are usually performed one index at a time, so the inefficiency
+		 * doesn't really matter.
+		 */
+		
+		for (File indexDir : Util.listFiles(indexParentDir)) {
+			if (!indexDir.isDirectory())
+				continue;
+			File serFile = new File(indexDir, SER_FILENAME);
+			if (!serFile.isFile())
+				continue;
+			
+			LuceneIndex index = indexDirMap.remove(indexDir);
+			
+			// New index found
+			if (index == null) {
+				loadIndex(serFile);
+			}
+			// Existing index; may have been modified
+			else {
+				Long oldLM = indexes.get(index);
+				long newLM = serFile.lastModified();
+				if (oldLM != null && oldLM.longValue() != newLM) {
+					/*
+					 * Remove the old version of the index and add the new
+					 * version. Let's just hope it isn't in the queue or being
+					 * searched in right now.
+					 */
+					removeIndexes(Collections.singletonList(index), false);
+					loadIndex(serFile);
+				}
+			}
+		}
+		
+		// Handle missing indexes
+		removeIndexes(indexDirMap.values(), false);
 	}
 	
 	@VisibleForPackageGroup

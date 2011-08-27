@@ -19,7 +19,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.contentobjects.jnotify.JNotify;
-import net.contentobjects.jnotify.JNotifyListener;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
@@ -47,9 +46,8 @@ public final class FolderWatcher {
 	 */
 	private final Map<LuceneIndex, Boolean> watchQueue = Maps.newLinkedHashMap(); // guarded by lock
 	
-	// These two fields should only be accessed from the worker thread
+	// Should only be accessed from the worker thread
 	private final Map<LuceneIndex, Integer> watchIdMap = Maps.newHashMap();
-	private final Map<Integer, DelayedExecutor> idsToExecutorsMap = Maps.newHashMap();
 	
 	private final Lock lock = new ReentrantLock(true);
 	private final Condition needsUpdate = lock.newCondition();
@@ -174,7 +172,6 @@ public final class FolderWatcher {
 		 */
 		if (shutdown) {
 			for (Integer id : watchIdMap.values()) {
-				idsToExecutorsMap.remove(id).shutdown();
 				try {
 					JNotify.removeWatch(id);
 				}
@@ -182,7 +179,6 @@ public final class FolderWatcher {
 					Util.printErr(e);
 				}
 			}
-			assert idsToExecutorsMap.isEmpty();
 			watchIdMap.clear();
 			LuceneIndex.evtWatchFoldersChanged.remove(watchChangedListener);
 			throw new InterruptedException();
@@ -223,16 +219,13 @@ public final class FolderWatcher {
 				 * TODO check this for Mac OS X
 				 */
 				File fileToWatch = rootFile.isFile() && !Util.IS_LINUX
-				? Util.getParentFile(rootFile)
+					? Util.getParentFile(rootFile)
 					: rootFile;
-				String path = Util.getSystemAbsPath(fileToWatch);
 
 				JNotifyListenerImpl listener = new JNotifyListenerImpl(index);
 				try {
-					int id = JNotify.addWatch(
-						path, JNotify.FILE_ANY, true, listener);
+					int id = listener.addWatch(fileToWatch);
 					watchIdMap.put(index, id);
-					idsToExecutorsMap.put(id, listener.delayedExecutor);
 				}
 				catch (Exception e) {
 					// TODO suggest raising the global watch limit
@@ -248,7 +241,6 @@ public final class FolderWatcher {
 				Integer id = watchIdMap.remove(index);
 				if (id == null)
 					continue;
-				idsToExecutorsMap.remove(id).shutdown();
 				if (!rootFile.exists()) {
 					// Remove ID from map even if root file doesn't exist
 					continue;
@@ -277,27 +269,15 @@ public final class FolderWatcher {
 		}
 	}
 	
-	private final class JNotifyListenerImpl implements JNotifyListener {
+	private final class JNotifyListenerImpl extends SimpleJNotifyListener {
 		private final LuceneIndex watchedIndex;
 		private final DelayedExecutor delayedExecutor = new DelayedExecutor(1000);
 		
 		private JNotifyListenerImpl(@NotNull LuceneIndex watchedIndex) {
 			this.watchedIndex = Util.checkNotNull(watchedIndex);
 		}
-		public void fileCreated(int wd, String rootPath, String name) {
-			handleEvent(rootPath, name);
-		}
-		public void fileDeleted(int wd, String rootPath, String name) {
-			handleEvent(rootPath, name);
-		}
-		public void fileModified(int wd, String rootPath, String name) {
-			handleEvent(rootPath, name);
-		}
-		public void fileRenamed(int wd, String rootPath, String oldName, String newName) {
-			handleEvent(rootPath, newName);
-		}
-		private void handleEvent(String rootPath, String name) {
-			if (!accept(new File(rootPath, name)))
+		protected void handleEvent(File targetFile) {
+			if (!accept(targetFile))
 				return;
 			
 			/*
