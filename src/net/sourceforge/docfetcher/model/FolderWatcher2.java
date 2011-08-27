@@ -21,9 +21,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.ListMap;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
@@ -168,7 +168,9 @@ public final class FolderWatcher2 {
 		
 		/*
 		 * If the shutdown flag is set, ignore the watch queue. Instead, just
-		 * remove all existing watches and terminate.
+		 * remove all existing watches and terminate. Note that no lock is
+		 * needed when accessing the shutdown flag, since its value can only
+		 * change from false to true.
 		 */
 		if (shutdown) {
 			for (Integer id : watchIdMap.values()) {
@@ -186,11 +188,13 @@ public final class FolderWatcher2 {
 			throw new InterruptedException();
 		}
 		
-		int size = watchQueueCopy.size();
-		ListMap<LuceneIndex, Exception> errors = ListMap.create(size);
-		
 		for (LuceneIndex index : watchQueueCopy.keySet()) {
 			File rootFile = index.getRootFile();
+			
+			// Don't watch read-only files (some might be on a CD-ROM)
+			if (!rootFile.canWrite())
+				continue;
+			
 			try {
 				/*
 				 * Note: Before adding or removing a watch, we must check
@@ -244,16 +248,13 @@ public final class FolderWatcher2 {
 				}
 			}
 			catch (JNotifyException e) {
-				errors.add(index, e);
+				AppUtil.showStackTrace(e);
 			}
 			catch (RuntimeException e) {
 				// JNotify can throw RuntimeExceptions
-				errors.add(index, e);
+				Util.printErr(e);
 			}
 		}
-		
-		// TODO report errors (syncExec); what to do on shutdown?
-		// don't report if display is already disposed!
 	}
 	
 	public void shutdown() {

@@ -77,6 +77,10 @@ public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 		return list.size();
 	}
 	
+	public boolean isEmpty() {
+		return list.isEmpty();
+	}
+	
 	@NotNull
 	public Iterator<Entry<K, V>> iterator() {
 		return list.iterator();
