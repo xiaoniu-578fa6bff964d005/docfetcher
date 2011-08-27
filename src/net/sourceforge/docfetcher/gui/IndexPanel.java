@@ -212,6 +212,15 @@ public final class IndexPanel {
 				List<LuceneIndex> sel = getSelectedIndexes();
 				if (!isUpdate)
 					indexRegistry.removeIndexes(sel, false);
+				
+				/*
+				 * The indexing dialog must be opened *before* adding the tasks
+				 * to the queue. Otherwise, it may happen that the tasks are
+				 * completed before the dialog is opened, in which case the
+				 * dialog will be empty and won't close automatically.
+				 */
+				dialogFactory.open();
+				
 				for (LuceneIndex index : sel) {
 					Rejection rejection = queue.addTask(index, action);
 					
@@ -220,7 +229,6 @@ public final class IndexPanel {
 						? rejection == null
 						: true;
 				}
-				dialogFactory.open();
 			}
 		}
 		menuManager.add(new UpdateOrRebuildAction("Update Index...", true));
