@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -283,8 +284,16 @@ public final class IndexRegistry {
 	private void loadIndex(@NotNull File serFile) {
 		ObjectInputStream in = null;
 		try {
-			in = new ObjectInputStream(new FileInputStream(serFile));
-			LuceneIndex index = (LuceneIndex) in.readObject();
+			FileInputStream fin = new FileInputStream(serFile);
+			FileLock lock = fin.getChannel().lock(0, Long.MAX_VALUE, true);
+			LuceneIndex index;
+			try {
+				in = new ObjectInputStream(fin);
+				index = (LuceneIndex) in.readObject();
+			}
+			finally {
+				lock.release();
+			}
 			addIndex(index, serFile.lastModified());
 		}
 		catch (Exception e) {
@@ -358,8 +367,15 @@ public final class IndexRegistry {
 		ObjectOutputStream out = null;
 		try {
 			serFile.createNewFile();
-			out = new ObjectOutputStream(new FileOutputStream(serFile));
-			out.writeObject(index);
+			FileOutputStream fout = new FileOutputStream(serFile);
+			FileLock lock = fout.getChannel().lock();
+			try {
+				out = new ObjectOutputStream(fout);
+				out.writeObject(index);
+			}
+			finally {
+				lock.release();
+			}
 		}
 		catch (IOException e) {
 			Util.printErr(e); // The average user doesn't need to know

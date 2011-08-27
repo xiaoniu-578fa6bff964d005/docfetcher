@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -76,9 +77,17 @@ public final class ConfLoader {
 			else
 				throw new FileNotFoundException();
 		}
-		InputStream in = new BufferedInputStream(new FileInputStream(propFile));
+		InputStream in = null;
 		try {
-			return load(in, containerClass);
+			FileInputStream fin = new FileInputStream(propFile);
+			FileLock lock = fin.getChannel().lock(0, Long.MAX_VALUE, true);
+			try {
+				in = new BufferedInputStream(fin);
+				return load(in, containerClass);
+			}
+			finally {
+				lock.release();
+			}
 		} finally {
 			Closeables.closeQuietly(in);
 		}
@@ -89,6 +98,8 @@ public final class ConfLoader {
 	 * <tt>containerClass</tt> as the class containing the preferences enum
 	 * classes, and returns a list of entries where the value is missing or does
 	 * not have the proper structure.
+	 * <p>
+	 * The caller is responsible for closing the given input stream.
 	 */
 	// TODO doc: containerClass must contain nested enums that implement Loadable or Storable
 	@MutableCopy
@@ -159,43 +170,50 @@ public final class ConfLoader {
 		else
 			comment = Util.ensureLinuxLineSep(comment.trim());
 		
-		FileOutputStream out0 = new FileOutputStream(confFile, false);
-		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(out0, "utf-8"));
+		BufferedWriter out = null;
 		try {
-			out.write(comment);
-			out.write(lineSep);
-			out.write("#");
-			out.write(lineSep);
-			out.write("# ");
-			out.write(new Date().toString());
-			out.write(lineSep);
-			out.write(lineSep);
-
-			int i = 0;
-			for (Class<? extends Storable> clazz : ConfLoader.<Storable>getEnums(containerClass)) {
-				Storable[] entries = clazz.getEnumConstants();
-				if (entries.length == 0) continue;
-				if (i++ > 0) {
-					out.write(lineSep);
-					out.write(lineSep);
-				}
-				
-				String description = clazz.getAnnotation(Description.class).value();
-				if (useWinSep)
-					description = Util.ensureWindowsLineSep(description);
-				else
-					description = Util.ensureLinuxLineSep(description);
-				out.write(description);
+			FileOutputStream fout = new FileOutputStream(confFile, false);
+			FileLock lock = fout.getChannel().lock();
+			try {
+				out = new BufferedWriter(new OutputStreamWriter(fout, "utf-8"));
+				out.write(comment);
+				out.write(lineSep);
+				out.write("#");
+				out.write(lineSep);
+				out.write("# ");
+				out.write(new Date().toString());
+				out.write(lineSep);
 				out.write(lineSep);
 				
-				int j = 0;
-				for (Storable entry : entries) {
-					if (j++ > 0)
+				int i = 0;
+				for (Class<? extends Storable> clazz : ConfLoader.<Storable>getEnums(containerClass)) {
+					Storable[] entries = clazz.getEnumConstants();
+					if (entries.length == 0) continue;
+					if (i++ > 0) {
 						out.write(lineSep);
-					String key = convert(entry.name(), true);
-					String value = convert(entry.valueToString(), false);
-					out.write(key + " = " + value);
+						out.write(lineSep);
+					}
+					
+					String description = clazz.getAnnotation(Description.class).value();
+					if (useWinSep)
+						description = Util.ensureWindowsLineSep(description);
+					else
+						description = Util.ensureLinuxLineSep(description);
+					out.write(description);
+					out.write(lineSep);
+					
+					int j = 0;
+					for (Storable entry : entries) {
+						if (j++ > 0)
+							out.write(lineSep);
+						String key = convert(entry.name(), true);
+						String value = convert(entry.valueToString(), false);
+						out.write(key + " = " + value);
+					}
 				}
+			}
+			finally {
+				lock.release();
 			}
 		}
 		finally {
