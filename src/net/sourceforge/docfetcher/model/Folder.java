@@ -91,7 +91,7 @@ public abstract class Folder
 	
 	public Folder(@NotNull String name, @NotNull String path) {
 		super(name, name);
-		this.path = Util.checkNotNull(path).replace('\\', '/');
+		this.path = Util.fileSepMatcher.trimTrailingFrom(path).replace('\\', '/');
 	}
 	
 	@Nullable
@@ -126,6 +126,7 @@ public abstract class Folder
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
 	public synchronized final void putSubFolder(@NotNull F folder) {
+		Util.checkThat(folder.path.startsWith(path + "/"));
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
 		if (folder.parent != null)
