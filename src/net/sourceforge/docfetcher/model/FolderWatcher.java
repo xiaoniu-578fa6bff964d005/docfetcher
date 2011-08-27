@@ -19,7 +19,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.contentobjects.jnotify.JNotify;
-import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.DelayedExecutor;
@@ -195,64 +194,70 @@ public final class FolderWatcher {
 			if (!rootFile.canWrite())
 				continue;
 			
-			try {
+			/*
+			 * Note: Before adding or removing a watch, we must check
+			 * whether the watch ID map already contains or doesn't contain
+			 * the index as a key, respectively. Theoretically, this could
+			 * happen if the watch state is 'flipped' forth and back before
+			 * the worker thread processes the change. For example, an index
+			 * that is already being watched could quickly flip from
+			 * 'watched' to 'unwatched' and then back to 'watched'. Without
+			 * looking at the watch ID map, it would then appear that we
+			 * need to add a watch for the index, even though we're already
+			 * watching it.
+			 */
+			// Add watch
+			if (watchQueueCopy.get(index)) {
+				if (watchIdMap.containsKey(index))
+					continue;
+				if (!rootFile.exists())
+					continue;
+
 				/*
-				 * Note: Before adding or removing a watch, we must check
-				 * whether the watch ID map already contains or doesn't contain
-				 * the index as a key, respectively. Theoretically, this could
-				 * happen if the watch state is 'flipped' forth and back before
-				 * the worker thread processes the change. For example, an index
-				 * that is already being watched could quickly flip from
-				 * 'watched' to 'unwatched' and then back to 'watched'. Without
-				 * looking at the watch ID map, it would then appear that we
-				 * need to add a watch for the index, even though we're already
-				 * watching it.
+				 * Tests indicate that Linux can watch individual files, but
+				 * Windows can't. That means on non-Linux platforms we'll
+				 * watch the parent folder instead if our target is a file
+				 * (for example a PST file).
+				 * 
+				 * TODO check this for Mac OS X
 				 */
-				// Add watch
-				if (watchQueueCopy.get(index)) {
-					if (watchIdMap.containsKey(index))
-						continue;
-					if (!rootFile.exists())
-						continue;
-					
-					/*
-					 * Tests indicate that Linux can watch individual files, but
-					 * Windows can't. That means on non-Linux platforms we'll
-					 * watch the parent folder instead if our target is a file
-					 * (for example a PST file).
-					 * 
-					 * TODO check this for Mac OS X
-					 */
-					File fileToWatch = rootFile.isFile() && !Util.IS_LINUX
-						? Util.getParentFile(rootFile)
-						: rootFile;
-					String path = Util.getSystemAbsPath(fileToWatch);
-					
-					JNotifyListenerImpl listener = new JNotifyListenerImpl(index);
+				File fileToWatch = rootFile.isFile() && !Util.IS_LINUX
+				? Util.getParentFile(rootFile)
+					: rootFile;
+				String path = Util.getSystemAbsPath(fileToWatch);
+
+				JNotifyListenerImpl listener = new JNotifyListenerImpl(index);
+				try {
 					int id = JNotify.addWatch(
 						path, JNotify.FILE_ANY, true, listener);
 					watchIdMap.put(index, id);
 					idsToExecutorsMap.put(id, listener.delayedExecutor);
 				}
-				// Remove watch
-				else {
-					Integer id = watchIdMap.remove(index);
-					if (id == null)
-						continue;
-					idsToExecutorsMap.remove(id).shutdown();
-					if (!rootFile.exists()) {
-						// Remove ID from map even if root file doesn't exist
-						continue;
-					}
-					JNotify.removeWatch(id);
+				catch (Exception e) {
+					// TODO suggest raising the global watch limit
+					String msg = String.format(
+						"Failed to install watch for folder '%s'.\n\n"
+								+ "Internal error message:\n%s",
+						index.getDisplayName(), e.getMessage());
+					AppUtil.showError(msg, true, false);
 				}
 			}
-			catch (JNotifyException e) {
-				AppUtil.showStackTrace(e);
-			}
-			catch (RuntimeException e) {
-				// JNotify can throw RuntimeExceptions
-				Util.printErr(e);
+			// Remove watch
+			else {
+				Integer id = watchIdMap.remove(index);
+				if (id == null)
+					continue;
+				idsToExecutorsMap.remove(id).shutdown();
+				if (!rootFile.exists()) {
+					// Remove ID from map even if root file doesn't exist
+					continue;
+				}
+				try {
+					JNotify.removeWatch(id);
+				}
+				catch (Exception e) {
+					Util.printErr(e);
+				}
 			}
 		}
 	}
