@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.model.index;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.BoundedList;
@@ -24,23 +25,26 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 public final class DelegatingReporter extends IndexingReporter {
 
 	public interface ExistingMessagesHandler {
-		public void handleMessages(	List<IndexingInfo> infos,
-									List<IndexingError> errors);
+		// The given lists are mutable
+		public void handleMessages(	@NotNull List<IndexingInfo> infos,
+									@NotNull List<IndexingError> errors);
 	}
 
 	public interface ExistingMessagesProvider {
+		@NotNull
 		public List<IndexingInfo> getInfos();
 
+		@NotNull
 		public List<IndexingError> getErrors();
 	}
 
 	@Nullable private IndexingReporter delegate;
 	private final BoundedList<IndexingInfo> infos;
-	private final BoundedList<IndexingError> errors;
+	private final List<IndexingError> errors;
 
-	DelegatingReporter(int capacity) {
-		infos = new BoundedList<IndexingInfo>(capacity);
-		errors = new BoundedList<IndexingError>(capacity);
+	DelegatingReporter(int infoCapacity) {
+		infos = new BoundedList<IndexingInfo>(infoCapacity);
+		errors = new ArrayList<IndexingError>();
 	}
 
 	public synchronized void attachDelegate(@NotNull IndexingReporter delegate,
@@ -48,8 +52,9 @@ public final class DelegatingReporter extends IndexingReporter {
 		Util.checkNotNull(delegate, handler);
 		Util.checkThat(this.delegate == null);
 		this.delegate = delegate;
-		handler.handleMessages(
-			infos.removeAll(), errors.removeAll());
+		List<IndexingError> errorsCopy = new ArrayList<IndexingError>(errors);
+		handler.handleMessages(infos.removeAll(), errorsCopy);
+		errors.clear();
 	}
 
 	public synchronized void detachDelegate(@NotNull IndexingReporter delegate,
