@@ -240,6 +240,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 										@NotNull final File dirOrZip)
 			throws IndexingException {
 		assert dirOrZip.isDirectory();
+		assert folder.getError() == null;
+		
 		final IndexingConfig config = context.getConfig();
 		boolean htmlPairing = config.isHtmlPairing();
 		Collection<String> htmlExtensions = config.getHtmlExtensions();
@@ -354,6 +356,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 					if (isUnmodifiedArchive(subFolder, newLastModified))
 						return;
 					subFolder.setLastModified(newLastModified);
+					subFolder.setError(null);
 				}
 				try {
 					visitDirOrZip(context, subFolder, dir);
@@ -440,6 +443,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			if (isUnmodifiedArchive(archiveFolder, newLastModified))
 				return true; // Don't recurse into unmodified archive
 			archiveFolder.setLastModified(newLastModified);
+			archiveFolder.setError(null);
 		}
 
 		File unpackedArchiveFile = null;
@@ -459,10 +463,10 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		}
 		catch (IOException e) {
 			archiveFolder.removeChildren();
-			if (Util.hasExtension(archiveName, "exe"))
-				context.fail(ErrorType.NOT_AN_ARCHIVE, archiveFolder, e);
-			else
-				context.fail(ErrorType.ARCHIVE, archiveFolder, e);
+			ErrorType errorType = Util.hasExtension(archiveName, "exe")
+				? ErrorType.NOT_AN_ARCHIVE
+				: ErrorType.ARCHIVE;
+			context.fail(errorType, archiveFolder, e);
 		}
 		catch (ArchiveEncryptedException e) {
 			archiveFolder.removeChildren();
@@ -477,6 +481,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 											@NotNull FileFolder archiveFolder,
 											@NotNull SolidArchiveTree<?> archiveTree)
 			throws IndexingException {
+		assert archiveFolder.getError() == null;
 		FileFolder newArchiveFolder = archiveTree.getArchiveFolder();
 		try {
 			// Collect files to unpack
@@ -487,18 +492,18 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 				context.nestedArchives.keySet());
 
 			// Unpack added and modified files
-			context.info(InfoType.UNPACKING, newArchiveFolder);
+			context.info(InfoType.UNPACKING, archiveFolder);
 			archiveTree.unpack(unpackEntries, null);
 		}
 		catch (IOException e) {
 			archiveFolder.removeChildren();
-			context.fail(ErrorType.ARCHIVE, newArchiveFolder, e);
+			context.fail(ErrorType.ARCHIVE, archiveFolder, e);
 			return;
 		}
 		catch (DiskSpaceException e) {
 			archiveFolder.removeChildren();
 			context.fail(
-				ErrorType.ARCHIVE_UNPACK_DISKSPACE, newArchiveFolder, e);
+				ErrorType.ARCHIVE_UNPACK_DISKSPACE, archiveFolder, e);
 			return;
 
 		}
@@ -549,6 +554,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 												@NotNull final FileFolder oldFolder,
 												@NotNull FileFolder newFolder)
 			throws IndexingException {
+		assert oldFolder.getError() == null;
+		assert newFolder.getError() == null;
+		
 		/*
 		 * Run document diff
 		 */
@@ -733,6 +741,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		unpackedFile = new TFile(unpackedFile, context.getZipDetector());
 		String archiveName = archive.getName();
 		IndexingConfig config = context.getConfig();
+		archive.setError(null);
 
 		/*
 		 * The user-defined zip extensions have higher priority, so we'll check
@@ -759,10 +768,10 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		}
 		catch (IOException e) {
 			archive.removeChildren();
-			if (Util.hasExtension(archiveName, "exe"))
-				context.fail(ErrorType.NOT_AN_ARCHIVE, archive, e);
-			else
-				context.fail(ErrorType.ARCHIVE, archive, e);
+			ErrorType errorType = Util.hasExtension(archiveName, "exe")
+				? ErrorType.NOT_AN_ARCHIVE
+				: ErrorType.ARCHIVE;
+			context.fail(errorType, archive, e);
 		}
 		catch (ArchiveEncryptedException e) {
 			archive.removeChildren();

@@ -186,7 +186,7 @@ class FileContext {
 		reporter.info(new IndexingInfo(type, treeNode));
 	}
 	
-	// Reports and saves the given error
+	// Reports the given error and saves it in the given tree node
 	public final void fail(	@NotNull ErrorType type,
 							@NotNull TreeNode treeNode,
 							@Nullable Throwable cause) {

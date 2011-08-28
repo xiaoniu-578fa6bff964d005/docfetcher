@@ -30,10 +30,10 @@ import com.pff.PSTRecipient;
 
 final class OutlookContext {
 	
-	@NotNull private final IndexingConfig config;
-	@NotNull private final IndexWriterAdapter writer;
-	@NotNull private final IndexingReporter reporter;
-	@NotNull private final Cancelable cancelable;
+	private final IndexingConfig config;
+	private final IndexWriterAdapter writer;
+	private final IndexingReporter reporter;
+	private final Cancelable cancelable;
 
 	public OutlookContext(	@NotNull IndexingConfig config,
 	                      	@NotNull IndexWriterAdapter writer,
