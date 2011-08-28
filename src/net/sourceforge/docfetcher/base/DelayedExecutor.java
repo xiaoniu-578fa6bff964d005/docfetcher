@@ -34,6 +34,9 @@ public final class DelayedExecutor {
 	
 	// Discards the previously scheduled runnable if the time passed since the
 	// last scheduling is less than the delay
+	// If the given Runnable throws an Exception, the latter will be propagated
+	// to the default exception handler. The executor will then continue to operate
+	// normally.
 	public void schedule(@NotNull Runnable runnable) {
 		Util.checkNotNull(runnable);
 		synchronized (lock) {
@@ -42,7 +45,7 @@ public final class DelayedExecutor {
 			if (thread != null)
 				return;
 			
-			thread = new Thread() {
+			thread = new Thread(DelayedExecutor.class.getName()) {
 				public void run() {
 					long sleepTime = delay;
 					while (true) {
@@ -55,9 +58,13 @@ public final class DelayedExecutor {
 						synchronized (lock) {
 							long timePassed = System.currentTimeMillis() - lastTimestamp;
 							if (timePassed > delay) {
-								lastRunnable.run();
-								lastRunnable = null;
-								thread = null;
+								try {
+									lastRunnable.run();
+								}
+								finally {
+									lastRunnable = null;
+									thread = null;
+								}
 								break;
 							}
 							else {
