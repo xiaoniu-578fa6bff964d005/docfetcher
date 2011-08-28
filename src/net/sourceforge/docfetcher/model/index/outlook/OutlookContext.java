@@ -57,12 +57,12 @@ final class OutlookContext {
 						boolean added) throws IndexingException {
 		reporter.info(new IndexingInfo(InfoType.EXTRACTING, doc));
 		try {
-			Document luceneDoc = createLuceneDoc(doc, email);
+			doc.setError(null);
+			Document luceneDoc = createLuceneDoc(doc, email); // might store some errors
 			if (added)
 				writer.add(luceneDoc);
 			else
 				writer.update(doc.getUniqueId(), luceneDoc);
-			doc.setError(null);
 		}
 		catch (IOException e) {
 			throw new IndexingException(e);
@@ -136,18 +136,14 @@ final class OutlookContext {
 
 				// Put error in temporary list and report it
 				if (errors == null)
-					errors = new ArrayList<IndexingError>();
+					errors = new ArrayList<IndexingError>(5);
 				IndexingError error = new IndexingError(
 					ErrorType.ATTACHMENT, attachNode, e);
 				errors.add(error);
 				reporter.fail(error);
 			}
 			protected void runFinally() {
-				// Save errors
-				if (errors != null) {
-					IndexingError[] array = new IndexingError[errors.size()];
-					doc.setErrors(errors.toArray(array));
-				}
+				doc.setErrors(errors);
 			}
 		}.run();
 		

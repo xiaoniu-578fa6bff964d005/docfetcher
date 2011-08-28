@@ -12,8 +12,13 @@
 package net.sourceforge.docfetcher.model;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
@@ -33,7 +38,7 @@ public abstract class TreeNode implements Serializable {
 	 * The indexing errors that occurred on this tree node the last time the
 	 * index was updated. Null if no error occurred during the last update.
 	 */
-	@Nullable private IndexingError[] errors;
+	@Nullable private List<IndexingError> errors; // Null instead of empty list to save some RAM
 	
 	public TreeNode(@NotNull String name,
 					@NotNull String displayName) {
@@ -60,17 +65,24 @@ public abstract class TreeNode implements Serializable {
 		return getPath();
 	}
 
-	@Nullable
-	public final IndexingError[] getErrors() {
-		return errors;
+	@Immutable
+	@NotNull
+	public synchronized final List<IndexingError> getErrors() {
+		return errors == null
+			? Collections.<IndexingError> emptyList()
+			: errors;
 	}
 	
-	public final void setError(@Nullable IndexingError error) {
-		this.errors = error == null ? null : new IndexingError[] { error };
+	public synchronized final boolean hasErrors() {
+		return errors != null && !errors.isEmpty();
+	}
+	
+	public synchronized final void setError(@Nullable IndexingError error) {
+		this.errors = error == null ? null : Collections.singletonList(error);
 	}
 
-	public final void setErrors(@Nullable IndexingError[] errors) {
-		this.errors = errors;
+	public synchronized final void setErrors(@Nullable List<IndexingError> errors) {
+		this.errors = errors == null ? null : ImmutableList.copyOf(errors);
 	}
 	
 }
