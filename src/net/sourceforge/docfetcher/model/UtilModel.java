@@ -292,4 +292,9 @@ public final class UtilModel {
 		return lastChar != '/' && lastChar != '\\';
 	}
 	
+	@NotNull
+	public static String normalizePath(@NotNull String path) {
+		return Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
+	}
+	
 }

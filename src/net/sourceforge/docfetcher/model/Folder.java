@@ -91,7 +91,7 @@ public abstract class Folder
 	
 	public Folder(@NotNull String name, @NotNull String path) {
 		super(name, name);
-		this.path = Util.fileSepMatcher.trimTrailingFrom(path).replace('\\', '/');
+		this.path = UtilModel.normalizePath(path);
 	}
 	
 	@Nullable
@@ -340,8 +340,7 @@ public abstract class Folder
 	@Nullable
 	public final D findDocument(@NotNull String targetPath) {
 		Util.checkNotNull(targetPath);
-		targetPath = Util.fileSepMatcher.trimTrailingFrom(targetPath);
-		targetPath = targetPath.replace("\\", "/");
+		targetPath = UtilModel.normalizePath(targetPath);
 		return findDocumentUnchecked(targetPath);
 	}
 	

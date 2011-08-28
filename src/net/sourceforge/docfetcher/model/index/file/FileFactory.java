@@ -65,8 +65,7 @@ public final class FileFactory {
 	public FileResource createFile(	@NotNull IndexingConfig config,
 									@NotNull String path) throws ParseException {
 		Util.checkNotNull(config, path);
-		path = path.replace('\\', '/');
-		path = Util.fileSepMatcher.trimTrailingFrom(path);
+		path = UtilModel.normalizePath(path);
 		
 		try {
 			String[] pathParts = UtilModel.splitAtExisting(path, "");
