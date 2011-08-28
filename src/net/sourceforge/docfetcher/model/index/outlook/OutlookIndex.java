@@ -95,10 +95,14 @@ public final class OutlookIndex extends TreeIndex
 	
 	public boolean update(@NotNull IndexingReporter reporter,
 	                      @NotNull Cancelable cancelable) {
-		if (cancelable.isCanceled()) return false;
+		if (cancelable.isCanceled())
+			return false;
+		
 		reporter.indexingStarted();
 		MailFolder rootFolder = getRootFolder();
+		rootFolder.setError(null);
 		IndexWriterAdapter writer = null;
+		
 		try {
 			writer = new IndexWriterAdapter(getLuceneDir());
 			OutlookContext context = new OutlookContext(
@@ -123,22 +127,28 @@ public final class OutlookIndex extends TreeIndex
 			return true;
 		}
 		catch (PSTException e) {
-			reporter.fail(new IndexingError(
-				ErrorType.IO_EXCEPTION, rootFolder, e));
+			report(reporter, e);
 		}
 		catch (IOException e) {
-			reporter.fail(new IndexingError(
-				ErrorType.IO_EXCEPTION, rootFolder, e));
+			report(reporter, e);
 		}
 		catch (IndexingException e) {
-			reporter.fail(new IndexingError(
-				ErrorType.IO_EXCEPTION, rootFolder, e.getIOException()));
+			report(reporter, e.getIOException());
 		}
 		finally {
 			Closeables.closeQuietly(writer);
 			reporter.indexingStopped();
 		}
 		return false;
+	}
+	
+	private void report(@NotNull IndexingReporter reporter,
+						@NotNull Exception e) {
+		MailFolder rootFolder = getRootFolder();
+		IndexingError error = new IndexingError(
+			ErrorType.IO_EXCEPTION, rootFolder, e);
+		rootFolder.setError(error);
+		reporter.fail(error);
 	}
 	
 	// TODO method currently not in use

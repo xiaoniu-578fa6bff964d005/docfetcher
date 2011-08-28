@@ -139,6 +139,10 @@ class FileContext {
 				writer.add(doc, file, parseResult);
 			else
 				writer.update(doc, file, parseResult);
+			
+			// Clear errors from previous indexing operations
+			doc.setError(null);
+			
 			return true;
 		}
 		catch (IOException e) {
@@ -182,10 +186,13 @@ class FileContext {
 		reporter.info(new IndexingInfo(type, treeNode));
 	}
 	
+	// Reports and saves the given error
 	public final void fail(	@NotNull ErrorType type,
 							@NotNull TreeNode treeNode,
 							@Nullable Throwable cause) {
-		reporter.fail(new IndexingError(type, treeNode, cause));
+		IndexingError error = new IndexingError(type, treeNode, cause);
+		treeNode.setError(error);
+		reporter.fail(error);
 	}
 	
 	/**

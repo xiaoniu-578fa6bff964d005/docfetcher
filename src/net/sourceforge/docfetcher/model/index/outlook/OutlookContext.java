@@ -129,6 +129,7 @@ final class OutlookContext {
 						return filepath;
 					}
 				};
+				// TODO save error in tree node? -> must also clear previous errors
 				reporter.fail(new IndexingError(
 					ErrorType.ATTACHMENT, attachNode, e));
 			}

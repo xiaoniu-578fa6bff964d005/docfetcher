@@ -90,11 +90,13 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 	// returns success
 	public boolean update(	@NotNull IndexingReporter reporter,
 							@NotNull Cancelable cancelable) {
-		if (cancelable.isCanceled()) return false;
+		if (cancelable.isCanceled())
+			return false;
+		
 		reporter.indexingStarted();
-
 		IndexingConfig config = getConfig();
 		FileFolder rootFolder = getRootFolder();
+		rootFolder.setError(null);
 		SimpleDocWriter writer = null;
 
 		/*
@@ -129,23 +131,31 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			return true;
 		}
 		catch (ArchiveEncryptedException e) {
-			reporter.fail(new IndexingError(ErrorType.ARCHIVE_ENCRYPTED, rootFolder, e));
+			report(ErrorType.ARCHIVE_ENCRYPTED, reporter, e);
 		}
 		catch (IOException e) {
 			ErrorType errorType = Util.hasExtension(rootFolder.getName(), "exe")
 				? ErrorType.NOT_AN_ARCHIVE
 				: ErrorType.IO_EXCEPTION;
-			reporter.fail(new IndexingError(errorType, rootFolder, e));
+			report(errorType, reporter, e);
 		}
 		catch (IndexingException e) {
-			reporter.fail(new IndexingError(
-				ErrorType.IO_EXCEPTION, rootFolder, e.getIOException()));
+			report(ErrorType.IO_EXCEPTION, reporter, e.getIOException());
 		}
 		finally {
 			Closeables.closeQuietly(writer);
 			reporter.indexingStopped();
 		}
 		return false;
+	}
+	
+	private void report(@NotNull ErrorType errorType,
+	                    @NotNull IndexingReporter reporter,
+						@NotNull Exception e) {
+		FileFolder rootFolder = getRootFolder();
+		IndexingError error = new IndexingError(errorType, rootFolder, e);
+		rootFolder.setError(error);
+		reporter.fail(error);
 	}
 
 	@Nullable

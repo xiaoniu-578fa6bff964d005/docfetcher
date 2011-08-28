@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.model.index;
 
+import java.io.Serializable;
+
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -20,8 +22,9 @@ import net.sourceforge.docfetcher.model.TreeNode;
 /**
  * @author Tran Nam Quang
  */
+@SuppressWarnings("serial")
 @VisibleForPackageGroup
-public final class IndexingError {
+public final class IndexingError implements Serializable {
 	
 	public enum ErrorType {
 		// Files
