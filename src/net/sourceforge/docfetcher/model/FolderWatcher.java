@@ -24,10 +24,12 @@ import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.file.FileDocument;
+import net.sourceforge.docfetcher.model.index.file.FileFolder;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 
@@ -276,6 +278,7 @@ public final class FolderWatcher {
 		private JNotifyListenerImpl(@NotNull LuceneIndex watchedIndex) {
 			this.watchedIndex = Util.checkNotNull(watchedIndex);
 		}
+		
 		protected void handleEvent(File targetFile) {
 			if (!accept(targetFile))
 				return;
@@ -291,6 +294,7 @@ public final class FolderWatcher {
 				}
 			});
 		}
+		
 		private boolean accept(@NotNull File target) {
 			String name = target.getName();
 			boolean isFile = target.isFile();
@@ -316,16 +320,47 @@ public final class FolderWatcher {
 					&& !ParseService.canParseByName(config, name))
 				return false;
 			
-			// Check if the file was *really* modified (JNotify tends to fire
-			// even when files have only been accessed)
+			/*
+			 * Check if the file was *really* modified - JNotify tends to fire
+			 * even when files have only been accessed.
+			 */
 			if (watchedIndex instanceof FileIndex) {
 				FileIndex index = (FileIndex) watchedIndex;
-				FileDocument doc = index.getRootFolder().findDocument(path);
-				if (doc != null && doc.getLastModified() == target.lastModified())
+				TreeNode treeNode = index.getRootFolder().findTreeNode(path);
+				if (sameLastModified(treeNode, target))
 					return false;
 			}
 			
+			/*
+			 * Workaround for a problem with TrueZIP: It appears that TrueZIP
+			 * sometimes changes the last-modified field of the files it
+			 * accesses. Consequently, running an index update can trigger
+			 * JNotify events, which leads to more index updates. The workaround
+			 * is to ignore changed zip archives if an index update is currently
+			 * running.
+			 */
+			if (isFile && watchedIndex instanceof FileIndex
+					&& watchedIndex.isIndexing() && config.isZipArchive(name)) {
+				return false;
+			}
+			
 			return true;
+		}
+
+		private boolean sameLastModified(	@Nullable TreeNode treeNode,
+											@NotNull File file) {
+			if (treeNode == null)
+				return false;
+			if (treeNode instanceof FileDocument) {
+				FileDocument doc = (FileDocument) treeNode;
+				return doc.getLastModified() == file.lastModified();
+			}
+			if (treeNode instanceof FileFolder) {
+				// Implicit assertion: tree node is an archive
+				FileFolder folder = (FileFolder) treeNode;
+				return folder.getLastModified().longValue() == file.lastModified();
+			}
+			throw new IllegalStateException();
 		}
 	};
 	

@@ -34,13 +34,13 @@ public final class FolderTest {
 			FileDocument doc = new FileDocument(f2, "three", 1L);
 			
 			String targetPath = prefix + "one/two/three";
-			assertTrue(doc == f1.findDocument(targetPath));
+			assertTrue(doc == f1.findTreeNode(targetPath));
 			
 			String wrongPrefix = absolutePath ? "" : "/";
 			String wrongPath = wrongPrefix + "one/two/three";
-			assertNull(f1.findDocument(wrongPath));
+			assertNull(f1.findTreeNode(wrongPath));
 			
-			assertNull(f1.findDocument(prefix + "does/not/exist"));
+			assertNull(f1.findTreeNode(prefix + "does/not/exist"));
 		}
 	}
 

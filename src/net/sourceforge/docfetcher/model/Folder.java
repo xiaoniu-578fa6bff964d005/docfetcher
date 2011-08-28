@@ -28,6 +28,7 @@ import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 
 import com.google.common.collect.Maps;
@@ -78,9 +79,10 @@ public abstract class Folder
 	 * These maps are set to null when they're empty in order to avoid wasting
 	 * RAM when the tree is very large and has many empty leaf nodes.
 	 */
-	@Nullable private HashMap<String, D> documents;
-	@Nullable private HashMap<String, F> subFolders;
-	@Nullable private F parent;
+	@Nullable private HashMap<String, D> documents; // guarded by 'this' lock
+	@Nullable private HashMap<String, F> subFolders; // guarded by 'this' lock
+	@Nullable private F parent; // guarded by 'this' lock
+	
 	private final String path;
 	
 	/*
@@ -328,28 +330,30 @@ public abstract class Folder
 	}
 
 	/**
-	 * Returns the document underneath the receiver that has the given path, or
-	 * null if there is no such document. The search for the document is done
+	 * Returns the tree node underneath the receiver that has the given path, or
+	 * null if there is no such tree node. The search for the tree node is done
 	 * recursively. Trailing slashes in the given path will be ignored, and
 	 * backward slashes are automatically converted to forward slashes.
 	 * <p>
 	 * This method does not convert between absolute and relative paths, so if
-	 * the documents of the receiver have relative paths, the given path must
+	 * the tree nodes of the receiver have relative paths, the given path must
 	 * also be a relative path.
 	 */
 	@Nullable
-	public final D findDocument(@NotNull String targetPath) {
+	@ThreadSafe
+	public final TreeNode findTreeNode(@NotNull String targetPath) {
 		Util.checkNotNull(targetPath);
 		targetPath = UtilModel.normalizePath(targetPath);
-		return findDocumentUnchecked(targetPath);
+		return findTreeNodeUnchecked(targetPath);
 	}
 	
 	/**
-	 * Recursive helper method for {@link #findDocument(String)}.
+	 * Recursive helper method for {@link #findTreeNode(String)}.
 	 */
 	@Nullable
 	@RecursiveMethod
-	private D findDocumentUnchecked(@NotNull String targetPath) {
+	@ThreadSafe
+	private synchronized TreeNode findTreeNodeUnchecked(@NotNull String targetPath) {
 		if (documents != null) {
 			for (D document : documents.values()) {
 				String path = document.getPath();
@@ -362,8 +366,10 @@ public abstract class Folder
 			for (F subFolder : subFolders.values()) {
 				String path = subFolder.getPath();
 				assert UtilModel.noTrailingSlash(path);
+				if (targetPath.equals(path))
+					return subFolder;
 				if (targetPath.startsWith(path + "/"))
-					return subFolder.findDocumentUnchecked(targetPath);
+					return subFolder.findTreeNodeUnchecked(targetPath);
 			}
 		}
 		return null;

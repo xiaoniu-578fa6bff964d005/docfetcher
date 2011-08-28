@@ -141,7 +141,9 @@ public final class IndexingQueue {
 			indexRegistry.getSearcher().replaceLuceneSearcher();
 			luceneIndex.clear();
 		}
+		luceneIndex.setIndexing(true);
 		boolean success = task.update(); // Long-running process
+		luceneIndex.setIndexing(false);
 
 		boolean doDelete = false;
 		boolean doSave = false;

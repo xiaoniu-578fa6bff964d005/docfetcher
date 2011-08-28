@@ -240,9 +240,7 @@ public class IndexingConfig implements Serializable {
 		String ext = Util.getExtension(filename);
 		if (ext.equals("7z") || ext.equals("rar") || ext.equals("exe"))
 			return true;
-		if (zipExtensions.contains(ext))
-			return true;
-		return false;
+		return zipExtensions.contains(ext);
 	}
 	
 	// Accepts filenames and filepaths
@@ -263,6 +261,12 @@ public class IndexingConfig implements Serializable {
 	// Accepts filenames and filepaths
 	public boolean isSolidArchive(@NotNull String filename) {
 		return getSolidArchiveFactory(filename) != null;
+	}
+	
+	// Accepts filenames and filepaths
+	public boolean isZipArchive(@NotNull String filename) {
+		String ext = Util.getExtension(filename);
+		return zipExtensions.contains(ext);
 	}
 	
 	public boolean isWatchFolders() {

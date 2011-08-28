@@ -73,5 +73,9 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public boolean isWatchFolders();
 	
 	public void setWatchFolders(boolean watchFolders);
+	
+	public boolean isIndexing();
+	
+	public void setIndexing(boolean isIndexing);
 
 }

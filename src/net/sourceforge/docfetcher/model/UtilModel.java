@@ -211,6 +211,8 @@ public final class UtilModel {
 
 	/**
 	 * Returns true if the given TrueZIP file is a zip archive, false otherwise.
+	 * 
+	 * @see IndexingConfig#isZipArchive(String)
 	 */
 	@VisibleForPackageGroup
 	public static boolean isZipArchive(@NotNull TFile file) {
