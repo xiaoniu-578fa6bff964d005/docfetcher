@@ -21,10 +21,12 @@ import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingInfo;
+import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.InfoType;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -89,7 +91,7 @@ class FileContext {
 	
 	// May return a default empty reporter
 	@NotNull
-	public final IndexingReporter getReporter() {
+	protected final IndexingReporter getReporter() {
 		return reporter;
 	}
 
@@ -116,7 +118,7 @@ class FileContext {
 	public final boolean index(	@NotNull FileDocument doc,
 								@NotNull File file,
 								boolean isAdded) throws IndexingException {
-		reporter.info(InfoType.EXTRACTING, doc);
+		info(InfoType.EXTRACTING, doc);
 		try {
 			// Text extraction; may throw OutOfMemoryErrors
 			ParseResult parseResult = ParseService.parse(
@@ -143,13 +145,13 @@ class FileContext {
 			throw new IndexingException(e);
 		}
 		catch (ParseException e) {
-			reporter.fail(ErrorType.PARSING, doc, e);
+			fail(ErrorType.PARSING, doc, e);
 		}
 		catch (OutOfMemoryError e) {
-			reporter.fail(ErrorType.OUT_OF_MEMORY, doc, e);
+			fail(ErrorType.OUT_OF_MEMORY, doc, e);
 		}
 		catch (StackOverflowError e) {
-			reporter.fail(ErrorType.STACK_OVERFLOW, doc, e);
+			fail(ErrorType.STACK_OVERFLOW, doc, e);
 		}
 		return false;
 	}
@@ -176,14 +178,14 @@ class FileContext {
 		}
 	}
 	
-	public final void info(InfoType type, TreeNode treeNode) {
-		reporter.info(type, treeNode);
+	public final void info(@NotNull InfoType type, @NotNull TreeNode treeNode) {
+		reporter.info(new IndexingInfo(type, treeNode));
 	}
 	
-	public final void fail(	ErrorType type,
-							TreeNode treeNode,
+	public final void fail(	@NotNull ErrorType type,
+							@NotNull TreeNode treeNode,
 							@Nullable Throwable cause) {
-		reporter.fail(type, treeNode, cause);
+		reporter.fail(new IndexingError(type, treeNode, cause));
 	}
 	
 	/**

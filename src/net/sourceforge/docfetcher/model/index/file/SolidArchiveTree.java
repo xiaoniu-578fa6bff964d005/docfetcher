@@ -31,8 +31,8 @@ import net.sourceforge.docfetcher.model.Folder.Predicate;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 

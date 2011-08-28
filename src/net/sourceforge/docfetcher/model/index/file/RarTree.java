@@ -21,7 +21,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;

@@ -12,7 +12,9 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 /**
@@ -45,15 +47,13 @@ final class ProgressReporter extends IndexingReporter {
 		Util.println(msg);
 	}
 	
-	public void info(	InfoType infoType,
-						TreeNode treeNode) {
-		progressPanel.append(treeNode.getDisplayName());
+	public void info(@NotNull IndexingInfo info) {
+		progressPanel.append(info.getTreeNode().getDisplayName());
 	}
 	
-	public void fail(	ErrorType errorType,
-						TreeNode treeNode,
-						Throwable cause) {
-		progressPanel.append("ERROR " + errorType.name() + ": " + treeNode.getDisplayName());
+	public void fail(@NotNull IndexingError error) {
+		progressPanel.append("ERROR " + error.getErrorType().name() + ": "
+				+ error.getTreeNode().getDisplayName());
 	}
 
 }

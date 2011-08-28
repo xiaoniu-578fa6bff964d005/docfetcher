@@ -14,8 +14,8 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.io.IOException;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
 
 import org.apache.lucene.document.Document;
 
@@ -46,10 +46,12 @@ final class AppendingContext extends FileContext {
 		try {
 			outerContext.getWriter().write(doc, luceneDoc, isAdded);
 			return true;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IndexingException(e);
-		} catch (OutOfMemoryError e) {
-			outerContext.getReporter().fail(ErrorType.OUT_OF_MEMORY, doc, e);
+		}
+		catch (OutOfMemoryError e) {
+			outerContext.fail(ErrorType.OUT_OF_MEMORY, doc, e);
 		}
 		return false;
 	}

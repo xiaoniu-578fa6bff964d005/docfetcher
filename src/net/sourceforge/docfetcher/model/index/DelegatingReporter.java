@@ -17,7 +17,6 @@ import net.sourceforge.docfetcher.base.BoundedList;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.model.TreeNode;
 
 /**
  * @author Tran Nam Quang
@@ -25,68 +24,23 @@ import net.sourceforge.docfetcher.model.TreeNode;
 public final class DelegatingReporter extends IndexingReporter {
 
 	public interface ExistingMessagesHandler {
-		public void handleMessages(	List<InfoMessage> infoMessages,
-									List<ErrorMessage> errorMessages);
+		public void handleMessages(	List<IndexingInfo> infos,
+									List<IndexingError> errors);
 	}
 
 	public interface ExistingMessagesProvider {
-		public List<InfoMessage> getInfoMessages();
+		public List<IndexingInfo> getInfos();
 
-		public List<ErrorMessage> getErrorMessages();
+		public List<IndexingError> getErrors();
 	}
 
-	public static final class InfoMessage {
-		private final InfoType infoType;
-		private final TreeNode treeNode;
-
-		private InfoMessage(InfoType infoType, TreeNode treeNode) {
-			this.infoType = infoType;
-			this.treeNode = treeNode;
-		}
-
-		public InfoType getInfoType() {
-			return infoType;
-		}
-
-		public TreeNode getTreeNode() {
-			return treeNode;
-		}
-	}
-
-	public static final class ErrorMessage {
-		private final ErrorType errorType;
-		private final TreeNode treeNode;
-		private final Throwable cause;
-
-		private ErrorMessage(	ErrorType errorType,
-								TreeNode treeNode,
-								Throwable cause) {
-			this.errorType = errorType;
-			this.treeNode = treeNode;
-			this.cause = cause;
-		}
-
-		public ErrorType getErrorType() {
-			return errorType;
-		}
-
-		public TreeNode getTreeNode() {
-			return treeNode;
-		}
-
-		public Throwable getCause() {
-			return cause;
-		}
-	}
-
-	@Nullable
-	private IndexingReporter delegate;
-	private final BoundedList<InfoMessage> infoMessages;
-	private final BoundedList<ErrorMessage> errorMessages;
+	@Nullable private IndexingReporter delegate;
+	private final BoundedList<IndexingInfo> infos;
+	private final BoundedList<IndexingError> errors;
 
 	DelegatingReporter(int capacity) {
-		infoMessages = new BoundedList<InfoMessage>(capacity);
-		errorMessages = new BoundedList<ErrorMessage>(capacity);
+		infos = new BoundedList<IndexingInfo>(capacity);
+		errors = new BoundedList<IndexingError>(capacity);
 	}
 
 	public synchronized void attachDelegate(@NotNull IndexingReporter delegate,
@@ -95,17 +49,17 @@ public final class DelegatingReporter extends IndexingReporter {
 		Util.checkThat(this.delegate == null);
 		this.delegate = delegate;
 		handler.handleMessages(
-			infoMessages.removeAll(), errorMessages.removeAll());
+			infos.removeAll(), errors.removeAll());
 	}
 
 	public synchronized void detachDelegate(@NotNull IndexingReporter delegate,
 											@NotNull ExistingMessagesProvider provider) {
 		Util.checkNotNull(delegate, provider);
 		Util.checkThat(this.delegate == delegate);
-		Util.checkThat(infoMessages.isEmpty() && errorMessages.isEmpty());
+		Util.checkThat(infos.isEmpty() && errors.isEmpty());
 		this.delegate = null;
-		infoMessages.addAll(provider.getInfoMessages());
-		errorMessages.addAll(provider.getErrorMessages());
+		infos.addAll(provider.getInfos());
+		errors.addAll(provider.getErrors());
 	}
 
 	public synchronized void indexingStarted() {
@@ -118,20 +72,18 @@ public final class DelegatingReporter extends IndexingReporter {
 			delegate.indexingStopped();
 	}
 
-	public synchronized void info(InfoType infoType, TreeNode treeNode) {
+	public synchronized void info(@NotNull IndexingInfo info) {
 		if (delegate != null)
-			delegate.info(infoType, treeNode);
+			delegate.info(info);
 		else
-			infoMessages.add(new InfoMessage(infoType, treeNode));
+			infos.add(info);
 	}
 
-	public synchronized void fail(	ErrorType errorType,
-									TreeNode treeNode,
-									Throwable cause) {
+	public synchronized void fail(@NotNull IndexingError error) {
 		if (delegate != null)
-			delegate.fail(errorType, treeNode, cause);
+			delegate.fail(error);
 		else
-			errorMessages.add(new ErrorMessage(errorType, treeNode, cause));
+			errors.add(error);
 	}
 
 }

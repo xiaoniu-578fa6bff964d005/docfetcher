@@ -11,50 +11,19 @@
 
 package net.sourceforge.docfetcher.model.index;
 
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 /**
  * @author Tran Nam Quang
  */
-@VisibleForPackageGroup
 public class IndexingReporter {
-	
-	public enum InfoType {
-		// Files
-		UNPACKING,
-		
-		// Files and Outlook
-		EXTRACTING,
-	}
-	
-	public enum ErrorType {
-		// Files
-		ARCHIVE,
-		ARCHIVE_UNPACK_DISKSPACE,
-		ARCHIVE_ENCRYPTED,
-		ARCHIVE_ENTRY,
-		ARCHIVE_ENTRY_ENCRYPTED,
-		PARSING,
-		OUT_OF_MEMORY,
-		STACK_OVERFLOW,
-		NOT_AN_ARCHIVE,
-		
-		// Outlook
-		ATTACHMENT,
-		
-		// Files and Outlook
-		IO_EXCEPTION,
-	}
 	
 	public void indexingStarted() {}
 	
 	public void indexingStopped() {}
 	
-	public void info(InfoType infoType, TreeNode treeNode) {}
+	public void info(@NotNull IndexingInfo info) {}
 	
-	// Throwable can be null to indicate cause is unavailable / unknown
-	public void fail(ErrorType errorType, TreeNode treeNode, @Nullable Throwable cause) {}
+	public void fail(@NotNull IndexingError error) {}
 	
 }

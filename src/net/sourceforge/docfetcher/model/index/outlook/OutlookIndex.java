@@ -25,9 +25,10 @@ import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.TreeIndex;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
@@ -120,13 +121,20 @@ public final class OutlookIndex extends TreeIndex
 			
 			writer.optimize();
 			return true;
-		} catch (PSTException e) {
-			reporter.fail(ErrorType.IO_EXCEPTION, rootFolder, e);
-		} catch (IOException e) {
-			reporter.fail(ErrorType.IO_EXCEPTION, rootFolder, e);
-		} catch (IndexingException e) {
-			reporter.fail(ErrorType.IO_EXCEPTION, rootFolder, e.getIOException());
-		} finally {
+		}
+		catch (PSTException e) {
+			reporter.fail(new IndexingError(
+				ErrorType.IO_EXCEPTION, rootFolder, e));
+		}
+		catch (IOException e) {
+			reporter.fail(new IndexingError(
+				ErrorType.IO_EXCEPTION, rootFolder, e));
+		}
+		catch (IndexingException e) {
+			reporter.fail(new IndexingError(
+				ErrorType.IO_EXCEPTION, rootFolder, e.getIOException()));
+		}
+		finally {
 			Closeables.closeQuietly(writer);
 			reporter.indexingStopped();
 		}

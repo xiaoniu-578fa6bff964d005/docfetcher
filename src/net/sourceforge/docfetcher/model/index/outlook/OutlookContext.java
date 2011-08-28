@@ -13,10 +13,12 @@ import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingInfo;
+import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.InfoType;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -52,14 +54,15 @@ final class OutlookContext {
 	public void index(	@NotNull MailDocument doc,
 						@NotNull PSTMessage email,
 						boolean added) throws IndexingException {
-		reporter.info(InfoType.EXTRACTING, doc);
+		reporter.info(new IndexingInfo(InfoType.EXTRACTING, doc));
 		try {
 			Document luceneDoc = createLuceneDoc(doc, email);
 			if (added)
 				writer.add(luceneDoc);
 			else
 				writer.update(doc.getUniqueId(), luceneDoc);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IndexingException(e);
 		}
 	}
@@ -126,7 +129,8 @@ final class OutlookContext {
 						return filepath;
 					}
 				};
-				reporter.fail(ErrorType.ATTACHMENT, attachNode, e);
+				reporter.fail(new IndexingError(
+					ErrorType.ATTACHMENT, attachNode, e));
 			}
 		}.run();
 		

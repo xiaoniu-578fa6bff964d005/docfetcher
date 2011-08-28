@@ -24,9 +24,10 @@ import net.sourceforge.docfetcher.base.ListMap;
 import net.sourceforge.docfetcher.base.ListMap.Entry;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.NullCancelable;
-import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingInfo;
+import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 import org.apache.lucene.store.Directory;
@@ -172,8 +173,8 @@ public final class FileIndexTest {
 	private static class CountingReporter extends IndexingReporter {
 		private int counter = 0;
 		
-		public void info(InfoType infoType, TreeNode treeNode) {
-			if (infoType == InfoType.EXTRACTING)
+		public void info(IndexingInfo info) {
+			if (info.is(InfoType.EXTRACTING))
 				counter++;
 		}
 	}

@@ -28,11 +28,11 @@ import net.sourceforge.docfetcher.gui.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;
-import net.sourceforge.docfetcher.model.index.DelegatingReporter.ErrorMessage;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesProvider;
-import net.sourceforge.docfetcher.model.index.DelegatingReporter.InfoMessage;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingQueue.ExistingTasksHandler;
 import net.sourceforge.docfetcher.model.index.Task;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
@@ -348,8 +348,8 @@ public final class IndexingDialog implements Dialog {
 		final ProgressReporter reporter = new ProgressReporter(progressPanel);
 		
 		task.attachReporter(reporter, new ExistingMessagesHandler() {
-			public void handleMessages(	List<InfoMessage> infoMessages,
-										List<ErrorMessage> errorMessages) {
+			public void handleMessages(	List<IndexingInfo> infos,
+										List<IndexingError> errors) {
 				// TODO fill outer reporter with info and error messages
 			}
 		});
@@ -357,12 +357,12 @@ public final class IndexingDialog implements Dialog {
 		progressPanel.getControl().addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				task.detachReporter(reporter, new ExistingMessagesProvider() {
-					public List<InfoMessage> getInfoMessages() {
+					public List<IndexingInfo> getInfos() {
 						// TODO
 						return Collections.emptyList();
 					}
 					
-					public List<ErrorMessage> getErrorMessages() {
+					public List<IndexingError> getErrors() {
 						// TODO
 						return Collections.emptyList();
 					}

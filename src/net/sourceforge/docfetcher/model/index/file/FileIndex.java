@@ -27,10 +27,11 @@ import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.ErrorType;
-import net.sourceforge.docfetcher.model.index.IndexingReporter.InfoType;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 
 import com.google.common.collect.Iterables;
@@ -128,17 +129,17 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			return true;
 		}
 		catch (ArchiveEncryptedException e) {
-			reporter.fail(ErrorType.ARCHIVE_ENCRYPTED, rootFolder, e);
+			reporter.fail(new IndexingError(ErrorType.ARCHIVE_ENCRYPTED, rootFolder, e));
 		}
 		catch (IOException e) {
-			if (Util.hasExtension(rootFolder.getName(), "exe"))
-				reporter.fail(ErrorType.NOT_AN_ARCHIVE, rootFolder, e);
-			else
-				reporter.fail(ErrorType.IO_EXCEPTION, rootFolder, e);
+			ErrorType errorType = Util.hasExtension(rootFolder.getName(), "exe")
+				? ErrorType.NOT_AN_ARCHIVE
+				: ErrorType.IO_EXCEPTION;
+			reporter.fail(new IndexingError(errorType, rootFolder, e));
 		}
 		catch (IndexingException e) {
-			reporter.fail(
-				ErrorType.IO_EXCEPTION, rootFolder, e.getIOException());
+			reporter.fail(new IndexingError(
+				ErrorType.IO_EXCEPTION, rootFolder, e.getIOException()));
 		}
 		finally {
 			Closeables.closeQuietly(writer);
