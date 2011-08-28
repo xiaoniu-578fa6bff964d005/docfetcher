@@ -30,10 +30,10 @@ public abstract class TreeNode implements Serializable {
 	private final String displayName;
 	
 	/**
-	 * The indexing error that occurred on this tree node the last time the
+	 * The indexing errors that occurred on this tree node the last time the
 	 * index was updated. Null if no error occurred during the last update.
 	 */
-	@Nullable private IndexingError error;
+	@Nullable private IndexingError[] errors;
 	
 	public TreeNode(@NotNull String name,
 					@NotNull String displayName) {
@@ -61,12 +61,16 @@ public abstract class TreeNode implements Serializable {
 	}
 
 	@Nullable
-	public final IndexingError getError() {
-		return error;
+	public final IndexingError[] getErrors() {
+		return errors;
+	}
+	
+	public final void setError(@Nullable IndexingError error) {
+		this.errors = error == null ? null : new IndexingError[] { error };
 	}
 
-	public final void setError(@Nullable IndexingError error) {
-		this.error = error;
+	public final void setErrors(@Nullable IndexingError[] errors) {
+		this.errors = errors;
 	}
 	
 }

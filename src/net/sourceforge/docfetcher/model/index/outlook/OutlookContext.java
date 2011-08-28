@@ -8,6 +8,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.MutableCopy;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.TreeNode;
@@ -61,6 +62,7 @@ final class OutlookContext {
 				writer.add(luceneDoc);
 			else
 				writer.update(doc.getUniqueId(), luceneDoc);
+			doc.setError(null);
 		}
 		catch (IOException e) {
 			throw new IndexingException(e);
@@ -108,6 +110,8 @@ final class OutlookContext {
 		
 		// Parse and append attachments
 		new AttachmentVisitor(config, email, true) {
+			@Nullable private List<IndexingError> errors;
+			
 			protected void handleAttachment(String filename,
 											File tempFile)
 					throws ParseException {
@@ -129,9 +133,21 @@ final class OutlookContext {
 						return filepath;
 					}
 				};
-				// TODO save error in tree node? -> must also clear previous errors
-				reporter.fail(new IndexingError(
-					ErrorType.ATTACHMENT, attachNode, e));
+
+				// Put error in temporary list and report it
+				if (errors == null)
+					errors = new ArrayList<IndexingError>();
+				IndexingError error = new IndexingError(
+					ErrorType.ATTACHMENT, attachNode, e);
+				errors.add(error);
+				reporter.fail(error);
+			}
+			protected void runFinally() {
+				// Save errors
+				if (errors != null) {
+					IndexingError[] array = new IndexingError[errors.size()];
+					doc.setErrors(errors.toArray(array));
+				}
 			}
 		}.run();
 		

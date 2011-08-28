@@ -42,7 +42,7 @@ class FileContext {
 	
 	@NotNull private final IndexingConfig config;
 	@NotNull private final TArchiveDetector zipDetector;
-	@NotNull private LuceneDocWriter writer;
+	@NotNull private final LuceneDocWriter writer;
 	@NotNull private IndexingReporter reporter;
 	@Nullable private final String originalPath;
 	@NotNull private final Cancelable cancelable;

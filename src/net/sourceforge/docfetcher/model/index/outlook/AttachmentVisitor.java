@@ -91,6 +91,7 @@ abstract class AttachmentVisitor {
 					tempFile.delete();
 			}
 		}
+		runFinally();
 	}
 	
 	protected abstract void handleAttachment(	@NotNull String filename,
@@ -99,5 +100,7 @@ abstract class AttachmentVisitor {
 	
 	protected abstract void handleException(@NotNull String filename,
 											@NotNull Exception e);
+	
+	protected void runFinally() {}
 
 }

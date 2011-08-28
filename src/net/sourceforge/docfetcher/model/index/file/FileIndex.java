@@ -240,7 +240,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 										@NotNull final File dirOrZip)
 			throws IndexingException {
 		assert dirOrZip.isDirectory();
-		assert folder.getError() == null;
+		assert folder.getErrors() == null;
 		
 		final IndexingConfig config = context.getConfig();
 		boolean htmlPairing = config.isHtmlPairing();
@@ -481,7 +481,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 											@NotNull FileFolder archiveFolder,
 											@NotNull SolidArchiveTree<?> archiveTree)
 			throws IndexingException {
-		assert archiveFolder.getError() == null;
+		assert archiveFolder.getErrors() == null;
 		FileFolder newArchiveFolder = archiveTree.getArchiveFolder();
 		try {
 			// Collect files to unpack
@@ -554,8 +554,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 												@NotNull final FileFolder oldFolder,
 												@NotNull FileFolder newFolder)
 			throws IndexingException {
-		assert oldFolder.getError() == null;
-		assert newFolder.getError() == null;
+		assert oldFolder.getErrors() == null;
+		assert newFolder.getErrors() == null;
 		
 		/*
 		 * Run document diff
