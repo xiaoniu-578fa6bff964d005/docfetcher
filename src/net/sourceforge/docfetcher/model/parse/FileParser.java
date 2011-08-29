@@ -15,6 +15,7 @@ import java.io.File;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 /**
  * @author Tran Nam Quang
@@ -25,6 +26,7 @@ abstract class FileParser extends Parser {
 	// immediately if possible and return the partially extracted text.
 	@NotNull
 	protected abstract ParseResult parse(	@NotNull File file,
+	                                     	@NotNull IndexingReporter reporter,
 											@NotNull Cancelable cancelable)
 			throws ParseException;
 	
@@ -32,7 +34,8 @@ abstract class FileParser extends Parser {
 	protected String renderText(@NotNull File file,
 								@NotNull Cancelable cancelable)
 			throws ParseException {
-		return parse(file, cancelable).getContent().toString();
+		ParseResult parseResult = parse(file, IndexingReporter.nullReporter, cancelable);
+		return parseResult.getContent().toString();
 	}
 
 }

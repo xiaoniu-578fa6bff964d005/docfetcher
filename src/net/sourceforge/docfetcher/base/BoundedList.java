@@ -73,6 +73,11 @@ public final class BoundedList<T> implements Iterable<T> {
 		virtualSize += elements.size();
 	}
 	
+	@NotNull
+	public T getLast() {
+		return list.getLast();
+	}
+	
 	public int getVirtualSize() {
 		return virtualSize;
 	}

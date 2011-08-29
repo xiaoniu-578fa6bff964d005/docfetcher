@@ -38,8 +38,6 @@ import de.schlichtherle.truezip.file.TFile;
  */
 class FileContext {
 	
-	private static final IndexingReporter nullReporter = new IndexingReporter();
-	
 	@NotNull private final IndexingConfig config;
 	@NotNull private final TArchiveDetector zipDetector;
 	@NotNull private final LuceneDocWriter writer;
@@ -96,7 +94,9 @@ class FileContext {
 	}
 
 	public final void setReporter(@Nullable IndexingReporter reporter) {
-		this.reporter = reporter == null ? nullReporter : reporter;
+		this.reporter = reporter == null
+			? IndexingReporter.nullReporter
+			: reporter;
 	}
 	
 	@Nullable
@@ -122,7 +122,7 @@ class FileContext {
 		try {
 			// Text extraction; may throw OutOfMemoryErrors
 			ParseResult parseResult = ParseService.parse(
-				config, doc.getName(), file, cancelable);
+				config, doc.getName(), file, reporter, cancelable);
 			
 			/*
 			 * If we detect a cancel request at this point, the request probably

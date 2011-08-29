@@ -15,6 +15,7 @@ import java.io.File;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 /**
  * @author Tran Nam Quang
@@ -23,6 +24,7 @@ abstract class OOoParser extends FileParser {
 	
 	// accepts TrueZIP files
 	protected ParseResult parse(@NotNull File file,
+	                            @NotNull IndexingReporter reporter,
 								@NotNull Cancelable cancelable)
 			throws ParseException {
 		return null; // TODO

@@ -351,6 +351,7 @@ public final class IndexingDialog implements Dialog {
 			public void handleMessages(	List<IndexingInfo> infos,
 										List<IndexingError> errors) {
 				// TODO fill outer reporter with info and error messages
+				// info objects may have percentages set
 			}
 		});
 		

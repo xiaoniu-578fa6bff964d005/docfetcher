@@ -15,14 +15,16 @@ import java.io.File;
 import java.util.Collection;
 
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 /**
  * @author Tran Nam Quang
  */
 final class ChmParser extends FileParser {
 
-	protected ParseResult parse(File file, Cancelable cancelable)
-			throws ParseException {
+	protected ParseResult parse(File file,
+								IndexingReporter reporter,
+								Cancelable cancelable) throws ParseException {
 		return null; // TODO
 	}
 

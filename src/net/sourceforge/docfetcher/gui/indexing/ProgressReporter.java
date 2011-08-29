@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -31,6 +32,7 @@ final class ProgressReporter extends IndexingReporter {
 	
 	private final ProgressPanel progressPanel;
 	private long lastStart = 0;
+	@Nullable private IndexingInfo lastInfo;
 
 	public ProgressReporter(ProgressPanel progressPanel) {
 		this.progressPanel = progressPanel;
@@ -49,6 +51,14 @@ final class ProgressReporter extends IndexingReporter {
 	
 	public void info(@NotNull IndexingInfo info) {
 		progressPanel.append(info.getTreeNode().getDisplayName());
+		lastInfo = info;
+	}
+	
+	public void subInfo(int current, int total) {
+		Util.checkThat(lastInfo != null);
+		String message = lastInfo.getTreeNode().getDisplayName();
+		message = String.format("%s [%d/%d]", message, current, total);
+		progressPanel.replaceLast(message);
 	}
 	
 	public void fail(@NotNull IndexingError error) {

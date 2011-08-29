@@ -33,6 +33,7 @@ import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 import com.google.common.io.Closeables;
 
@@ -92,6 +93,7 @@ public final class ParseService {
 	public static ParseResult parse(@NotNull IndexingConfig config,
 	                                @NotNull String filename,
 	                                @NotNull File file,
+	                                @NotNull IndexingReporter reporter,
 	                                @NotNull Cancelable cancelable)
 			throws ParseException {
 		if (config.matchesMimePattern(filename)) {
@@ -100,7 +102,7 @@ public final class ParseService {
 				for (Parser parser : parsers) {
 					try {
 						if (! Collections.disjoint(mimeTypes, parser.getTypes()))
-							return doParse(config, parser, file, cancelable);
+							return doParse(config, parser, file, reporter, cancelable);
 					} catch (ParseException e) {
 						// Try next parser
 					}
@@ -113,7 +115,7 @@ public final class ParseService {
 		Parser parser = findParser(config, file.getName());
 		if (parser == null)
 			throw new ParseException(new ParserNotFoundException());
-		return doParse(config, parser, file, cancelable);
+		return doParse(config, parser, file, reporter, cancelable);
 	}
 
 	// accepts TrueZIP files
@@ -121,6 +123,7 @@ public final class ParseService {
 	private static ParseResult doParse(	@NotNull IndexingConfig config,
 										@NotNull Parser parser,
 										@NotNull File file,
+										@NotNull IndexingReporter reporter,
 										@NotNull Cancelable cancelable) throws ParseException {
 		ParseResult result = null;
 		if (parser instanceof StreamParser) {
@@ -131,7 +134,7 @@ public final class ParseService {
 				else
 					in = new FileInputStream(file);
 				StreamParser streamParser = (StreamParser) parser;
-				result = streamParser.parse(in, cancelable);
+				result = streamParser.parse(in, reporter, cancelable);
 			}
 			catch (FileNotFoundException e) {
 				throw new ParseException(e);
@@ -143,7 +146,7 @@ public final class ParseService {
 		else if (parser instanceof OOoParser) {
 			// The OOo parser can handle both regular files and TrueZIP files
 			OOoParser oooParser = (OOoParser) parser;
-			result = oooParser.parse(file, cancelable);
+			result = oooParser.parse(file, reporter, cancelable);
 		}
 		else if (parser instanceof FileParser) {
 			FileParser fileParser = (FileParser) parser;
@@ -154,7 +157,7 @@ public final class ParseService {
 				try {
 					tempFile = config.createDerivedTempFile(tzFile.getName());
 					tzFile.cp(tempFile);
-					result = fileParser.parse(tempFile, cancelable);
+					result = fileParser.parse(tempFile, reporter, cancelable);
 				}
 				catch (IndexingException e) {
 					throw new ParseException(e.getIOException());
@@ -167,7 +170,7 @@ public final class ParseService {
 						tempFile.delete();
 				}
 			} else {
-				result = fileParser.parse(file, cancelable);
+				result = fileParser.parse(file, reporter, cancelable);
 			}
 		} else {
 			throw new IllegalStateException();
@@ -188,7 +191,6 @@ public final class ParseService {
 	                                @NotNull File file,
 									@NotNull String parserName)
 			throws ParseException {
-		// TODO test
 		Util.checkThat(! (file instanceof TFile));
 		NullCancelable cancelable = NullCancelable.getInstance();
 		for (Parser parser : parsers) {

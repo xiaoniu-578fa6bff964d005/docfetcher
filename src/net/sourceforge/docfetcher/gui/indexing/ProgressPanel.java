@@ -75,10 +75,13 @@ public final class ProgressPanel {
 
 	private final Lock lock = new ReentrantLock(true);
 	private final Condition notEmpty = lock.newCondition();
-	private final List<String> queue = new LinkedList<String>();
+	
+	private final LinkedList<String> queue = new LinkedList<String>(); // guarded by lock
+	private boolean replaceLastInTable = false; // guarded by lock
+	
 	private final int itemLimit;
 	private final Table table;
-	private final LinkedList<String> tableItems = new LinkedList<String>();
+	private final LinkedList<String> tableItems = new LinkedList<String>(); // accessed exclusively by worker thread
 
 	public ProgressPanel(@NotNull Composite parent, final int itemLimit) {
 		Util.checkThat(itemLimit >= 2);
@@ -115,6 +118,7 @@ public final class ProgressPanel {
 			public void run() {
 				while (true) {
 					List<String> subList;
+					final boolean _replaceLastInTable;
 					lock.lock();
 					try {
 						while (queue.isEmpty())
@@ -124,6 +128,9 @@ public final class ProgressPanel {
 						subList = queue.subList(start, size);
 						subList = new ArrayList<String>(subList);
 						queue.clear();
+						
+						_replaceLastInTable = replaceLastInTable;
+						replaceLastInTable = false;
 					}
 					catch (InterruptedException e) {
 						break;
@@ -133,7 +140,7 @@ public final class ProgressPanel {
 					}
 					
 					// Display messages; should be done without holding the lock
-					append(subList);
+					append(subList, _replaceLastInTable);
 					
 					try {
 						/*
@@ -175,16 +182,45 @@ public final class ProgressPanel {
 			lock.unlock();
 		}
 	}
+	
+	@ThreadSafe
+	public void replaceLast(@NotNull String message) {
+		Util.checkNotNull(message);
+		lock.lock();
+		try {
+			if (queue.isEmpty()) {
+				assert !replaceLastInTable;
+				replaceLastInTable = true;
+			}
+			else {
+				queue.removeLast();
+			}
+			queue.add(message);
+			notEmpty.signal();
+		}
+		finally {
+			lock.unlock();
+		}
+	}
 
 	@NotThreadSafe
-	private void append(@NotNull final List<String> messages) {
+	private void append(@NotNull final List<String> messages,
+						final boolean replaceLastInTable) {
 		Util.checkThat(!messages.isEmpty());
 		Util.checkThat(messages.size() <= itemLimit);
 		Util.runSyncExec(table, new Runnable() {
 			public void run() {
 				table.setRedraw(false);
-				int newItemCount = table.getItemCount() + messages.size();
+				
+				int replaceIndex = -1;
+				if (replaceLastInTable && !tableItems.isEmpty()) {
+					tableItems.removeLast();
+					replaceIndex = tableItems.size();
+				}
+				
+				int newItemCount = tableItems.size() + messages.size();
 				int removeCount = newItemCount - itemLimit;
+				
 				if (removeCount > 0) {
 					while (removeCount > 0) {
 						tableItems.removeFirst();
@@ -197,10 +233,14 @@ public final class ProgressPanel {
 				}
 				else {
 					tableItems.addAll(messages);
+					if (replaceIndex != -1)
+						table.clear(replaceIndex);
 					table.setItemCount(newItemCount);
 				}
+				
 				TableItem lastItem = table.getItem(tableItems.size() - 1);
 				table.showItem(lastItem);
+				
 				table.setRedraw(true);
 			}
 		});

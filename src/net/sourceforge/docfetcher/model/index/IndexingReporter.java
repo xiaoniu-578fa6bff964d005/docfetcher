@@ -18,11 +18,15 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
  */
 public class IndexingReporter {
 	
+	public static final IndexingReporter nullReporter = new IndexingReporter();
+	
 	public void indexingStarted() {}
 	
 	public void indexingStopped() {}
 	
 	public void info(@NotNull IndexingInfo info) {}
+	
+	public void subInfo(int current, int total) {}
 	
 	public void fail(@NotNull IndexingError error) {}
 	

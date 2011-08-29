@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.index;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.TreeNode;
 
 /**
@@ -31,6 +32,8 @@ public final class IndexingInfo {
 	private final InfoType infoType;
 	private final TreeNode treeNode;
 	
+	@Nullable private int[] percentage;
+	
 	public IndexingInfo(@NotNull InfoType infoType, @NotNull TreeNode treeNode) {
 		Util.checkNotNull(infoType, treeNode);
 		this.infoType = infoType;
@@ -46,6 +49,16 @@ public final class IndexingInfo {
 	@NotNull
 	public TreeNode getTreeNode() {
 		return treeNode;
+	}
+
+	@Nullable
+	public int[] getPercentage() {
+		return percentage;
+	}
+
+	public void setPercentage(@Nullable int... percentage) {
+		Util.checkThat(percentage == null || percentage.length == 2);
+		this.percentage = percentage;
 	}
 	
 }

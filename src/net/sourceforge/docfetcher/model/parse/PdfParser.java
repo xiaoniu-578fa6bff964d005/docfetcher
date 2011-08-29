@@ -20,6 +20,7 @@ import java.util.Collections;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -38,6 +39,7 @@ public final class PdfParser extends StreamParser {
 	}
 	
 	protected ParseResult parse(@NotNull InputStream in,
+	                            @NotNull final IndexingReporter reporter,
 								@NotNull final Cancelable cancelable)
 			throws ParseException {
 		PDDocument pdfDoc = null;
@@ -51,6 +53,7 @@ public final class PdfParser extends StreamParser {
 			 */
 			pdfDoc = PDDocument.load(in, true);
 			PDDocumentInformation pdInfo = pdfDoc.getDocumentInformation();
+			final int pageCount = pdfDoc.getNumberOfPages();
 			StringWriter writer = new StringWriter();
 			
 			/*
@@ -62,6 +65,9 @@ public final class PdfParser extends StreamParser {
 			 * because the extracted text will be digested by Lucene anyway.
 			 */
 			PDFTextStripper stripper = new PDFTextStripper() {
+				protected void startPage(PDPage page) throws IOException {
+					reporter.subInfo(getCurrentPageNo(), pageCount);
+				}
 				protected void endPage(PDPage page) throws IOException {
 					if (cancelable.isCanceled())
 						setEndPage(0);

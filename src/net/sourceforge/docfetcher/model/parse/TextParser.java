@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 import com.google.common.io.ByteStreams;
 
@@ -27,8 +28,9 @@ final class TextParser extends StreamParser {
 	
 	private final Collection<String> types = Collections.singleton("text/plain");
 
-	protected ParseResult parse(InputStream in, Cancelable cancelable)
-			throws ParseException {
+	protected ParseResult parse(InputStream in,
+								IndexingReporter reporter,
+								Cancelable cancelable) throws ParseException {
 		// TODO try to detect charset -> see Tika text parser
 		try {
 			byte[] bytes = ByteStreams.toByteArray(in);

@@ -83,6 +83,16 @@ public final class DelegatingReporter extends IndexingReporter {
 		else
 			infos.add(info);
 	}
+	
+	public synchronized void subInfo(int current, int total) {
+		if (delegate != null) {
+			delegate.subInfo(current, total);
+		}
+		else {
+			Util.checkThat(!infos.isEmpty());
+			infos.getLast().setPercentage(current, total);
+		}
+	}
 
 	public synchronized void fail(@NotNull IndexingError error) {
 		if (delegate != null)
