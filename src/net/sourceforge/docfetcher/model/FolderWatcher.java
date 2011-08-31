@@ -279,8 +279,8 @@ public final class FolderWatcher {
 			this.watchedIndex = Util.checkNotNull(watchedIndex);
 		}
 		
-		protected void handleEvent(File targetFile) {
-			if (!accept(targetFile))
+		protected void handleEvent(File targetFile, boolean deleted) {
+			if (!deleted && !accept(targetFile))
 				return;
 			
 			/*

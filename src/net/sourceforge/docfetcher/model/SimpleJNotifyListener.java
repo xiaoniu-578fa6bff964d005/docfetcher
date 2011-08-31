@@ -28,26 +28,27 @@ abstract class SimpleJNotifyListener {
 
 	@Nullable private JNotifyListener listener = new JNotifyListener() {
 		public final void fileCreated(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name));
+			handleEvent(new File(rootPath, name), false);
 		}
 
 		public final void fileDeleted(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name));
+			handleEvent(new File(rootPath, name), true);
 		}
 
 		public final void fileModified(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name));
+			handleEvent(new File(rootPath, name), false);
 		}
 
 		public final void fileRenamed(	int wd,
 		                              	String rootPath,
 		                              	String oldName,
 		                              	String newName) {
-			handleEvent(new File(rootPath, newName));
+			handleEvent(new File(rootPath, newName), false);
 		}
 	};
 	
-	protected abstract void handleEvent(@NotNull File targetFile);
+	protected abstract void handleEvent(@NotNull File targetFile,
+										boolean deleted);
 	
 	@CallOnce
 	public final int addWatch(@NotNull File watchFile) throws JNotifyException {
