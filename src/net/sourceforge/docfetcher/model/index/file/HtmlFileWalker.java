@@ -41,7 +41,7 @@ abstract class HtmlFileWalker extends Stoppable <Exception> {
 	}
 	
 	private void run(@NotNull File parentDir) {
-		new HtmlFileLister <Exception> (parentDir, htmlExtensions, htmlPairing) {
+		new HtmlFileLister <Exception> (parentDir, htmlExtensions, htmlPairing, null) {
 			protected void handleFile(File file) {
 				if (HtmlFileWalker.this.isStopped())
 					stop(); // Stop HTMML file lister

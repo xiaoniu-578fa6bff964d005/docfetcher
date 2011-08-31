@@ -254,7 +254,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		 * a consistent state, so that the user can continue indexing later.
 		 */
 		new HtmlFileLister<IndexingException>(
-			dirOrZip, htmlExtensions, htmlPairing) {
+			dirOrZip, htmlExtensions, htmlPairing, context.getReporter()) {
 			protected void handleFile(@NotNull File file) {
 				if (context.isStopped()) stop();
 				try {

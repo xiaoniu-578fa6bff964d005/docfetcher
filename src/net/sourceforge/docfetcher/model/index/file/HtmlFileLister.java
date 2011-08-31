@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.model.index.file;
 
+import java.io.CharConversionException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +23,10 @@ import net.sourceforge.docfetcher.base.Stoppable;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
 /**
  * @author Tran Nam Quang
@@ -31,14 +36,17 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 	@NotNull private final File parentDir;
 	@NotNull private final Collection<String> htmlExtensions;
 	private final boolean htmlPairing;
+	@Nullable private final IndexingReporter reporter;
 	
 	public HtmlFileLister(	@NotNull File parentDir,
 							@NotNull Collection<String> htmlExtensions,
-							boolean htmlPairing) {
+							boolean htmlPairing,
+							@Nullable IndexingReporter reporter) {
 		Util.checkNotNull(parentDir, htmlExtensions);
 		this.parentDir = parentDir;
 		this.htmlExtensions = htmlExtensions;
 		this.htmlPairing = htmlPairing;
+		this.reporter = reporter;
 	}
 	
 	protected final void doRun() {
@@ -55,7 +63,15 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 				continue;
 			if (Util.isJunctionOrSymlink(fileOrDir))
 				continue;
-			if (fileOrDir.isFile()) {
+			boolean isFile;
+			try {
+				isFile = fileOrDir.isFile();
+			}
+			catch (AssertionError e) {
+				handleCharConversionException(e, fileOrDir);
+				continue;
+			}
+			if (isFile) {
 				if (isHtmlFile(fileOrDir))
 					handleHtmlPair(fileOrDir, null);
 				else
@@ -76,18 +92,27 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		
 		// Note: The file filter should be applied *after* the HTML pairing.
 		
-		for (File fileOrDir : filesOrDirs) {
+		for (final File fileOrDir : filesOrDirs) {
 			if (isStopped()) return;
 			if (Util.isSymLink(fileOrDir))
 				continue;
 			if (Util.isJunctionOrSymlink(fileOrDir))
 				continue;
-			if (fileOrDir.isFile()) {
+			boolean isFile;
+			try {
+				isFile = fileOrDir.isFile();
+			}
+			catch (AssertionError e) {
+				handleCharConversionException(e, fileOrDir);
+				continue;
+			}
+			if (isFile) {
 				if (isHtmlFile(fileOrDir))
 					htmlFiles.add(fileOrDir);
-				else if (! skip(fileOrDir))
+				else if (!skip(fileOrDir))
 					handleFile(fileOrDir);
-			} else if (fileOrDir.isDirectory()) {
+			}
+			else if (fileOrDir.isDirectory()) {
 				tempDirs.add(fileOrDir);
 			}
 		}
@@ -125,6 +150,28 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 
 	private boolean isHtmlFile(@NotNull File file) {
 		return Util.hasExtension(file.getName(), htmlExtensions);
+	}
+	
+	private void handleCharConversionException(	@NotNull AssertionError e,
+												@NotNull final File file) {
+		/*
+		 * TrueZIP crashes with a CharConversionException while traversing
+		 * certain zip files containing Chinese encodings.
+		 */
+		if (!(e.getCause() instanceof CharConversionException))
+			throw e;
+		if (reporter == null) {
+			Util.printErr(e.getCause().getMessage());
+			return;
+		}
+		String filename = file.getName();
+		@SuppressWarnings("serial")
+		TreeNode treeNode = new TreeNode(filename, filename) {
+			public String getPath() {
+				return file.getPath();
+			}
+		};
+		reporter.fail(new IndexingError(ErrorType.ENCODING, treeNode, e.getCause()));
 	}
 	
 	// guaranteed not to be an HTML file
