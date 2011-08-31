@@ -14,6 +14,7 @@
 **/*cpl*.htm*
 **/*EPL*.htm*
 **/*epl*.htm
+**/MPL*
 
 # HTML folders
 **/*_files/*

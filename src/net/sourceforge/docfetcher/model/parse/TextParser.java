@@ -11,14 +11,19 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 
+import org.mozilla.universalchardet.UniversalDetector;
+
+import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -26,15 +31,30 @@ import com.google.common.io.ByteStreams;
  */
 final class TextParser extends StreamParser {
 	
+	@Nullable private UniversalDetector charsetDetector;
 	private final Collection<String> types = Collections.singleton("text/plain");
 
 	protected ParseResult parse(InputStream in,
 								IndexingReporter reporter,
 								Cancelable cancelable) throws ParseException {
-		// TODO try to detect charset -> see Tika text parser
 		try {
 			byte[] bytes = ByteStreams.toByteArray(in);
-			String contents = new String(bytes, "utf-8");
+			
+			if (charsetDetector == null)
+				charsetDetector = new UniversalDetector(null);
+			byte[] buf = new byte[4096];
+			ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
+			
+			int nread;
+		    while ((nread = byteIn.read(buf)) > 0 && !charsetDetector.isDone())
+				charsetDetector.handleData(buf, 0, nread);
+		    charsetDetector.dataEnd();
+		    String charsetName = charsetDetector.getDetectedCharset();
+		    charsetDetector.reset();
+			
+			String contents = charsetName == null ? new String(
+				bytes, Charsets.ISO_8859_1) : new String(bytes, charsetName);
+			
 			return new ParseResult(contents);
 		}
 		catch (IOException e) {

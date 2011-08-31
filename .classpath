@@ -23,6 +23,7 @@
 	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.0.jar" sourcepath="lib/truezip/truezip-file-7.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.0.jar" sourcepath="lib/truezip/truezip-kernel-7.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/ant/ant-1.8.2.jar" sourcepath="lib/ant/ant-1.8.2-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/juniversalchardet/juniversalchardet-1.0.3.jar" sourcepath="lib/juniversalchardet/juniversalchardet-1.0.3-src-stripped.zip"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_6_1.jar"/>
