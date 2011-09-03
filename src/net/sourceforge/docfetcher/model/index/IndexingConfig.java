@@ -263,12 +263,6 @@ public class IndexingConfig implements Serializable {
 		return getSolidArchiveFactory(filename) != null;
 	}
 	
-	// Accepts filenames and filepaths
-	public boolean isZipArchive(@NotNull String filename) {
-		String ext = Util.getExtension(filename);
-		return zipExtensions.contains(ext);
-	}
-	
 	public boolean isWatchFolders() {
 		return watchFolders;
 	}

@@ -331,19 +331,6 @@ public final class FolderWatcher {
 					return false;
 			}
 			
-			/*
-			 * Workaround for a problem with TrueZIP: It appears that TrueZIP
-			 * sometimes changes the last-modified field of the files it
-			 * accesses. Consequently, running an index update can trigger
-			 * JNotify events, which leads to more index updates. The workaround
-			 * is to ignore changed zip archives if an index update is currently
-			 * running.
-			 */
-			if (isFile && watchedIndex instanceof FileIndex
-					&& watchedIndex.isIndexing() && config.isZipArchive(name)) {
-				return false;
-			}
-			
 			return true;
 		}
 

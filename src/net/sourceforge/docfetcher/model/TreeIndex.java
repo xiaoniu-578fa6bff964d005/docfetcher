@@ -41,7 +41,6 @@ public abstract class TreeIndex <
 	@Nullable private transient RAMDirectory ramIndexDir;
 	@NotNull private final F rootFolder;
 	@NotNull private C config;
-	private volatile boolean isIndexing;
 	
 	// if indexDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir
@@ -163,12 +162,4 @@ public abstract class TreeIndex <
 		LuceneIndex.evtWatchFoldersChanged.fire(this);
 	}
 	
-	public boolean isIndexing() {
-		return isIndexing;
-	}
-	
-	public void setIndexing(boolean isIndexing) {
-		this.isIndexing = isIndexing;
-	}
-
 }
