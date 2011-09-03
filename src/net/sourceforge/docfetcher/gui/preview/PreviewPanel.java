@@ -25,9 +25,14 @@ import net.sourceforge.docfetcher.model.search.ResultDocument.PdfPageHandler;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -38,7 +43,10 @@ public final class PreviewPanel extends Composite {
 	private final TextPreview textPreview;
 	@Nullable private EmailPreview emailPreview;
 	@Nullable private HtmlPreview htmlPreview;
+	private final Composite stackComp;
 	private final StackLayout stackLayout;
+	private final StyledText errorField;
+	private final Color lightRed;
 	
 	// These fields should only be accessed from the GUI thread
 	@Nullable private ResultDocument lastDoc;
@@ -50,13 +58,28 @@ public final class PreviewPanel extends Composite {
 	
 	public PreviewPanel(@NotNull Composite parent) {
 		super(parent, SWT.NONE);
-		textPreview = new TextPreview(this);
-		setLayout(stackLayout = new StackLayout());
+		setLayout(Util.createGridLayout(1, false, 0, 2));
+		
+		stackComp = new Composite(this, SWT.NONE);
+		stackComp.setLayout(stackLayout = new StackLayout());
+		stackComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		textPreview = new TextPreview(stackComp);
 		stackLayout.topControl = textPreview;
+		
+		errorField = new StyledText(this, SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
+		errorField.setMargins(5, 5, 5, 5);
+		errorField.setBackground(lightRed = new Color(getDisplay(), new RGB(0f, 0.5f, 1)));
+		errorField.getCaret().setVisible(false);
+		
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gridData.exclude = true;
+		errorField.setLayoutData(gridData);
 		
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				disposeLastResources();
+				lightRed.dispose();
 			}
 		});
 	}
@@ -67,13 +90,13 @@ public final class PreviewPanel extends Composite {
 		Util.checkThat(Display.getCurrent() != null);
 		
 		// TODO show 'loading' message where appropriate (-> maybe as a separate composite)
-		// TODO display parse errors on a separate bar
 		
 		if (lastDoc == doc)
 			return;
 		lastDoc = doc;
 		disposeLastResources();
 		requestCount++;
+		setError(null, requestCount);
 		
 		if (doc.isEmail()) {
 			clearPreviews(true, false, true);
@@ -115,6 +138,28 @@ public final class PreviewPanel extends Composite {
 		}
 	}
 	
+	@ThreadSafe
+	private synchronized void setError(	@Nullable final String message,
+										long requestCount) {
+		if (requestCount != this.requestCount)
+			return;
+		Util.runSWTSafe(this, new Runnable() {
+			public void run() {
+				errorField.setText(message == null ? "" : message);
+				((GridData) errorField.getLayoutData()).exclude = message == null;
+				layout();
+			}
+		});
+	}
+	
+	@NotThreadSafe
+	private void moveToTop(@NotNull Control control) {
+		if (stackLayout.topControl == control)
+			return;
+		stackLayout.topControl = control;
+		stackComp.layout();
+	}
+	
 	// Returns true on success
 	@ThreadSafe
 	private boolean setTextSafely(	@NotNull final HighlightedString string,
@@ -126,10 +171,7 @@ public final class PreviewPanel extends Composite {
 					textPreview.appendText(string);
 				else
 					textPreview.setText(string);
-				if (stackLayout.topControl != textPreview) {
-					stackLayout.topControl = textPreview;
-					layout();
-				}
+				moveToTop(textPreview);
 			}
 		});
 	}
@@ -155,19 +197,17 @@ public final class PreviewPanel extends Composite {
 				boolean success = runSafely(startCount, new Runnable() {
 					public void run() {
 						if (emailPreview == null)
-							emailPreview = new EmailPreview(PreviewPanel.this);
+							emailPreview = new EmailPreview(stackComp);
 						emailPreview.setEmail(mailResource);
-						if (stackLayout.topControl != emailPreview) {
-							stackLayout.topControl = emailPreview;
-							layout();
-						}
+						moveToTop(emailPreview);
 						lastMailResource = mailResource; // Save a reference for disposal
 					}
 				});
 				if (!success)
 					mailResource.dispose();
-			} catch (ParseException e) {
-				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
+			}
+			catch (ParseException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
 		}
 	}
@@ -183,19 +223,17 @@ public final class PreviewPanel extends Composite {
 				boolean success = runSafely(startCount, new Runnable() {
 					public void run() {
 						if (htmlPreview == null)
-							htmlPreview = new HtmlPreview(PreviewPanel.this);
+							htmlPreview = new HtmlPreview(stackComp);
 						htmlPreview.setFile(htmlResource.getFile());
-						if (stackLayout.topControl != htmlPreview) {
-							stackLayout.topControl = htmlPreview;
-							layout();
-						}
+						moveToTop(htmlPreview);
 						lastHtmlResource = htmlResource; // Save a reference for disposal
 					}
 				});
 				if (!success)
 					htmlResource.dispose();
-			} catch (ParseException e) {
-				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
+			}
+			catch (ParseException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
 		}
 	}
@@ -217,8 +255,9 @@ public final class PreviewPanel extends Composite {
 					}
 				});
 				// TODO catch OutOfMemoryErrors
-			} catch (ParseException e) {
-				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
+			}
+			catch (ParseException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
 		}
 	}
@@ -232,8 +271,9 @@ public final class PreviewPanel extends Composite {
 				HighlightedString string = doc.getHighlightedText();
 				setTextSafely(string, startCount, false);
 				// TODO catch OutOfMemoryErrors
-			} catch (ParseException e) {
-				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
+			}
+			catch (ParseException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
 		}
 	}

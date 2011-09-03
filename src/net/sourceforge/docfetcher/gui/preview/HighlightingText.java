@@ -33,7 +33,7 @@ final class HighlightingText {
 	@NotNull private StyledText textViewer;
 	
 	public HighlightingText(@NotNull Composite parent) {
-		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL;
+		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
 		textViewer = new StyledText(parent, style);
 	}
 	
