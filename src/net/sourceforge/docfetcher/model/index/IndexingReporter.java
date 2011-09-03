@@ -20,9 +20,9 @@ public class IndexingReporter {
 	
 	public static final IndexingReporter nullReporter = new IndexingReporter();
 	
-	public void indexingStarted() {}
+	public void setStartTime(long time) {}
 	
-	public void indexingStopped() {}
+	public void setEndTime(long time) {}
 	
 	public void info(@NotNull IndexingInfo info) {}
 	

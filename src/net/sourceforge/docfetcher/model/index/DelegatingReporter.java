@@ -41,6 +41,8 @@ public final class DelegatingReporter extends IndexingReporter {
 	@Nullable private IndexingReporter delegate;
 	private final BoundedList<IndexingInfo> infos;
 	private final List<IndexingError> errors;
+	@Nullable private Long start;
+	@Nullable private Long end;
 
 	DelegatingReporter(int infoCapacity) {
 		infos = new BoundedList<IndexingInfo>(infoCapacity);
@@ -51,7 +53,14 @@ public final class DelegatingReporter extends IndexingReporter {
 											@NotNull ExistingMessagesHandler handler) {
 		Util.checkNotNull(delegate, handler);
 		Util.checkThat(this.delegate == null);
+		
 		this.delegate = delegate;
+		
+		if (start != null)
+			delegate.setStartTime(start);
+		if (end != null)
+			delegate.setEndTime(end);
+		
 		List<IndexingError> errorsCopy = new ArrayList<IndexingError>(errors);
 		handler.handleMessages(infos.removeAll(), errorsCopy);
 		errors.clear();
@@ -67,14 +76,16 @@ public final class DelegatingReporter extends IndexingReporter {
 		errors.addAll(provider.getErrors());
 	}
 
-	public synchronized void indexingStarted() {
+	public synchronized void setStartTime(long time) {
+		start = time;
 		if (delegate != null)
-			delegate.indexingStarted();
+			delegate.setStartTime(time);
 	}
 
-	public synchronized void indexingStopped() {
+	public synchronized void setEndTime(long time) {
+		end = time;
 		if (delegate != null)
-			delegate.indexingStopped();
+			delegate.setEndTime(time);
 	}
 
 	public synchronized void info(@NotNull IndexingInfo info) {

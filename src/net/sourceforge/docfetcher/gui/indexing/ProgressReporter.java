@@ -31,19 +31,19 @@ final class ProgressReporter extends IndexingReporter {
 	 */
 	
 	private final ProgressPanel progressPanel;
-	private long lastStart = 0;
+	private long start = 0;
 	@Nullable private IndexingInfo lastInfo;
 
 	public ProgressReporter(ProgressPanel progressPanel) {
 		this.progressPanel = progressPanel;
 	}
 	
-	public void indexingStarted() {
-		lastStart = System.currentTimeMillis();
+	public void setStartTime(long time) {
+		start = time;
 	}
 	
-	public void indexingStopped() {
-		long duration = (System.currentTimeMillis() - lastStart) / 1000;
+	public void setEndTime(long time) {
+		long duration = (time - start) / 1000;
 		String msg = "Duration: " + duration + " s";
 		progressPanel.append(msg);
 		Util.println(msg);

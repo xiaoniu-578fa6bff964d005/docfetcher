@@ -93,7 +93,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		if (cancelable.isCanceled())
 			return false;
 		
-		reporter.indexingStarted();
+		reporter.setStartTime(System.currentTimeMillis());
 		IndexingConfig config = getConfig();
 		FileFolder rootFolder = getRootFolder();
 		rootFolder.setError(null);
@@ -144,7 +144,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		}
 		finally {
 			Closeables.closeQuietly(writer);
-			reporter.indexingStopped();
+			reporter.setEndTime(System.currentTimeMillis());
 		}
 		return false;
 	}

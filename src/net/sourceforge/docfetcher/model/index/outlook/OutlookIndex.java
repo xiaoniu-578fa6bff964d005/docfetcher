@@ -98,7 +98,7 @@ public final class OutlookIndex extends TreeIndex
 		if (cancelable.isCanceled())
 			return false;
 		
-		reporter.indexingStarted();
+		reporter.setStartTime(System.currentTimeMillis());
 		MailFolder rootFolder = getRootFolder();
 		rootFolder.setError(null);
 		IndexWriterAdapter writer = null;
@@ -137,7 +137,7 @@ public final class OutlookIndex extends TreeIndex
 		}
 		finally {
 			Closeables.closeQuietly(writer);
-			reporter.indexingStopped();
+			reporter.setEndTime(System.currentTimeMillis());
 		}
 		return false;
 	}
