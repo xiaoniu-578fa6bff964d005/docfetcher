@@ -253,10 +253,10 @@ public final class IndexRegistry {
 			final DelayedExecutor executor = new DelayedExecutor(1000);
 			
 			final int watchId = new SimpleJNotifyListener() {
-				protected void handleEvent(File targetFile, boolean deleted) {
+				protected void handleEvent(File targetFile, EventType eventType) {
 					if (!targetFile.getName().equals(SER_FILENAME))
 						return;
-					if (deleted)
+					if (eventType != EventType.MODIFIED)
 						return;
 					executor.schedule(new Runnable() {
 						public void run() {

@@ -279,8 +279,8 @@ public final class FolderWatcher {
 			this.watchedIndex = Util.checkNotNull(watchedIndex);
 		}
 		
-		protected void handleEvent(File targetFile, boolean deleted) {
-			if (!deleted && !accept(targetFile))
+		protected void handleEvent(File targetFile, EventType eventType) {
+			if (!accept(targetFile, eventType))
 				return;
 			
 			/*
@@ -295,9 +295,20 @@ public final class FolderWatcher {
 			});
 		}
 		
-		private boolean accept(@NotNull File target) {
+		private boolean accept(	@NotNull File target,
+								@NotNull EventType eventType) {
 			String name = target.getName();
 			boolean isFile = target.isFile();
+			boolean isDeleted = eventType == EventType.DELETED;
+			
+			/*
+			 * If the file was deleted, File.isFile() should have returned
+			 * false, regardless of whether the file object was a file or a
+			 * directory. Consequently, the isFile flag is of no use if the file
+			 * was deleted.
+			 */
+			if (isDeleted)
+				assert !isFile;
 			
 			// Accept if target is an archive root or a PST file
 			if (target.equals(watchedIndex.getRootFile()))
@@ -305,13 +316,13 @@ public final class FolderWatcher {
 
 			// Ignore so-called 'temporary owner files' created by MS Word.
 			// See bug #2804172.
-			if (isFile && name.matches("~\\$.*\\.docx?"))
+			if (name.matches("~\\$.*\\.docx?"))
 				return false;
 			
 			// Ignore target if it's matched by the user-defined filter
 			IndexingConfig config = watchedIndex.getConfig();
 			String path = config.getStorablePath(target);
-			if (config.getFileFilter().matches(name, path, isFile))
+			if (!isDeleted && config.getFileFilter().matches(name, path, isFile))
 				return false;
 			
 			// Ignore unparsable files
@@ -324,7 +335,8 @@ public final class FolderWatcher {
 			 * Check if the file was *really* modified - JNotify tends to fire
 			 * even when files have only been accessed.
 			 */
-			if (watchedIndex instanceof FileIndex) {
+			if (eventType == EventType.MODIFIED
+					&& (watchedIndex instanceof FileIndex)) {
 				FileIndex index = (FileIndex) watchedIndex;
 				TreeNode treeNode = index.getRootFolder().findTreeNode(path);
 				if (sameLastModified(treeNode, target))

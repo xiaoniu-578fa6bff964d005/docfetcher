@@ -25,30 +25,34 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
  * @author Tran Nam Quang
  */
 abstract class SimpleJNotifyListener {
+	
+	enum EventType {
+		CREATED, DELETED, MODIFIED, RENAMED
+	}
 
 	@Nullable private JNotifyListener listener = new JNotifyListener() {
 		public final void fileCreated(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), false);
+			handleEvent(new File(rootPath, name), EventType.CREATED);
 		}
 
 		public final void fileDeleted(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), true);
+			handleEvent(new File(rootPath, name), EventType.DELETED);
 		}
 
 		public final void fileModified(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), false);
+			handleEvent(new File(rootPath, name), EventType.MODIFIED);
 		}
 
 		public final void fileRenamed(	int wd,
 		                              	String rootPath,
 		                              	String oldName,
 		                              	String newName) {
-			handleEvent(new File(rootPath, newName), false);
+			handleEvent(new File(rootPath, newName), EventType.RENAMED);
 		}
 	};
 	
 	protected abstract void handleEvent(@NotNull File targetFile,
-										boolean deleted);
+										@NotNull EventType eventType);
 	
 	@CallOnce
 	public final int addWatch(@NotNull File watchFile) throws JNotifyException {
