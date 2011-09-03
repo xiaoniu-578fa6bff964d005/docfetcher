@@ -43,6 +43,7 @@ public enum TestFiles {
 	multiple_dirs_rar ("multiple-dirs.rar"),
 	index_update_html_in_7z ("index-update-html-in-7z"),
 	index_update_rename_in_7z ("index-update-rename-in-7z"),
+	index_update_html_in_html ("index-update-html-in-html"),
 	;
 	
 	private final String path;

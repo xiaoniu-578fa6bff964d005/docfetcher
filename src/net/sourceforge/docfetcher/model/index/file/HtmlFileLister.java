@@ -24,6 +24,7 @@ import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -39,13 +40,12 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 	@Nullable private final IndexingReporter reporter;
 	
 	public HtmlFileLister(	@NotNull File parentDir,
-							@NotNull Collection<String> htmlExtensions,
-							boolean htmlPairing,
+							@NotNull IndexingConfig config,
 							@Nullable IndexingReporter reporter) {
-		Util.checkNotNull(parentDir, htmlExtensions);
+		Util.checkNotNull(parentDir, config);
 		this.parentDir = parentDir;
-		this.htmlExtensions = htmlExtensions;
-		this.htmlPairing = htmlPairing;
+		this.htmlExtensions = config.getHtmlExtensions();
+		this.htmlPairing = config.isHtmlPairing();
 		this.reporter = reporter;
 	}
 	

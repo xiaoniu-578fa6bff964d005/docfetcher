@@ -12,28 +12,24 @@
 package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.File;
-import java.util.Collection;
-
 import net.sourceforge.docfetcher.base.Stoppable;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.model.index.IndexingConfig;
 
 /**
  * @author Tran Nam Quang
  */
 abstract class HtmlFileWalker extends Stoppable <Exception> {
 	
-	@NotNull private final File rootDir;
-	@NotNull private final Collection<String> htmlExtensions;
-	private final boolean htmlPairing;
+	private final File rootDir;
+	private final IndexingConfig config;
 	
 	public HtmlFileWalker(	@NotNull File rootDir,
-							@NotNull Collection<String> htmlExtensions,
-							boolean htmlPairing) {
-		Util.checkNotNull(rootDir, htmlExtensions);
+							@NotNull IndexingConfig config) {
+		Util.checkNotNull(rootDir, config);
 		this.rootDir = rootDir;
-		this.htmlExtensions = htmlExtensions;
-		this.htmlPairing = htmlPairing;
+		this.config = config;
 	}
 
 	protected final void doRun() {
@@ -41,7 +37,7 @@ abstract class HtmlFileWalker extends Stoppable <Exception> {
 	}
 	
 	private void run(@NotNull File parentDir) {
-		new HtmlFileLister <Exception> (parentDir, htmlExtensions, htmlPairing, null) {
+		new HtmlFileLister <Exception> (parentDir, config, null) {
 			protected void handleFile(File file) {
 				if (HtmlFileWalker.this.isStopped())
 					stop(); // Stop HTMML file lister

@@ -216,7 +216,7 @@ public final class FileFactory {
 		 * Note: We'll ignore the HTML pairing flag in the config object and
 		 * always leave the HTML pairing on.
 		 */
-		new HtmlFileWalker (archiveFile, config.getHtmlExtensions(), true) {
+		new HtmlFileWalker (archiveFile, config) {
 			protected void handleFile(File file) {
 				String currentPath = getRelativePath(archiveFile, file);
 				try {

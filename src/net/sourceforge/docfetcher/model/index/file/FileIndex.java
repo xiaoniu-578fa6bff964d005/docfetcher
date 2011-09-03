@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.base.Util;
@@ -242,10 +241,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		assert dirOrZip.isDirectory();
 		assert !folder.hasErrors();
 		
-		final IndexingConfig config = context.getConfig();
-		boolean htmlPairing = config.isHtmlPairing();
-		Collection<String> htmlExtensions = config.getHtmlExtensions();
-
 		final Map<String, FileDocument> unseenDocs = Maps.newHashMap(folder.getDocumentMap());
 		final Map<String, FileFolder> unseenSubFolders = Maps.newHashMap(folder.getSubFolderMap());
 
@@ -254,7 +249,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		 * a consistent state, so that the user can continue indexing later.
 		 */
 		new HtmlFileLister<IndexingException>(
-			dirOrZip, htmlExtensions, htmlPairing, context.getReporter()) {
+			dirOrZip, context.getConfig(), context.getReporter()) {
 			protected void handleFile(@NotNull File file) {
 				if (context.isStopped()) stop();
 				try {

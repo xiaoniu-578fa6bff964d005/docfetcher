@@ -12,7 +12,7 @@
 package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.util.Map;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
@@ -21,6 +21,11 @@ import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.DocumentType;
+import net.sourceforge.docfetcher.model.index.IndexingConfig;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+
 import de.schlichtherle.truezip.file.TFile;
 
 @SuppressWarnings("serial")
@@ -62,50 +67,52 @@ public final class FileDocument extends Document<FileDocument, FileFolder> {
 	private static boolean isFolderModified(@NotNull final FileContext context,
 											@Nullable FileFolder oldFolder,
 											@Nullable File newFolder) {
+		Util.checkThat(newFolder == null || (newFolder instanceof TFile));
+		
 		if (oldFolder == null)
 			return newFolder != null;
 		else if (newFolder == null)
 			return true;
-
-		File[] newFiles = Util.listFiles(newFolder, new FileFilter() {
-			public boolean accept(File file) {
-				return !context.skip((TFile) file);
-			}
-		});
 		
-		if (newFiles.length != oldFolder.getChildCount())
-			return true;
-
-		for (File newFile : newFiles) {
-			String name = newFile.getName();
-			long newLastModified = newFile.lastModified();
-			
-			if (newFile.isFile()) {
-				if (context.getConfig().isSolidArchive(name)) {
-					FileFolder subFolder = oldFolder.getSubFolder(name);
-					if (subFolder == null)
-						return true;
-					if (subFolder.getLastModified() != newLastModified)
-						return true;
+		final IndexingConfig config = context.getConfig();
+		final Map<String, FileDocument> unseenDocs = Maps.newHashMap(oldFolder.getDocumentMap());
+		final Map<String, FileFolder> unseenSubFolders = Maps.newHashMap(oldFolder.getSubFolderMap());
+		final boolean[] modificationFound = { false };
+		
+		new HtmlFileLister <Exception> (newFolder, config, null) {
+			protected void handleFile(File file) {
+				if (config.isSolidArchive(file.getName())) {
+					FileFolder subFolder = unseenSubFolders.remove(file.getName());
+					if (subFolder == null || !Objects.equal(subFolder.getLastModified(), file.lastModified()))
+						modified();
 				}
 				else {
-					FileDocument doc = oldFolder.getDocument(name);
-					if (doc == null)
-						return true;
-					if (doc.getLastModified() != newLastModified)
-						return true;
+					FileDocument doc = unseenDocs.remove(file.getName());
+					if (doc == null || doc.getLastModified() != file.lastModified())
+						modified();
 				}
 			}
-			else if (newFile.isDirectory()) {
-				FileFolder subFolder = oldFolder.getSubFolder(name);
-				if (subFolder == null)
-					return true;
-				if (isFolderModified(context, subFolder, newFile))
-					return true;
+			protected void handleHtmlPair(File htmlFile, File htmlDir) {
+				FileDocument doc = unseenDocs.remove(htmlFile.getName());
+				if (doc == null || doc.isModified(context, htmlFile, htmlDir))
+					modified();
 			}
-		}
-
-		return false;
+			protected void handleDir(File dir) {
+				FileFolder subFolder = unseenSubFolders.remove(dir.getName());
+				if (subFolder == null || isFolderModified(context, subFolder, dir))
+					modified();
+			}
+			protected boolean skip(File fileOrDir) {
+				return context.skip((TFile) fileOrDir);
+			}
+			private void modified() {
+				modificationFound[0] = true;
+				stop(); // Stop file lister
+			}
+		}.runSilently();
+		
+		return modificationFound[0] || !unseenDocs.isEmpty()
+				|| !unseenSubFolders.isEmpty();
 	}
 	
 	// new doc must have the same name

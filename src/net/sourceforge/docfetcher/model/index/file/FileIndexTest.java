@@ -263,4 +263,22 @@ public final class FileIndexTest {
 		Files.deleteRecursively(tempDir);
 	}
 	
+	/**
+	 * Checks that the indexing algorithm can properly deal with HTML files
+	 * nested inside the HTML folders of other HTML files.
+	 */
+	@Test
+	public void testIndexUpdateOnNestedHtml() throws Exception {
+		File dir = TestFiles.index_update_html_in_html.get();
+		IndexingConfig config = new IndexingConfig();
+		FileIndex index = new FileIndex(config, null, dir);
+		
+		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		UtilModel.assertDocCount(index.getLuceneDir(), 2);
+		
+		CountingReporter countingReporter = new CountingReporter();
+		index.update(countingReporter, NullCancelable.getInstance());
+		assertEquals(0, countingReporter.counter);
+	}
+	
 }
