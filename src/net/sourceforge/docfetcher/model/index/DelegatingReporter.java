@@ -12,10 +12,12 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.BoundedList;
 import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 
@@ -25,9 +27,9 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 public final class DelegatingReporter extends IndexingReporter {
 
 	public interface ExistingMessagesHandler {
-		// The given lists are mutable
-		public void handleMessages(	@NotNull List<IndexingInfo> infos,
-									@NotNull List<IndexingError> errors);
+		// Method is called under lock of DelegatingReporter
+		public void handleMessages(	@Immutable @NotNull List<IndexingInfo> infos,
+									@Immutable @NotNull List<IndexingError> errors);
 	}
 
 	public interface ExistingMessagesProvider {
@@ -53,27 +55,19 @@ public final class DelegatingReporter extends IndexingReporter {
 											@NotNull ExistingMessagesHandler handler) {
 		Util.checkNotNull(delegate, handler);
 		Util.checkThat(this.delegate == null);
-		
 		this.delegate = delegate;
-		
 		if (start != null)
 			delegate.setStartTime(start);
 		if (end != null)
 			delegate.setEndTime(end);
-		
-		List<IndexingError> errorsCopy = new ArrayList<IndexingError>(errors);
-		handler.handleMessages(infos.removeAll(), errorsCopy);
-		errors.clear();
+		handler.handleMessages(
+			infos.unmodifiableList(), Collections.unmodifiableList(errors));
 	}
 
-	public synchronized void detachDelegate(@NotNull IndexingReporter delegate,
-											@NotNull ExistingMessagesProvider provider) {
-		Util.checkNotNull(delegate, provider);
+	public synchronized void detachDelegate(@NotNull IndexingReporter delegate) {
+		Util.checkNotNull(delegate);
 		Util.checkThat(this.delegate == delegate);
-		Util.checkThat(infos.isEmpty() && errors.isEmpty());
 		this.delegate = null;
-		infos.addAll(provider.getInfos());
-		errors.addAll(provider.getErrors());
 	}
 
 	public synchronized void setStartTime(long time) {
@@ -89,27 +83,22 @@ public final class DelegatingReporter extends IndexingReporter {
 	}
 
 	public synchronized void info(@NotNull IndexingInfo info) {
+		infos.add(info);
 		if (delegate != null)
 			delegate.info(info);
-		else
-			infos.add(info);
 	}
 	
 	public synchronized void subInfo(int current, int total) {
-		if (delegate != null) {
+		Util.checkThat(!infos.isEmpty());
+		infos.getLast().setPercentage(current, total);
+		if (delegate != null)
 			delegate.subInfo(current, total);
-		}
-		else {
-			Util.checkThat(!infos.isEmpty());
-			infos.getLast().setPercentage(current, total);
-		}
 	}
 
 	public synchronized void fail(@NotNull IndexingError error) {
+		errors.add(error);
 		if (delegate != null)
 			delegate.fail(error);
-		else
-			errors.add(error);
 	}
 
 }

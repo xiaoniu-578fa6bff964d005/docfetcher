@@ -21,8 +21,6 @@ import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
-import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesProvider;
-
 import com.google.common.base.Objects;
 
 /**
@@ -139,9 +137,8 @@ public final class Task {
 		reporter.attachDelegate(delegate, handler);
 	}
 
-	public void detachReporter(	@NotNull IndexingReporter delegate,
-								@NotNull ExistingMessagesProvider provider) {
-		reporter.detachDelegate(delegate, provider);
+	public void detachReporter(	@NotNull IndexingReporter delegate) {
+		reporter.detachDelegate(delegate);
 	}
 
 	@ThreadSafe

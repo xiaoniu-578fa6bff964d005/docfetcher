@@ -14,7 +14,8 @@ import java.lang.annotation.Target;
  */
 @Target({
 	ElementType.FIELD,
-	ElementType.METHOD
+	ElementType.METHOD,
+	ElementType.PARAMETER
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface MutableCopy {

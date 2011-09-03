@@ -11,7 +11,6 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.Event;
@@ -29,7 +28,6 @@ import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
-import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesProvider;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
@@ -357,17 +355,7 @@ public final class IndexingDialog implements Dialog {
 		
 		progressPanel.getControl().addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				task.detachReporter(reporter, new ExistingMessagesProvider() {
-					public List<IndexingInfo> getInfos() {
-						// TODO
-						return Collections.emptyList();
-					}
-					
-					public List<IndexingError> getErrors() {
-						// TODO
-						return Collections.emptyList();
-					}
-				});
+				task.detachReporter(reporter);
 			}
 		});
 	}

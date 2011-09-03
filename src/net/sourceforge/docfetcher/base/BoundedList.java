@@ -12,10 +12,12 @@
 package net.sourceforge.docfetcher.base;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.base.annotations.Immutable;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 /**
@@ -134,6 +136,12 @@ public final class BoundedList<T> implements Iterable<T> {
 				assert virtualSize >= 0;
 			}
 		};
+	}
+	
+	@Immutable
+	@NotNull
+	public List<T> unmodifiableList() {
+		return Collections.unmodifiableList(list);
 	}
 
 }
