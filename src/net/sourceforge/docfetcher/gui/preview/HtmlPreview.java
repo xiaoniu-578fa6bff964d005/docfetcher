@@ -11,6 +11,10 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
+import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 
 import org.eclipse.swt.SWT;
@@ -28,7 +32,6 @@ final class HtmlPreview extends ToolBarForm {
 	
 	public HtmlPreview(@NotNull Composite parent) {
 		super(parent);
-		browser.setText("Hello World");
 	}
 	
 	@NotNull
@@ -46,8 +49,19 @@ final class HtmlPreview extends ToolBarForm {
 	}
 	
 	// TODO maybe add HTML highlighting
-	public void setText(@NotNull String html) {
-		browser.setText(html);
+	/**
+	 * Sets the file to be displayed.
+	 */
+	public void setFile(@NotNull File file) {
+		String path = Util.getSystemAbsPath(file);
+		try {
+			String url = file.toURI().toURL().toString();
+			browser.setUrl(url);
+		}
+		catch (MalformedURLException e) {
+			browser.setUrl(path);
+		}
+		// TODO show file path in location bar
 	}
 
 	public void clear() {

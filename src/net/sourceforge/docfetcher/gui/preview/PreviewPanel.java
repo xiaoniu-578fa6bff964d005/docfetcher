@@ -13,7 +13,10 @@ package net.sourceforge.docfetcher.gui.preview;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
@@ -37,9 +40,13 @@ public final class PreviewPanel extends Composite {
 	@Nullable private HtmlPreview htmlPreview;
 	private final StackLayout stackLayout;
 	
+	// These fields should only be accessed from the GUI thread
 	@Nullable private ResultDocument lastDoc;
 	@Nullable private MailResource lastMailResource;
-	private long requestCount = 0; // used as a thread interrupt signal
+	@Nullable private FileResource lastHtmlResource;
+	
+	// Guarded by 'this' lock; used as a thread interrupt signal
+	private long requestCount = 0;
 	
 	public PreviewPanel(@NotNull Composite parent) {
 		super(parent, SWT.NONE);
@@ -54,6 +61,7 @@ public final class PreviewPanel extends Composite {
 		});
 	}
 	
+	@ThreadSafe
 	public synchronized void setPreview(@NotNull ResultDocument doc) {
 		Util.checkNotNull(doc);
 		Util.checkThat(Display.getCurrent() != null);
@@ -61,7 +69,8 @@ public final class PreviewPanel extends Composite {
 		// TODO show 'loading' message where appropriate (-> maybe as a separate composite)
 		// TODO display parse errors on a separate bar
 		
-		if (lastDoc == doc) return;
+		if (lastDoc == doc)
+			return;
 		lastDoc = doc;
 		disposeLastResources();
 		requestCount++;
@@ -69,65 +78,49 @@ public final class PreviewPanel extends Composite {
 		if (doc.isEmail()) {
 			clearPreviews(true, false, true);
 			new EmailThread(doc, requestCount).start();
-		} else if (doc.isHtmlFile()) {
+		}
+		else if (doc.isHtmlFile()) {
 			clearPreviews(true, true, false);
 			new HtmlThread(doc, requestCount).start();
-		} else if (doc.isPdfFile()) {
+		}
+		else if (doc.isPdfFile()) {
 			clearPreviews(true, true, true);
 			new PdfThread(doc, requestCount).start();
-		} else {
+		}
+		else {
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
 	}
 	
+	@NotThreadSafe
 	private void clearPreviews(boolean text, boolean email, boolean html) {
-		if (text) textPreview.clear();
+		if (text)
+			textPreview.clear();
 		if (email && emailPreview != null)
 			emailPreview.clear();
 		if (html && htmlPreview != null)
 			htmlPreview.clear();
 	}
 
+	@NotThreadSafe
 	private void disposeLastResources() {
 		if (lastMailResource != null) {
 			lastMailResource.dispose();
 			lastMailResource = null;
 		}
-		// dispose HTML resource
+		if (lastHtmlResource != null) {
+			lastHtmlResource.dispose();
+			lastHtmlResource = null;
+		}
 	}
 	
 	// Returns true on success
-	private synchronized boolean setEmailSafely(@NotNull final MailResource mailResource,
-												long requestCount) {
-		if (requestCount != this.requestCount)
-			return false;
-		if (emailPreview != null && emailPreview.isDisposed())
-			return false;
-		Util.runSyncExec(this, new Runnable() {
-			public void run() {
-				if (emailPreview == null)
-					emailPreview = new EmailPreview(PreviewPanel.this);
-				emailPreview.setEmail(mailResource);
-				if (stackLayout.topControl != emailPreview) {
-					stackLayout.topControl = emailPreview;
-					layout();
-				}
-				lastMailResource = mailResource; // Save a reference for disposal
-			}
-		});
-		return true;
-	}
-	
-	// Returns true on success
-	private synchronized boolean setTextSafely(	final HighlightedString string,
-	                                           	long requestCount,
-												final boolean append) {
-		if (requestCount != this.requestCount)
-			return false;
-		if (textPreview != null && textPreview.isDisposed())
-			return false;
-		Util.runSyncExec(this, new Runnable() {
+	@ThreadSafe
+	private boolean setTextSafely(	@NotNull final HighlightedString string,
+									long requestCount,
+									final boolean append) {
+		return runSafely(requestCount, new Runnable() {
 			public void run() {
 				if (append)
 					textPreview.appendText(string);
@@ -139,6 +132,15 @@ public final class PreviewPanel extends Composite {
 				}
 			}
 		});
+	}
+	
+	// Returns true on success
+	@ThreadSafe
+	private synchronized boolean runSafely(	long requestCount,
+	                                       	@NotNull Runnable runnable) {
+		if (requestCount != this.requestCount)
+			return false;
+		Util.runSyncExec(this, runnable);
 		return true;
 	}
 	
@@ -148,10 +150,22 @@ public final class PreviewPanel extends Composite {
 		}
 		public void run() {
 			try {
-				MailResource mailResource = doc.getMailResource();
-				if (! setEmailSafely(mailResource, startCount))
-					mailResource.dispose();
 				// TODO catch OutOfMemoryErrors
+				final MailResource mailResource = doc.getMailResource();
+				boolean success = runSafely(startCount, new Runnable() {
+					public void run() {
+						if (emailPreview == null)
+							emailPreview = new EmailPreview(PreviewPanel.this);
+						emailPreview.setEmail(mailResource);
+						if (stackLayout.topControl != emailPreview) {
+							stackLayout.topControl = emailPreview;
+							layout();
+						}
+						lastMailResource = mailResource; // Save a reference for disposal
+					}
+				});
+				if (!success)
+					mailResource.dispose();
 			} catch (ParseException e) {
 				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
 			}
@@ -164,9 +178,22 @@ public final class PreviewPanel extends Composite {
 		}
 		public void run() {
 			try {
-				throw new ParseException(null);
-				// TODO implement, update stack layout
 				// TODO catch OutOfMemoryErrors
+				final FileResource htmlResource = doc.getFileResource();
+				boolean success = runSafely(startCount, new Runnable() {
+					public void run() {
+						if (htmlPreview == null)
+							htmlPreview = new HtmlPreview(PreviewPanel.this);
+						htmlPreview.setFile(htmlResource.getFile());
+						if (stackLayout.topControl != htmlPreview) {
+							stackLayout.topControl = htmlPreview;
+							layout();
+						}
+						lastHtmlResource = htmlResource; // Save a reference for disposal
+					}
+				});
+				if (!success)
+					htmlResource.dispose();
 			} catch (ParseException e) {
 				// TODO show error message (check thread.isInterrupted and disposal of widgets!)
 			}
