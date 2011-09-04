@@ -157,7 +157,7 @@ public final class IndexingDialog implements Dialog {
 		addedListener = new Event.Listener<Task>() {
 			public void update(final Task task) {
 				assert !shell.isDisposed();
-				Util.runSWTSafe(tabFolder, new Runnable() {
+				Util.runSwtSafe(tabFolder, new Runnable() {
 					public void run() {
 						addTab(task, !task.is(IndexAction.UPDATE));
 					}
@@ -168,7 +168,7 @@ public final class IndexingDialog implements Dialog {
 		removedListener = new Event.Listener<Task>() {
 			public void update(final Task task) {
 				assert !shell.isDisposed();
-				Util.runSWTSafe(tabFolder, new Runnable() {
+				Util.runSwtSafe(tabFolder, new Runnable() {
 					public void run() {
 						for (CTabItem item : tabFolder.getItems()) {
 							if (item.getData() == task) {
@@ -186,7 +186,7 @@ public final class IndexingDialog implements Dialog {
 				if (tabFolder.getItemCount() == 0) {
 					indexRegistry.getQueue().removeListeners(
 						addedListener, this);
-					Util.runSWTSafe(shell, new Runnable() {
+					Util.runSwtSafe(shell, new Runnable() {
 						public void run() {
 							shell.dispose();
 						}

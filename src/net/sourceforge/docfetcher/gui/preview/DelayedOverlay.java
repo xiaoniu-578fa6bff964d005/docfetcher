@@ -75,7 +75,7 @@ final class DelayedOverlay {
 
 		@ThreadSafe
 		public void hide() {
-			Util.runSWTSafe(control, new Runnable() {
+			Util.runSwtSafe(control, new Runnable() {
 				public void run() {
 					if (localVersion == version)
 						doHide();

@@ -806,7 +806,7 @@ public final class Util {
 	 * The returned Boolean indicates whether the Runnable was run (true) or not
 	 * (false).
 	 */
-	public static boolean runSWTSafe(	@Nullable final Widget widget,
+	public static boolean runSwtSafe(	@Nullable final Widget widget,
 										@NotNull final Runnable runnable) {
 		if (Display.getCurrent() != null) {
 			boolean wasRun = widget != null && !widget.isDisposed();
@@ -820,9 +820,9 @@ public final class Util {
 	}
 	
 	/**
-	 * @see #runSWTSafe(Widget, Runnable)
+	 * @see #runSwtSafe(Widget, Runnable)
 	 */
-	public static boolean runSWTSafe(	@Nullable final Display display,
+	public static boolean runSwtSafe(	@Nullable final Display display,
 										@NotNull final Runnable runnable) {
 		if (Display.getCurrent() != null) {
 			boolean wasRun = display != null && !display.isDisposed();

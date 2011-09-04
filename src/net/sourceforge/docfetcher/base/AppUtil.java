@@ -347,7 +347,7 @@ public final class AppUtil {
 			}
 		}
 		MyRunnable myRunnable = new MyRunnable();
-		Util.runSWTSafe(display, myRunnable);
+		Util.runSwtSafe(display, myRunnable);
 		return myRunnable.answer;
 	}
 
@@ -360,7 +360,7 @@ public final class AppUtil {
 		checkConstInitialized();
 		ensureDisplay();
 		
-		Util.runSWTSafe(display, new Runnable() {
+		Util.runSwtSafe(display, new Runnable() {
 			public void run() {
 				MessageBox msgBox = new MessageBox(getActiveShell(),
 						SWT.ICON_INFORMATION | SWT.OK);
@@ -383,7 +383,7 @@ public final class AppUtil {
 		checkConstInitialized();
 		ensureDisplay();
 		
-		Util.runSWTSafe(display, new Runnable() {
+		Util.runSwtSafe(display, new Runnable() {
 			public void run() {
 				int style = SWT.OK;
 				style |= isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING;
@@ -472,7 +472,7 @@ public final class AppUtil {
 		}
 
 		// Show stacktrace in error window
-		Util.runSWTSafe(display, new Runnable() {
+		Util.runSwtSafe(display, new Runnable() {
 			public void run() {
 				StackTraceWindow window = new StackTraceWindow(display);
 				window.setTitle(throwable.getClass().getSimpleName());

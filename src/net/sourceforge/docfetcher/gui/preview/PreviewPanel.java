@@ -153,7 +153,7 @@ public final class PreviewPanel extends Composite {
 	@ThreadSafe
 	private void setError(	@Nullable final String message,
 							final long requestCount) {
-		Util.runSWTSafe(errorField, new Runnable() {
+		Util.runSwtSafe(errorField, new Runnable() {
 			public void run() {
 				if (requestCount != PreviewPanel.this.requestCount)
 					return;
@@ -194,7 +194,7 @@ public final class PreviewPanel extends Composite {
 								@NotNull Widget widget,
 								@NotNull final Runnable runnable) {
 		final boolean[] success = { true };
-		Util.runSWTSafe(widget, new Runnable() {
+		Util.runSwtSafe(widget, new Runnable() {
 			public void run() {
 				if (requestCount != PreviewPanel.this.requestCount) {
 					success[0] = false;

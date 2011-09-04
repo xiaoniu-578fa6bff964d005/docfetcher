@@ -139,7 +139,7 @@ public final class IndexPanel {
 		 */
 		Folder.evtFolderAdded.add(new Event.Listener<FolderEvent>() {
 			public void update(final FolderEvent eventData) {
-				Util.runSWTSafe(tree, new Runnable() {
+				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						viewer.add(eventData.parent, eventData.folder);
 					}
@@ -148,7 +148,7 @@ public final class IndexPanel {
 		});
 		Folder.evtFolderRemoved.add(new Event.Listener<FolderEvent>() {
 			public void update(final FolderEvent eventData) {
-				Util.runSWTSafe(tree, new Runnable() {
+				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						viewer.remove(eventData.folder);
 					}
@@ -162,7 +162,7 @@ public final class IndexPanel {
 			}
 		}, new Event.Listener<LuceneIndex>() {
 			public void update(final LuceneIndex eventData) {
-				Util.runSWTSafe(tree, new Runnable() {
+				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						viewer.addRoot(eventData);
 					}
@@ -170,7 +170,7 @@ public final class IndexPanel {
 			}
 		}, new Event.Listener<List<LuceneIndex>>() {
 			public void update(final List<LuceneIndex> eventData) {
-				Util.runSWTSafe(tree, new Runnable() {
+				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						viewer.remove(UtilGlobal.<ViewNode> convert(eventData));
 					}
@@ -401,7 +401,7 @@ public final class IndexPanel {
 					return;
 				if (eventData.folder != clickedNode[0])
 					return;
-				Util.runSWTSafe(tree, new Runnable() {
+				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						menu.setVisible(false);
 					}
