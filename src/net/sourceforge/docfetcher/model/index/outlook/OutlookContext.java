@@ -2,6 +2,7 @@ package net.sourceforge.docfetcher.model.index.outlook;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,12 +128,7 @@ final class OutlookContext {
 			protected void handleException(	String filename,
 											Exception e) {
 				final String filepath = Util.joinPath(doc.getPath(), filename);
-				@SuppressWarnings("serial")
-				TreeNode attachNode = new TreeNode(filename, filename) {
-					public String getPath() {
-						return filepath;
-					}
-				};
+				TreeNode attachNode = new AttachNode(filename, filepath);
 
 				// Put error in temporary list and report it
 				if (errors == null)
@@ -148,6 +144,23 @@ final class OutlookContext {
 		}.run();
 		
 		return luceneDoc;
+	}
+	
+	/*
+	 * Must be static in order to avoid attempting to serialize the surrounding
+	 * OutlookContext instance.
+	 */
+	@SuppressWarnings("serial")
+	private static class AttachNode extends TreeNode implements Serializable {
+		private final String filepath;
+		
+		public AttachNode(String filename, String filepath) {
+			super(filename, filename);
+			this.filepath = filepath;
+		}
+		public String getPath() {
+			return filepath;
+		}
 	}
 	
 	@NotNull
