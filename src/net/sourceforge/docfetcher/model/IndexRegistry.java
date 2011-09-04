@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
@@ -81,14 +84,9 @@ public final class IndexRegistry {
 	static {
 		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
 	}
-	
-	/*
-	 * Note: The indexing queue assumes this class uses itself as lock, so the
-	 * indexing queue must be modified accordingly when switching to another
-	 * lock.
-	 */
 
 	// These events must always be fired under lock!
+	// Avoid firing while holding only the read-lock, since it cannot be upgraded to a write-lock
 	private final Event<LuceneIndex> evtAdded = new Event<LuceneIndex>();
 	private final Event<List<LuceneIndex>> evtRemoved = new Event<List<LuceneIndex>>();
 
@@ -97,7 +95,18 @@ public final class IndexRegistry {
 	 * indexes' ser files. A last-modified value may be null, which indicates
 	 * that the corresponding index hasn't been saved yet.
 	 */
-	private final Map<LuceneIndex, Long> indexes = Maps.newTreeMap(IndexComparator.instance);
+	private final Map<LuceneIndex, Long> indexes = Maps.newTreeMap(IndexComparator.instance); // guarded by read-write lock
+	
+	/*
+	 * This read-write lock is used for the index registry, the indexing queue,
+	 * the searcher and the folder watcher. With the exception of the searcher,
+	 * a read-write lock might not be the best choice for these classes in terms
+	 * of efficiency. However, by using the same lock for all classes, we can
+	 * avoid potential lock-ordering deadlocks.
+	 */
+	private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
+	private final Lock readLock = lock.readLock();
+	private final Lock writeLock = lock.writeLock();
 	
 	private final File indexParentDir;
 	private final IndexingQueue queue;
@@ -123,11 +132,13 @@ public final class IndexRegistry {
 	}
 	
 	@NotNull
+	@ThreadSafe
 	public File getIndexParentDir() {
 		return indexParentDir;
 	}
 	
 	@NotNull
+	@ThreadSafe
 	public IndexingQueue getQueue() {
 		return queue;
 	}
@@ -135,12 +146,27 @@ public final class IndexRegistry {
 	// Will block until the searcher is available (i.e. after load(...) has finished)
 	// May return null if the calling thread was interrupted
 	@Nullable
+	@ThreadSafe
 	public Searcher getSearcher() {
 		/*
-		 * This method must not be synchronized, otherwise we'll get a deadlock
+		 * This method must not be synchronized, otherwise we'll get a livelock
 		 * when this method is called while the load method is running.
 		 */
 		return searcher.get();
+	}
+	
+	// Should not be used by clients
+	@NotNull
+	@ThreadSafe
+	public Lock getReadLock() {
+		return readLock;
+	}
+	
+	// Should not be used by clients
+	@NotNull
+	@ThreadSafe
+	public Lock getWriteLock() {
+		return writeLock;
 	}
 
 	@ThreadSafe
@@ -149,18 +175,26 @@ public final class IndexRegistry {
 		addIndex(index, null);
 	}
 	
-	private synchronized void addIndex(	@NotNull LuceneIndex index,
-										@Nullable Long lastModified) {
+	@ThreadSafe
+	private void addIndex(	@NotNull LuceneIndex index,
+							@Nullable Long lastModified) {
 		Util.checkNotNull(index);
 		Util.checkNotNull(index.getIndexDir()); // RAM indexes not allowed
-		if (indexes.containsKey(index))
-			return;
-		indexes.put(index, lastModified);
-		evtAdded.fire(index);
+		writeLock.lock();
+		try {
+			if (indexes.containsKey(index))
+				return;
+			indexes.put(index, lastModified);
+			evtAdded.fire(index);
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 	
-	public synchronized void removeIndexes(	@NotNull Collection<LuceneIndex> indexesToRemove,
-											boolean deleteFiles) {
+	@ThreadSafe
+	public void removeIndexes(	@NotNull Collection<LuceneIndex> indexesToRemove,
+								boolean deleteFiles) {
 		Util.checkNotNull(indexesToRemove);
 		if (indexesToRemove.isEmpty())
 			return; // Avoid firing event when given collection is empty
@@ -171,19 +205,25 @@ public final class IndexRegistry {
 			? new ArrayList<PendingDeletion>(size)
 			: null;
 		
-		for (LuceneIndex index : indexesToRemove) {
-			if (!indexes.containsKey(index))
-				continue;
-			indexes.remove(index);
-			if (deleteFiles)
-				deletions.add(new PendingDeletion(index));
-			removed.add(index);
+		writeLock.lock();
+		try {
+			for (LuceneIndex index : indexesToRemove) {
+				if (!indexes.containsKey(index))
+					continue;
+				indexes.remove(index);
+				if (deleteFiles)
+					deletions.add(new PendingDeletion(index));
+				removed.add(index);
+			}
+
+			evtRemoved.fire(removed);
+			if (deletions != null) {
+				queue.approveDeletions(deletions);
+				searcher.get().approveDeletions(deletions);
+			}
 		}
-		
-		evtRemoved.fire(removed);
-		if (deletions != null) {
-			queue.approveDeletions(deletions);
-			searcher.get().approveDeletions(deletions);
+		finally {
+			writeLock.unlock();
 		}
 	}
 
@@ -194,29 +234,60 @@ public final class IndexRegistry {
 	// Events may arrive from non-GUI threads; indexes handler runs in the same
 	// thread as the client
 	// The list of indexes given to the handler is an immutable copy
-	public synchronized void addListeners(	@Nullable ExistingIndexesHandler handler,
-											@Nullable Event.Listener<LuceneIndex> addedListener,
-											@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
-		if (handler != null)
-			handler.handleExistingIndexes(getIndexes());
-		if (addedListener != null)
-			evtAdded.add(addedListener);
-		if (removedListener != null)
-			evtRemoved.add(removedListener);
+	@ThreadSafe
+	public void addListeners(	@Nullable ExistingIndexesHandler handler,
+								@Nullable Event.Listener<LuceneIndex> addedListener,
+								@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
+		if (handler == null && addedListener == null && removedListener == null)
+			return;
+		
+		writeLock.lock();
+		try {
+			if (handler != null)
+				handler.handleExistingIndexes(getIndexes());
+			if (addedListener != null)
+				evtAdded.add(addedListener);
+			if (removedListener != null)
+				evtRemoved.add(removedListener);
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 	
-	public synchronized void removeListeners(	@Nullable Event.Listener<LuceneIndex> addedListener,
-												@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
-		if (addedListener != null)
-			evtAdded.remove(addedListener);
-		if (removedListener != null)
-			evtRemoved.remove(removedListener);
+	@ThreadSafe
+	public void removeListeners(@Nullable Event.Listener<LuceneIndex> addedListener,
+								@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
+		if (addedListener == null && removedListener == null)
+			return;
+		
+		/*
+		 * The event class is thread-safe; the lock is only used to make this an
+		 * atomic operation.
+		 */
+		writeLock.lock();
+		try {
+			if (addedListener != null)
+				evtAdded.remove(addedListener);
+			if (removedListener != null)
+				evtRemoved.remove(removedListener);
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 	@ImmutableCopy
 	@NotNull
-	public synchronized List<LuceneIndex> getIndexes() {
-		return ImmutableList.copyOf(indexes.keySet());
+	@ThreadSafe
+	public List<LuceneIndex> getIndexes() {
+		readLock.lock();
+		try {
+			return ImmutableList.copyOf(indexes.keySet());
+		}
+		finally {
+			readLock.unlock();
+		}
 	}
 
 	@CallOnce
@@ -306,90 +377,101 @@ public final class IndexRegistry {
 		}
 	}
 	
-	private synchronized void reload() {
-		Map<File, LuceneIndex> indexDirMap = Maps.newHashMap();
-		for (LuceneIndex index : indexes.keySet())
-			indexDirMap.put(index.getIndexDir(), index);
-		
-		/*
-		 * The code below is pretty inefficient if many indexes are added,
-		 * modified and/or removed. However, we can assume that these operations
-		 * are usually performed one index at a time, so the inefficiency
-		 * doesn't really matter.
-		 */
-		
-		for (File indexDir : Util.listFiles(indexParentDir)) {
-			if (!indexDir.isDirectory())
-				continue;
-			File serFile = new File(indexDir, SER_FILENAME);
-			if (!serFile.isFile())
-				continue;
+	private void reload() {
+		writeLock.lock();
+		try {
+			Map<File, LuceneIndex> indexDirMap = Maps.newHashMap();
+			for (LuceneIndex index : indexes.keySet())
+				indexDirMap.put(index.getIndexDir(), index);
 			
-			LuceneIndex index = indexDirMap.remove(indexDir);
+			/*
+			 * The code below is pretty inefficient if many indexes are added,
+			 * modified and/or removed. However, we can assume that these operations
+			 * are usually performed one index at a time, so the inefficiency
+			 * doesn't really matter.
+			 */
 			
-			// New index found
-			if (index == null) {
-				loadIndex(serFile);
-			}
-			// Existing index; may have been modified
-			else {
-				Long oldLM = indexes.get(index);
-				long newLM = serFile.lastModified();
-				if (oldLM != null && oldLM.longValue() != newLM) {
-					/*
-					 * Remove the old version of the index and add the new
-					 * version. Let's just hope it isn't in the queue or being
-					 * searched in right now.
-					 */
-					removeIndexes(Collections.singletonList(index), false);
+			for (File indexDir : Util.listFiles(indexParentDir)) {
+				if (!indexDir.isDirectory())
+					continue;
+				File serFile = new File(indexDir, SER_FILENAME);
+				if (!serFile.isFile())
+					continue;
+				
+				LuceneIndex index = indexDirMap.remove(indexDir);
+				
+				// New index found
+				if (index == null) {
 					loadIndex(serFile);
 				}
+				// Existing index; may have been modified
+				else {
+					Long oldLM = indexes.get(index);
+					long newLM = serFile.lastModified();
+					if (oldLM != null && oldLM.longValue() != newLM) {
+						/*
+						 * Remove the old version of the index and add the new
+						 * version. Let's just hope it isn't in the queue or being
+						 * searched in right now.
+						 */
+						removeIndexes(Collections.singletonList(index), false);
+						loadIndex(serFile);
+					}
+				}
 			}
+			
+			// Handle missing indexes
+			removeIndexes(indexDirMap.values(), false);
 		}
-		
-		// Handle missing indexes
-		removeIndexes(indexDirMap.values(), false);
+		finally {
+			writeLock.unlock();
+		}
 	}
 	
 	@VisibleForPackageGroup
-	public synchronized void save(@NotNull LuceneIndex index) {
+	public void save(@NotNull LuceneIndex index) {
 		Util.checkNotNull(index);
-		
-		File indexDir = index.getIndexDir();
-		indexDir.mkdirs();
-		File serFile = new File(indexDir, SER_FILENAME);
-
-		/*
-		 * DocFetcher might have been burned onto a CD-ROM; if so, then just
-		 * ignore it.
-		 */
-		if (serFile.exists() && !serFile.canWrite())
-			return;
-
-		ObjectOutputStream out = null;
+		writeLock.lock();
 		try {
-			serFile.createNewFile();
-			FileOutputStream fout = new FileOutputStream(serFile);
-			FileLock lock = fout.getChannel().lock();
+			File indexDir = index.getIndexDir();
+			indexDir.mkdirs();
+			File serFile = new File(indexDir, SER_FILENAME);
+			
+			/*
+			 * DocFetcher might have been burned onto a CD-ROM; if so, then just
+			 * ignore it.
+			 */
+			if (serFile.exists() && !serFile.canWrite())
+				return;
+			
+			ObjectOutputStream out = null;
 			try {
-				out = new ObjectOutputStream(fout);
-				out.writeObject(index);
+				serFile.createNewFile();
+				FileOutputStream fout = new FileOutputStream(serFile);
+				FileLock lock = fout.getChannel().lock();
+				try {
+					out = new ObjectOutputStream(fout);
+					out.writeObject(index);
+				}
+				finally {
+					lock.release();
+				}
+			}
+			catch (IOException e) {
+				Util.printErr(e); // The average user doesn't need to know
 			}
 			finally {
-				lock.release();
+				Closeables.closeQuietly(out);
 			}
-		}
-		catch (IOException e) {
-			Util.printErr(e); // The average user doesn't need to know
+			
+			// Update cached last-modified value of index
+			indexes.put(index, serFile.lastModified());
+			
+			// TODO Write indexes.txt file used by the daemon
 		}
 		finally {
-			Closeables.closeQuietly(out);
+			writeLock.unlock();
 		}
-		
-		// Update cached last-modified value of index
-		indexes.put(index, serFile.lastModified());
-		
-		// TODO Write indexes.txt file used by the daemon
 	}
 	
 	@NotNull

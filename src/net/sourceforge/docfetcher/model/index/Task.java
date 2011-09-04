@@ -77,7 +77,7 @@ public final class Task {
 	@ThreadSafe
 	public void remove(@NotNull CancelHandler handler) {
 		Util.checkNotNull(handler);
-		queue.lock.lock();
+		queue.writeLock.lock();
 		try {
 			if (is(TaskState.INDEXING)) {
 				if (is(IndexAction.UPDATE))
@@ -88,14 +88,14 @@ public final class Task {
 			queue.remove(this);
 		}
 		finally {
-			queue.lock.unlock();
+			queue.writeLock.unlock();
 		}
 	}
 
 	// for index updates, the ready-state is set automatically
 	@ThreadSafe
 	public void setReady() {
-		queue.lock.lock();
+		queue.writeLock.lock();
 		try {
 			Util.checkThat(cancelAction == null);
 			if (!is(TaskState.NOT_READY))
@@ -115,7 +115,7 @@ public final class Task {
 			queue.readyTaskAvailable.signal();
 		}
 		finally {
-			queue.lock.unlock();
+			queue.writeLock.unlock();
 		}
 	}
 
@@ -149,57 +149,57 @@ public final class Task {
 
 	@ThreadSafe
 	boolean is(@Nullable CancelAction cancelAction) {
-		queue.lock.lock();
+		queue.readLock.lock();
 		try {
 			return Objects.equal(this.cancelAction, cancelAction);
 		}
 		finally {
-			queue.lock.unlock();
+			queue.readLock.unlock();
 		}
 	}
 
 	@ThreadSafe
 	public boolean is(@Nullable TaskState state) {
-		queue.lock.lock();
+		queue.readLock.lock();
 		try {
 			return Objects.equal(this.state, state);
 		}
 		finally {
-			queue.lock.unlock();
+			queue.readLock.unlock();
 		}
 	}
 
 	@ThreadSafe
 	void set(@NotNull TaskState state) {
-		queue.lock.lock();
+		queue.writeLock.lock();
 		try {
 			this.state = Util.checkNotNull(state);
 		}
 		finally {
-			queue.lock.unlock();
+			queue.writeLock.unlock();
 		}
 	}
 	
 	@ThreadSafe
 	void setDeletion(@NotNull PendingDeletion deletion) {
-		queue.lock.lock();
+		queue.writeLock.lock();
 		try {
 			this.deletion = Util.checkNotNull(deletion);
 		}
 		finally {
-			queue.lock.unlock();
+			queue.writeLock.unlock();
 		}
 	}
 	
 	@Nullable
 	@ThreadSafe
 	PendingDeletion getDeletion() {
-		queue.lock.lock();
+		queue.readLock.lock();
 		try {
 			return deletion;
 		}
 		finally {
-			queue.lock.unlock();
+			queue.readLock.unlock();
 		}
 	}
 

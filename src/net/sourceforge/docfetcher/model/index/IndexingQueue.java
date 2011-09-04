@@ -18,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
@@ -66,14 +64,19 @@ public final class IndexingQueue {
 	private final LinkedList<Task> tasks = new LinkedList<Task>();
 
 	private volatile boolean shutdown = false;
-	final Lock lock = new ReentrantLock(true);
-	final Condition readyTaskAvailable = lock.newCondition();
+	final Lock readLock;
+	final Lock writeLock;
+	final Condition readyTaskAvailable;
 	final int reporterCapacity;
 
 	public IndexingQueue(	@NotNull final IndexRegistry indexRegistry,
 							int reporterCapacity) {
 		this.indexRegistry = indexRegistry;
 		this.reporterCapacity = reporterCapacity;
+		
+		readLock = indexRegistry.getReadLock();
+		writeLock = indexRegistry.getWriteLock();
+		readyTaskAvailable = writeLock.newCondition();
 		
 		/*
 		 * In case of rebuild tasks, if a task is removed before it has entered
@@ -113,7 +116,7 @@ public final class IndexingQueue {
 	private void threadLoop() throws InterruptedException {
 		// Wait for next task
 		Task task;
-		lock.lock();
+		writeLock.lock();
 		try {
 			task = getReadyTask();
 			while (task == null) {
@@ -122,7 +125,7 @@ public final class IndexingQueue {
 			}
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 
 		assert isValidRegistryState(indexRegistry, task);
@@ -148,7 +151,7 @@ public final class IndexingQueue {
 		boolean doUpdateSearcher = false;
 		
 		// Post-processing
-		lock.lock();
+		writeLock.lock();
 		try {
 			if (task.is(IndexAction.UPDATE)) {
 				/*
@@ -185,7 +188,7 @@ public final class IndexingQueue {
 			task.set(TaskState.FINISHED);
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 		
 		// Save or delete index; this can be done without holding the lock
@@ -248,144 +251,142 @@ public final class IndexingQueue {
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		Util.checkThat(Util.equals(taskParentIndexDir, indexParentDir));
 
-		synchronized (indexRegistry) {
-			lock.lock();
-			try {
-				assert task.cancelAction == null;
-				assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
-				if (shutdown)
-					return Rejection.SHUTDOWN;
-				
-				List<LuceneIndex> indexesInRegistry = indexRegistry.getIndexes();
+		writeLock.lock();
+		try {
+			assert task.cancelAction == null;
+			assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
+			if (shutdown)
+				return Rejection.SHUTDOWN;
 
-				if (task.is(IndexAction.UPDATE)) {
-					/*
-					 * Reject update requests for indexes that are not (or no
-					 * longer) in the registry. Such requests may be caused by
-					 * obsolete folder watching events.
-					 */
-					if (!indexesInRegistry.contains(index))
-						return Rejection.INVALID_UPDATE;
-					
-					/*
-					 * Here, we reject a request to enqueue an update task if there
-					 * is already another task in the queue that has the same target
-					 * file or directory and is in ready state.
-					 * 
-					 * This is not a bullet-proof way to avoid unnecessary updates
-					 * while ensuring that any necessary updates are run: Going
-					 * through the queue, we could find a ready task with a matching
-					 * target, and reject the enqueue request based on that, but the
-					 * user could later cancel the ready task, thus skipping an
-					 * update that should have been run. However, the approach here
-					 * should work well enough, assuming that it is very unlikely
-					 * that the user will cancel ready tasks.
-					 */
-					for (Task queueTask : tasks)
-						if (queueTask.is(TaskState.READY)
-								&& sameTarget(queueTask, task))
-							return Rejection.REDUNDANT_UPDATE;
-				}
-				else if (index instanceof OutlookIndex) {
-					/*
-					 * Reject a request to create or rebuild an Outlook index if
-					 * it has the same PST file as another Outlook index in the
-					 * registry.
-					 */
-					for (LuceneIndex index0 : indexesInRegistry)
-						if (index0 instanceof OutlookIndex
-								&& sameTarget(index0, task))
-							return Rejection.SAME_IN_REGISTRY;
-					
-					/*
-					 * Reject a request to create or rebuild an Outlook index if
-					 * it has the same PST file as an Outlook index in the
-					 * queue. Exception: Rebuild tasks may replace existing
-					 * update tasks on the same PST file, causing the update
-					 * tasks to be cancelled.
-					 */
-					Iterator<Task> it = tasks.iterator();
-					while (it.hasNext()) {
-						Task queueTask = it.next();
-						assert queueTask != task;
-						if (!(queueTask.getLuceneIndex() instanceof OutlookIndex))
-							continue;
+			List<LuceneIndex> indexesInRegistry = indexRegistry.getIndexes();
 
-						if (task.is(IndexAction.REBUILD)
-								&& queueTask.is(IndexAction.UPDATE)) {
-							if (sameTarget(queueTask, task)) {
-								assert index == queueTask.getLuceneIndex();
-								if (queueTask.is(TaskState.INDEXING))
-									queueTask.cancelAction = CancelAction.KEEP;
-								it.remove();
-								evtRemoved.fire(queueTask);
-							}
-						}
-						else if (sameTarget(queueTask, task)) {
-							return Rejection.SAME_IN_QUEUE;
-						}
-					}
-				}
-				else {
-					/*
-					 * Reject a request to create or rebuild a file index if it
-					 * overlaps with a file index in the registry.
-					 */
-					assert index instanceof FileIndex;
-					for (LuceneIndex index0 : indexesInRegistry) {
-						if (index0 instanceof OutlookIndex)
-							continue;
-						File f1 = index0.getRootFile();
-						File f2 = task.getLuceneIndex().getRootFile();
-						if (Util.equals(f1, f2))
-							return Rejection.SAME_IN_REGISTRY;
-						if (isOverlapping(f1, f2))
-							return Rejection.OVERLAP_WITH_REGISTRY;
-					}
+			if (task.is(IndexAction.UPDATE)) {
+				/*
+				 * Reject update requests for indexes that are not (or no
+				 * longer) in the registry. Such requests may be caused by
+				 * obsolete folder watching events.
+				 */
+				if (!indexesInRegistry.contains(index))
+					return Rejection.INVALID_UPDATE;
 
-					/*
-					 * Reject a request to create or rebuild a file index if it
-					 * overlaps with a file index in the queue. Exception:
-					 * Rebuild tasks may replace existing update tasks on the
-					 * same index, causing the update tasks to be cancelled.
-					 */
-					Iterator<Task> it = tasks.iterator();
-					while (it.hasNext()) {
-						Task queueTask = it.next();
-						assert queueTask != task;
-						if (!(queueTask.getLuceneIndex() instanceof FileIndex))
-							continue;
-
-						File f1 = queueTask.getLuceneIndex().getRootFile();
-						File f2 = index.getRootFile();
-
-						if (isOverlapping(f1, f2))
-							return Rejection.OVERLAP_WITH_QUEUE;
-
-						if (task.is(IndexAction.REBUILD)
-								&& queueTask.is(IndexAction.UPDATE)) {
-							if (Util.equals(f1, f2)) {
-								if (queueTask.is(TaskState.INDEXING))
-									queueTask.cancelAction = CancelAction.KEEP;
-								it.remove();
-								evtRemoved.fire(queueTask);
-							}
-						}
-						else if (Util.equals(f1, f2)) {
-							return Rejection.SAME_IN_QUEUE;
-						}
-					}
-				}
-
-				tasks.add(task);
-				evtAdded.fire(task);
-				if (task.is(TaskState.READY))
-					readyTaskAvailable.signal();
-				return null;
+				/*
+				 * Here, we reject a request to enqueue an update task if there
+				 * is already another task in the queue that has the same target
+				 * file or directory and is in ready state.
+				 * 
+				 * This is not a bullet-proof way to avoid unnecessary updates
+				 * while ensuring that any necessary updates are run: Going
+				 * through the queue, we could find a ready task with a matching
+				 * target, and reject the enqueue request based on that, but the
+				 * user could later cancel the ready task, thus skipping an
+				 * update that should have been run. However, the approach here
+				 * should work well enough, assuming that it is very unlikely
+				 * that the user will cancel ready tasks.
+				 */
+				for (Task queueTask : tasks)
+					if (queueTask.is(TaskState.READY)
+							&& sameTarget(queueTask, task))
+						return Rejection.REDUNDANT_UPDATE;
 			}
-			finally {
-				lock.unlock();
+			else if (index instanceof OutlookIndex) {
+				/*
+				 * Reject a request to create or rebuild an Outlook index if
+				 * it has the same PST file as another Outlook index in the
+				 * registry.
+				 */
+				for (LuceneIndex index0 : indexesInRegistry)
+					if (index0 instanceof OutlookIndex
+							&& sameTarget(index0, task))
+						return Rejection.SAME_IN_REGISTRY;
+
+				/*
+				 * Reject a request to create or rebuild an Outlook index if
+				 * it has the same PST file as an Outlook index in the
+				 * queue. Exception: Rebuild tasks may replace existing
+				 * update tasks on the same PST file, causing the update
+				 * tasks to be cancelled.
+				 */
+				Iterator<Task> it = tasks.iterator();
+				while (it.hasNext()) {
+					Task queueTask = it.next();
+					assert queueTask != task;
+					if (!(queueTask.getLuceneIndex() instanceof OutlookIndex))
+						continue;
+
+					if (task.is(IndexAction.REBUILD)
+							&& queueTask.is(IndexAction.UPDATE)) {
+						if (sameTarget(queueTask, task)) {
+							assert index == queueTask.getLuceneIndex();
+							if (queueTask.is(TaskState.INDEXING))
+								queueTask.cancelAction = CancelAction.KEEP;
+							it.remove();
+							evtRemoved.fire(queueTask);
+						}
+					}
+					else if (sameTarget(queueTask, task)) {
+						return Rejection.SAME_IN_QUEUE;
+					}
+				}
 			}
+			else {
+				/*
+				 * Reject a request to create or rebuild a file index if it
+				 * overlaps with a file index in the registry.
+				 */
+				assert index instanceof FileIndex;
+				for (LuceneIndex index0 : indexesInRegistry) {
+					if (index0 instanceof OutlookIndex)
+						continue;
+					File f1 = index0.getRootFile();
+					File f2 = task.getLuceneIndex().getRootFile();
+					if (Util.equals(f1, f2))
+						return Rejection.SAME_IN_REGISTRY;
+					if (isOverlapping(f1, f2))
+						return Rejection.OVERLAP_WITH_REGISTRY;
+				}
+
+				/*
+				 * Reject a request to create or rebuild a file index if it
+				 * overlaps with a file index in the queue. Exception:
+				 * Rebuild tasks may replace existing update tasks on the
+				 * same index, causing the update tasks to be cancelled.
+				 */
+				Iterator<Task> it = tasks.iterator();
+				while (it.hasNext()) {
+					Task queueTask = it.next();
+					assert queueTask != task;
+					if (!(queueTask.getLuceneIndex() instanceof FileIndex))
+						continue;
+
+					File f1 = queueTask.getLuceneIndex().getRootFile();
+					File f2 = index.getRootFile();
+
+					if (isOverlapping(f1, f2))
+						return Rejection.OVERLAP_WITH_QUEUE;
+
+					if (task.is(IndexAction.REBUILD)
+							&& queueTask.is(IndexAction.UPDATE)) {
+						if (Util.equals(f1, f2)) {
+							if (queueTask.is(TaskState.INDEXING))
+								queueTask.cancelAction = CancelAction.KEEP;
+							it.remove();
+							evtRemoved.fire(queueTask);
+						}
+					}
+					else if (Util.equals(f1, f2)) {
+						return Rejection.SAME_IN_QUEUE;
+					}
+				}
+			}
+
+			tasks.add(task);
+			evtAdded.fire(task);
+			if (task.is(TaskState.READY))
+				readyTaskAvailable.signal();
+			return null;
+		}
+		finally {
+			writeLock.unlock();
 		}
 	}
 
@@ -415,7 +416,7 @@ public final class IndexingQueue {
 							@NotNull Event.Listener<Task> addedListener,
 							@NotNull Event.Listener<Task> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
-		lock.lock();
+		writeLock.lock();
 		try {
 			Iterator<Task> it = tasks.iterator();
 			while (it.hasNext()) {
@@ -435,7 +436,7 @@ public final class IndexingQueue {
 			evtRemoved.remove(removedListener);
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 	}
 
@@ -447,27 +448,27 @@ public final class IndexingQueue {
 								@NotNull Event.Listener<Task> addedListener,
 								@NotNull Event.Listener<Task> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
-		lock.lock();
+		writeLock.lock();
 		try {
 			handler.handleExistingTasks(ImmutableList.copyOf(tasks));
 			evtAdded.add(addedListener);
 			evtRemoved.add(removedListener);
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 	}
 
 	public void removeListeners(@NotNull Event.Listener<Task> addedListener,
 								@NotNull Event.Listener<Task> removedListener) {
 		Util.checkNotNull(addedListener);
-		lock.lock();
+		writeLock.lock();
 		try {
 			evtAdded.remove(addedListener);
 			evtRemoved.remove(removedListener);
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 	}
 
@@ -514,7 +515,7 @@ public final class IndexingQueue {
 		if (deletions.isEmpty())
 			return;
 		
-		lock.lock();
+		writeLock.lock();
 		try {
 			for (PendingDeletion deletion : deletions) {
 				Iterator<Task> it = tasks.iterator();
@@ -543,7 +544,7 @@ public final class IndexingQueue {
 			}
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 	}
 
@@ -556,7 +557,7 @@ public final class IndexingQueue {
 	 */
 	@ThreadSafe
 	public boolean shutdown(@NotNull final CancelHandler handler) {
-		lock.lock();
+		writeLock.lock();
 		try {
 			if (shutdown)
 				throw new UnsupportedOperationException();
@@ -589,7 +590,7 @@ public final class IndexingQueue {
 			shutdown = true;
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 
 		// Wake up and terminate worker thread if it was waiting

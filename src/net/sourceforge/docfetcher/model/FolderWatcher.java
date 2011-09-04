@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import net.contentobjects.jnotify.JNotify;
 import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.DelayedExecutor;
@@ -50,9 +48,9 @@ public final class FolderWatcher {
 	
 	// Should only be accessed from the worker thread
 	private final Map<LuceneIndex, Integer> watchIdMap = Maps.newHashMap();
-	
-	private final Lock lock = new ReentrantLock(true);
-	private final Condition needsUpdate = lock.newCondition();
+
+	private final Lock writeLock;
+	private final Condition needsUpdate;
 	private final Thread thread;
 	private volatile boolean shutdown = false;
 	
@@ -63,6 +61,9 @@ public final class FolderWatcher {
 	
 	public FolderWatcher(@NotNull IndexRegistry indexRegistry) {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
+		
+		writeLock = indexRegistry.getWriteLock();
+		needsUpdate = writeLock.newCondition();
 		
 		initListeners();
 		
@@ -93,7 +94,7 @@ public final class FolderWatcher {
 		
 		addedListener = new Event.Listener<LuceneIndex>() {
 			public void update(LuceneIndex index) {
-				lock.lock();
+				writeLock.lock();
 				try {
 					if (index.isWatchFolders()) {
 						watchQueue.put(index, true);
@@ -101,13 +102,13 @@ public final class FolderWatcher {
 					}
 				}
 				finally {
-					lock.unlock();
+					writeLock.unlock();
 				}
 			}
 		};
 		removedListener = new Event.Listener<List<LuceneIndex>>() {
 			public void update(List<LuceneIndex> indexes) {
-				lock.lock();
+				writeLock.lock();
 				try {
 					boolean shouldSignal = false;
 					for (LuceneIndex index : indexes) {
@@ -120,7 +121,7 @@ public final class FolderWatcher {
 						needsUpdate.signal();
 				}
 				finally {
-					lock.unlock();
+					writeLock.unlock();
 				}
 			}
 		};
@@ -140,13 +141,13 @@ public final class FolderWatcher {
 		// React to changes to the indexes' watch flags
 		watchChangedListener = new Event.Listener<LuceneIndex>() {
 			public void update(LuceneIndex index) {
-				lock.lock();
+				writeLock.lock();
 				try {
 					watchQueue.put(index, index.isWatchFolders());
 					needsUpdate.signal();
 				}
 				finally {
-					lock.unlock();
+					writeLock.unlock();
 				}
 			}
 		};
@@ -155,7 +156,7 @@ public final class FolderWatcher {
 
 	private void threadLoop() throws InterruptedException {
 		Map<LuceneIndex, Boolean> watchQueueCopy;
-		lock.lock();
+		writeLock.lock();
 		try {
 			while (watchQueue.isEmpty() && !shutdown)
 				needsUpdate.await();
@@ -163,7 +164,7 @@ public final class FolderWatcher {
 			watchQueue.clear();
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 		
 		/*
@@ -258,7 +259,7 @@ public final class FolderWatcher {
 	}
 	
 	public void shutdown() {
-		lock.lock();
+		writeLock.lock();
 		try {
 			if (shutdown)
 				return;
@@ -267,7 +268,7 @@ public final class FolderWatcher {
 			needsUpdate.signal(); // Might need to wake up the worker thread
 		}
 		finally {
-			lock.unlock();
+			writeLock.unlock();
 		}
 	}
 	

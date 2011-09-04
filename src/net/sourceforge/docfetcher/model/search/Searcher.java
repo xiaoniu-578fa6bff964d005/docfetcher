@@ -21,9 +21,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
@@ -122,9 +119,8 @@ public final class Searcher {
 	@NotNull private List<LuceneIndex> indexes; // guarded by read-write lock
 	@Nullable private volatile IOException ioException;
 	
-	private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
-	private final Lock readLock = lock.readLock();
-	private final Lock writeLock = lock.writeLock();
+	private final Lock readLock;
+	private final Lock writeLock;
 	
 	/**
 	 * This method should not be called by clients. Use
@@ -139,6 +135,9 @@ public final class Searcher {
 		this.indexRegistry = indexRegistry;
 		this.fileFactory = fileFactory;
 		this.outlookMailFactory = outlookMailFactory;
+		
+		readLock = indexRegistry.getReadLock();
+		writeLock = indexRegistry.getWriteLock();
 		
 		addedListener = new Event.Listener<LuceneIndex>() {
 			public void update(LuceneIndex eventData) {
