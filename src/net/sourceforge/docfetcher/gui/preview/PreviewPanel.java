@@ -16,6 +16,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.model.parse.ParseException;
@@ -33,27 +34,34 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * @author Tran Nam Quang
  */
 public final class PreviewPanel extends Composite {
 	
+	/*
+	 * Mixing custom locking with SWT code has been found to be very dead-lock
+	 * prone, so this class relies exclusively on SWT's synchronization
+	 * facilities for thread-safety.
+	 */
+	
 	private final TextPreview textPreview;
 	@Nullable private EmailPreview emailPreview;
 	@Nullable private HtmlPreview htmlPreview;
 	private final Composite stackComp;
 	private final StackLayout stackLayout;
+	private final DelayedOverlay delayedOverlay;
 	private final StyledText errorField;
 	private final Color lightRed;
 	
-	// These fields should only be accessed from the GUI thread
+	// These fields should only be accessed by the GUI thread
 	@Nullable private ResultDocument lastDoc;
 	@Nullable private MailResource lastMailResource;
 	@Nullable private FileResource lastHtmlResource;
 	
-	// Guarded by 'this' lock; used as a thread interrupt signal
+	// Thread interrupt signal
 	private long requestCount = 0;
 	
 	public PreviewPanel(@NotNull Composite parent) {
@@ -67,10 +75,14 @@ public final class PreviewPanel extends Composite {
 		textPreview = new TextPreview(stackComp);
 		stackLayout.topControl = textPreview;
 		
+		delayedOverlay = new DelayedOverlay(stackComp);
+		delayedOverlay.setDelay(500);
+		delayedOverlay.setMessage("Loading..."); // TODO i18n
+		
 		errorField = new StyledText(this, SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
 		errorField.setMargins(5, 5, 5, 5);
 		errorField.setBackground(lightRed = new Color(getDisplay(), new RGB(0f, 0.5f, 1)));
-		errorField.getCaret().setVisible(false);
+		errorField.setCaret(null);
 		
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gridData.exclude = true;
@@ -85,19 +97,19 @@ public final class PreviewPanel extends Composite {
 	}
 	
 	@ThreadSafe
-	public synchronized void setPreview(@NotNull ResultDocument doc) {
+	public void setPreview(@NotNull ResultDocument doc) {
 		Util.checkNotNull(doc);
-		Util.checkThat(Display.getCurrent() != null);
-		
+		Util.assertSwtThread();
+
 		// TODO show 'loading' message where appropriate (-> maybe as a separate composite)
-		
+
 		if (lastDoc == doc)
 			return;
 		lastDoc = doc;
 		disposeLastResources();
 		requestCount++;
 		setError(null, requestCount);
-		
+
 		if (doc.isEmail()) {
 			clearPreviews(true, false, true);
 			new EmailThread(doc, requestCount).start();
@@ -139,12 +151,12 @@ public final class PreviewPanel extends Composite {
 	}
 	
 	@ThreadSafe
-	private synchronized void setError(	@Nullable final String message,
-										long requestCount) {
-		if (requestCount != this.requestCount)
-			return;
-		Util.runSWTSafe(this, new Runnable() {
+	private void setError(	@Nullable final String message,
+							final long requestCount) {
+		Util.runSWTSafe(errorField, new Runnable() {
 			public void run() {
+				if (requestCount != PreviewPanel.this.requestCount)
+					return;
 				errorField.setText(message == null ? "" : message);
 				((GridData) errorField.getLayoutData()).exclude = message == null;
 				layout();
@@ -163,9 +175,9 @@ public final class PreviewPanel extends Composite {
 	// Returns true on success
 	@ThreadSafe
 	private boolean setTextSafely(	@NotNull final HighlightedString string,
-									long requestCount,
+									final long requestCount,
 									final boolean append) {
-		return runSafely(requestCount, new Runnable() {
+		return runSafely(requestCount, textPreview, new Runnable() {
 			public void run() {
 				if (append)
 					textPreview.appendText(string);
@@ -178,37 +190,40 @@ public final class PreviewPanel extends Composite {
 	
 	// Returns true on success
 	@ThreadSafe
-	private synchronized boolean runSafely(	long requestCount,
-	                                       	@NotNull Runnable runnable) {
-		if (requestCount != this.requestCount)
-			return false;
-		Util.runSyncExec(this, runnable);
-		return true;
+	private boolean runSafely(	final long requestCount,
+								@NotNull Widget widget,
+								@NotNull final Runnable runnable) {
+		final boolean[] success = { true };
+		Util.runSWTSafe(widget, new Runnable() {
+			public void run() {
+				if (requestCount != PreviewPanel.this.requestCount) {
+					success[0] = false;
+					return;
+				}
+				runnable.run();
+			}
+		});
+		return success[0];
 	}
 	
 	private class EmailThread extends PreviewThread {
 		public EmailThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		public void run() {
-			try {
-				// TODO catch OutOfMemoryErrors
-				final MailResource mailResource = doc.getMailResource();
-				boolean success = runSafely(startCount, new Runnable() {
-					public void run() {
-						if (emailPreview == null)
-							emailPreview = new EmailPreview(stackComp);
-						emailPreview.setEmail(mailResource);
-						moveToTop(emailPreview);
-						lastMailResource = mailResource; // Save a reference for disposal
-					}
-				});
-				if (!success)
-					mailResource.dispose();
-			}
-			catch (ParseException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
-			}
+		protected void doRun(Hider overlayHider) throws ParseException {
+			// TODO catch OutOfMemoryErrors
+			final MailResource mailResource = doc.getMailResource();
+			boolean success = runSafely(startCount, stackComp, new Runnable() {
+				public void run() {
+					if (emailPreview == null)
+						emailPreview = new EmailPreview(stackComp);
+					emailPreview.setEmail(mailResource);
+					moveToTop(emailPreview);
+					lastMailResource = mailResource; // Save a reference for disposal
+				}
+			});
+			if (!success)
+				mailResource.dispose();
 		}
 	}
 	
@@ -216,25 +231,20 @@ public final class PreviewPanel extends Composite {
 		public HtmlThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		public void run() {
-			try {
-				// TODO catch OutOfMemoryErrors
-				final FileResource htmlResource = doc.getFileResource();
-				boolean success = runSafely(startCount, new Runnable() {
-					public void run() {
-						if (htmlPreview == null)
-							htmlPreview = new HtmlPreview(stackComp);
-						htmlPreview.setFile(htmlResource.getFile());
-						moveToTop(htmlPreview);
-						lastHtmlResource = htmlResource; // Save a reference for disposal
-					}
-				});
-				if (!success)
-					htmlResource.dispose();
-			}
-			catch (ParseException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
-			}
+		protected void doRun(Hider overlayHider) throws ParseException {
+			// TODO catch OutOfMemoryErrors
+			final FileResource htmlResource = doc.getFileResource();
+			boolean success = runSafely(startCount, stackComp, new Runnable() {
+				public void run() {
+					if (htmlPreview == null)
+						htmlPreview = new HtmlPreview(stackComp);
+					htmlPreview.setFile(htmlResource.getFile());
+					moveToTop(htmlPreview);
+					lastHtmlResource = htmlResource; // Save a reference for disposal
+				}
+			});
+			if (!success)
+				htmlResource.dispose();
 		}
 	}
 	
@@ -242,23 +252,19 @@ public final class PreviewPanel extends Composite {
 		public PdfThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		public void run() {
-			try {
-				doc.readPdfPages(new PdfPageHandler() {
-					private boolean isStopped = false;
-					public void handlePage(HighlightedString pageText) {
-						if (! setTextSafely(pageText, startCount, true))
-							isStopped = true;
-					}
-					public boolean isStopped() {
-						return isStopped;
-					}
-				});
-				// TODO catch OutOfMemoryErrors
-			}
-			catch (ParseException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
-			}
+		protected void doRun(final Hider overlayHider) throws ParseException {
+			doc.readPdfPages(new PdfPageHandler() {
+				private boolean isStopped = false;
+				public void handlePage(HighlightedString pageText) {
+					if (!setTextSafely(pageText, startCount, true))
+						isStopped = true;
+					overlayHider.hide(); // Hide overlay after first page
+				}
+				public boolean isStopped() {
+					return isStopped;
+				}
+			});
+			// TODO catch OutOfMemoryErrors
 		}
 	}
 	
@@ -266,15 +272,10 @@ public final class PreviewPanel extends Composite {
 		public TextThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		public void run() {
-			try {
-				HighlightedString string = doc.getHighlightedText();
-				setTextSafely(string, startCount, false);
-				// TODO catch OutOfMemoryErrors
-			}
-			catch (ParseException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
-			}
+		protected void doRun(Hider overlayHider) throws ParseException {
+			HighlightedString string = doc.getHighlightedText();
+			setTextSafely(string, startCount, false);
+			// TODO catch OutOfMemoryErrors
 		}
 	}
 	
@@ -283,9 +284,26 @@ public final class PreviewPanel extends Composite {
 		protected final long startCount;
 
 		public PreviewThread(@NotNull ResultDocument doc, long startCount) {
+			super(PreviewThread.class.getName());
 			this.doc = Util.checkNotNull(doc);
 			this.startCount = startCount;
 		}
+		
+		public final void run() {
+			Hider hider = delayedOverlay.show();
+			try {
+				doRun(hider);
+			}
+			catch (ParseException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
+			}
+			finally {
+				hider.hide();
+			}
+		}
+		
+		protected abstract void doRun(@NotNull Hider overlayHider)
+				throws ParseException;
 	}
 	
 }

@@ -226,6 +226,21 @@ public final class Util {
 		}
 		shell.setLocation(shellPosX, shellPosY);
 	}
+	
+	/**
+	 * Packs the given shell and then centers it relative to the given control.
+	 */
+	public static void setCenteredBounds(	@NotNull Shell shell,
+											@NotNull Control control) {
+		shell.pack();
+		Point shellSize = shell.getSize();
+		Composite parent = control.getParent();
+		Rectangle bounds = control.getBounds();
+		bounds = control.getDisplay().map(parent, null, bounds);
+		int x = bounds.x + (bounds.width - shellSize.x) / 2;
+		int y = bounds.y + (bounds.height - shellSize.y)/ 2;
+		shell.setLocation(x, y);
+	}
 
 	/**
 	 * Centers the given shell relative to its parent shell and sets the shell's
@@ -646,6 +661,11 @@ public final class Util {
 			if (filename.endsWith("." + ext.toLowerCase()))
 				return true;
 		return false;
+	}
+	
+	public static void assertSwtThread() {
+		if (Display.getCurrent() == null)
+			throw new IllegalStateException();
 	}
 	
 	/**
