@@ -27,6 +27,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Control;
@@ -84,12 +86,12 @@ final class DelayedOverlay {
 		}
 	}
 	
-	@Nullable private Shell shell;
+	@Nullable private Shell shell; // should only be accessed from GUI thread
 	private final Control control;
 	private final Color bgColor;
 	private volatile long delay = 100;
 	private volatile String message = "";
-	private volatile long version = 0; // should only be modified in GUI thread
+	private long version = 0; // should only be accessed from GUI thread
 	
 	public DelayedOverlay(@NotNull final Control control) {
 		Util.checkNotNull(control);
@@ -131,7 +133,12 @@ final class DelayedOverlay {
 	@NotNull
 	@ThreadSafe
 	public Hider show() {
-		final long localVersion = version;
+		final long[] localVersion = { -1L };
+		Util.runSwtSafe(control, new Runnable() {
+			public void run() {
+				localVersion[0] = version;
+			}
+		});
 		new Thread(DelayedOverlay.class.getName()) {
 			public void run() {
 				try {
@@ -142,13 +149,13 @@ final class DelayedOverlay {
 				}
 				Util.runSyncExec(control, new Runnable() {
 					public void run() {
-						if (localVersion == version)
+						if (localVersion[0] == version)
 							doShow();
 					}
 				});
 			}
 		}.start();
-		return new Hider(localVersion);
+		return new Hider(localVersion[0]);
 	}
 	
 	@NotThreadSafe
@@ -165,16 +172,23 @@ final class DelayedOverlay {
 		final int hMargin = 20;
 		StyledText st = new StyledText(shell, SWT.WRAP | SWT.READ_ONLY);
 		st.setText(message);
-		st.setCaret(null);
 		st.setMargins(hMargin, vMargin, hMargin, vMargin);
 		st.setBackground(shell.getBackground());
 		st.setForeground(shell.getForeground());
+		st.setEnabled(false);
 		
 		Util.setCenteredBounds(shell, control);
 		
 		shell.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				shell = null;
+			}
+		});
+		
+		shell.addShellListener(new ShellAdapter() {
+			public void shellClosed(ShellEvent e) {
+				// Disallow closing shell via 'ESC'
+				e.doit = false;
 			}
 		});
 		
