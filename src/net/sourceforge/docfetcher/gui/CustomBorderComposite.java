@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.gui;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -22,7 +24,8 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @author Tran Nam Quang
  */
-class CustomBorderComposite extends Composite {
+@VisibleForPackageGroup
+public class CustomBorderComposite extends Composite {
 	
 	public CustomBorderComposite(@NotNull Composite parent) {
 		super(parent, Util.IS_WINDOWS ? SWT.NONE : SWT.BORDER);

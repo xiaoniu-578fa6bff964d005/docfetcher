@@ -285,6 +285,8 @@ public final class PreviewPanel extends Composite {
 
 		public PreviewThread(@NotNull ResultDocument doc, long startCount) {
 			super(PreviewThread.class.getName());
+			setPriority(MIN_PRIORITY);
+			
 			this.doc = Util.checkNotNull(doc);
 			this.startCount = startCount;
 		}

@@ -11,10 +11,12 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.gui.Col;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.Range;
@@ -22,8 +24,8 @@ import net.sourceforge.docfetcher.model.search.Range;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Tran Nam Quang
@@ -31,6 +33,8 @@ import org.eclipse.swt.widgets.Control;
 final class HighlightingText {
 	
 	@NotNull private StyledText textViewer;
+	private final List<int[]> rangesList = new ArrayList<int[]>();
+	private int occCount;
 	
 	public HighlightingText(@NotNull Composite parent) {
 		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
@@ -38,35 +42,97 @@ final class HighlightingText {
 	}
 	
 	@NotNull
-	public Control getControl() {
+	public StyledText getControl() {
 		return textViewer;
 	}
 	
 	public void clear() {
-		if (textViewer.isDisposed()) return;
 		textViewer.setText("");
+		rangesList.clear();
+		occCount = 0;
+	}
+	
+	public int getOccCount() {
+		return occCount;
 	}
 	
 	public void setText(@NotNull HighlightedString string) {
-		if (textViewer.isDisposed()) return;
+		rangesList.clear();
+		occCount = 0;
+		
 		textViewer.setText(string.getString());
-		if (string.isEmpty()) return;
+		if (string.isEmpty())
+			return;
+		
 		int[] rangeArray = getRangeArray(string, 0);
 		StyleRange[] styles = getStylesArray(string);
 		textViewer.setStyleRanges(rangeArray, styles);
+		
+		rangesList.add(rangeArray);
+		occCount = string.getRangeCount();
 	}
 	
 	public void appendText(@NotNull HighlightedString string) {
-		if (textViewer.isDisposed()) return;
-		if (string.isEmpty()) return;
+		if (string.isEmpty())
+			return;
+		
 		int offset = textViewer.getCharCount();
 		textViewer.append(string.getString());
-		int [] rangeArray = getRangeArray(string, offset);
+		
+		int[] rangeArray = getRangeArray(string, offset);
 		StyleRange[] styles = getStylesArray(string);
 		textViewer.setStyleRanges(offset, string.length(), rangeArray, styles);
+		
+		rangesList.add(rangeArray);
+		occCount += string.getRangeCount();
+	}
+	
+	@Nullable
+	public Integer goTo(boolean nextNotPrevious) {
+		Point sel = textViewer.getSelection();
+		int searchStart = nextNotPrevious ? sel.y : sel.x;
+		int tokenStart = -1;
+		int tokenEnd = -1;
+		int tokenIndex = 0;
+		
+		outer: {
+			if (nextNotPrevious) {
+				for (int[] ranges : rangesList) {
+					for (int i = 0; i < ranges.length - 1; i = i + 2) {
+						if (ranges[i] >= searchStart) {
+							tokenStart = ranges[i];
+							tokenEnd = tokenStart + ranges[i + 1];
+							break outer;
+						}
+						tokenIndex++;
+					}
+				}
+			}
+			else {
+				for (int[] ranges : rangesList) {
+					for (int i = 0; i < ranges.length - 1; i = i + 2) {
+						if (ranges[i] + ranges[i + 1] <= searchStart) {
+							tokenStart = ranges[i];
+							tokenEnd = ranges[i] + ranges[i + 1];
+						}
+						else
+							break outer;
+						tokenIndex++;
+					}
+				}
+			}
+		}
+		
+		if (tokenStart == -1)
+			return null;
+		
+		textViewer.setSelection(tokenStart, tokenEnd);
+		scrollToMiddle((tokenStart + tokenEnd) / 2);
+		return tokenIndex + 1;
 	}
 
-	private int[] getRangeArray(HighlightedString string,
+	@NotNull
+	private static int[] getRangeArray(@NotNull HighlightedString string,
 								int offset) {
 		List<Range> ranges = string.getRanges();
 		int[] rangeArray = new int[ranges.size() * 2];
@@ -77,11 +143,39 @@ final class HighlightingText {
 		return rangeArray;
 	}
 	
-	private StyleRange[] getStylesArray(HighlightedString string) {
+	@NotNull
+	private static StyleRange[] getStylesArray(@NotNull HighlightedString string) {
 		StyleRange style = new StyleRange(0, 0, null, Col.YELLOW.get());
 		StyleRange[] styles = new StyleRange[string.getRangeCount()];
 		Arrays.fill(styles, style);
 		return styles;
+	}
+	
+	/**
+	 * Vertically divides the text viewer into three segments of equal height
+	 * and scrolls the given caret offset into view so that it is always
+	 * displayed in the middle segment (either at the top or at bottom of it or
+	 * somewhere in between).
+	 */
+	private void scrollToMiddle(int caretOffset) {
+		try {
+			int lineIndexNow = textViewer.getLineAtOffset(caretOffset);
+			int lineIndexTop = textViewer.getTopIndex();
+			int lineIndexBottom = textViewer.getLineIndex(textViewer.getClientArea().height);
+			double dist = lineIndexBottom - lineIndexTop;
+			int dist13 = (int) (dist / 3);
+			int dist23 = (int) (2 * dist / 3);
+			double lineIndexMiddleTop = lineIndexTop + dist / 3;
+			double lineIndexMiddleBottom = lineIndexBottom - dist / 3;
+			if (lineIndexNow < lineIndexMiddleTop)
+				textViewer.setTopIndex(lineIndexNow - dist13);
+			else if (lineIndexNow > lineIndexMiddleBottom)
+				textViewer.setTopIndex(lineIndexNow - dist23);
+		}
+		catch (Exception e) {
+			// textViewer.getLineAtOffset(..) can throw an IllegalArgumentException
+			// See bug #2778204
+		}
 	}
 
 }
