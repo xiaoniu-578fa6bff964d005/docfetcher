@@ -167,7 +167,12 @@ public final class Main {
 		SettingsConf.ShellBounds.MainWindow.bind(shell);
 		SettingsConf.Bool.MainShellMaximized.bindMaximized(shell);
 		shell.setLayout(new FormLayout());
-		shell.setText(ProgramConf.Str.AppName.get());
+		
+		// Set shell title
+		if (SystemConf.Bool.IsDevelopmentVersion.get())
+			shell.setText(SystemConf.Str.ProgramName.get());
+		else
+			shell.setText(ProgramConf.Str.AppName.get());
 
 		ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
 			protected Control createFirstControl(Composite parent) {
