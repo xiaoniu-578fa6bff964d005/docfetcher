@@ -106,6 +106,7 @@ public final class FolderWatcher {
 				}
 			}
 		};
+		
 		removedListener = new Event.Listener<List<LuceneIndex>>() {
 			public void update(List<LuceneIndex> indexes) {
 				writeLock.lock();
@@ -125,18 +126,24 @@ public final class FolderWatcher {
 				}
 			}
 		};
-		indexRegistry.addListeners(new ExistingIndexesHandler() {
-			public void handleExistingIndexes(List<LuceneIndex> indexes) {
-				/*
-				 * Neither locking nor signalling are needed here because the
-				 * worker thread hasn't been started yet.
-				 */
-				assert thread == null;
-				for (LuceneIndex index : indexes)
-					if (index.isWatchFolders())
-						watchQueue.put(index, true);
-			}
-		}, addedListener, removedListener);
+
+		/*
+		 * This lock could be moved into the indexes handler, but we'll put it
+		 * here to avoid releasing and reacquiring it.
+		 */
+		writeLock.lock();
+		try {
+			indexRegistry.addListeners(new ExistingIndexesHandler() {
+				public void handleExistingIndexes(List<LuceneIndex> indexes) {
+					for (LuceneIndex index : indexes)
+						if (index.isWatchFolders())
+							watchQueue.put(index, true);
+				}
+			}, addedListener, removedListener);
+		}
+		finally {
+			writeLock.unlock();
+		}
 		
 		// React to changes to the indexes' watch flags
 		watchChangedListener = new Event.Listener<LuceneIndex>() {

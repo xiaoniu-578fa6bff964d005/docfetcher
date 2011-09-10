@@ -145,16 +145,26 @@ public final class Searcher {
 			}
 		};
 		
-		indexRegistry.addListeners(new ExistingIndexesHandler() {
-			public void handleExistingIndexes(List<LuceneIndex> indexes) {
-				try {
-					setLuceneSearcher(indexes);
+		/*
+		 * This lock could be moved into the indexes handler, but we'll put it
+		 * here to avoid releasing and reacquiring it.
+		 */
+		writeLock.lock();
+		try {
+			indexRegistry.addListeners(new ExistingIndexesHandler() {
+				public void handleExistingIndexes(List<LuceneIndex> indexes) {
+					try {
+						setLuceneSearcher(indexes);
+					}
+					catch (IOException e) {
+						ioException = e;
+					}
 				}
-				catch (IOException e) {
-					ioException = e;
-				}
-			}
-		}, addedListener, null);
+			}, addedListener, null);
+		}
+		finally {
+			writeLock.unlock();
+		}
 		
 		if (ioException != null)
 			throw ioException;

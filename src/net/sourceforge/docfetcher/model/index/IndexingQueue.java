@@ -12,13 +12,14 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+
 import net.sourceforge.docfetcher.base.Event;
+import net.sourceforge.docfetcher.base.LazyList;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
@@ -66,7 +67,7 @@ public final class IndexingQueue {
 	private volatile boolean shutdown = false;
 	final Lock readLock;
 	final Lock writeLock;
-	final Condition readyTaskAvailable;
+	private final Condition readyTaskAvailable;
 	final int reporterCapacity;
 
 	public IndexingQueue(	@NotNull final IndexRegistry indexRegistry,
@@ -91,9 +92,15 @@ public final class IndexingQueue {
 				if (!task.is(TaskState.NOT_READY) && !task.is(TaskState.READY))
 					return;
 				LuceneIndex luceneIndex = task.getLuceneIndex();
-				assert !indexRegistry.getIndexes().contains(luceneIndex);
-				indexRegistry.addIndex(luceneIndex);
-				indexRegistry.save(luceneIndex);
+				writeLock.lock();
+				try {
+					assert !indexRegistry.getIndexes().contains(luceneIndex);
+					indexRegistry.addIndex(luceneIndex);
+					indexRegistry.save(luceneIndex);
+				}
+				finally {
+					writeLock.unlock();
+				}
 			}
 		});
 		
@@ -147,8 +154,7 @@ public final class IndexingQueue {
 		boolean success = task.update(); // Long-running process
 
 		boolean doDelete = false;
-		boolean doSave = false;
-		boolean doUpdateSearcher = false;
+		boolean fireRemoved = false;
 		
 		// Post-processing
 		writeLock.lock();
@@ -162,28 +168,28 @@ public final class IndexingQueue {
 				 */
 				assert !task.is(CancelAction.DISCARD);
 				if (task.getDeletion() == null) {
-					doSave = true;
-					doUpdateSearcher = true;
+					indexRegistry.save(luceneIndex);
+					indexRegistry.getSearcher().replaceLuceneSearcher();
 				}
 				else {
 					doDelete = true;
 				}
-				remove(task);
+				fireRemoved = tasks.remove(task);
 			}
 			else if (!success) {
 				doDelete = true;
 			}
 			else if (task.is(CancelAction.DISCARD)) {
 				doDelete = true;
-				remove(task);
+				fireRemoved = tasks.remove(task);
 			}
 			else {
-				doSave = true;
 				indexRegistry.addIndex(luceneIndex);
+				indexRegistry.save(luceneIndex);
 				boolean keep = task.is(CancelAction.KEEP);
 				boolean noErrors = true; // TODO
 				if (keep || noErrors || shutdown)
-					remove(task);
+					fireRemoved = tasks.remove(task);
 			}
 			task.set(TaskState.FINISHED);
 		}
@@ -191,11 +197,11 @@ public final class IndexingQueue {
 			writeLock.unlock();
 		}
 		
-		// Save or delete index; this can be done without holding the lock
-		if (doSave) {
-			indexRegistry.save(luceneIndex);
-		}
-		else if (doDelete) {
+		if (fireRemoved)
+			evtRemoved.fire(task);
+		
+		// Delete index; this can be done without holding the lock
+		if (doDelete) {
 			/*
 			 * Note: This is a typical check-then-act situation that would
 			 * normally require holding the lock. However, in this case the lock
@@ -213,10 +219,6 @@ public final class IndexingQueue {
 				deletion.setApprovedByQueue();
 			}
 		}
-		
-		// If the task was an update, refresh the Lucene searcher
-		if (doUpdateSearcher)
-			indexRegistry.getSearcher().replaceLuceneSearcher();
 	}
 
 	@NotThreadSafe
@@ -250,6 +252,8 @@ public final class IndexingQueue {
 		File taskParentIndexDir = Util.getParentFile(taskIndexDir);
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		Util.checkThat(Util.equals(taskParentIndexDir, indexParentDir));
+		
+		LazyList<Task> removedTasks = new LazyList<Task>();
 
 		writeLock.lock();
 		try {
@@ -320,7 +324,7 @@ public final class IndexingQueue {
 							if (queueTask.is(TaskState.INDEXING))
 								queueTask.cancelAction = CancelAction.KEEP;
 							it.remove();
-							evtRemoved.fire(queueTask);
+							removedTasks.add(queueTask);
 						}
 					}
 					else if (sameTarget(queueTask, task)) {
@@ -370,7 +374,7 @@ public final class IndexingQueue {
 							if (queueTask.is(TaskState.INDEXING))
 								queueTask.cancelAction = CancelAction.KEEP;
 							it.remove();
-							evtRemoved.fire(queueTask);
+							removedTasks.add(queueTask);
 						}
 					}
 					else if (Util.equals(f1, f2)) {
@@ -380,14 +384,18 @@ public final class IndexingQueue {
 			}
 
 			tasks.add(task);
-			evtAdded.fire(task);
 			if (task.is(TaskState.READY))
 				readyTaskAvailable.signal();
-			return null;
 		}
 		finally {
 			writeLock.unlock();
 		}
+		
+		evtAdded.fire(task);
+		for (Task removedTask : removedTasks)
+			evtRemoved.fire(removedTask);
+		
+		return null;
 	}
 
 	@NotThreadSafe
@@ -411,52 +419,81 @@ public final class IndexingQueue {
 	}
 
 	// see Task.remove(CancelHandler)
+	// The listeners are not detached if the cancel handler returns null on the active task
+	// Warning: Cancel handler is called under lock, so caller must take possible
+	// lock-ordering deadlocks into account.
 	@ThreadSafe
 	public void removeAll(	@NotNull CancelHandler handler,
 							@NotNull Event.Listener<Task> addedListener,
 							@NotNull Event.Listener<Task> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
+		LazyList<Task> removedTasks = new LazyList<Task>();
+		
 		writeLock.lock();
 		try {
-			Iterator<Task> it = tasks.iterator();
-			while (it.hasNext()) {
-				Task task = it.next();
-				if (task.is(TaskState.INDEXING)) {
-					if (task.is(IndexAction.UPDATE))
-						task.cancelAction = CancelAction.KEEP;
-					else
-						task.cancelAction = handler.cancel(); // May return null
-				}
-				it.remove();
-				evtRemoved.fire(task);
-			}
-
-			// Must be done *after* firing the removed events
+			if (!removeAll(handler, removedTasks))
+				return;
 			evtAdded.remove(addedListener);
 			evtRemoved.remove(removedListener);
 		}
 		finally {
 			writeLock.unlock();
 		}
+		
+		/*
+		 * We can't call evtRemoved.fire(task) here since the removed listener
+		 * is not attached to evtRemoved anymore.
+		 */
+		for (Task task : removedTasks)
+			removedListener.update(task);
+	}
+	
+	// returns 'proceed', fills the given list with removed tasks
+	@NotThreadSafe
+	private boolean removeAll(	@NotNull CancelHandler handler,
+								@NotNull LazyList<Task> removedTasks) {
+		/*
+		 * Cancel active task if there is one. Note that if the cancel
+		 * handler returns null, no tasks are removed.
+		 */
+		for (Task task : tasks) {
+			if (!task.is(TaskState.INDEXING))
+				continue;
+			if (task.is(IndexAction.UPDATE)) {
+				task.cancelAction = CancelAction.KEEP;
+			}
+			else {
+				task.cancelAction = handler.cancel();
+				if (task.cancelAction == null)
+					return false;
+			}
+		}
+
+		// Remove all tasks (including active task)
+		removedTasks.addAll(tasks);
+		tasks.clear();
+		return true;
 	}
 
-	// Event listeners are notified under lock and possibly from a non-GUI
-	// thread
+	// Event listeners are notified without lock and possibly from a non-GUI
+	// thread. Handler is called without lock and in the same thread as the caller of this method.
 	// The list of tasks given to the handler is an immutable copy
 	@ThreadSafe
 	public void addListeners(	@NotNull ExistingTasksHandler handler,
 								@NotNull Event.Listener<Task> addedListener,
 								@NotNull Event.Listener<Task> removedListener) {
 		Util.checkNotNull(handler, addedListener, removedListener);
+		ImmutableList<Task> tasksCopy;
 		writeLock.lock();
 		try {
-			handler.handleExistingTasks(ImmutableList.copyOf(tasks));
+			tasksCopy = ImmutableList.copyOf(tasks);
 			evtAdded.add(addedListener);
 			evtRemoved.add(removedListener);
 		}
 		finally {
 			writeLock.unlock();
 		}
+		handler.handleExistingTasks(tasksCopy);
 	}
 
 	public void removeListeners(@NotNull Event.Listener<Task> addedListener,
@@ -471,35 +508,66 @@ public final class IndexingQueue {
 			writeLock.unlock();
 		}
 	}
-
-	@NotThreadSafe
-	void remove(@NotNull Task task) {
-		Util.checkNotNull(task);
-		if (tasks.remove(task))
+	
+	@ThreadSafe
+	void remove(@NotNull Task task, @NotNull CancelHandler handler) {
+		Util.checkNotNull(task, handler);
+		boolean fireRemoved = false;
+		
+		writeLock.lock();
+		try {
+			if (task.is(TaskState.INDEXING)) {
+				if (task.is(IndexAction.UPDATE)) {
+					task.cancelAction = CancelAction.KEEP;
+				}
+				else {
+					task.cancelAction = handler.cancel(); // May return null
+					if (task.cancelAction == null)
+						return;
+				}
+			}
+			fireRemoved = tasks.remove(task);
+		}
+		finally {
+			writeLock.unlock();
+		}
+		
+		if (fireRemoved)
 			evtRemoved.fire(task);
 	}
+	
+	@ThreadSafe
+	void setReady(@NotNull Task task) {
+		Util.checkNotNull(task);
+		LazyList<Task> removedTasks = new LazyList<Task>();
+		
+		writeLock.lock();
+		try {
+			Util.checkThat(task.cancelAction == null);
+			if (!task.is(TaskState.NOT_READY))
+				return;
+			task.set(TaskState.READY);
 
-	// Iterator supports removal of elements
-	@NotNull
-	@NotThreadSafe
-	Iterator<Task> iterator() {
-		final Iterator<Task> innerIterator = tasks.iterator();
-		return new Iterator<Task>() {
-			private Task lastElement;
-
-			public boolean hasNext() {
-				return innerIterator.hasNext();
+			// Remove redundant update tasks from the queue
+			Iterator<Task> it = tasks.iterator();
+			while (it.hasNext()) {
+				Task queueTask = it.next();
+				if (queueTask != task && queueTask.is(IndexAction.UPDATE)
+						&& queueTask.is(TaskState.READY)
+						&& IndexingQueue.sameTarget(queueTask, task)) {
+					it.remove();
+					removedTasks.add(queueTask);
+				}
 			}
 
-			public Task next() {
-				return lastElement = innerIterator.next();
-			}
-
-			public void remove() {
-				innerIterator.remove();
-				evtRemoved.fire(lastElement);
-			}
-		};
+			readyTaskAvailable.signal();
+		}
+		finally {
+			writeLock.unlock();
+		}
+		
+		for (Task removedTask : removedTasks)
+			evtRemoved.fire(removedTask);
 	}
 	
 	// should only be called with indexes that are currently in the registry
@@ -514,6 +582,8 @@ public final class IndexingQueue {
 		Util.checkNotNull(deletions);
 		if (deletions.isEmpty())
 			return;
+		
+		LazyList<Task> removedTasks = new LazyList<Task>();
 		
 		writeLock.lock();
 		try {
@@ -537,7 +607,7 @@ public final class IndexingQueue {
 					 * task addition request to fail due to directory overlaps.
 					 */
 					it.remove();
-					evtRemoved.fire(task);
+					removedTasks.add(task);
 				}
 				if (approveImmediately)
 					deletion.setApprovedByQueue();
@@ -546,52 +616,38 @@ public final class IndexingQueue {
 		finally {
 			writeLock.unlock();
 		}
+		
+		for (Task task : removedTasks)
+			evtRemoved.fire(task);
 	}
 
-	// TODO call shutdown
 	// returns 'proceed'; cancel handler is called if a creation or rebuild
 	// task is currently running
+	// Warning: Cancel handler is called under lock, so caller must take possible
+	// lock-ordering deadlocks into account.
 	/*
 	 * This method must not be called again after a previous call has set the
 	 * shutdown flag.
 	 */
 	@ThreadSafe
 	public boolean shutdown(@NotNull final CancelHandler handler) {
+		Util.checkNotNull(handler);
+		LazyList<Task> removedTasks = new LazyList<Task>();
+		
 		writeLock.lock();
 		try {
 			if (shutdown)
 				throw new UnsupportedOperationException();
-			
-			// Cancel active task if there is one
-			final boolean[] doShutdown = { true };
-			for (Task task : tasks) {
-				if (!task.is(TaskState.INDEXING))
-					continue;
-				task.remove(new CancelHandler() {
-					public CancelAction cancel() {
-						CancelAction action = handler.cancel();
-						if (action == null)
-							doShutdown[0] = false;
-						return action;
-					}
-				});
-				break; // There should be only one active task at any time
-			}
-
-			if (!doShutdown[0])
+			if (!removeAll(handler, removedTasks))
 				return false;
-
-			// Remove all tasks (including active task)
-			List<Task> tasksCopy = new ArrayList<Task>(tasks);
-			tasks.clear();
-			for (Task task : tasksCopy)
-				evtRemoved.fire(task);
-
 			shutdown = true;
 		}
 		finally {
 			writeLock.unlock();
 		}
+		
+		for (Task task : removedTasks)
+			evtRemoved.fire(task);
 
 		// Wake up and terminate worker thread if it was waiting
 		thread.interrupt();

@@ -176,22 +176,15 @@ public final class IndexingDialog implements Dialog {
 								break;
 							}
 						}
-					}
-				});
-				/*
-				 * If there are no more tabs, close the indexing dialog. Note
-				 * that detaching the listeners cannot be done in another
-				 * thread; trying to do so would cause a deadlock.
-				 */
-				if (tabFolder.getItemCount() == 0) {
-					indexRegistry.getQueue().removeListeners(
-						addedListener, this);
-					Util.runSwtSafe(shell, new Runnable() {
-						public void run() {
+						
+						// If there are no more tabs, close the indexing dialog
+						if (tabFolder.getItemCount() == 0) {
+							indexRegistry.getQueue().removeListeners(
+								addedListener, removedListener);
 							shell.dispose();
 						}
-					});
-				}
+					}
+				});
 			}
 		};
 		

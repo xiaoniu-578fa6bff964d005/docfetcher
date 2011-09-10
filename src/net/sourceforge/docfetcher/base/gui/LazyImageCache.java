@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.base.AppUtil;
+import net.sourceforge.docfetcher.base.LazyList;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -77,25 +78,18 @@ public final class LazyImageCache {
 	                                                                      	@NotNull Class<T> clazz,
 																			@NotNull String errorMessage) {
 		/*
-		 * Notes:
-		 * 
-		 * 1) We don't really need the shell argument here, but it will make
+		 * Note: We don't really need the shell argument here, but it will make
 		 * sure this method isn't called before any shells are created. This is
 		 * a requirement, as the showError method below depends on a shell to be
 		 * available.
-		 * 
-		 * 2) We'll initialize the following list as null because we're not
-		 * expecting any images to be missing.
 		 */
-		List<File> missingFiles = null;
+		LazyList<File> missingFiles = new LazyList<File>();
 		for (FilenameProvider provider : clazz.getEnumConstants()) {
 			File file = new File(imageDir, provider.getFilename());
-			if (file.isFile()) continue;
-			if (missingFiles == null)
-				missingFiles = new ArrayList<File> ();
-			missingFiles.add(file);
+			if (!file.isFile())
+				missingFiles.add(file);
 		}
-		if (missingFiles == null)
+		if (missingFiles.isEmpty())
 			return;
 		
 		// Display the first missing files

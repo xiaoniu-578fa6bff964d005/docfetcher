@@ -149,7 +149,7 @@ public final class IndexRegistry {
 	@ThreadSafe
 	public Searcher getSearcher() {
 		/*
-		 * This method must not be synchronized, otherwise we'll get a livelock
+		 * This method must not be synchronized, otherwise we'll get a deadlock
 		 * when this method is called while the load method is running.
 		 */
 		return searcher.get();
@@ -185,11 +185,11 @@ public final class IndexRegistry {
 			if (indexes.containsKey(index))
 				return;
 			indexes.put(index, lastModified);
-			evtAdded.fire(index);
 		}
 		finally {
 			writeLock.unlock();
 		}
+		evtAdded.fire(index);
 	}
 	
 	@ThreadSafe
@@ -216,7 +216,10 @@ public final class IndexRegistry {
 				removed.add(index);
 			}
 
-			evtRemoved.fire(removed);
+			/*
+			 * This is done with the lock held to avoid releasing and
+			 * reacquiring it.
+			 */
 			if (deletions != null) {
 				queue.approveDeletions(deletions);
 				searcher.get().approveDeletions(deletions);
@@ -225,26 +228,26 @@ public final class IndexRegistry {
 		finally {
 			writeLock.unlock();
 		}
+		
+		evtRemoved.fire(removed);
 	}
 
-	// Allows attaching a change listener and processing the existing indexes in
-	// one atomic operation.
-	// Note: The IndexRegistry is locked when the event handlers are notified,
-	// so that the IndexRegistry cannot change during the execution of the event handler
+	// Allows attaching change listeners and processing the existing indexes in
+	// one atomic operation, i.e. the indexes handler only receives the indexes
+	// that will existed when this method is called.
+	// Indexes handler and listeners are notified *without* holding the lock.
 	// Events may arrive from non-GUI threads; indexes handler runs in the same
 	// thread as the client
 	// The list of indexes given to the handler is an immutable copy
 	@ThreadSafe
-	public void addListeners(	@Nullable ExistingIndexesHandler handler,
+	public void addListeners(	@NotNull ExistingIndexesHandler handler,
 								@Nullable Event.Listener<LuceneIndex> addedListener,
 								@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
-		if (handler == null && addedListener == null && removedListener == null)
-			return;
-		
+		Util.checkNotNull(handler);
+		List<LuceneIndex> indexesCopy;
 		writeLock.lock();
 		try {
-			if (handler != null)
-				handler.handleExistingIndexes(getIndexes());
+			indexesCopy = ImmutableList.copyOf(indexes.keySet());
 			if (addedListener != null)
 				evtAdded.add(addedListener);
 			if (removedListener != null)
@@ -253,6 +256,7 @@ public final class IndexRegistry {
 		finally {
 			writeLock.unlock();
 		}
+		handler.handleExistingIndexes(indexesCopy);
 	}
 	
 	@ThreadSafe

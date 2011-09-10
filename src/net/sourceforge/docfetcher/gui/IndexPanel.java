@@ -157,8 +157,9 @@ public final class IndexPanel {
 		});
 
 		indexRegistry.addListeners(new ExistingIndexesHandler() {
-			public void handleExistingIndexes(final List<LuceneIndex> indexes) {
-				viewer.setRoots(UtilGlobal.<ViewNode> convert(indexes));
+			public void handleExistingIndexes(List<LuceneIndex> indexes) {
+				for (LuceneIndex index : indexes)
+					viewer.addRoot(index);
 			}
 		}, new Event.Listener<LuceneIndex>() {
 			public void update(final LuceneIndex eventData) {

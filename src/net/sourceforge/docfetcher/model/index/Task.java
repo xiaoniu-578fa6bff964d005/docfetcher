@@ -11,8 +11,6 @@
 
 package net.sourceforge.docfetcher.model.index;
 
-import java.util.Iterator;
-
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -31,7 +29,8 @@ public final class Task {
 	public interface CancelHandler {
 		/**
 		 * Returns the type of cancelation. May be null to indicate that the
-		 * indexing should not be canceled.
+		 * indexing should not be canceled. Warning: This method is called under
+		 * lock.
 		 */
 		@Nullable
 		public CancelAction cancel();
@@ -74,49 +73,17 @@ public final class Task {
 	// of 'Update' tasks, the index is always kept. If in indexing state, only
 	// a cancel flag is set, but the task may be removed later.
 	// See IndexingQueue.removeAll(CancelHandler)
+	// Warning: Cancel handler is called under lock, so caller must take possible
+	// lock-ordering deadlocks into account.
 	@ThreadSafe
 	public void remove(@NotNull CancelHandler handler) {
-		Util.checkNotNull(handler);
-		queue.writeLock.lock();
-		try {
-			if (is(TaskState.INDEXING)) {
-				if (is(IndexAction.UPDATE))
-					cancelAction = CancelAction.KEEP;
-				else
-					cancelAction = handler.cancel(); // May return null
-			}
-			queue.remove(this);
-		}
-		finally {
-			queue.writeLock.unlock();
-		}
+		queue.remove(this, handler);
 	}
 
 	// for index updates, the ready-state is set automatically
 	@ThreadSafe
 	public void setReady() {
-		queue.writeLock.lock();
-		try {
-			Util.checkThat(cancelAction == null);
-			if (!is(TaskState.NOT_READY))
-				return;
-			set(TaskState.READY);
-
-			// Remove redundant update tasks from the queue
-			Iterator<Task> it = queue.iterator();
-			while (it.hasNext()) {
-				Task queueTask = it.next();
-				if (queueTask != this && queueTask.is(IndexAction.UPDATE)
-						&& queueTask.is(TaskState.READY)
-						&& IndexingQueue.sameTarget(queueTask, this))
-					it.remove();
-			}
-
-			queue.readyTaskAvailable.signal();
-		}
-		finally {
-			queue.writeLock.unlock();
-		}
+		queue.setReady(this);
 	}
 
 	boolean update() {
