@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import net.sourceforge.docfetcher.base.MergingBlockingQueue;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
@@ -158,8 +159,17 @@ public final class PreviewPanel extends Composite {
 				if (requestCount != PreviewPanel.this.requestCount)
 					return;
 				errorField.setText(message == null ? "" : message);
-				((GridData) errorField.getLayoutData()).exclude = message == null;
-				layout();
+				GridData gridData = (GridData) errorField.getLayoutData();
+				boolean wasExcluded = gridData.exclude;
+				gridData.exclude = message == null;
+				
+				/*
+				 * It is important to avoid calling layout() if not needed:
+				 * layout() will be extremely slow if there is a lot of text in
+				 * the text preview.
+				 */
+				if (wasExcluded != gridData.exclude)
+					layout();
 			}
 		});
 	}
@@ -249,21 +259,64 @@ public final class PreviewPanel extends Composite {
 	}
 	
 	private class PdfThread extends PreviewThread {
+		private volatile boolean isStopped = false;
+		
 		public PdfThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
 		protected void doRun(final Hider overlayHider) throws ParseException {
+			class Item {
+				@Nullable private final HighlightedString string;
+				private boolean isLastItem;
+				
+				public Item(@Nullable HighlightedString string,
+							boolean isLastItem) {
+					this.string = string;
+					this.isLastItem = isLastItem;
+				}
+			}
+			
+			final MergingBlockingQueue<Item> queue = new MergingBlockingQueue<Item>() {
+				protected Item merge(Item item1, Item item2) {
+					if (item2.string != null)
+						item1.string.add(item2.string);
+					item1.isLastItem = item1.isLastItem || item2.isLastItem;
+					return item1;
+				};
+			};
+			
+			final Thread updater = new Thread(PreviewPanel.class.getName() + " (PDF updater)") {
+				public void run() {
+					while (true) {
+						try {
+							Item item = queue.take();
+							if (item.string != null)
+								if (!setTextSafely(item.string, startCount, true))
+									isStopped = true;
+							overlayHider.hide(); // Hide overlay after first page
+							if (item.isLastItem)
+								return;
+							Thread.sleep(40);
+						}
+						catch (InterruptedException e) {
+							continue;
+						}
+					}
+				}
+			};
+			updater.start();
+			
 			doc.readPdfPages(new PdfPageHandler() {
-				private boolean isStopped = false;
 				public void handlePage(HighlightedString pageText) {
-					if (!setTextSafely(pageText, startCount, true))
-						isStopped = true;
-					overlayHider.hide(); // Hide overlay after first page
+					queue.put(new Item(pageText, false));
 				}
 				public boolean isStopped() {
 					return isStopped;
 				}
 			});
+			
+			queue.put(new Item(null, true));
+			
 			// TODO catch OutOfMemoryErrors
 		}
 	}

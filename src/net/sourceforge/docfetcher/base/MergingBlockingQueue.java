@@ -21,56 +21,43 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 /**
  * @author Tran Nam Quang
  */
-public final class BlockingWrapper<T> {
+public abstract class MergingBlockingQueue<T> {
 	
-	private final Lock lock = new ReentrantLock();
+	@Nullable private T item; // guarded by lock
+	private final Lock lock = new ReentrantLock(true);
 	private final Condition notNull = lock.newCondition();
 	
-	@Nullable private T object; // guarded by lock
-	
-	// Blocks until the wrapped object is not null
-	// May return null if the calling thread was interrupted
-	@Nullable
-	public T get() {
+	public void put(@NotNull T item) {
+		Util.checkNotNull(item);
 		lock.lock();
 		try {
-			while (object == null) {
-				try {
-					notNull.await();
-				}
-				catch (InterruptedException e) {
-					return null;
-				}
-			}
-			return object;
+			if (this.item == null)
+				this.item = item;
+			else
+				this.item = merge(this.item, item);
+			notNull.signal();
 		}
 		finally {
 			lock.unlock();
 		}
 	}
 	
-	public void set(@NotNull T object) {
-		Util.checkNotNull(object);
+	@NotNull
+	public T take() throws InterruptedException {
 		lock.lock();
 		try {
-			boolean wasNull = this.object == null;
-			this.object = object;
-			if (wasNull)
-				notNull.signal();
+			while (item == null)
+				notNull.await();
+			T ret = item;
+			item = null;
+			return ret;
 		}
 		finally {
 			lock.unlock();
 		}
 	}
 	
-	public boolean isNull() {
-		lock.lock();
-		try {
-			return object == null;
-		}
-		finally {
-			lock.unlock();
-		}
-	}
+	@NotNull
+	protected abstract T merge(@NotNull T item1, @NotNull T item2);
 
 }

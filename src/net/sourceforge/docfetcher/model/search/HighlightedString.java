@@ -23,7 +23,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
  */
 public final class HighlightedString {
 	
-	private final String string;
+	private String string;
 	private final List<Range> ranges;
 	
 	HighlightedString(@NotNull String string, @NotNull List<Range> ranges) {
@@ -53,6 +53,14 @@ public final class HighlightedString {
 	
 	public int getRangeCount() {
 		return ranges.size();
+	}
+	
+	public void add(@NotNull HighlightedString otherString) {
+		Util.checkNotNull(otherString);
+		int offset = string.length();
+		string = string + otherString.string;
+		for (Range range : otherString.ranges)
+			ranges.add(new Range(range.start + offset, range.length));
 	}
 
 }
