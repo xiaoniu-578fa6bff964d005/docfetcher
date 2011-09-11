@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.model.search;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,18 +24,23 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
  */
 public final class HighlightedString {
 	
-	private String string;
+	private final List<String> strings = new ArrayList<String>(1);
 	private final List<Range> ranges;
+	private int length;
 	
 	HighlightedString(@NotNull String string, @NotNull List<Range> ranges) {
 		Util.checkNotNull(string, ranges);
-		this.string = string;
+		strings.add(string);
+		length = string.length();
 		this.ranges = ranges;
 	}
 	
 	@NotNull
 	public String getString() {
-		return string;
+		StringBuilder sb = new StringBuilder(length);
+		for (String string : strings)
+			sb.append(string);
+		return sb.toString();
 	}
 	
 	@Immutable
@@ -44,23 +50,28 @@ public final class HighlightedString {
 	}
 	
 	public int length() {
-		return string.length();
+		return length;
 	}
 	
 	public boolean isEmpty() {
-		return string.length() == 0;
+		return length == 0;
 	}
 	
 	public int getRangeCount() {
 		return ranges.size();
 	}
 	
+	// The receiver is modified, the given highlighted string is not
 	public void add(@NotNull HighlightedString otherString) {
 		Util.checkNotNull(otherString);
-		int offset = string.length();
-		string = string + otherString.string;
+		strings.addAll(otherString.strings);
+		
+		// We must create new Range objects here, otherwise we'll modify the
+		// given highlighted string
 		for (Range range : otherString.ranges)
-			ranges.add(new Range(range.start + offset, range.length));
+			ranges.add(new Range(range.start + length, range.length));
+		
+		length += otherString.length;
 	}
 
 }
