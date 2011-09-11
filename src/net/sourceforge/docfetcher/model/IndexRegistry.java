@@ -30,6 +30,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
+import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.base.BlockingWrapper;
 import net.sourceforge.docfetcher.base.DelayedExecutor;
 import net.sourceforge.docfetcher.base.Event;
@@ -466,6 +467,10 @@ public final class IndexRegistry {
 			}
 			finally {
 				Closeables.closeQuietly(out);
+				
+				// TODO temporary code
+				if (serFile.length() == 0)
+					AppUtil.showError("Corrupted file: " + serFile.getPath(), true, false);
 			}
 			
 			// Update cached last-modified value of index
