@@ -92,7 +92,9 @@ public final class HtmlParser extends StreamParser {
 		return null;
 	}
 	
-	public String renderText(InputStream in) throws ParseException {
+	@Override
+	protected String renderText(InputStream in, Cancelable cancelable)
+			throws ParseException {
 		try {
 			Source source = new Source(in);
 			source.setLogger(null);
