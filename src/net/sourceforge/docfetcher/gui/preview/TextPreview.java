@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
@@ -36,9 +37,12 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 final class TextPreview extends ToolBarForm {
 	
+	public final Event<Void> evtTextToHtmlBt = new Event<Void>();
+	
 	@NotNull private Text counter;
 	@NotNull private ToolItem upBt;
 	@NotNull private ToolItem downBt;
+	@NotNull private ToolItem htmlBt;
 	@NotNull private HighlightingText textViewer;
 	
 	@Nullable private Integer currentOcc;
@@ -89,6 +93,16 @@ final class TextPreview extends ToolBarForm {
 		downBt = tif.image(Img.ARROW_DOWN.get()).toolTip("next_occurrence")
 				.listener(new ButtonHandler(true)).create();
 		
+		new ToolItem(toolBar, SWT.SEPARATOR);
+		
+		htmlBt = tif.image(Img.BUILDING_BLOCKS.get())
+				.toolTip("use_embedded_html_viewer")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						evtTextToHtmlBt.fire(null);
+					}
+				}).create();
+		
 		return comp;
 	}
 	
@@ -123,6 +137,11 @@ final class TextPreview extends ToolBarForm {
 		upBt.setEnabled(false);
 		downBt.setEnabled(false);
 		currentOcc = null;
+		htmlBt.setEnabled(false);
+	}
+	
+	public void setHtmlButtonEnabled(boolean enabled) {
+		htmlBt.setEnabled(enabled);
 	}
 	
 	public void setText(@NotNull HighlightedString string) {

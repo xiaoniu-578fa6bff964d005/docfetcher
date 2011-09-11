@@ -26,7 +26,8 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public final class ToolItemFactory {
 	
-	private final ToolBar toolBar;
+	@NotNull private ToolBar toolBar;
+	private int style = SWT.PUSH;
 	@Nullable private Image image;
 	@Nullable private String text;
 	@Nullable private String toolTip;
@@ -39,8 +40,15 @@ public final class ToolItemFactory {
 	}
 	
 	@NotNull
+	public ToolItemFactory toolBar(@NotNull ToolBar toolBar) {
+		Util.checkNotNull(toolBar);
+		this.toolBar = toolBar;
+		return this;
+	}
+	
+	@NotNull
 	public ToolItem create() {
-		ToolItem item = new ToolItem(toolBar, SWT.PUSH);
+		ToolItem item = new ToolItem(toolBar, style);
 		if (image != null)
 			item.setImage(image);
 		if (text != null)
@@ -52,6 +60,12 @@ public final class ToolItemFactory {
 		if (!enabled)
 			item.setEnabled(false);
 		return item;
+	}
+	
+	@NotNull
+	public ToolItemFactory style(int style) {
+		this.style = style;
+		return this;
 	}
 	
 	@NotNull

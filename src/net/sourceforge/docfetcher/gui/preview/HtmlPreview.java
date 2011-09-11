@@ -15,6 +15,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 
+import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.gui.Col;
@@ -43,9 +44,12 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 final class HtmlPreview extends ToolBarForm {
 	
+	public final Event<Void> evtHtmlToTextBt = new Event<Void>();
+	
 	@NotNull private ToolItem backBt;
 	@NotNull private ToolItem forwardBt;
 	@NotNull private Text locationBar;
+	@NotNull private ToolItem htmlBt;
 	@NotNull private Browser browser;
 	
 	public HtmlPreview(@NotNull Composite parent) {
@@ -57,12 +61,12 @@ final class HtmlPreview extends ToolBarForm {
 		CustomBorderComposite comp = new CustomBorderComposite(parent);
 		comp.setLayout(Util.createGridLayout(3, false, 0, 0));
 		
-		ToolBar toolBar = new ToolBar(comp, SWT.FLAT);
-		toolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		ToolBar leftToolBar = new ToolBar(comp, SWT.FLAT);
+		leftToolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		
 		// TODO i18n for all button tooltips
 		
-		ToolItemFactory tif = new ToolItemFactory(toolBar);
+		ToolItemFactory tif = new ToolItemFactory(leftToolBar);
 		tif.enabled(false);
 		
 		backBt = tif.image(Img.ARROW_LEFT.get()).toolTip("prev_page")
@@ -117,6 +121,22 @@ final class HtmlPreview extends ToolBarForm {
 					browser.setUrl(locationBar.getText());
 			}
 		});
+		
+		ToolBar rightToolBar = new ToolBar(comp, SWT.FLAT);
+		rightToolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		
+		tif.toolBar(rightToolBar);
+		tif.style(SWT.CHECK);
+		
+		htmlBt = tif.image(Img.BUILDING_BLOCKS.get())
+				.toolTip("use_embedded_html_viewer")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						evtHtmlToTextBt.fire(null);
+					}
+				}).create();
+		
+		htmlBt.setSelection(true);
 		
 		return comp;
 	}
@@ -178,10 +198,14 @@ final class HtmlPreview extends ToolBarForm {
 			browser.setUrl(path);
 		}
 		locationBar.setText(path);
+		htmlBt.setEnabled(true);
+		htmlBt.setSelection(true);
 	}
 
 	public void clear() {
 		browser.setText("");
+		htmlBt.setEnabled(false);
+		htmlBt.setSelection(false);
 	}
 
 }

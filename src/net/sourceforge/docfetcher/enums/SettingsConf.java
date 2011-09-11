@@ -67,6 +67,7 @@ public final class SettingsConf {
 	public static enum Bool implements Storable {
 		MainShellMaximized (false),
 		UseOrOperator (true),
+		PreferHtmlPreview (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

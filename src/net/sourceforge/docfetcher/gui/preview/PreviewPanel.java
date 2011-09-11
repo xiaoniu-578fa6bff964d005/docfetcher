@@ -11,12 +11,14 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.MergingBlockingQueue;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
@@ -55,7 +57,7 @@ public final class PreviewPanel extends Composite {
 	private final StackLayout stackLayout;
 	private final DelayedOverlay delayedOverlay;
 	private final StyledText errorField;
-	private final Color lightRed;
+	@Nullable private Color lightRed; // Only allocated when needed
 	
 	// These fields should only be accessed by the GUI thread
 	@Nullable private ResultDocument lastDoc;
@@ -82,7 +84,6 @@ public final class PreviewPanel extends Composite {
 		
 		errorField = new StyledText(this, SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
 		errorField.setMargins(5, 5, 5, 5);
-		errorField.setBackground(lightRed = new Color(getDisplay(), new RGB(0f, 0.5f, 1)));
 		errorField.setCaret(null);
 		
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
@@ -92,7 +93,15 @@ public final class PreviewPanel extends Composite {
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				disposeLastResources();
-				lightRed.dispose();
+				if (lightRed != null)
+					lightRed.dispose();
+			}
+		});
+		
+		textPreview.evtTextToHtmlBt.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				SettingsConf.Bool.PreferHtmlPreview.set(true);
+				setPreviewUnchecked(lastDoc);
 			}
 		});
 	}
@@ -101,10 +110,16 @@ public final class PreviewPanel extends Composite {
 	public void setPreview(@NotNull ResultDocument doc) {
 		Util.checkNotNull(doc);
 		Util.assertSwtThread();
-
+		
 		if (lastDoc == doc)
 			return;
 		lastDoc = doc;
+		
+		setPreviewUnchecked(doc);
+	}
+	
+	@NotThreadSafe
+	private void setPreviewUnchecked(@NotNull ResultDocument doc) {
 		disposeLastResources();
 		requestCount++;
 		setError(null, requestCount);
@@ -116,9 +131,16 @@ public final class PreviewPanel extends Composite {
 			clearPreviews(true, false, true);
 			new EmailThread(doc, requestCount).start();
 		}
-		else if (doc.isHtmlFile()) {
-			if (htmlPreview == null)
+		else if (doc.isHtmlFile() && SettingsConf.Bool.PreferHtmlPreview.get()) {
+			if (htmlPreview == null) {
 				htmlPreview = new HtmlPreview(stackComp);
+				htmlPreview.evtHtmlToTextBt.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						SettingsConf.Bool.PreferHtmlPreview.set(false);
+						setPreviewUnchecked(lastDoc);
+					}
+				});
+			}
 			moveToTop(htmlPreview);
 			clearPreviews(true, true, false);
 			new HtmlThread(doc, requestCount).start();
@@ -129,6 +151,7 @@ public final class PreviewPanel extends Composite {
 			new PdfThread(doc, requestCount).start();
 		}
 		else {
+			textPreview.setHtmlButtonEnabled(doc.isHtmlFile());
 			moveToTop(textPreview);
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
@@ -164,17 +187,31 @@ public final class PreviewPanel extends Composite {
 			public void run() {
 				if (requestCount != PreviewPanel.this.requestCount)
 					return;
-				errorField.setText(message == null ? "" : message);
+				
+				boolean show = message != null;
 				GridData gridData = (GridData) errorField.getLayoutData();
-				boolean wasExcluded = gridData.exclude;
-				gridData.exclude = message == null;
+				boolean wasShown = !gridData.exclude;
+				gridData.exclude = !show;
+				
+				errorField.setText(show ? message : "");
+				
+				assert (lightRed == null) == !wasShown;
+				if (show && !wasShown) {
+					lightRed = new Color(getDisplay(), new RGB(0f, 0.5f, 1));
+					errorField.setBackground(lightRed);
+				}
+				else if (!show && wasShown) {
+					errorField.setBackground(null);
+					lightRed.dispose();
+					lightRed = null;
+				}
 				
 				/*
 				 * It is important to avoid calling layout() if not needed:
 				 * layout() will be extremely slow if there is a lot of text in
 				 * the text preview.
 				 */
-				if (wasExcluded != gridData.exclude)
+				if (wasShown != show)
 					layout();
 			}
 		});
