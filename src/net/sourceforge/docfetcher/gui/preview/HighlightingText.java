@@ -98,26 +98,27 @@ final class HighlightingText {
 		outer: {
 			if (nextNotPrevious) {
 				for (int[] ranges : rangesList) {
-					for (int i = 0; i < ranges.length - 1; i = i + 2) {
+					for (int i = 0; i < ranges.length - 1; i += 2) {
+						tokenIndex++;
 						if (ranges[i] >= searchStart) {
 							tokenStart = ranges[i];
 							tokenEnd = tokenStart + ranges[i + 1];
 							break outer;
 						}
-						tokenIndex++;
 					}
 				}
 			}
 			else {
 				for (int[] ranges : rangesList) {
-					for (int i = 0; i < ranges.length - 1; i = i + 2) {
+					for (int i = 0; i < ranges.length - 1; i += 2) {
 						if (ranges[i] + ranges[i + 1] <= searchStart) {
 							tokenStart = ranges[i];
-							tokenEnd = ranges[i] + ranges[i + 1];
+							tokenEnd = tokenStart + ranges[i + 1];
+							tokenIndex++;
 						}
-						else
+						else {
 							break outer;
-						tokenIndex++;
+						}
 					}
 				}
 			}
@@ -128,7 +129,7 @@ final class HighlightingText {
 		
 		textViewer.setSelection(tokenStart, tokenEnd);
 		scrollToMiddle((tokenStart + tokenEnd) / 2);
-		return tokenIndex + 1;
+		return tokenIndex;
 	}
 
 	@NotNull
