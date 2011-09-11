@@ -15,6 +15,7 @@ import net.sourceforge.docfetcher.base.Event;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.gui.FormDataFactory;
+import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 
@@ -69,14 +70,17 @@ public final class SearchBar {
 		
 		// Create toolbar
 		final ToolBar toolBar = new ToolBar(comp, SWT.FLAT);
+		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
 		// TODO i18n
-		Util.createToolItem(toolBar, Img.BROWSER.get(), null, "Web Interface", new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
-				dialog.open();
-			}
-		});
+
+		tif.image(Img.BROWSER.get()).toolTip("Web Interface")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
+						dialog.open();
+					}
+				}).create();
 		
 		final int searchBoxMaxWidth = ProgramConf.Int.SearchBoxMaxWidth.get();
 		FormDataFactory fdf = FormDataFactory.getInstance();

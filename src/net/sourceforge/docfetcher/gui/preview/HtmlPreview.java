@@ -65,42 +65,47 @@ final class HtmlPreview extends ToolBarForm {
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		tif.enabled(false);
 		
-		backBt = tif.listener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				browser.back();
-			}
-		}).image(Img.ARROW_LEFT.get()).toolTip("prev_page").create();
+		backBt = tif.image(Img.ARROW_LEFT.get()).toolTip("prev_page")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						browser.back();
+					}
+				}).create();
 		
-		forwardBt = tif.listener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				browser.forward();
-			}
-		}).image(Img.ARROW_RIGHT.get()).toolTip("next_page").create();
+		forwardBt = tif.image(Img.ARROW_RIGHT.get()).toolTip("next_page")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						browser.forward();
+					}
+				}).create();
 		
 		tif.enabled(true);
 		
-		tif.listener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				browser.stop();
-			}
-		}).image(Img.STOP.get()).toolTip("browser_stop").create();
+		tif.image(Img.STOP.get()).toolTip("browser_stop")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						browser.stop();
+					}
+				}).create();
 		
-		tif.listener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				browser.refresh();
-			}
-		}).image(Img.REFRESH.get()).toolTip("browser_refresh").create();
-		
-		tif.listener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String url = browser.getUrl();
-				if (url.equals(""))
-					return;
-				Util.launch(url);
-				// TODO minimize DocFetcher to system tray
-				// (depends on program settings)
-			}
-		}).image(Img.WINDOW.get()).toolTip("browser_launch_external").create();
+		tif.image(Img.REFRESH.get()).toolTip("browser_refresh")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						browser.refresh();
+					}
+				}).create();
+
+		tif.image(Img.WINDOW.get()).toolTip("browser_launch_external")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						String url = browser.getUrl();
+						if (url.equals(""))
+							return;
+						Util.launch(url);
+						// TODO minimize DocFetcher to system tray
+						// (depends on program settings)
+					}
+				}).create();
 		
 		locationBar = new Text(comp, SWT.SINGLE | SWT.BORDER);
 		locationBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

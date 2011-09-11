@@ -36,8 +36,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -50,8 +48,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 import com.google.common.base.CharMatcher;
@@ -1081,22 +1077,6 @@ public final class Util {
 	public static void selectAll(@NotNull Combo combo) {
 		int length = combo.getText().length();
 		combo.setSelection(new Point(0, length));
-	}
-
-	@NotNull
-	public static ToolItem createToolItem(	@NotNull ToolBar toolBar,
-											@Nullable Image image,
-											@Nullable String text,
-											@Nullable String toolTip,
-											@Nullable SelectionListener listener) {
-		ToolItem item = new ToolItem(toolBar, SWT.PUSH);
-		item.setImage(image);
-		if (text != null)
-			item.setText(text);
-		item.setToolTipText(toolTip);
-		if (listener != null)
-			item.addSelectionListener(listener);
-		return item;
 	}
 
 	public static int clamp(int value, int minimum, int maximum) {

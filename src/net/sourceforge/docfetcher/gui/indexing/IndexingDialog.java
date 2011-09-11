@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.base.gui.TabFolderFactory;
+import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
@@ -107,38 +108,40 @@ public final class IndexingDialog implements Dialog {
 		// Create tabfolder toolbar
 		ToolBar toolBar = new ToolBar(tabFolder, SWT.FLAT);
 		tabFolder.setTopRight(toolBar);
-
-		// TODO i18n
-		// Create Add-Directory button
-		Util.createToolItem(
-			toolBar, Img.FOLDER.get(), null, "add_to_queue",
-			new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					IndexPanel.createFileTaskFromDialog(
-						shell, indexRegistry, null);
-				}
-			});
-
-		// TODO i18n, find more suitable image (mail-like)
-		// Create Add-Outlook button
-		Util.createToolItem(
-			toolBar, Img.EMAIL.get(), null, "add_to_queue",
-			new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					IndexPanel.createOutlookTaskFromDialog(
-						shell, indexRegistry, null);
-				}
-			});
+		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
-		Util.createToolItem(toolBar, Img.HIDE.get(), null, "Minimize To Status Bar", new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// TODO save all indexing config modifications
-				indexRegistry.getQueue().removeListeners(addedListener, removedListener);
-				Rectangle bounds = shell.getBounds();
-				shell.dispose();
-				evtDialogMinimized.fire(bounds);
-			}
-		});
+		// TODO i18n for all buttons
+		
+		// Create Add-Directory button
+		tif.image(Img.FOLDER.get()).toolTip("add_to_queue")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						IndexPanel.createFileTaskFromDialog(
+							shell, indexRegistry, null);
+					}
+				}).create();
+
+		// TODO find more suitable image (mail-like)
+		// Create Add-Outlook button
+		tif.image(Img.EMAIL.get()).toolTip("add_to_queue")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						IndexPanel.createOutlookTaskFromDialog(
+							shell, indexRegistry, null);
+					}
+				}).create();
+		
+		tif.image(Img.HIDE.get()).toolTip("Minimize To Status Bar")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						// TODO save all indexing config modifications
+						indexRegistry.getQueue().removeListeners(
+							addedListener, removedListener);
+						Rectangle bounds = shell.getBounds();
+						shell.dispose();
+						evtDialogMinimized.fire(bounds);
+					}
+				}).create();
 
 		// TODO maybe try computeSize() instead of getSize()?
 //		tabFolder.setTabHeight((int) (toolBar.getSize().y * 1.5)); // A factor of 1.0 would crop the add button image.

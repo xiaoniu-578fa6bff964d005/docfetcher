@@ -15,6 +15,7 @@ import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.gui.Col;
+import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
@@ -51,7 +52,7 @@ final class TextPreview extends ToolBarForm {
 		CustomBorderComposite comp = new CustomBorderComposite(parent);
 		comp.setLayout(Util.createGridLayout(2, false, 0, 0));
 		
-		// TODO i18n x3
+		// TODO i18n for counter and buttons
 		
 		int textStyle = SWT.BORDER | SWT.SINGLE | SWT.CENTER | SWT.READ_ONLY;
 		counter = new Text(comp, textStyle);
@@ -79,15 +80,14 @@ final class TextPreview extends ToolBarForm {
 			}
 		}
 		
-		upBt = Util.createToolItem(
-			toolBar, Img.ARROW_UP.get(), null, "prev_occurrence",
-			new ButtonHandler(false));
-		upBt.setEnabled(false);
+		ToolItemFactory tif = new ToolItemFactory(toolBar);
+		tif.enabled(false);
 		
-		downBt = Util.createToolItem(
-			toolBar, Img.ARROW_DOWN.get(), null, "next_occurrence",
-			new ButtonHandler(true));
-		downBt.setEnabled(false);
+		upBt = tif.image(Img.ARROW_UP.get()).toolTip("prev_occurrence")
+				.listener(new ButtonHandler(false)).create();
+		
+		downBt = tif.image(Img.ARROW_DOWN.get()).toolTip("next_occurrence")
+				.listener(new ButtonHandler(true)).create();
 		
 		return comp;
 	}
