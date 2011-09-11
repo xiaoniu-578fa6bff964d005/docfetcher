@@ -46,15 +46,6 @@ import org.eclipse.swt.widgets.Shell;
  */
 final class EmailPreview extends Composite {
 	
-	private final DateFormat dateFormat = new SimpleDateFormat();
-	
-	@NotNull private StyledText fromField;
-	@NotNull private StyledText toField;
-	@NotNull private StyledText subjectField;
-	@NotNull private StyledText dateField;
-	@NotNull private HighlightingText bodyBox;
-	@NotNull private Composite headerComp;
-
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
@@ -74,6 +65,15 @@ final class EmailPreview extends Composite {
 		}
 		display.dispose();
 	}
+	
+	private final DateFormat dateFormat = new SimpleDateFormat();
+	
+	@NotNull private StyledText fromField;
+	@NotNull private StyledText toField;
+	@NotNull private StyledText subjectField;
+	@NotNull private StyledText dateField;
+	@NotNull private HighlightingText bodyBox;
+	@NotNull private Composite headerComp;
 	
 	public EmailPreview(@NotNull Composite parent) {
 		super(parent, SWT.NONE);
