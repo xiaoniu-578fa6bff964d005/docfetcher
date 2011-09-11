@@ -122,33 +122,49 @@ public final class Util {
 	}
 
 	/**
-	 * Encodes the given string array into a single string, using the specified
-	 * separator. The resulting string is a concatenation of the elements of the
-	 * string array, which are separated by the given separator and where
-	 * occurrences of the separator and backslashes are escaped appropriately.
-	 *
+	 * Encodes the given collection of strings into a single string, using the
+	 * specified separator. The resulting string is a concatenation of the
+	 * elements of the collection, which are separated by the given separator
+	 * and where occurrences of the separator and backslashes are escaped
+	 * appropriately.
+	 * 
 	 * @see Util#decodeStrings(String, char)
 	 */
-	public static String encodeStrings(String sep, String... parts) {
+	@NotNull
+	public static String encodeStrings(	@NotNull String sep,
+										@NotNull Collection<String> parts) {
+		Util.checkNotNull(sep, parts);
+		if (parts.isEmpty())
+			return "";
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < parts.length; i++) {
-			sb.append(parts[i].replace("\\", "\\\\").replace(sep, "\\" + sep));
-			if (i != parts.length - 1)
+		boolean isFirst = true;
+		for (String part : parts) {
+			if (!isFirst)
 				sb.append(sep);
+			sb.append(part.replace("\\", "\\\\").replace(sep, "\\" + sep));
+			isFirst = false;
 		}
 		return sb.toString();
 	}
 
 	/**
-	 * Decodes the given string into an array of strings, using the specified
+	 * Decodes the given string into a list of strings, using the specified
 	 * separator. This method basically splits the given string at those
 	 * occurrences of the separator that aren't escaped with a backslash.
+	 * <p>
+	 * Special case: If the given string is an empty string, an empty list is
+	 * returned.
 	 *
 	 * @see Util#encodeStrings(String, char)
 	 */
-	public static String[] decodeStrings(char sep, String str) {
+	@MutableCopy
+	@NotNull
+	public static List<String> decodeStrings(char sep, @NotNull String str) {
+		Util.checkNotNull(str);
+		if (str.isEmpty())
+			return new ArrayList<String>(0);
 		boolean precedingBackslash = false;
-		List<String> parts = new ArrayList<String> ();
+		List<String> parts = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < str.length(); i++) {
 			char c = str.charAt(i);
@@ -164,7 +180,20 @@ public final class Util {
 				precedingBackslash = false;
 		}
 		parts.add(sb.toString());
-		return parts.toArray(new String[parts.size()]);
+		return parts;
+	}
+	
+	public static <T> boolean equals(@NotNull Collection<T> col, @NotNull T[] a) {
+		Util.checkNotNull(col, a);
+		if (col.size() != a.length)
+			return false;
+		int i = 0;
+		for (T e1 : col) {
+			if (!e1.equals(a[i]))
+				return false;
+			i++;
+		}
+		return true;
 	}
 	
 	public static String ensureLinuxLineSep(@NotNull String input) {

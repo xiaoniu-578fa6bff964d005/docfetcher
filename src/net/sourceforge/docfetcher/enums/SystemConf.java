@@ -12,6 +12,8 @@
 package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
@@ -110,14 +112,14 @@ public final class SystemConf {
 		}
 	}
 	
-	public static enum StrArray implements Loadable {
+	public static enum StrList implements Loadable {
 		;
 
-		private String[] value;
-		StrArray(String... value) {
-			this.value = value;
+		private List<String> value;
+		StrList(String... value) {
+			this.value = Arrays.asList(value);
 		}
-		public String[] get() {
+		public List<String> get() {
 			return value;
 		}
 		public void load(String str) {

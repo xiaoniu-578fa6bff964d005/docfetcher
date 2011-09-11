@@ -12,12 +12,14 @@
 package net.sourceforge.docfetcher.gui;
 
 import net.sourceforge.docfetcher.base.Event;
+import net.sourceforge.docfetcher.base.MemoryList;
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.gui.FormDataFactory;
 import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -43,6 +45,7 @@ public final class SearchBar {
 	private final Composite comp;
 	private final Combo searchBox;
 	private final Button searchBt;
+	private final MemoryList<String> searchHistory;
 	
 	public SearchBar(@NotNull Composite parent) {
 		comp = new CustomBorderComposite(parent);
@@ -55,16 +58,24 @@ public final class SearchBar {
 		
 		searchBox.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-				if (UtilGui.isEnterKey(e.keyCode))
-					evtSearch.fire(searchBox.getText());
+				String query = searchBox.getText().trim();
+				if (!query.isEmpty() && UtilGui.isEnterKey(e.keyCode))
+					evtSearch.fire(query);
 			}
 		});
+		
+		// Load search history
+		searchHistory = new MemoryList<String>(ProgramConf.Int.SearchHistorySize.get());
+		searchHistory.addAll(SettingsConf.StrList.SearchHistory.get()); // may discard items
+		searchBox.setItems(getHistoryArray());
 		
 		searchBt = new Button(comp, SWT.PUSH);
 		searchBt.setText("Search");
 		searchBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				evtSearch.fire(searchBox.getText());
+				String query = searchBox.getText().trim();
+				if (!query.isEmpty())
+					evtSearch.fire(query);
 			}
 		});
 		
@@ -100,6 +111,20 @@ public final class SearchBar {
 				comp.layout();
 			}
 		});
+	}
+	
+	public void addToSearchHistory(@NotNull String query) {
+		Util.checkNotNull(query);
+		searchHistory.add(query);
+		String[] historyArray = getHistoryArray();
+		SettingsConf.StrList.SearchHistory.set(historyArray);
+		searchBox.setItems(historyArray);
+		searchBox.setText(query);
+	}
+	
+	@NotNull
+	private String[] getHistoryArray() {
+		return searchHistory.toArray(new String[searchHistory.size()]);
 	}
 	
 	@NotNull

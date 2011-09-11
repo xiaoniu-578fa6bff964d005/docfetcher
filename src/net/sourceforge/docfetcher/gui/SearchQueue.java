@@ -299,6 +299,9 @@ public final class SearchQueue {
 				resultPanel.setResults(visibleResults, mode);
 				searchBar.setEnabled(true);
 				// TODO move focus to result panel
+				
+				if (query != null)
+					searchBar.addToSearchHistory(query);
 			}
 		});
 	}

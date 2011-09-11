@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.enums;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,21 +190,29 @@ public final class SettingsConf {
 	}
 
 	@Description("# Semicolon-separated lists of strings.")
-	public static enum StrArray implements Storable {
+	public static enum StrList implements Storable {
+		SearchHistory,
 		;
 
-		public final Event<String[]> evtChanged = new Event<String[]> ();
-		public final String[] defaultValue;
-		private String[] value;
+		public final Event<List<String>> evtChanged = new Event<List<String>> ();
+		public final List<String> defaultValue;
+		private List<String> value;
 
-		StrArray(String... defaultValue) {
-			value = this.defaultValue = defaultValue;
+		StrList(String... defaultValue) {
+			value = this.defaultValue = Arrays.asList(defaultValue);
 		}
-		public String[] get() {
+		public List<String> get() {
 			return value;
 		}
 		public void set(String... value) {
-			if (Arrays.equals(this.value, value)) return;
+			if (Util.equals(this.value, value))
+				return;
+			this.value = Arrays.asList(value);
+			evtChanged.fire(this.value);
+		}
+		public void set(List<String> value) {
+			if (this.value.equals(value))
+				return;
 			this.value = value;
 			evtChanged.fire(value);
 		}

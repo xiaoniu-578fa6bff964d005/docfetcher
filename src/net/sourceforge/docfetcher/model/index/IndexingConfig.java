@@ -206,7 +206,7 @@ public class IndexingConfig implements Serializable {
 	
 	@NotNull
 	public Collection<String> getHtmlExtensions() {
-		return Arrays.asList(ProgramConf.StrArray.HtmlExtensions.get());
+		return ProgramConf.StrList.HtmlExtensions.get();
 	}
 	
 	public boolean isHtmlPairing() {

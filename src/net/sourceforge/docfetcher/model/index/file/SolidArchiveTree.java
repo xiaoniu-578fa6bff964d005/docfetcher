@@ -283,7 +283,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				continue;
 			}
 			boolean isHtmlFolder = false;
-			for (String htmlExt : ProgramConf.StrArray.HtmlExtensions.get()) { // TODO set html extensions?
+			for (String htmlExt : ProgramConf.StrList.HtmlExtensions.get()) { // TODO set html extensions?
 				String filename = basename + "." + htmlExt;
 				FileDocument htmlEntry = folder.getDocument(filename);
 				if (htmlEntry == null)

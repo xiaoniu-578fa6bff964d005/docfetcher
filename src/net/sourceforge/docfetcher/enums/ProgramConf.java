@@ -12,11 +12,13 @@
 package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
-
-import org.aspectj.lang.annotation.SuppressAjWarnings;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sourceforge.docfetcher.base.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.base.Util;
+
+import org.aspectj.lang.annotation.SuppressAjWarnings;
 
 /**
  * This class handles the retrieval of application-wide, <em>unmodifiable</em>
@@ -122,15 +124,15 @@ public final class ProgramConf {
 		}
 	}
 
-	public static enum StrArray implements Loadable {
+	public static enum StrList implements Loadable {
 		HtmlExtensions ("html", "htm", "xhtml", "shtml", "shtm", "php", "asp", "jsp")
 		;
 
-		private String[] value;
-		StrArray(String... value) {
-			this.value = value;
+		private List<String> value;
+		StrList(String... value) {
+			this.value = Arrays.asList(value);
 		}
-		public String[] get() {
+		public List<String> get() {
 			return value;
 		}
 		public void load(String str) {
