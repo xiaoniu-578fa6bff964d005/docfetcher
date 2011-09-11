@@ -116,6 +116,7 @@ public final class BuildMain {
 		U.copyFlatten("lib", releaseDir + "/lib", "**/*.jar", excludedLibs);
 		U.copyFlatten("lib", releaseDir + "/lib/windows", "**/swt*win32*.jar", null);
 		U.copyFlatten("lib", releaseDir + "/lib/linux", "**/swt*linux*.jar", null);
+		U.copyFlatten("lib", releaseDir + "/lib", "**/*.so, **/*.dll", null);
 		
 		String dstMainJar = U.format(
 			"%s/lib/%s", releaseDir, tmpMainJar.getName());
