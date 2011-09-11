@@ -68,6 +68,7 @@ public final class SettingsConf {
 		MainShellMaximized (false),
 		UseOrOperator (true),
 		PreferHtmlPreview (true),
+		HighlightingEnabled (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

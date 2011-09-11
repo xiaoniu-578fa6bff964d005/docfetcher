@@ -56,6 +56,7 @@ public enum Img implements FilenameProvider {
 	EMAIL ("email.gif"),
 	BROWSER ("browser.gif"),
 	BUILDING_BLOCKS ("building_blocks.gif"),
+	HIGHLIGHT ("highlight.gif"),
 	;
 	
 	private static LazyImageCache lazyImageCache;

@@ -18,6 +18,7 @@ import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.gui.Col;
 import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 
@@ -42,6 +43,7 @@ final class TextPreview extends ToolBarForm {
 	@NotNull private Text counter;
 	@NotNull private ToolItem upBt;
 	@NotNull private ToolItem downBt;
+	@NotNull private ToolItem highlightBt;
 	@NotNull private ToolItem htmlBt;
 	@NotNull private HighlightingText textViewer;
 	
@@ -94,6 +96,20 @@ final class TextPreview extends ToolBarForm {
 				.listener(new ButtonHandler(true)).create();
 		
 		new ToolItem(toolBar, SWT.SEPARATOR);
+		tif.style(SWT.CHECK);
+		
+		highlightBt = tif.image(Img.HIGHLIGHT.get())
+				.toolTip("Highlighting On/Off")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						boolean selected = highlightBt.getSelection();
+						SettingsConf.Bool.HighlightingEnabled.set(selected);
+						textViewer.updateHighlighting();
+					}
+				}).create();
+		
+		highlightBt.setSelection(SettingsConf.Bool.HighlightingEnabled.get());
+		tif.style(SWT.PUSH);
 		
 		htmlBt = tif.image(Img.BUILDING_BLOCKS.get())
 				.toolTip("use_embedded_html_viewer")
@@ -138,6 +154,7 @@ final class TextPreview extends ToolBarForm {
 		downBt.setEnabled(false);
 		currentOcc = null;
 		htmlBt.setEnabled(false);
+		highlightBt.setEnabled(false);
 	}
 	
 	public void setHtmlButtonEnabled(boolean enabled) {
@@ -151,6 +168,7 @@ final class TextPreview extends ToolBarForm {
 		upBt.setEnabled(occCount > 0);
 		downBt.setEnabled(occCount > 0);
 		currentOcc = null;
+		highlightBt.setEnabled(occCount > 0);
 	}
 
 	public void appendText(@NotNull HighlightedString string) {
@@ -159,6 +177,7 @@ final class TextPreview extends ToolBarForm {
 		if (string.getRangeCount() > 0) {
 			upBt.setEnabled(true);
 			downBt.setEnabled(true);
+			highlightBt.setEnabled(true);
 		}
 	}
 

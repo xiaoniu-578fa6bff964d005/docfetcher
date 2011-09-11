@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.base.gui.Col;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.Range;
 
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 final class HighlightingText {
 	
 	@NotNull private StyledText textViewer;
+	private final StyleRange highlightStyle = new StyleRange(0, 0, null, Col.YELLOW.get());
 	private final List<int[]> rangesList = new ArrayList<int[]>();
 	private int occCount;
 	
@@ -65,8 +67,10 @@ final class HighlightingText {
 			return;
 		
 		int[] rangeArray = getRangeArray(string, 0);
-		StyleRange[] styles = getStylesArray(string);
-		textViewer.setStyleRanges(rangeArray, styles);
+		if (SettingsConf.Bool.HighlightingEnabled.get()) {
+			StyleRange[] styles = getStylesArray(string);
+			textViewer.setStyleRanges(rangeArray, styles);
+		}
 		
 		rangesList.add(rangeArray);
 		occCount = string.getRangeCount();
@@ -80,11 +84,30 @@ final class HighlightingText {
 		textViewer.append(string.getString());
 		
 		int[] rangeArray = getRangeArray(string, offset);
-		StyleRange[] styles = getStylesArray(string);
-		textViewer.setStyleRanges(offset, string.length(), rangeArray, styles);
+		if (SettingsConf.Bool.HighlightingEnabled.get()) {
+			StyleRange[] styles = getStylesArray(string);
+			textViewer.setStyleRanges(offset, string.length(), rangeArray, styles);
+		}
 		
 		rangesList.add(rangeArray);
 		occCount += string.getRangeCount();
+	}
+	
+	public void updateHighlighting() {
+		if (SettingsConf.Bool.HighlightingEnabled.get()) {
+			int[] fullRangeArray = new int[2 * occCount];
+			int offset = 0;
+			for (int[] array : rangesList) {
+				System.arraycopy(array, 0, fullRangeArray, offset, array.length);
+				offset += array.length;
+			}
+			StyleRange[] styleArray = new StyleRange[occCount];
+			Arrays.fill(styleArray, highlightStyle);
+			textViewer.setStyleRanges(fullRangeArray, styleArray);
+		}
+		else {
+			textViewer.setStyleRanges(new StyleRange[0]);
+		}
 	}
 	
 	@Nullable
@@ -145,10 +168,9 @@ final class HighlightingText {
 	}
 	
 	@NotNull
-	private static StyleRange[] getStylesArray(@NotNull HighlightedString string) {
-		StyleRange style = new StyleRange(0, 0, null, Col.YELLOW.get());
+	private StyleRange[] getStylesArray(@NotNull HighlightedString string) {
 		StyleRange[] styles = new StyleRange[string.getRangeCount()];
-		Arrays.fill(styles, style);
+		Arrays.fill(styles, highlightStyle);
 		return styles;
 	}
 	
