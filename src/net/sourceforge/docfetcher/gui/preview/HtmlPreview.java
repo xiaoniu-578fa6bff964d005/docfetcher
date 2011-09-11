@@ -13,21 +13,39 @@ package net.sourceforge.docfetcher.gui.preview;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 
 import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.base.gui.Col;
+import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
+import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.gui.CustomBorderComposite;
+import net.sourceforge.docfetcher.gui.UtilGui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * @author Tran Nam Quang
  */
 final class HtmlPreview extends ToolBarForm {
 	
+	@NotNull private ToolItem backBt;
+	@NotNull private ToolItem forwardBt;
+	@NotNull private Text locationBar;
 	@NotNull private Browser browser;
 	
 	public HtmlPreview(@NotNull Composite parent) {
@@ -36,16 +54,109 @@ final class HtmlPreview extends ToolBarForm {
 	
 	@NotNull
 	protected Control createToolBar(@NotNull Composite parent) {
-		Label label = new Label(parent, SWT.SINGLE | SWT.BORDER);
-		label.setText("Toolbar");
-		return label;
+		CustomBorderComposite comp = new CustomBorderComposite(parent);
+		comp.setLayout(Util.createGridLayout(3, false, 0, 0));
+		
+		ToolBar toolBar = new ToolBar(comp, SWT.FLAT);
+		toolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		
+		// TODO i18n for all button tooltips
+		
+		ToolItemFactory tif = new ToolItemFactory(toolBar);
+		tif.enabled(false);
+		
+		backBt = tif.listener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browser.back();
+			}
+		}).image(Img.ARROW_LEFT.get()).toolTip("prev_page").create();
+		
+		forwardBt = tif.listener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browser.forward();
+			}
+		}).image(Img.ARROW_RIGHT.get()).toolTip("next_page").create();
+		
+		tif.enabled(true);
+		
+		tif.listener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browser.stop();
+			}
+		}).image(Img.STOP.get()).toolTip("browser_stop").create();
+		
+		tif.listener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browser.refresh();
+			}
+		}).image(Img.REFRESH.get()).toolTip("browser_refresh").create();
+		
+		tif.listener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String url = browser.getUrl();
+				if (url.equals(""))
+					return;
+				Util.launch(url);
+				// TODO minimize DocFetcher to system tray
+				// (depends on program settings)
+			}
+		}).image(Img.WINDOW.get()).toolTip("browser_launch_external").create();
+		
+		locationBar = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		locationBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		Util.selectAllOnFocus(locationBar);
+		
+		locationBar.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				if (UtilGui.isEnterKey(e.keyCode))
+					browser.setUrl(locationBar.getText());
+			}
+		});
+		
+		return comp;
 	}
 	
 	@NotNull
 	protected Control createContents(@NotNull Composite parent) {
 		// TODO Add program.conf entry to allow using Mozilla (SWT.MOZILLA) or WebKit browser
-		// TODO Browser may not be available on the system -> will throw an SWTError
-		return browser = new Browser(parent, SWT.BORDER);
+		browser = new Browser(parent, SWT.BORDER);
+		
+		browser.addLocationListener(new LocationAdapter() {
+			public void changing(LocationEvent event) {
+				locationBar.setBackground(Col.WIDGET_BACKGROUND.get());
+			}
+			public void changed(LocationEvent event) {
+				backBt.setEnabled(browser.isBackEnabled());
+				forwardBt.setEnabled(browser.isForwardEnabled());
+				String path = browser.getUrl();
+				
+				if (path.equals("about:blank")) {
+					path = "";
+				}
+				else if (path.startsWith("file:///")) { //$NON-NLS-1$
+					try {
+						path = Util.getSystemAbsPath(new File(new URI(path)));
+					}
+					catch (Exception e) {
+						/*
+						 * Ignoring URISyntaxException and
+						 * IllegalArgumentException. The latter can happen if
+						 * the URI contains a "fragment component", e.g.
+						 * "myfile.htm#Section_1".
+						 */
+					}
+				}
+				locationBar.setText(path);
+	            
+				/*
+				 * The appropriate color is 'LIST_BACKGROUND', not 'WHITE',
+				 * because the user might have chosen a dark theme.
+				 */
+	            locationBar.setBackground(Col.LIST_BACKGROUND.get());
+			}
+		});
+		
+		return browser;
 	}
 	
 	// TODO maybe add HTML highlighting
@@ -61,11 +172,11 @@ final class HtmlPreview extends ToolBarForm {
 		catch (MalformedURLException e) {
 			browser.setUrl(path);
 		}
-		// TODO show file path in location bar
+		locationBar.setText(path);
 	}
 
 	public void clear() {
-		// TODO
+		browser.setText("");
 	}
 
 }

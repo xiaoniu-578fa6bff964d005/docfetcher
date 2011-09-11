@@ -102,8 +102,6 @@ public final class PreviewPanel extends Composite {
 		Util.checkNotNull(doc);
 		Util.assertSwtThread();
 
-		// TODO show 'loading' message where appropriate (-> maybe as a separate composite)
-
 		if (lastDoc == doc)
 			return;
 		lastDoc = doc;
@@ -246,6 +244,7 @@ public final class PreviewPanel extends Composite {
 			final FileResource htmlResource = doc.getFileResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
+					// TODO Browser may not be available on the system -> will throw an SWTError
 					if (htmlPreview == null)
 						htmlPreview = new HtmlPreview(stackComp);
 					htmlPreview.setFile(htmlResource.getFile());

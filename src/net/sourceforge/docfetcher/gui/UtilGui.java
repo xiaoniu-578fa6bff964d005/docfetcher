@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.base.gui.Col;
 
 import org.eclipse.swt.SWT;
@@ -25,7 +26,8 @@ import org.eclipse.swt.widgets.Control;
 /**
  * @author Tran Nam Quang
  */
-final class UtilGui {
+@VisibleForPackageGroup
+public final class UtilGui {
 	
 	private UtilGui() {
 	}
@@ -66,7 +68,7 @@ final class UtilGui {
 	 * Returns whether the given key code represents the Enter key, which can be
 	 * either the 'normal' Enter key or the Enter key on the numpad.
 	 */
-	static boolean isEnterKey(int keyCode){
+	public static boolean isEnterKey(int keyCode){
 		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
 	}
 

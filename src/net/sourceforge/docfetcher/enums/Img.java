@@ -44,10 +44,13 @@ public enum Img implements FilenameProvider {
 	HIDE ("hide.gif"),
 	RESTORE ("restore.png"),
 	INDEXING_DIALOG ("indexing_dialog.gif"),
-	ARROW_LEFT ("arrow_left.gif"), // TODO image still used?
-	ARROW_RIGHT ("arrow_right.gif"), // TODO image still used?
+	ARROW_LEFT ("arrow_left.gif"),
+	ARROW_RIGHT ("arrow_right.gif"),
 	ARROW_UP ("arrow_up.gif"),
 	ARROW_DOWN ("arrow_down.gif"),
+	STOP ("stop.gif"),
+	REFRESH ("refresh.gif"),
+	WINDOW ("program.gif"),
 	FOLDER ("folder.gif"),
 	FILE ("file.gif"),
 	EMAIL ("email.gif"),
