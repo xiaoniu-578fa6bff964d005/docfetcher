@@ -110,18 +110,26 @@ public final class PreviewPanel extends Composite {
 		setError(null, requestCount);
 
 		if (doc.isEmail()) {
+			if (emailPreview == null)
+				emailPreview = new EmailPreview(stackComp);
+			moveToTop(emailPreview);
 			clearPreviews(true, false, true);
 			new EmailThread(doc, requestCount).start();
 		}
 		else if (doc.isHtmlFile()) {
+			if (htmlPreview == null)
+				htmlPreview = new HtmlPreview(stackComp);
+			moveToTop(htmlPreview);
 			clearPreviews(true, true, false);
 			new HtmlThread(doc, requestCount).start();
 		}
 		else if (doc.isPdfFile()) {
+			moveToTop(textPreview);
 			clearPreviews(true, true, true);
 			new PdfThread(doc, requestCount).start();
 		}
 		else {
+			moveToTop(textPreview);
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
@@ -174,6 +182,7 @@ public final class PreviewPanel extends Composite {
 	
 	@NotThreadSafe
 	private void moveToTop(@NotNull Control control) {
+		Util.checkNotNull(control);
 		if (stackLayout.topControl == control)
 			return;
 		stackLayout.topControl = control;
@@ -191,7 +200,6 @@ public final class PreviewPanel extends Composite {
 					textPreview.appendText(string);
 				else
 					textPreview.setText(string);
-				moveToTop(textPreview);
 			}
 		});
 	}
@@ -223,10 +231,7 @@ public final class PreviewPanel extends Composite {
 			final MailResource mailResource = doc.getMailResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
-					if (emailPreview == null)
-						emailPreview = new EmailPreview(stackComp);
 					emailPreview.setEmail(mailResource);
-					moveToTop(emailPreview);
 					lastMailResource = mailResource; // Save a reference for disposal
 				}
 			});
@@ -245,10 +250,7 @@ public final class PreviewPanel extends Composite {
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
 					// TODO Browser may not be available on the system -> will throw an SWTError
-					if (htmlPreview == null)
-						htmlPreview = new HtmlPreview(stackComp);
 					htmlPreview.setFile(htmlResource.getFile());
-					moveToTop(htmlPreview);
 					lastHtmlResource = htmlResource; // Save a reference for disposal
 				}
 			});
