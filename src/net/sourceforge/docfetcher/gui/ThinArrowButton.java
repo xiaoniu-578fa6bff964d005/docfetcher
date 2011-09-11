@@ -11,8 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.gui.Col;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;

@@ -16,16 +16,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.gui.FileIconCache;
-import net.sourceforge.docfetcher.base.gui.VirtualTableViewer;
-import net.sourceforge.docfetcher.base.gui.VirtualTableViewer.Column;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.FileIconCache;
+import net.sourceforge.docfetcher.util.gui.VirtualTableViewer;
+import net.sourceforge.docfetcher.util.gui.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

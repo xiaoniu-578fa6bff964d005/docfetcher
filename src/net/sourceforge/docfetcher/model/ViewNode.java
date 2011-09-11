@@ -13,8 +13,8 @@ package net.sourceforge.docfetcher.model;
 
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * A node of a tree structure that can be displayed on the user interface. (This

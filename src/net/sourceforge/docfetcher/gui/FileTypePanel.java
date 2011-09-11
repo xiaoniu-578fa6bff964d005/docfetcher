@@ -12,12 +12,12 @@
 package net.sourceforge.docfetcher.gui;
 
 import java.util.Comparator;
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.ListMap;
-import net.sourceforge.docfetcher.base.ListMap.Entry;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.parse.Parser;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.collect.ListMap;
+import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;

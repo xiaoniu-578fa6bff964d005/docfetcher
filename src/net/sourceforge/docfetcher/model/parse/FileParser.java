@@ -13,9 +13,9 @@ package net.sourceforge.docfetcher.model.parse;
 
 import java.io.File;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * @author Tran Nam Quang

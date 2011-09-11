@@ -14,8 +14,8 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.io.Closeable;
 import java.io.IOException;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.store.Directory;

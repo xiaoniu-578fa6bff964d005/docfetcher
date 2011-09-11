@@ -12,7 +12,7 @@
 package net.sourceforge.docfetcher.model.index;
 
 import static org.junit.Assert.assertTrue;
-import net.sourceforge.docfetcher.base.AppUtil;
+import net.sourceforge.docfetcher.util.AppUtil;
 
 import org.junit.Test;
 

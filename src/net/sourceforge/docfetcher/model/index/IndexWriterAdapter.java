@@ -14,10 +14,10 @@ package net.sourceforge.docfetcher.model.index;
 import java.io.Closeable;
 import java.io.IOException;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;

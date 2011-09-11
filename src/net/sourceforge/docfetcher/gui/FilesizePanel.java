@@ -11,11 +11,11 @@
 
 package net.sourceforge.docfetcher.gui;
 
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.gui.FormDataFactory;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

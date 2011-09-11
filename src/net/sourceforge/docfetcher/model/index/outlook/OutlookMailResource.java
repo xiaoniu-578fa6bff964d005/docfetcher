@@ -17,9 +17,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Immutable;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.MailResource;
@@ -27,6 +24,9 @@ import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightService;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.Immutable;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.search.Query;
 

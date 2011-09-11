@@ -11,15 +11,15 @@
 
 package net.sourceforge.docfetcher.gui;
 
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.MemoryList;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.gui.FormDataFactory;
-import net.sourceforge.docfetcher.base.gui.ToolItemFactory;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.collect.MemoryList;
+import net.sourceforge.docfetcher.util.gui.FormDataFactory;
+import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;

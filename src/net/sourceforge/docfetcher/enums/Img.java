@@ -11,10 +11,10 @@
 
 package net.sourceforge.docfetcher.enums;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.gui.LazyImageCache;
-import net.sourceforge.docfetcher.base.gui.LazyImageCache.FilenameProvider;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.LazyImageCache;
+import net.sourceforge.docfetcher.util.gui.LazyImageCache.FilenameProvider;
 
 import org.eclipse.swt.graphics.Image;
 

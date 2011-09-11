@@ -14,8 +14,8 @@ package net.sourceforge.docfetcher;
 import java.util.Collections;
 import java.util.Iterator;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 /**
  * @author Tran Nam Quang

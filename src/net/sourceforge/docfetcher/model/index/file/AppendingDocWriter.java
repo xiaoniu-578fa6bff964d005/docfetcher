@@ -14,10 +14,10 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.io.File;
 import java.io.IOException;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;

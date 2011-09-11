@@ -13,9 +13,6 @@ package net.sourceforge.docfetcher.model.search;
 
 import java.io.File;
 import java.util.Date;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.FileResource;
@@ -29,6 +26,9 @@ import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.parse.PdfParser;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;

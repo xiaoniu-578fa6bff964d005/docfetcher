@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.build;
 
 import java.io.File;
 
-import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;

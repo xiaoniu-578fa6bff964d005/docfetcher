@@ -19,12 +19,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.AppUtil;
-import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
+import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.junit.Test;
 

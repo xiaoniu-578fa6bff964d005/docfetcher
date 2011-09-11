@@ -21,15 +21,15 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.UtilGlobal;
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.ImmutableCopy;
-import net.sourceforge.docfetcher.base.annotations.MutableCopy;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.annotations.RecursiveMethod;
-import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import com.google.common.collect.Maps;
 

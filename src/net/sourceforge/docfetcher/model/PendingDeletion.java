@@ -11,11 +11,11 @@
 
 package net.sourceforge.docfetcher.model;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
-import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.NotThreadSafe;
+import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang

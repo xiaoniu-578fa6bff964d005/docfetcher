@@ -18,10 +18,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.NotThreadSafe;
-import net.sourceforge.docfetcher.base.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.NotThreadSafe;
+import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;

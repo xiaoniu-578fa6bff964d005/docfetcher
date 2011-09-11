@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * @author Tran Nam Quang

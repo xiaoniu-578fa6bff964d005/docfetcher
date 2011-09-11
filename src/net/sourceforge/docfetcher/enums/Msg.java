@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.enums;
 
 import java.text.MessageFormat;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 public enum Msg {
 	

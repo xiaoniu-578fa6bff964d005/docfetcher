@@ -11,11 +11,11 @@
 
 package net.sourceforge.docfetcher.model.index.file;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.model.Folder;
 import net.sourceforge.docfetcher.model.FolderVisitor;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang

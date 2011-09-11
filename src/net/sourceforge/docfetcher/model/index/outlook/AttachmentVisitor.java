@@ -15,10 +15,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import com.google.common.io.Closeables;
 import com.pff.PSTAttachment;

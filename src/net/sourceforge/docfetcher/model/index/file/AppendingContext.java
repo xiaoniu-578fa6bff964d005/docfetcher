@@ -13,9 +13,9 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.IOException;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.document.Document;
 

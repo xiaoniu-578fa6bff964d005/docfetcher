@@ -19,16 +19,16 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.AppUtil;
-import net.sourceforge.docfetcher.base.ListMap;
-import net.sourceforge.docfetcher.base.ListMap.Entry;
-import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.collect.ListMap;
+import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
 import org.apache.lucene.store.Directory;
 import org.junit.Test;

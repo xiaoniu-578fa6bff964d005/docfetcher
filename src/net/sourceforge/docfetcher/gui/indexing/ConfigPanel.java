@@ -11,9 +11,9 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;

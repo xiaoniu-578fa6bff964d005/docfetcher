@@ -11,8 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
-import net.sourceforge.docfetcher.base.gui.Col;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;

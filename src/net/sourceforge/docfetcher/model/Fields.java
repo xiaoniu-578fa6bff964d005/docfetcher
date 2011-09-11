@@ -12,8 +12,8 @@
 package net.sourceforge.docfetcher.model;
 
 import javolution.io.CharSequenceReader;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;

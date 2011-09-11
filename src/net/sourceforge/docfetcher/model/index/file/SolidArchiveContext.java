@@ -14,12 +14,12 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveTree.FailReporter;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 
 /**

@@ -13,8 +13,8 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.Serializable;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang

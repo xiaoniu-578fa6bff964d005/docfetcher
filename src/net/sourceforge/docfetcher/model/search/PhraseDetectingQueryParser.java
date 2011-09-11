@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.model.search;
 
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;

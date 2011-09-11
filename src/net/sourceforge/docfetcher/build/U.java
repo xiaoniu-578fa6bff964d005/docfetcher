@@ -18,8 +18,8 @@ import java.util.List;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Zip;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

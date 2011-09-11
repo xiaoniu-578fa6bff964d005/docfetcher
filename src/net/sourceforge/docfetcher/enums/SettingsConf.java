@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.docfetcher.base.ConfLoader.Description;
-import net.sourceforge.docfetcher.base.ConfLoader.Storable;
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.ConfLoader.Description;
+import net.sourceforge.docfetcher.util.ConfLoader.Storable;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;

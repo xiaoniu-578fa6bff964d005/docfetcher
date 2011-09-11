@@ -21,8 +21,8 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.AppUtil;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Jar;

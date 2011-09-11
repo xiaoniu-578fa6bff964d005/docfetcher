@@ -15,10 +15,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.document.Document;
 

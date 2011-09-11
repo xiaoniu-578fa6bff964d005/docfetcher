@@ -17,9 +17,9 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.mozilla.universalchardet.UniversalDetector;
 

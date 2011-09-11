@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.AppUtil;
-import net.sourceforge.docfetcher.base.Util;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
+import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.junit.Test;
 

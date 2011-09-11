@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.junit.Test;
 

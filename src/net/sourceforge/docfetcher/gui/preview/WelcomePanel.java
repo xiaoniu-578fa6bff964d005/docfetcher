@@ -11,13 +11,12 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
-import net.sourceforge.docfetcher.base.AppUtil;
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.Util;
-import net.sourceforge.docfetcher.base.annotations.ForDevelopment;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.gui.Col;
 import net.sourceforge.docfetcher.enums.SystemConf;
+import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -42,7 +41,6 @@ import org.eclipse.swt.widgets.Shell;
  */
 public final class WelcomePanel extends Composite {
 
-	@ForDevelopment
 	public static void main(String[] args) {
 		AppUtil.Const.autoInit();
 		

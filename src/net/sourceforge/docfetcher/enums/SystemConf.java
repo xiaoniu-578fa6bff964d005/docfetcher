@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
-import net.sourceforge.docfetcher.base.ConfLoader.Loadable;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 
 /**
  * This class handles the retrieval of application-wide system constants and

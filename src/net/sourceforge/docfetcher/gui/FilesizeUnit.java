@@ -11,8 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 /**
  * An enumeration of possible filesize units (byte, kilobyte, etc.) with the

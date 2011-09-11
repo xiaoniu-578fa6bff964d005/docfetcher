@@ -11,9 +11,9 @@
 
 package net.sourceforge.docfetcher.model.index.outlook;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.DocumentType;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * @author Tran Nam Quang

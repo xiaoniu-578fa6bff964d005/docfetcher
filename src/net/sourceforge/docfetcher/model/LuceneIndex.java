@@ -15,11 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import net.sourceforge.docfetcher.base.Event;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
-import net.sourceforge.docfetcher.base.annotations.Nullable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.lucene.store.Directory;
 

@@ -14,11 +14,11 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.File;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.base.AppUtil;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.AppUtil;
 
 import org.apache.lucene.store.Directory;
 import org.junit.Test;

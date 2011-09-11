@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.model.index;
 
-import net.sourceforge.docfetcher.base.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang

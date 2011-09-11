@@ -14,8 +14,8 @@ package net.sourceforge.docfetcher.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.annotations.MutableCopy;
-import net.sourceforge.docfetcher.base.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * @author Tran Nam Quang

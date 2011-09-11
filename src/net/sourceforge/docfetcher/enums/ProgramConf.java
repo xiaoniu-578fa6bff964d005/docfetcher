@@ -15,8 +15,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sourceforge.docfetcher.base.ConfLoader.Loadable;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 

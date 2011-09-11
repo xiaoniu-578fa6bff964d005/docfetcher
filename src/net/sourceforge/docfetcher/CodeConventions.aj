@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 
-import net.sourceforge.docfetcher.base.ConfLoader;
-import net.sourceforge.docfetcher.base.ConfLoader.Loadable;
-import net.sourceforge.docfetcher.base.LoopTimer;
-import net.sourceforge.docfetcher.base.Util;
+import net.sourceforge.docfetcher.util.ConfLoader;
+import net.sourceforge.docfetcher.util.LoopTimer;
+import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.program.Program;

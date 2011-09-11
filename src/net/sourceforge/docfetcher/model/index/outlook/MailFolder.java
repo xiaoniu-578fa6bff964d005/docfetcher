@@ -11,8 +11,8 @@
 
 package net.sourceforge.docfetcher.model.index.outlook;
 
-import net.sourceforge.docfetcher.base.annotations.NotNull;
 import net.sourceforge.docfetcher.model.Folder;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * This class is intended to be a generics-free middleman for the Folder class,
