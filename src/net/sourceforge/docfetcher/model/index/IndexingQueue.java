@@ -498,7 +498,7 @@ public final class IndexingQueue {
 
 	public void removeListeners(@NotNull Event.Listener<Task> addedListener,
 								@NotNull Event.Listener<Task> removedListener) {
-		Util.checkNotNull(addedListener);
+		Util.checkNotNull(addedListener, removedListener);
 		writeLock.lock();
 		try {
 			evtAdded.remove(addedListener);

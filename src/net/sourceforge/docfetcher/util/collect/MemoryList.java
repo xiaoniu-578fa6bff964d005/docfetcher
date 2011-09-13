@@ -11,10 +11,14 @@
 
 package net.sourceforge.docfetcher.util.collect;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
+
+import com.google.common.collect.Lists;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -58,14 +62,21 @@ public final class MemoryList<E> implements Collection<E> {
 	}
 
 	/**
-	 * Has the same effect as iterating over the given collection and calling
-	 * {@link #add(Object)} for each element.
+	 * Has the same effect as iterating <b>backwards</b> over the given
+	 * collection and calling {@link #add(Object)} for each element.
+	 * <p>
+	 * The purpose of iterating backwards is to allow clients to use this method
+	 * for initializing the receiver with the given collection, so that the
+	 * order of the elements in the receiver is the same as in the given
+	 * collection, i.e. from most to least recently accessed.
 	 * 
 	 * @see #add(Object)
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection<? extends E> c) {
+		List<E> list = c instanceof List ? (List<E>) c : new ArrayList<E>(c);
 		boolean changed = false;
-		for (E e : c)
+		for (E e : Lists.reverse(list))
 			changed |= add(e);
 		return changed;
 	}
