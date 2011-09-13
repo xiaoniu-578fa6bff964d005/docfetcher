@@ -13,10 +13,12 @@ package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
+import net.sourceforge.docfetcher.util.annotations.Immutable;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
@@ -132,8 +134,9 @@ public final class ProgramConf {
 		StrList(String... value) {
 			this.value = Arrays.asList(value);
 		}
+		@Immutable
 		public List<String> get() {
-			return value;
+			return Collections.unmodifiableList(value);
 		}
 		public void load(String str) {
 			value = Util.decodeStrings(';', str);

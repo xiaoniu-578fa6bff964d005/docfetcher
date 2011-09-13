@@ -13,12 +13,14 @@ package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
+import net.sourceforge.docfetcher.util.annotations.Immutable;
 
 /**
  * This class handles the retrieval of application-wide system constants and
@@ -119,8 +121,9 @@ public final class SystemConf {
 		StrList(String... value) {
 			this.value = Arrays.asList(value);
 		}
+		@Immutable
 		public List<String> get() {
-			return value;
+			return Collections.unmodifiableList(value);
 		}
 		public void load(String str) {
 			value = Util.decodeStrings(';', str);

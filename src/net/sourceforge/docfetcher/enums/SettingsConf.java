@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.enums;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Description;
 import net.sourceforge.docfetcher.util.ConfLoader.Storable;
+import net.sourceforge.docfetcher.util.annotations.Immutable;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
@@ -195,14 +197,15 @@ public final class SettingsConf {
 		;
 
 		public final Event<List<String>> evtChanged = new Event<List<String>> ();
-		public final List<String> defaultValue;
+		@Immutable public final List<String> defaultValue;
 		private List<String> value;
 
 		StrList(String... defaultValue) {
 			value = this.defaultValue = Arrays.asList(defaultValue);
 		}
+		@Immutable
 		public List<String> get() {
-			return value;
+			return Collections.unmodifiableList(value);
 		}
 		public void set(String... value) {
 			if (Util.equals(this.value, value))
