@@ -331,20 +331,6 @@ public final class Searcher {
 		}
 	}
 	
-	// Checks that all indexes still exist
-	@NotNull
-	@NotThreadSafe
-	private void checkIndexesExist() throws SearchException {
-		for (LuceneIndex index : indexes) {
-			File indexDir = index.getIndexDir();
-			if (indexDir != null && !indexDir.isDirectory()) {
-				String msg = "folders_not_found"; // TODO i18n
-				msg += "\n" + Util.getSystemAbsPath(indexDir);
-				throw new SearchException(msg);
-			}
-		}
-	}
-	
 	/**
 	 * For the given query, returns the requested page of results. This method
 	 * should not be called anymore after {@link #shutdown()} has been called,
@@ -404,6 +390,8 @@ public final class Searcher {
 		
 		readLock.lock();
 		try {
+			checkIndexesExist();
+			
 			// Perform search
 			int maxResults = (webQuery.pageIndex + 1) * PAGE_SIZE;
 			TopDocs topDocs = luceneSearcher.search(query, filter, maxResults);
@@ -465,6 +453,22 @@ public final class Searcher {
 			// TODO i18n
 			throw new SearchException("invalid_query.value" + "\n"
 					+ e.getMessage());
+		}
+	}
+	
+	// Checks that all indexes still exist
+	@NotNull
+	@NotThreadSafe
+	private void checkIndexesExist() throws SearchException {
+		if (indexes.isEmpty())
+			throw new SearchException("Nothing to search in: No indexes have been created yet."); // TODO i18n
+		for (LuceneIndex index : indexes) {
+			File indexDir = index.getIndexDir();
+			if (indexDir != null && !indexDir.isDirectory()) {
+				String msg = "folders_not_found"; // TODO i18n
+				msg += "\n" + Util.getSystemAbsPath(indexDir);
+				throw new SearchException(msg);
+			}
 		}
 	}
 	
