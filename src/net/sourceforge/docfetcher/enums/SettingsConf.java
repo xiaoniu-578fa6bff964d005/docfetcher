@@ -126,7 +126,7 @@ public final class SettingsConf {
 			evtChanged.fire(value);
 		}
 		public void load(String str) {
-			value = Integer.parseInt(str);
+			value = Util.toInt(str, value);
 		}
 		public String valueToString() {
 			return Integer.toString(value);
@@ -184,7 +184,7 @@ public final class SettingsConf {
 			evtChanged.fire(value);
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
@@ -263,7 +263,7 @@ public final class SettingsConf {
 			});
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
@@ -301,7 +301,7 @@ public final class SettingsConf {
 			}
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
@@ -338,7 +338,7 @@ public final class SettingsConf {
 			sash.setWeights(weights);
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
@@ -439,7 +439,7 @@ public final class SettingsConf {
 			value = defaultValue= new RGB(hue, saturation, brightness);
 		}
 		public void load(String str) {
-			int[] values = Util.toIntArray(str);
+			int[] values = Util.toIntArray(str, new int[] {value.red, value.green, value.blue});
 			value = new RGB(values[0], values[1], values[2]);
 		}
 		public String valueToString() {

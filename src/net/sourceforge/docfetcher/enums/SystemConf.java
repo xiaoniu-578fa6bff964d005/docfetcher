@@ -70,7 +70,7 @@ public final class SystemConf {
 			return value;
 		}
 		public void load(String str) {
-			value = Integer.parseInt(str);
+			value = Util.toInt(str, value);
 		}
 	}
 
@@ -110,7 +110,7 @@ public final class SystemConf {
 			return value;
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 	}
 	

@@ -87,7 +87,7 @@ public final class ProgramConf {
 			return value;
 		}
 		public void load(String str) {
-			value = Util.clamp(Integer.parseInt(str), min, max);
+			value = Util.clamp(Util.toInt(str, value), min, max);
 		}
 	}
 
@@ -122,7 +122,7 @@ public final class ProgramConf {
 			return value;
 		}
 		public void load(String str) {
-			value = Util.toIntArray(str);
+			value = Util.toIntArray(str, value);
 		}
 	}
 

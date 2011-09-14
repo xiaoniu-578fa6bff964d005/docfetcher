@@ -106,19 +106,56 @@ public final class Util {
 	public static final String FS = System.getProperty("file.separator");
 
 	private Util() {}
-	
+
 	/**
 	 * Splits the given string into an integer array. Any characters other than
 	 * digits and the 'minus' are treated as separators.
+	 * <p>
+	 * If the string cannot be parsed, the given array of default values is
+	 * returned. If the string contains numbers that are greater than
+	 * {@code Integer.MAX_VALUE} or less than {@code Integer.MIN_VALUE}, those
+	 * numbers will be clamped.
 	 */
-	public static int[] toIntArray(String str) {
+	public static int[] toIntArray(String str, int[] defaultValues) {
 		if (str.trim().equals(""))
 			return new int[0];
 		String[] rawValues = str.split("[^-\\d]+");
 		int[] array = new int[rawValues.length];
-		for (int i = 0; i < rawValues.length; i++)
-			array[i] = Integer.parseInt(rawValues[i]);
+		for (int i = 0; i < rawValues.length; i++) {
+			try {
+				array[i] = Integer.parseInt(rawValues[i]);
+			}
+			catch (NumberFormatException e) {
+				if (rawValues[i].matches("\\d{10,}"))
+					array[i] = Integer.MAX_VALUE;
+				else if (rawValues[i].matches("-\\d{10,}"))
+					array[i] = Integer.MIN_VALUE;
+				else
+					return defaultValues;
+			}
+		}
 		return array;
+	}
+
+	/**
+	 * Returns the given integer string as an {@code int} value. Leading and
+	 * trailing whitespaces are ignored. If the string cannot be parsed, the
+	 * given default value is returned. If the string is a number, but greater
+	 * than {@code Integer.MAX_VALUE} or less than {@code Integer.MIN_VALUE}, a
+	 * clamped value is returned.
+	 */
+	public static int toInt(String value, int defaultValue) {
+		value = value.trim();
+		try {
+			return Integer.parseInt(value);
+		}
+		catch (NumberFormatException e) {
+			if (value.matches("\\d{10,}"))
+				return Integer.MAX_VALUE;
+			else if (value.matches("-\\d{10,}"))
+				return Integer.MIN_VALUE;
+		}
+		return defaultValue;
 	}
 
 	/**
