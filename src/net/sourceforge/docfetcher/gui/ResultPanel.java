@@ -117,7 +117,7 @@ public final class ResultPanel {
 		
 		viewer.addColumn(new Column<ResultDocument>("Size", SWT.RIGHT) { // TODO i18n
 			protected String getLabel(ResultDocument element) {
-				return String.valueOf(element.getSizeInKB()) + " KB";
+				return String.format("%,d KB", element.getSizeInKB());
 			}
 		});
 
