@@ -371,22 +371,24 @@ public final class AppUtil {
 	}
 
 	/**
-	 * Shows the given message in an error message box. If <tt>isSevere</tt> is
-	 * true, an error icon is shown, otherwise a warning icon. If
-	 * <tt>isUserError</tt> is true, the shell title is set to
+	 * Shows the given message in an error message box. If
+	 * <tt>errorNotWarning</tt> is true, an error icon is shown, otherwise a
+	 * warning icon. If <tt>isUserError</tt> is true, the shell title is set to
 	 * "Invalid Operation", otherwise "System Error".
 	 * <p>
 	 * This method may be called from a non-GUI thread. It should not be called
 	 * before the first shell is created.
 	 */
-	public static void showError(final String message, final boolean isSevere, final boolean isUserError) {
+	public static void showError(	@NotNull final String message,
+									final boolean errorNotWarning,
+									final boolean isUserError) {
 		checkConstInitialized();
 		ensureDisplay();
 		
 		Util.runSwtSafe(display, new Runnable() {
 			public void run() {
 				int style = SWT.OK;
-				style |= isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING;
+				style |= errorNotWarning ? SWT.ICON_ERROR : SWT.ICON_WARNING;
 				MessageBox msgBox = new MessageBox(getActiveShell(), style);
 				msgBox.setText(isUserError ? Msg.invalid_operation.value
 						: Msg.system_error.value);

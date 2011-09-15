@@ -158,6 +158,20 @@ public final class PreviewPanel extends Composite {
 		}
 	}
 	
+	// Returns the currently displayed result document, if there is one
+	@Nullable
+	@ThreadSafe
+	public ResultDocument clear() {
+		Util.assertSwtThread();
+		disposeLastResources();
+		requestCount++;
+		setError(null, requestCount);
+		clearPreviews(true, true, true);
+		ResultDocument ret = lastDoc;
+		lastDoc = null;
+		return ret;
+	}
+	
 	@NotThreadSafe
 	private void clearPreviews(boolean text, boolean email, boolean html) {
 		if (text)

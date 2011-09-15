@@ -33,6 +33,7 @@ import net.sourceforge.docfetcher.gui.SearchBar;
 import net.sourceforge.docfetcher.gui.SearchQueue;
 import net.sourceforge.docfetcher.gui.StatusBar;
 import net.sourceforge.docfetcher.gui.StatusBar.StatusBarPart;
+import net.sourceforge.docfetcher.gui.SystemTrayHider;
 import net.sourceforge.docfetcher.gui.ThreePanelForm;
 import net.sourceforge.docfetcher.gui.ToolBarForm;
 import net.sourceforge.docfetcher.gui.TwoFormExpander;
@@ -47,9 +48,9 @@ import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.ConfLoader;
+import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
-import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
@@ -96,6 +97,7 @@ public final class Main {
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
 	private static StatusBarPart indexingDialogStatusBarPart;
+	private static SystemTrayHider systemTrayHider;
 
 	private Main() {
 		throw new UnsupportedOperationException();
@@ -173,6 +175,8 @@ public final class Main {
 			shell.setText(SystemConf.Str.ProgramName.get());
 		else
 			shell.setText(ProgramConf.Str.AppName.get());
+		
+		initSystemTrayHider();
 
 		ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
 			protected Control createFirstControl(Composite parent) {
@@ -461,6 +465,12 @@ public final class Main {
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).top().left().right().applyTo(searchBar.getControl());
 		fdf.top(searchBar.getControl()).bottom().applyTo(resultPanel.getControl());
+		
+		searchBar.evtHideInSystemTray.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				systemTrayHider.hide();
+			}
+		});
 
 		resultPanel.evtSelection.add(new Event.Listener<List<ResultDocument>>() {
 			public void update(List<ResultDocument> eventData) {
@@ -479,6 +489,45 @@ public final class Main {
 		dest = display.map(shell, null, dest);
 		MovingBox movingBox = new MovingBox(shell, src, dest, 0.2, 40);
 		movingBox.start();
+	}
+	
+	/*
+	 * Sets up system tray hiding.
+	 */
+	private static void initSystemTrayHider() {
+		systemTrayHider = new SystemTrayHider(shell);
+		
+		final ResultDocument[] lastDoc = new ResultDocument[1];
+		
+		systemTrayHider.evtHiding.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				/*
+				 * If DocFetcher is sent to the system tray while being
+				 * maximized and showing a big file on the preview panel, one
+				 * would experience an annoying delay once the program returns
+				 * from the system tray. The workaround is to clear the preview
+				 * panel before going to the system tray and reset it when we
+				 * come back.
+				 */
+				lastDoc[0] = previewPanel.clear();
+			}
+		});
+		
+		systemTrayHider.evtRestored.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				if (lastDoc[0] != null) {
+					previewPanel.setPreview(lastDoc[0]);
+					lastDoc[0] = null;
+				}
+				searchBar.setFocus();
+			}
+		});
+		
+		systemTrayHider.evtShutdown.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				shell.close();
+			}
+		});
 	}
 
 }

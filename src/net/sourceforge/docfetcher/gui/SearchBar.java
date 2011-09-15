@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.ToolBar;
 public final class SearchBar {
 	
 	public final Event<String> evtSearch = new Event<String>();
+	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	
 	private final Composite comp;
 	private final Combo searchBox;
@@ -90,6 +91,13 @@ public final class SearchBar {
 					public void widgetSelected(SelectionEvent e) {
 						WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
 						dialog.open();
+					}
+				}).create();
+		
+		tif.image(Img.HIDE.get()).toolTip("to_systray")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						evtHideInSystemTray.fire(null);
 					}
 				}).create();
 		

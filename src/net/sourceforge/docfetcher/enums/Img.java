@@ -36,8 +36,10 @@ import org.eclipse.swt.graphics.Image;
 public enum Img implements FilenameProvider {
 	
 	DOCFETCHER_16 ("docfetcher16.png"),
+	DOCFETCHER_24 ("docfetcher24.png"),
 	DOCFETCHER_32 ("docfetcher32.png"),
 	DOCFETCHER_48 ("docfetcher48.png"),
+	
 	INDEXING ("indexing.gif"),
 	MINIMIZE ("minimize.gif"),
 	MAXIMIZE ("maximize.gif"),
