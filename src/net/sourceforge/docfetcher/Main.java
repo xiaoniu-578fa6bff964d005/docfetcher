@@ -479,6 +479,12 @@ public final class Main {
 				// TODO update status bar
 			}
 		});
+		
+		resultPanel.evtHideInSystemTray.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				systemTrayHider.hide();
+			}
+		});
 
 		return comp;
 	}

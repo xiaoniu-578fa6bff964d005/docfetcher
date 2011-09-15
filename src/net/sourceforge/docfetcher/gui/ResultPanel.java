@@ -18,12 +18,17 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.model.FileResource;
+import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.FileIconCache;
+import net.sourceforge.docfetcher.util.gui.MenuAction;
 import net.sourceforge.docfetcher.util.gui.VirtualTableViewer;
 import net.sourceforge.docfetcher.util.gui.VirtualTableViewer.Column;
 
@@ -73,6 +78,7 @@ public final class ResultPanel {
 	private static final DateFormat dateFormat = new SimpleDateFormat();
 	
 	public final Event<List<ResultDocument>> evtSelection = new Event<List<ResultDocument>> ();
+	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	
 	private final VirtualTableViewer<ResultDocument> viewer;
 	private final FileIconCache iconCache;
@@ -91,6 +97,8 @@ public final class ResultPanel {
 		};
 		
 		viewer.getControl().setHeaderVisible(true);
+		
+		initContextMenu();
 		
 		viewer.getControl().addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -178,6 +186,58 @@ public final class ResultPanel {
 		
 		// TODO check if navigating to previous/next page clears
 		// the vertical scrolling, but not the horizontal scrolling
+	}
+
+	private void initContextMenu() {
+		// TODO i18n
+		
+		ContextMenuManager menuManager = new ContextMenuManager(viewer.getControl());
+		
+		menuManager.add(new MenuAction("open") {
+			public boolean isEnabled() {
+				List<ResultDocument> sel = viewer.getSelection();
+				return sel.size() == 1 && !sel.get(0).isEmail();
+			}
+			public void run() {
+				FileResource fileResource = null;
+				try {
+					fileResource = viewer.getSelection().get(0).getFileResource();
+					Util.launch(fileResource.getFile());
+					if (SettingsConf.Bool.HideOnOpen.get())
+						evtHideInSystemTray.fire(null);
+				}
+				catch (ParseException e) {
+					AppUtil.showError(e.getMessage(), true, false);
+				}
+				finally {
+					if (fileResource != null)
+						fileResource.dispose();
+				}
+			}
+		});
+		
+		menuManager.add(new MenuAction("open_parent") {
+			public boolean isEnabled() {
+				List<ResultDocument> sel = viewer.getSelection();
+				return sel.size() == 1;
+			}
+			public void run() {
+				// TODO
+				if (SettingsConf.Bool.HideOnOpen.get())
+					evtHideInSystemTray.fire(null);
+			}
+		});
+		
+		menuManager.addSeparator();
+		
+		menuManager.add(new MenuAction("copy\tCtrl+C") {
+			public boolean isEnabled() {
+				return !viewer.getSelection().isEmpty();
+			}
+			public void run() {
+				// TODO See 1.0.3 ResultPanel.copySelectionToClipboard
+			}
+		});
 	}
 	
 	@NotNull

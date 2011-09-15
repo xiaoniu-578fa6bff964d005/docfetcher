@@ -72,6 +72,7 @@ public final class SettingsConf {
 		UseOrOperator (true),
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
+		HideOnOpen (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();
