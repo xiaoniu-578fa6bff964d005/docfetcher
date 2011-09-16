@@ -26,9 +26,6 @@ public class ToolBarForm extends Composite {
 	@NotNull private final ToolBarFormHeader header;
 	@NotNull private final Control contents;
 
-	// TODO set image tooltip
-	// TODO click on image -> reset filter
-	
 	public ToolBarForm(Composite parent) {
 		super(parent, SWT.NONE);
 		setLayout(Util.createGridLayout(1, false, 0, 0));

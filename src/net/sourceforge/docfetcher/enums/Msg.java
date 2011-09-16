@@ -17,8 +17,8 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 public enum Msg {
 	
+	// TODO pre-release: remove unused message strings
 	
-	// TODO remove unused message strings
 	search_with_docfetcher ("Search With DocFetcher"),
 	report_bug ("Ooops! This program just died! " +
 			"Please help us to fix this problem by " +

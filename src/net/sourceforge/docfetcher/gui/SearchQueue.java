@@ -108,7 +108,7 @@ public final class SearchQueue {
 		
 		searchBar.evtSearch.add(new Event.Listener<String>() {
 			public void update(String eventData) {
-				// TODO abort with message if there are no indexes
+				// TODO now: abort with message if there are no indexes
 				// -> is the isEmpty check in IndexRegistry.search redundant?
 				lock.lock();
 				try {
@@ -164,7 +164,7 @@ public final class SearchQueue {
 		
 		indexPanel.evtListDocuments.add(new Event.Listener<Set<String>>() {
 			public void update(Set<String> eventData) {
-				// TODO abort with message if there are no indexes
+				// TODO now: abort with message if there are no indexes
 				// -> is the isEmpty check in IndexRegistry.search redundant?
 				lock.lock();
 				try {
@@ -298,7 +298,7 @@ public final class SearchQueue {
 			public void run() {
 				resultPanel.setResults(visibleResults, mode);
 				searchBar.setEnabled(true);
-				// TODO move focus to result panel
+				// TODO now: move focus to result panel
 				
 				if (query != null)
 					searchBar.addToSearchHistory(query);

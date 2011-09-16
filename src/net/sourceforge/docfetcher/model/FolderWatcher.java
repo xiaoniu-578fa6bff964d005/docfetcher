@@ -226,7 +226,7 @@ public final class FolderWatcher {
 				 * watch the parent folder instead if our target is a file
 				 * (for example a PST file).
 				 * 
-				 * TODO check this for Mac OS X
+				 * TODO mac: check this for Mac OS X
 				 */
 				File fileToWatch = rootFile.isFile() && !Util.IS_LINUX
 					? Util.getParentFile(rootFile)
@@ -238,7 +238,7 @@ public final class FolderWatcher {
 					watchIdMap.put(index, id);
 				}
 				catch (Exception e) {
-					// TODO suggest raising the global watch limit
+					// TODO now: suggest raising the global watch limit
 					String msg = String.format(
 						"Failed to install watch for folder '%s'.\n\n"
 								+ "Internal error message:\n%s",

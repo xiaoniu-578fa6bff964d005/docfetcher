@@ -36,7 +36,7 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 @SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
 	
-	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO add more extensions
+	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO now: add more zip extensions
 	private static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
 	private static final FileFilter defaultFileFilter = new FileFilter();
 	private static final Pattern defaultMimePattern = Pattern.compile("");

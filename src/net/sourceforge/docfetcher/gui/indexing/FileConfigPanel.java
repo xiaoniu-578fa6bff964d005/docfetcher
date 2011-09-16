@@ -33,13 +33,12 @@ final class FileConfigPanel extends ConfigPanel {
 		super(parent);
 		Util.checkNotNull(config);
 		
-		// TODO
+		// TODO now: implement file config panel
 		setLayout(new RowLayout());
 		Button bt = new Button(this, SWT.PUSH);
 		bt.setText("Run");
 		bt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO only fire event if configuration is valid
 				evtRunButtonClicked.fire(config);
 			}
 		});

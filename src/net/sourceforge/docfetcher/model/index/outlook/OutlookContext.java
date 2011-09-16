@@ -97,15 +97,15 @@ final class OutlookContext {
 		luceneDoc.add(Fields.DATE.create(String.valueOf(date)));
 		luceneDoc.add(Fields.SIZE.create(size));
 		luceneDoc.add(Fields.PARSER.create(Fields.EMAIL_PARSER));
-		// TODO Store a more informative path to the email for display on the result panel
-		// TODO Fill in more fields as necessary
+		// TODO now: Store a more informative path to the email for display on the result panel
+		// TODO pre-release: Fill in more fields as necessary
 		
 		StringBuilder contents = new StringBuilder();
 		contents.append(subject).append(" ");
 		contents.append(sender).append(" ");
 		contents.append(recipients).append(" ");
 		contents.append(body).append(" ");
-		// TODO Fill in more fields as necessary
+		// TODO pre-release: Fill in more fields as necessary
 		
 		luceneDoc.add(Fields.createContent(contents));
 		
@@ -116,8 +116,8 @@ final class OutlookContext {
 			protected void handleAttachment(String filename,
 											File tempFile)
 					throws ParseException {
-				// TODO Don't try to parse all files -> call ParseService.canParse
-				// TODO later: Maybe recurse into archive attachments
+				// TODO now: Don't try to parse all files -> call ParseService.canParse
+				// TODO post-release-1.1: Maybe recurse into archive attachments
 				ParseResult parseResult = ParseService.parse(
 					config, filename, tempFile, reporter, cancelable);
 				luceneDoc.add(Fields.createContent(parseResult.getContent()));

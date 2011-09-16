@@ -357,7 +357,7 @@ public final class FileFactory {
 												@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
 			FileNotFoundException, IOException {
-		// TODO can we check if the archive or the target archive entry is encrypted?
+		// TODO now: can we check if the archive or the target archive entry is encrypted?
 		assert UtilModel.noTrailingSlash(entryPath);
 		
 		IInArchive archive = new Handler();
@@ -373,7 +373,7 @@ public final class FileFactory {
 				assert ! currentPath.contains("\\");
 				assert UtilModel.noTrailingSlash(currentPath);
 
-				// TODO throw disk space exception
+				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
 					File unpackedFile = unpack7zEntry(config, archive, currentPath, i);
 					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
@@ -489,7 +489,7 @@ public final class FileFactory {
 				currentPath = currentPath.replace('\\', '/');
 				assert UtilModel.noTrailingSlash(currentPath);
 				
-				// TODO throw disk space exception
+				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
 					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
 					File unpackedFile = unpackRarEntry(config, archive, fh, entryPath);

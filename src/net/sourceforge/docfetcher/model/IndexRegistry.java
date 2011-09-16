@@ -66,7 +66,7 @@ public final class IndexRegistry {
 	}
 
 	/*
-	 * TODO code convention: Don't access Version elsewhere, don't instantiate
+	 * TODO websearch: code convention: Don't access Version elsewhere, don't instantiate
 	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsehwere.
 	 */
 	@VisibleForPackageGroup
@@ -468,7 +468,7 @@ public final class IndexRegistry {
 			finally {
 				Closeables.closeQuietly(out);
 				
-				// TODO temporary code
+				// TODO pre-release: temporary code
 				if (serFile.length() == 0)
 					AppUtil.showError("Corrupted file: " + serFile.getPath(), true, false);
 			}
@@ -476,7 +476,7 @@ public final class IndexRegistry {
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());
 			
-			// TODO Write indexes.txt file used by the daemon
+			// TODO now: Write indexes.txt file used by the daemon
 		}
 		finally {
 			writeLock.unlock();
@@ -502,7 +502,7 @@ public final class IndexRegistry {
 		private static final IndexComparator instance = new IndexComparator();
 
 		public int compare(LuceneIndex o1, LuceneIndex o2) {
-			// TODO use alphanum comparator
+			// TODO now: use alphanum comparator
 			return o1.getDisplayName().compareTo(o2.getDisplayName());
 		}
 	}

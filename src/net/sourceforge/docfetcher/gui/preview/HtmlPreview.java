@@ -106,7 +106,7 @@ final class HtmlPreview extends ToolBarForm {
 						if (url.equals(""))
 							return;
 						Util.launch(url);
-						// TODO minimize DocFetcher to system tray
+						// TODO now: minimize DocFetcher to system tray
 						// (depends on program settings)
 					}
 				}).create();
@@ -143,7 +143,7 @@ final class HtmlPreview extends ToolBarForm {
 	
 	@NotNull
 	protected Control createContents(@NotNull Composite parent) {
-		// TODO Add program.conf entry to allow using Mozilla (SWT.MOZILLA) or WebKit browser
+		// TODO websearch: Add program.conf entry to allow using Mozilla (SWT.MOZILLA) or WebKit browser
 		browser = new Browser(parent, SWT.BORDER);
 		
 		browser.addLocationListener(new LocationAdapter() {
@@ -184,7 +184,7 @@ final class HtmlPreview extends ToolBarForm {
 		return browser;
 	}
 	
-	// TODO maybe add HTML highlighting
+	// TODO post-release-1.1: maybe add HTML highlighting
 	/**
 	 * Sets the file to be displayed.
 	 */

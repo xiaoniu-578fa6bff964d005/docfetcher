@@ -60,7 +60,7 @@ public final class OutlookMailResource extends MailResource {
 		attachments = new ArrayList<Attachment> (email.getNumberOfAttachments());
 		
 		new AttachmentVisitor(config, email, false) {
-			// TODO tell attachment visitor to skip a file if it was found in the cache
+			// TODO now: tell attachment visitor to skip a file if it was found in the cache
 			protected void handleAttachment(String filename,
 											File tempFile) throws Exception {
 				String cacheKey = Util.joinPath(emailId, filename);
@@ -69,7 +69,7 @@ public final class OutlookMailResource extends MailResource {
 			}
 			protected void handleException(	String filename,
 											Exception e) {
-				// TODO if parsing of this file failed, show an error for the
+				// TODO now: if parsing of this file failed, show an error for the
 				// file on the preview panel
 			}
 		}.run();

@@ -64,7 +64,7 @@ import com.sun.jna.WString;
 public final class Util {
 	
 	/*
-	 * TODO consider structuring the methods in this class by putting them into
+	 * TODO pre-release: consider structuring the methods in this class by putting them into
 	 * public static inner classes.
 	 */
 
@@ -1058,7 +1058,7 @@ public final class Util {
 		return file1.getAbsoluteFile().equals(file2.getAbsoluteFile());
 	}
 
-	// TODO Debug method; show AspectJ warnings whenever it is used
+	// TODO now: Debug method; show AspectJ warnings whenever it is used
 	@SuppressAjWarnings
 	public static void println(@NotNull Object... objects) {
 		StringBuilder sb = new StringBuilder();

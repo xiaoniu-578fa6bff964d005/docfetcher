@@ -22,22 +22,24 @@ import net.sourceforge.docfetcher.model.index.IndexingReporter;
  */
 final class ChmParser extends FileParser {
 
+	// TODO websearch: parser
+	
 	protected ParseResult parse(File file,
 								IndexingReporter reporter,
 								Cancelable cancelable) throws ParseException {
-		return null; // TODO
+		return null;
 	}
 
 	protected Collection<String> getExtensions() {
-		return null; // TODO
+		return null;
 	}
 
 	protected Collection<String> getTypes() {
-		return null; // TODO
+		return null;
 	}
 	
 	public String getTypeLabel() {
-		return "CHM"; // TODO
+		return "CHM";
 	}
 
 }

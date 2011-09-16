@@ -187,7 +187,7 @@ public final class IndexingQueue {
 				indexRegistry.addIndex(luceneIndex);
 				indexRegistry.save(luceneIndex);
 				boolean keep = task.is(CancelAction.KEEP);
-				boolean noErrors = true; // TODO
+				boolean noErrors = true; // TODO now: take collected errors into account
 				if (keep || noErrors || shutdown)
 					fireRemoved = tasks.remove(task);
 			}

@@ -103,11 +103,10 @@ public final class IndexPanel {
 			public int compare(ViewNode o1, ViewNode o2) {
 				String name1 = o1.getDisplayName();
 				String name2 = o2.getDisplayName();
-				return name1.compareTo(name2); // TODO use alphanum comparator
+				return name1.compareTo(name2); // TODO now: use alphanum comparator
 			}
 		};
 
-		// TODO test code
 		viewer = new SimpleTreeViewer<ViewNode>(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI) {
 			protected Iterable<ViewNode> getChildren(ViewNode element) {
 				return element.getChildren();
@@ -184,8 +183,8 @@ public final class IndexPanel {
 
 	private void initContextMenu() {
 		ContextMenuManager menuManager = new ContextMenuManager(tree);
-		// TODO set enabled states of menu items
-		// TODO set keyboard shortcuts of menu items
+		// TODO pre-release: check that enabled states of menu items are set correctly
+		// TODO pre-release: check that keyboard shortcuts of menu items are set correctly
 		// TODO i18n menu item labels
 		menuManager.add(new MenuAction("Create Index...") {
 			public void run() {
@@ -414,7 +413,7 @@ public final class IndexPanel {
 				Display display = tree.getDisplay();
 				Point pos = display.getCursorLocation();
 				pos = display.map(null, tree, pos);
-				// TODO test on Windows that the model node is always found
+				// TODO now: test on Windows that the model node is always found
 				clickedNode[0] = viewer.getElement(pos);
 				if (clickedNode[0] != null)
 					Folder.evtFolderRemoved.add(menuHider);
@@ -534,7 +533,7 @@ public final class IndexPanel {
 
 		File pstFile = getOutlookPSTFile();
 		if (pstFile != null) {
-			// TODO On Windows, if the path is very long, the message dialog's width is too large
+			// TODO now: On Windows, if the path is very long, the message dialog's width is too large
 			String msg = "PST file found: " + pstFile + ". Index this file?";
 			int ans = AppUtil.showConfirmation(msg, false); // TODO i18n
 			if (ans == SWT.OK)

@@ -45,10 +45,10 @@ public final class PdfParser extends StreamParser {
 		PDDocument pdfDoc = null;
 		try {
 			/*
-			 * TODO check if 'force' argument in PDDocument/Stripper increases
+			 * TODO now: check if 'force' argument in PDDocument/Stripper increases
 			 * number of parsed PDF files
 			 * 
-			 * TODO maybe write unit test that checks that the default values
+			 * TODO now: maybe write unit test that checks that the default values
 			 * for force-parsing and sort-by-position are both false.
 			 */
 			pdfDoc = PDDocument.load(in, true);
@@ -109,7 +109,7 @@ public final class PdfParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "PDF"; // TODO
+		return "PDF"; // TODO i18n
 	}
 
 }

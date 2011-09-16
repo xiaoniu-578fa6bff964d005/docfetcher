@@ -70,8 +70,10 @@ final class WebInterfaceDialog {
 		
 		enableButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO start or stop web interface
-				// TODO also stop web interface automatically when the program exits (in Main class)
+				/*
+				 * TODO web interface: start or stop web interface
+				 * TODO web interface: also stop web interface automatically when the program exits (in Main class)
+				 */
 			}
 		});
 		
@@ -84,7 +86,7 @@ final class WebInterfaceDialog {
 		});
 		
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.bottom().right().minWidth(75).applyTo(closeButton); // TODO set button width
+		fdf.bottom().right().minWidth(75).applyTo(closeButton); // TODO now: set button width
 		fdf.reset().bottom(closeButton).left().top().right().applyTo(comp);
 	}
 	

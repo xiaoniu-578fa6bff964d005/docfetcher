@@ -24,8 +24,6 @@ import de.schlichtherle.truezip.file.TFile;
  */
 public final class UtilModelTest {
 	
-	// TODO exclude junit jar from build
-	
 	@Test
 	public void testGetRelativePath() {
 		String[] tests = {

@@ -256,7 +256,7 @@ public final class Searcher {
 			checkIndexesExist();
 			
 			// Perform search
-			// TODO calling search can throw an OutOfMemoryError -> catch it
+			// TODO now: calling search can throw an OutOfMemoryError -> catch it
 			ScoreDoc[] scoreDocs = luceneSearcher.search(query, MAX_RESULTS).scoreDocs;
 
 			// Create result documents
@@ -298,7 +298,7 @@ public final class Searcher {
 			checkIndexesExist();
 			
 			// Perform search
-			// TODO calling search can throw an OutOfMemoryError -> catch it
+			// TODO now: calling search can throw an OutOfMemoryError -> catch it
 			ScoreDoc[] scoreDocs = luceneSearcher.search(query, uidFilter, MAX_RESULTS).scoreDocs;
 			
 			// Create result documents
@@ -316,7 +316,7 @@ public final class Searcher {
 			// Sort results by title
 			Arrays.sort(results, new Comparator<ResultDocument>() {
 				public int compare(ResultDocument o1, ResultDocument o2) {
-					// TODO use alphanum comparator
+					// TODO now: use alphanum comparator
 					return o1.getTitle().compareTo(o2.getTitle());
 				}
 			});

@@ -27,9 +27,9 @@ import org.apache.lucene.document.NumericField;
 @VisibleForPackageGroup
 public enum Fields {
 	
-	// TODO check correctness of usage of Store.XXX, Index.XXX options
-	// TODO check if storing the file extension is necessary
-	// TODO some enums here are not used yet
+	// TODO pre-release: check correctness of usage of Store.XXX, Index.XXX options
+	// TODO pre-release: check if storing the file extension is necessary
+	// TODO pre-release: some enums here are not used yet
 	
 	/*
 	 * Note: All information that will be displayed on the result table must be
@@ -58,7 +58,7 @@ public enum Fields {
 	// Fields available for emails
 	SUBJECT (Store.YES, Index.ANALYZED),
 	SENDER (Store.YES, Index.ANALYZED),
-	RECIPIENTS (Store.NO, Index.ANALYZED), // TODO store this field and show on results panel in "email mode"
+	RECIPIENTS (Store.NO, Index.ANALYZED), // TODO now: store this field and show on results panel in "email mode"
 	DATE (Store.YES, Index.NO),
 	;
 	

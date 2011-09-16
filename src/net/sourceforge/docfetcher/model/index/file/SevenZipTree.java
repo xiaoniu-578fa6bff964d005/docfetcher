@@ -80,7 +80,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 				// do nothing
 			}
 			public boolean isEncrypted() {
-				// TODO to implement
+				// TODO now: to implement
 				return false;
 			}
 		};
@@ -130,7 +130,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 			return entry.getSize();
 		}
 		public boolean isEncrypted(SevenZipEntry entry) {
-			// TODO To implement
+			// TODO now: To implement
 			return false;
 		}
 	}

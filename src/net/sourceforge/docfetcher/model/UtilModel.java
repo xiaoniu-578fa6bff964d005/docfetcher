@@ -58,10 +58,10 @@ public final class UtilModel {
 	private UtilModel() {
 	}
 
-	// TODO Check: Can any of these methods be replaced by more efficient
+	// TODO pre-release: Can any of these methods be replaced by more efficient
 	// Guava or Commons Lang 3 functionality?
 
-	// TODO Check: Are any of these methods only used locally? If so,
+	// TODO pre-release: Are any of these methods only used locally? If so,
 	// move them to the call site.
 
 	/**
@@ -218,7 +218,7 @@ public final class UtilModel {
 	@VisibleForPackageGroup
 	public static boolean isZipArchive(@NotNull TFile file) {
 		/*
-		 * TODO later: Replace this hack if a future TrueZIP version ever
+		 * TODO post-release-1.1: Replace this hack if a future TrueZIP version ever
 		 * provides a way to distinguish between directories and zip archives.
 		 */
 		if (file.isFile())
@@ -287,7 +287,7 @@ public final class UtilModel {
 		return splitAtExisting(leftParts[0], newRight);
 	}
 
-	// TODO also check preceding slashes?
+	// TODO now: also check preceding slashes?
 	public static boolean noTrailingSlash(@NotNull String path) {
 		int length = path.length();
 		if (length == 0) return true;

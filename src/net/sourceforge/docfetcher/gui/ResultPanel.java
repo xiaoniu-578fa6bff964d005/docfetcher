@@ -44,11 +44,9 @@ import org.eclipse.swt.widgets.Table;
  */
 public final class ResultPanel {
 	
-	// TODO SWT bug: setting an image, then setting the image to null leaves an indent
-	// TODO hide second sender column when there are only emails?
-	// TODO show an additional icon if an email has attachments
-	// TODO show some helpful overlay message if a search yielded no results
-	// TODO implement page navigation
+	// TODO now: SWT bug: setting an image, then setting the image to null leaves an indent
+	// TODO now: show an additional icon if an email has attachments
+	// TODO post-release-1.1: show some helpful overlay message if a search yielded no results
 	
 	public enum HeaderMode {
 		FILES { protected void setLabel(VariableHeaderColumn<?> column) {
@@ -176,16 +174,15 @@ public final class ResultPanel {
 		});
 		
 		SettingsConf.ColumnWidths.ResultPanel.bind(viewer.getControl());
-		
-		// TODO Adjust column headers:
-		// - Title/Subject
-		// - Filename/Sender
-		// - Last-Modified/Sent Date
-		
-		// TODO make column headers movable and clickable
-		
-		// TODO check if navigating to previous/next page clears
-		// the vertical scrolling, but not the horizontal scrolling
+
+		/*
+		 * TODO now: Adjust result column headers:
+		 * - Title/Subject
+		 * - Filename/Sender
+		 * - Last-Modified/Sent Date
+		 * 
+		 * make column headers movable and clickable
+		 */
 	}
 
 	private void initContextMenu() {
@@ -222,7 +219,7 @@ public final class ResultPanel {
 				return sel.size() == 1;
 			}
 			public void run() {
-				// TODO
+				// TODO now
 				if (SettingsConf.Bool.HideOnOpen.get())
 					evtHideInSystemTray.fire(null);
 			}
@@ -235,7 +232,7 @@ public final class ResultPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				// TODO See 1.0.3 ResultPanel.copySelectionToClipboard
+				// TODO now: See 1.0.3 ResultPanel.copySelectionToClipboard
 			}
 		});
 	}
@@ -248,7 +245,6 @@ public final class ResultPanel {
 	// header mode: auto-detect for "files + emails", no auto-detect for files and emails mode
 	public void setResults(	@NotNull List<ResultDocument> results,
 							@NotNull HeaderMode headerMode) {
-		// TODO
 		Util.checkNotNull(results, headerMode);
 		
 		if (this.presetHeaderMode != headerMode) {
@@ -256,7 +252,7 @@ public final class ResultPanel {
 				updateColumnHeaders(headerMode);
 			this.presetHeaderMode = headerMode;
 		}
-		setActualHeaderMode(results); // TODO needs some refactoring
+		setActualHeaderMode(results); // TODO now: needs some refactoring
 		
 		viewer.setRoot(results);
 		viewer.scrollToTop();

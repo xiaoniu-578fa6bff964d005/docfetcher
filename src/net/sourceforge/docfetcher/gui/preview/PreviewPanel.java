@@ -278,7 +278,7 @@ public final class PreviewPanel extends Composite {
 			super(doc, startCount);
 		}
 		protected void doRun(Hider overlayHider) throws ParseException {
-			// TODO catch OutOfMemoryErrors
+			// TODO now: catch OutOfMemoryErrors
 			final MailResource mailResource = doc.getMailResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
@@ -296,11 +296,11 @@ public final class PreviewPanel extends Composite {
 			super(doc, startCount);
 		}
 		protected void doRun(Hider overlayHider) throws ParseException {
-			// TODO catch OutOfMemoryErrors
+			// TODO now: catch OutOfMemoryErrors
 			final FileResource htmlResource = doc.getFileResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
-					// TODO Browser may not be available on the system -> will throw an SWTError
+					// TODO websearch: Browser may not be available on the system -> will throw an SWTError
 					htmlPreview.setFile(htmlResource.getFile());
 					lastHtmlResource = htmlResource; // Save a reference for disposal
 				}
@@ -369,7 +369,7 @@ public final class PreviewPanel extends Composite {
 			
 			queue.put(new Item(null, true));
 			
-			// TODO catch OutOfMemoryErrors
+			// TODO now: catch OutOfMemoryErrors
 		}
 	}
 	
@@ -380,7 +380,7 @@ public final class PreviewPanel extends Composite {
 		protected void doRun(Hider overlayHider) throws ParseException {
 			HighlightedString string = doc.getHighlightedText();
 			setTextSafely(string, startCount, false);
-			// TODO catch OutOfMemoryErrors
+			// TODO now: catch OutOfMemoryErrors
 		}
 	}
 	

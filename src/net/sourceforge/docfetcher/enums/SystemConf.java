@@ -39,7 +39,7 @@ import net.sourceforge.docfetcher.util.annotations.Immutable;
  */
 public final class SystemConf {
 	
-	// TODO remove unused entries
+	// TODO pre-release: remove unused entries
 	
 	public static enum Bool implements Loadable {
 		IsPortable (true),

@@ -131,7 +131,7 @@ final class TextPreview extends ToolBarForm {
 	
 	@NotNull
 	protected Control createContents(@NotNull Composite parent) {
-		// TODO put text viewer into a container with margins
+		// TODO now: put text viewer into a container with margins
 		textViewer = new HighlightingText(parent);
 		
 		textViewer.getControl().addSelectionListener(new SelectionAdapter() {

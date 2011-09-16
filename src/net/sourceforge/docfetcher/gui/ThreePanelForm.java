@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public abstract class ThreePanelForm extends FixedSashForm {
 	
-	// TODO Vertical and horizontal layout have separate sash weights
+	// TODO now: Vertical and horizontal layout have separate sash weights
 	
 	private SashForm sash;
 	private Composite secondControl;

@@ -71,7 +71,7 @@ final class TextParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "Plain Text"; // TODO
+		return "Plain Text"; // TODO i18n
 	}
 
 }

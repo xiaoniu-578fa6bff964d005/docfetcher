@@ -64,7 +64,7 @@ import com.google.common.primitives.Ints;
  */
 public final class SettingsConf {
 	
-	// TODO remove unused entries
+	// TODO pre-release: remove unused entries
 
 	@Description("# Boolean entries. Allowed values: true, false")
 	public static enum Bool implements Storable {
@@ -348,7 +348,7 @@ public final class SettingsConf {
 
 	@Description("# Font entries, consisting of font name, height and style.")
 	public static enum Font implements Storable {
-		// TODO update system fonts on SWT.Settings event
+		// TODO now: update system fonts on SWT.Settings event
 
 		/** A bold version of the system font; will be set during runtime. */
 		SystemBold ("Times", 12, SWT.BOLD),

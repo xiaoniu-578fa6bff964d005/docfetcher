@@ -82,7 +82,7 @@ public final class IndexingDialog implements Dialog {
 							@NotNull final IndexRegistry indexRegistry) {
 		this.indexRegistry = Util.checkNotNull(indexRegistry);
 
-		// TODO
+		// TODO now
 //		// Open the indexing dialog only if DocFetcher doesn't hide in the system tray
 //		if (DocFetcher.getInstance().getShell().isVisible()) {
 //			shell.open();
@@ -92,7 +92,7 @@ public final class IndexingDialog implements Dialog {
 
 		// Create shell
 		int style = SWT.SHELL_TRIM;
-		if (!SystemConf.Bool.IsDevelopmentVersion.get()) // TODO remove after testing
+		if (!SystemConf.Bool.IsDevelopmentVersion.get()) // TODO pre-release: remove after testing
 			style |= SWT.PRIMARY_MODAL;
 		shell = new Shell(parentShell, style);
 		shell.setText("index_management"); // TODO i18n
@@ -121,7 +121,6 @@ public final class IndexingDialog implements Dialog {
 					}
 				}).create();
 
-		// TODO find more suitable image (mail-like)
 		// Create Add-Outlook button
 		tif.image(Img.EMAIL.get()).toolTip("add_to_queue")
 				.listener(new SelectionAdapter() {
@@ -134,7 +133,7 @@ public final class IndexingDialog implements Dialog {
 		tif.image(Img.HIDE.get()).toolTip("Minimize To Status Bar")
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						// TODO save all indexing config modifications
+						// TODO now: save all indexing config modifications
 						indexRegistry.getQueue().removeListeners(
 							addedListener, removedListener);
 						Rectangle bounds = shell.getBounds();
@@ -143,7 +142,7 @@ public final class IndexingDialog implements Dialog {
 					}
 				}).create();
 
-		// TODO maybe try computeSize() instead of getSize()?
+		// TODO now: maybe try computeSize() instead of getSize()?
 //		tabFolder.setTabHeight((int) (toolBar.getSize().y * 1.5)); // A factor of 1.0 would crop the add button image.
 
 		// For some unknown reason, the focus always goes to the ToolBar items
@@ -277,7 +276,7 @@ public final class IndexingDialog implements Dialog {
 	}
 
 	private void addTab(@NotNull final Task task, boolean selectTab) {
-		// TODO set tab title, icon and tooltip
+		// TODO now: set tab title, icon and tooltip
 		final CTabItem tabItem = new CTabItem(tabFolder, SWT.CLOSE);
 		tabItem.setText("Test");
 		tabItem.setImage(Img.DOCFETCHER_16.get());
@@ -318,7 +317,7 @@ public final class IndexingDialog implements Dialog {
 
 			configPanel.evtRunButtonClicked.add(new Event.Listener<IndexingConfig>() {
 				public void update(final IndexingConfig config) {
-					// TODO update tab image
+					// TODO now: update tab image
 					// switch to next waiting tab
 
 					configPanel.dispose();
@@ -344,7 +343,7 @@ public final class IndexingDialog implements Dialog {
 		task.attachReporter(reporter, new ExistingMessagesHandler() {
 			public void handleMessages(	List<IndexingInfo> infos,
 										List<IndexingError> errors) {
-				// TODO fill outer reporter with info and error messages
+				// TODO now: fill outer reporter with info and error messages
 				// info objects may have percentages set
 			}
 		});

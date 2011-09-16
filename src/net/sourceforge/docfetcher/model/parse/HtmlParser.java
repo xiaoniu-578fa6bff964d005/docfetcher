@@ -114,7 +114,7 @@ public final class HtmlParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "HTML"; // TODO
+		return "HTML"; // TODO i18n
 	}
 
 }

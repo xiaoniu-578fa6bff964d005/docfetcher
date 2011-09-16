@@ -42,7 +42,7 @@ public abstract class TwoFormExpander extends Composite {
 	@NotNull private ToolBarFormHeader formTop0;
 	@NotNull private ToolBarFormHeader formBottom0;
 	
-	// TODO store sash weights in maximized state, persist maximized state
+	// TODO now: store sash weights in maximized state, persist maximized state
 	
 	public TwoFormExpander(Composite parent) {
 		super(parent, SWT.NONE);

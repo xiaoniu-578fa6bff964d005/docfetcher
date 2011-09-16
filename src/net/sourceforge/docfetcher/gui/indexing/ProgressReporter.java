@@ -24,7 +24,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 final class ProgressReporter extends IndexingReporter {
 	
 	/*
-	 * TODO maybe print out some filesize-based info at the end:
+	 * TODO post-release-1.1: maybe print out some filesize-based info at the end:
 	 * - file throughput (MB/sec, files/sec)
 	 * - average filesize
 	 * take care when calculating filesizes for HTML pairs!

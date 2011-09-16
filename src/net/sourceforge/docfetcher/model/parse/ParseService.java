@@ -48,15 +48,15 @@ import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 public final class ParseService {
 
 	/*
-	 * TODO base: Extraction registry must handle archive entries as inputs
+	 * TODO now: Extraction registry must handle archive entries as inputs
 	 * transparently, including disk space check when extracting the file ->
 	 * document this
 	 * 
-	 * TODO Implement support for filename-only search: Requires a
+	 * TODO now: Implement support for filename-only search: Requires a
 	 * FilenameParser which is used in case of failure of another parser, or
 	 * when the filetype is unkown.
 	 * 
-	 * TODO Some parsers also accept InputStream rather than File (e.g. HTML
+	 * TODO now: Some parsers also accept InputStream rather than File (e.g. HTML
 	 * parser and Text parser), so unpacking from a PST or an archive may not
 	 * always be necessary.
 	 */
@@ -213,7 +213,7 @@ public final class ParseService {
 				return ((FileParser) parser).renderText(file, cancelable);
 			}
 		}
-		throw new IllegalArgumentException(); // TODO make this a checked exception?
+		throw new IllegalArgumentException(); // TODO now: make this a checked exception?
 	}
 	
 	@Nullable

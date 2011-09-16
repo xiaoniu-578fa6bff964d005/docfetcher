@@ -54,9 +54,6 @@ public final class SearchBar {
 		searchBox.setVisibleItemCount(ProgramConf.Int.SearchHistorySize.get());
 		Util.selectAllOnFocus(searchBox);
 		
-		// TODO bugfix: don't store empty queries in the search history
-		// -> put this in the changelog when fixed
-		
 		searchBox.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				String query = searchBox.getText().trim();

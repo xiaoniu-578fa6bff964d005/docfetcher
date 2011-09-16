@@ -41,7 +41,7 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
  */
 public final class ProgramConf {
 	
-	// TODO remove unused entries
+	// TODO pre-release: remove unused entries
 
 	public static enum Bool implements Loadable {
 		FixWindowSizes (false),

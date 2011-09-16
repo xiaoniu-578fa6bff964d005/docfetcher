@@ -123,9 +123,8 @@ public final class Main {
 			System.exit(1);
 		}
 
-		// TODO Initialize MsgUtil and AppUtil.Msg, should be done as early as
-		// possible
-		// TODO See what happens if we don't initialize all constants
+		// TODO now: See what happens if we don't initialize all constants
+		// TODO i18n: Initialize MsgUtil and AppUtil.Msg, should be done as early as possible
 		AppUtil.Const.PROGRAM_NAME.set(SystemConf.Str.ProgramName.get());
 		AppUtil.Const.PROGRAM_VERSION.set(SystemConf.Str.ProgramVersion.get());
 		AppUtil.Const.PROGRAM_BUILD_DATE.set(SystemConf.Str.BuildDate.get());
@@ -135,7 +134,7 @@ public final class Main {
 
 		if (!AppUtil.checkSingleInstance()) return;
 
-		// TODO load settings after starting the index registry thread ->
+		// TODO now: load settings after starting the index registry thread ->
 		// values for index registry constructor can be set later
 		
 		// Load program configuration and preferences; load index registry
@@ -234,7 +233,7 @@ public final class Main {
 		// Global keyboard shortcuts
 		display.addFilter(SWT.KeyUp, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				// TODO global keys
+				// TODO pre-release: global keys
 			}
 		});
 		
@@ -242,7 +241,7 @@ public final class Main {
 			public void shellClosed(final ShellEvent e) {
 				e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
 					public CancelAction cancel() {
-						// TODO Ask for confirmation:
+						// TODO now: Ask for confirmation:
 						// Discard, Keep, Don't Exit
 						// -> Refactor KeepDiscardDialog into generic 3-button confirmation dialog
 						return null;
@@ -256,9 +255,8 @@ public final class Main {
 			}
 		});
 
-		// TODO mark classes in 'view' package as final / package-visible when
-		// possible
-		// -> move GUI classes above into view package
+		// TODO pre-release: mark classes in gui package as final / package-visible when
+		// possible -> move GUI classes above into gui package
 
 		shell.open();
 		while (!shell.isDisposed()) {
@@ -296,7 +294,7 @@ public final class Main {
 		else
 			indexParentDir = AppUtil.getAppDataDir();
 		
-		// TODO make cache capacity customizable
+		// TODO now: make cache capacity customizable
 		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
 		indexRegistry = new IndexRegistry(indexParentDir, 20, reporterCapacity);
 		
@@ -408,7 +406,7 @@ public final class Main {
 						comp.layout();
 					}
 				});
-				// TODO move this method to GuiUtil?
+				// TODO now: move this method to GuiUtil?
 				// UtilDF.addMouseHighlighter(item);
 				return item;
 			}
@@ -423,8 +421,8 @@ public final class Main {
 
 		TwoFormExpander expander = new TwoFormExpander(comp) {
 			protected Control createFirstContents(Composite parent) {
-				// TODO Load parser states from file
-				// TODO Save parser states to file?
+				// TODO now: Load parser states from file
+				// TODO now: Save parser states to file?
 				List<Parser> parsers = ParseService.getParsers();
 				ListMap<Parser, Boolean> map = ListMap.create(parsers.size());
 				for (Parser parser : parsers)
@@ -476,7 +474,7 @@ public final class Main {
 			public void update(List<ResultDocument> eventData) {
 				if (eventData.isEmpty()) return;
 				previewPanel.setPreview(eventData.get(0));
-				// TODO update status bar
+				// TODO now: update status bar
 			}
 		});
 		

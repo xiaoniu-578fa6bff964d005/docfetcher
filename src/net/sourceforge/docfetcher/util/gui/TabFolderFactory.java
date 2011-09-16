@@ -40,7 +40,7 @@ public class TabFolderFactory {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setSimple(false);
 			if (coloredTabs) {
-				// TODO listen to SWT.Settings event -> put this in the changelog
+				// TODO now: listen to SWT.Settings event -> put this in the changelog
 				Color colBack = Col.TITLE_BACKGROUND.get();
 				Color colFront = Col.TITLE_FOREGROUND.get();
 				if (! colFront.equals(colBack)) {
