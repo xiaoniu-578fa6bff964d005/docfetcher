@@ -273,17 +273,6 @@ public final class ResultPanel {
 				return leftFile;
 			}
 		});
-		
-		menuManager.addSeparator();
-		
-		menuManager.add(new MenuAction("copy\tCtrl+C") {
-			public boolean isEnabled() {
-				return !viewer.getSelection().isEmpty();
-			}
-			public void run() {
-				// TODO now: See 1.0.3 ResultPanel.copySelectionToClipboard
-			}
-		});
 	}
 	
 	@NotNull
