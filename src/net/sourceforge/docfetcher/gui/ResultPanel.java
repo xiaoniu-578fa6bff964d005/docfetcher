@@ -20,10 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.FileResource;
-import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -263,7 +263,7 @@ public final class ResultPanel {
 				 * 
 				 * In each case, the target may or may not exist.
 				 */
-				String[] pathParts = UtilModel.splitAtExisting(path, "");
+				String[] pathParts = UtilGlobal.splitAtExisting(path);
 				
 				if (pathParts[1].length() == 0) // Existing ordinary file
 					return Util.getParentFile(path);

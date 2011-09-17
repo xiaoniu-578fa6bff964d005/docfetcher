@@ -14,9 +14,9 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.MailResource;
-import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.util.Util;
@@ -52,8 +52,7 @@ public final class OutlookMailFactory {
 			throws ParseException, FileNotFoundException {
 		String[] leftMiddle_right = Util.splitPathLast(emailPath);
 		try {
-			String[] left_middle = UtilModel.splitAtExisting(
-				leftMiddle_right[0], "");
+			String[] left_middle = UtilGlobal.splitAtExisting(leftMiddle_right[0]);
 			long pstId = Long.valueOf(leftMiddle_right[1]);
 			
 			PSTFile pstFile = new PSTFile(left_middle[0]);

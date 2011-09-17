@@ -14,7 +14,6 @@ package net.sourceforge.docfetcher.model;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.index.IndexReader;
@@ -257,36 +255,6 @@ public final class UtilModel {
 		}
 	}
 	
-	@NotNull
-	@RecursiveMethod
-	@VisibleForPackageGroup
-	public static String[] splitAtExisting(	@NotNull String left,
-											@NotNull String right)
-			throws FileNotFoundException {
-		if (new File(left).isFile())
-			return new String[] { left, right };
-		
-		// Reached left end of a relative path
-		if (!left.contains("/") && !left.contains("\\"))
-			throw new FileNotFoundException();
-		
-		String[] leftParts = Util.splitPathLast(left);
-		
-		// Reached Unix root
-		if (leftParts[0].length() == 0)
-			throw new FileNotFoundException();
-		
-		// Reached Windows root
-		if (leftParts[0].matches("[a-zA-Z]:"))
-			throw new FileNotFoundException();
-		
-		// Move by one path part to the left and recurse
-		if (right.length() == 0)
-			return splitAtExisting(leftParts[0], leftParts[1]);
-		String newRight = Util.joinPath(leftParts[1], right);
-		return splitAtExisting(leftParts[0], newRight);
-	}
-
 	// TODO now: also check preceding slashes?
 	public static boolean noTrailingSlash(@NotNull String path) {
 		int length = path.length();

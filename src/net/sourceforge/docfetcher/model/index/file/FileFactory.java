@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.HotColdFileCache.PermanentFileResource;
 import net.sourceforge.docfetcher.model.FileResource;
@@ -68,7 +69,7 @@ public final class FileFactory {
 		path = UtilModel.normalizePath(path);
 		
 		try {
-			String[] pathParts = UtilModel.splitAtExisting(path, "");
+			String[] pathParts = UtilGlobal.splitAtExisting(path);
 			File leftFile = new File(pathParts[0]);
 			
 			// Input path refers to an ordinary file;
