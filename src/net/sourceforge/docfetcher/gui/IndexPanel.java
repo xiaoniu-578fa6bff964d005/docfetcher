@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,7 +42,6 @@ import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
-import net.sourceforge.docfetcher.util.collect.BoundedList;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.InputLoop;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
@@ -321,56 +319,26 @@ public final class IndexPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				BoundedList<File> files = new BoundedList<File>(UtilGui.OPEN_LIMIT, false);
-				Set<File> missing = new LinkedHashSet<File>();
-				
+				MultiFileLauncher launcher = new MultiFileLauncher();
 				for (ViewNode element : viewer.getSelection()) {
 					if (element instanceof LuceneIndex) {
 						LuceneIndex index = (LuceneIndex) element;
 						File rootFile = index.getRootFile();
-						if (!rootFile.exists()) {
-							missing.add(rootFile);
-						}
-						else {
-							if (!files.containsEq(rootFile))
-								files.add(rootFile);
-						}
+						if (!rootFile.exists())
+							launcher.addMissing(rootFile);
+						else
+							launcher.addFile(rootFile);
 					}
 					else {
 						Folder<?, ?> folder = (Folder<?, ?>) element;
 						File rootFile = new File(folder.getRoot().getPath());
-						if (!rootFile.exists()) {
-							missing.add(rootFile);
-						}
-						else {
-							File dir = getNearestFile(folder);
-							if (!files.containsEq(dir))
-								files.add(dir);
-						}
+						if (!rootFile.exists())
+							launcher.addMissing(rootFile);
+						else
+							launcher.addFile(getNearestFile(folder));
 					}
 				}
-				
-				// Abort with an error message if any indexes are missing
-				if (!missing.isEmpty()) {
-					String items = Util.join("\n", missing);
-					String msg = "folders_not_found" + "\n" + items; // TODO i18n
-					AppUtil.showError(msg, true, false);
-					return;
-				}
-				
-				// Abort with an error message if the user tried to open too
-				// many files
-				if (files.getVirtualSize() > files.getCapacity()) {
-					AppUtil.showError("open_limit", true, true); // TODO i18n
-					return;
-				}
-				
-				// Open files or directories
-				for (File file : files) {
-					boolean success = Util.launch(file);
-					if (!success) // This is to be expected for PST files
-						Util.launch(Util.getParentFile(file));
-				}
+				launcher.launch();
 			}
 		});
 		

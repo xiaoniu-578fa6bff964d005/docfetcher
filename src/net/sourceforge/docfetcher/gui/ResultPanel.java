@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -198,21 +198,38 @@ public final class ResultPanel {
 		menuManager.add(new MenuAction("open") {
 			public boolean isEnabled() {
 				List<ResultDocument> sel = viewer.getSelection();
-				return sel.size() == 1 && !sel.get(0).isEmail();
+				if (sel.isEmpty())
+					return false;
+				for (ResultDocument doc : sel)
+					if (doc.isEmail())
+						return false;
+				return true;
 			}
 			public void run() {
-				FileResource fileResource = null;
+				MultiFileLauncher launcher = new MultiFileLauncher();
+				Set<FileResource> resources = new HashSet<FileResource>();
 				try {
-					fileResource = viewer.getSelection().get(0).getFileResource();
-					Util.launch(fileResource.getFile());
-					if (SettingsConf.Bool.HideOnOpen.get())
+					for (ResultDocument doc : viewer.getSelection()) {
+						try {
+							FileResource fileResource = doc.getFileResource();
+							resources.add(fileResource);
+							launcher.addFile(fileResource.getFile());
+						}
+						catch (ParseException e) {
+							if (e.getCause() instanceof FileNotFoundException) {
+								launcher.addMissing(doc.getPath());
+							}
+							else {
+								AppUtil.showError(e.getMessage(), true, false);
+								return;
+							}
+						}
+					}
+					if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
 						evtHideInSystemTray.fire(null);
 				}
-				catch (ParseException e) {
-					AppUtil.showError(e.getMessage(), true, false);
-				}
 				finally {
-					if (fileResource != null)
+					for (FileResource fileResource : resources)
 						fileResource.dispose();
 				}
 			}
@@ -223,37 +240,17 @@ public final class ResultPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				Set<File> files = new LinkedHashSet<File>();
-				Set<String> missing = new LinkedHashSet<String>();
-				
+				MultiFileLauncher launcher = new MultiFileLauncher();
 				for (ResultDocument doc : viewer.getSelection()) {
 					String path = doc.getPath();
 					try {
-						File parent = getParent(path);
-						if (files.size() == UtilGui.OPEN_LIMIT) {
-							AppUtil.showError("open_limit", true, true); // TODO i18n
-							return;
-						}
-						files.add(parent);
+						launcher.addFile(getParent(path));
 					}
 					catch (FileNotFoundException e) {
-						missing.add(path);
+						launcher.addMissing(path);
 					}
 				}
-				
-				// Abort with an error message if any files are missing
-				if (!missing.isEmpty()) {
-					String items = Util.join("\n", missing);
-					String msg = "Files or folders not found:" + "\n" + items; // TODO i18n
-					AppUtil.showError(msg, true, false);
-					return;
-				}
-				
-				// Open files or directories
-				for (File file : files)
-					Util.launch(file);
-				
-				if (SettingsConf.Bool.HideOnOpen.get())
+				if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
 					evtHideInSystemTray.fire(null);
 				
 			}
