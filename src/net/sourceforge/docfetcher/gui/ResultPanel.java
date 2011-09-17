@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,8 @@ import net.sourceforge.docfetcher.util.gui.VirtualTableViewer;
 import net.sourceforge.docfetcher.util.gui.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -100,6 +103,18 @@ public final class ResultPanel {
 		};
 		
 		viewer.getControl().setHeaderVisible(true);
+		
+		// Open result document on double-click
+		viewer.getControl().addMouseListener(new MouseAdapter() {
+			public void mouseDoubleClick(MouseEvent e) {
+				List<ResultDocument> selection = viewer.getSelection();
+				if (selection.isEmpty())
+					return;
+				ResultDocument doc = selection.get(0);
+				if (!doc.isEmail())
+					launchFiles(Collections.singletonList(doc));
+			}
+		});
 		
 		initContextMenu();
 		
@@ -206,30 +221,7 @@ public final class ResultPanel {
 				return true;
 			}
 			public void run() {
-				MultiFileLauncher launcher = new MultiFileLauncher();
-				Set<FileResource> resources = new HashSet<FileResource>();
-				try {
-					for (ResultDocument doc : viewer.getSelection()) {
-						try {
-							FileResource fileResource = doc.getFileResource();
-							resources.add(fileResource);
-							launcher.addFile(fileResource.getFile());
-						}
-						catch (FileNotFoundException e) {
-							launcher.addMissing(doc.getPath());
-						}
-						catch (ParseException e) {
-							AppUtil.showError(e.getMessage(), true, false);
-							return;
-						}
-					}
-					if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
-						evtHideInSystemTray.fire(null);
-				}
-				finally {
-					for (FileResource fileResource : resources)
-						fileResource.dispose();
-				}
+				launchFiles(viewer.getSelection());
 			}
 		});
 		
@@ -345,6 +337,35 @@ public final class ResultPanel {
 		return element.isEmail() ? Img.EMAIL.get() : null;
 	}
 	
+	// Should not be called with emails
+	private void launchFiles(@NotNull List<ResultDocument> docs) {
+		assert !docs.isEmpty();
+		MultiFileLauncher launcher = new MultiFileLauncher();
+		Set<FileResource> resources = new HashSet<FileResource>();
+		try {
+			for (ResultDocument doc : docs) {
+				try {
+					FileResource fileResource = doc.getFileResource();
+					resources.add(fileResource);
+					launcher.addFile(fileResource.getFile());
+				}
+				catch (FileNotFoundException e) {
+					launcher.addMissing(doc.getPath());
+				}
+				catch (ParseException e) {
+					AppUtil.showError(e.getMessage(), true, false);
+					return;
+				}
+			}
+			if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
+				evtHideInSystemTray.fire(null);
+		}
+		finally {
+			for (FileResource fileResource : resources)
+				fileResource.dispose();
+		}
+	}
+
 	private static abstract class VariableHeaderColumn<T> extends Column<T> {
 		private final String fileHeader;
 		private final String emailHeader;
