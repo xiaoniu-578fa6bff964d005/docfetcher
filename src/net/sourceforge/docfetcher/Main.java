@@ -424,7 +424,6 @@ public final class Main {
 				return filesizePanel.getControl();
 			}
 		};
-		filesizeForm.setImage(Img.INDEXING.get());
 		filesizeForm.setText("Minimum / Maximum Filesize");
 
 		TwoFormExpander expander = new TwoFormExpander(comp) {
@@ -449,8 +448,6 @@ public final class Main {
 				return indexPanel.getControl();
 			}
 		};
-		expander.setTopImage(Img.INDEXING.get());
-		expander.setBottomImage(Img.INDEXING.get());
 		expander.setTopText("Document Types");
 		expander.setBottomText("Search Scope");
 		expander.setSashWidth(sashWidth);
