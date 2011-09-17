@@ -307,8 +307,16 @@ public final class Main {
 						}
 					});
 					
-					// Start watching folders after index registry is fully
-					// loaded
+					/*
+					 * Install folder watches on the user's document folders.
+					 * 
+					 * This should be done *after* the index registry is loaded:
+					 * The index registry will try to install its own folder
+					 * watch during loading, and if we set up this folder
+					 * watcher before loading the registry, we might take up all
+					 * the allowed watches, so that there's none left for the
+					 * registry.
+					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
 				}
 				catch (IOException e) {
