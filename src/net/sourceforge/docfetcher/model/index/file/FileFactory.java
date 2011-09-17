@@ -62,7 +62,8 @@ public final class FileFactory {
 	@NotNull
 	@ThreadSafe
 	public FileResource createFile(	@NotNull IndexingConfig config,
-									@NotNull String path) throws ParseException {
+									@NotNull String path)
+			throws ParseException, FileNotFoundException {
 		Util.checkNotNull(config, path);
 		path = UtilModel.normalizePath(path);
 		
@@ -97,9 +98,6 @@ public final class FileFactory {
 					splitResult.fileResource,
 					splitResult.right
 			);
-		}
-		catch (FileNotFoundException e) {
-			throw new ParseException(e); // TODO i18n: add localized error message
 		}
 		catch (ArchiveEncryptedException e) {
 			throw new ParseException(e); // TODO i18n: add localized error message

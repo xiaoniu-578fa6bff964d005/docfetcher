@@ -12,7 +12,9 @@
 package net.sourceforge.docfetcher.model.search;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Date;
+
 import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.FileResource;
@@ -208,7 +210,7 @@ public final class ResultDocument {
 	// Should be run in a thread
 	// thrown parse exception has localized error message
 	@NotNull
-	private String getText() throws ParseException {
+	private String getText() throws ParseException, FileNotFoundException {
 		onlyFiles();
 		String parserName = luceneDoc.get(Fields.PARSER.key());
 		FileResource fileResource = null;
@@ -226,13 +228,14 @@ public final class ResultDocument {
 	// Should be run in a thread
 	// thrown parse exception has localized error message
 	@NotNull
-	public HighlightedString getHighlightedText() throws ParseException {
+	public HighlightedString getHighlightedText() throws ParseException,
+			FileNotFoundException {
 		return HighlightService.highlight(query, isPhraseQuery, getText());
 	}
 	
 	// should be run in a thread
 	public void readPdfPages(@NotNull final PdfPageHandler pageHandler)
-			throws ParseException {
+			throws ParseException, FileNotFoundException {
 		// TODO i18n of error messages
 		onlyFiles();
 		Util.checkNotNull(pageHandler);
@@ -266,7 +269,8 @@ public final class ResultDocument {
 	 * thread.
 	 */
 	@NotNull
-	public FileResource getFileResource() throws ParseException {
+	public FileResource getFileResource() throws ParseException,
+			FileNotFoundException {
 		onlyFiles();
 		String path = DocumentType.extractPath(uid);
 		IndexingConfig fileConfig = config;
@@ -282,7 +286,8 @@ public final class ResultDocument {
 	 * thread.
 	 */
 	@NotNull
-	public MailResource getMailResource() throws ParseException {
+	public MailResource getMailResource() throws ParseException,
+			FileNotFoundException {
 		onlyEmails();
 		String path = DocumentType.extractPath(uid);
 		return mailFactory.createMail(config, query, isPhraseQuery, path);

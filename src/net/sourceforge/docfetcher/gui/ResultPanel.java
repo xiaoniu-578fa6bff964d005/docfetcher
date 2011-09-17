@@ -215,14 +215,12 @@ public final class ResultPanel {
 							resources.add(fileResource);
 							launcher.addFile(fileResource.getFile());
 						}
+						catch (FileNotFoundException e) {
+							launcher.addMissing(doc.getPath());
+						}
 						catch (ParseException e) {
-							if (e.getCause() instanceof FileNotFoundException) {
-								launcher.addMissing(doc.getPath());
-							}
-							else {
-								AppUtil.showError(e.getMessage(), true, false);
-								return;
-							}
+							AppUtil.showError(e.getMessage(), true, false);
+							return;
 						}
 					}
 					if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())

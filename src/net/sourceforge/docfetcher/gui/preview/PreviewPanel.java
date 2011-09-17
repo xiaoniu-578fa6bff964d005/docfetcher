@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import java.io.FileNotFoundException;
+
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
 import net.sourceforge.docfetcher.model.FileResource;
@@ -277,7 +279,9 @@ public final class PreviewPanel extends Composite {
 		public EmailThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		protected void doRun(Hider overlayHider) throws ParseException {
+
+		protected void doRun(Hider overlayHider) throws ParseException,
+				FileNotFoundException {
 			// TODO now: catch OutOfMemoryErrors
 			final MailResource mailResource = doc.getMailResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
@@ -295,7 +299,9 @@ public final class PreviewPanel extends Composite {
 		public HtmlThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		protected void doRun(Hider overlayHider) throws ParseException {
+
+		protected void doRun(Hider overlayHider) throws ParseException,
+				FileNotFoundException {
 			// TODO now: catch OutOfMemoryErrors
 			final FileResource htmlResource = doc.getFileResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
@@ -316,7 +322,9 @@ public final class PreviewPanel extends Composite {
 		public PdfThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		protected void doRun(final Hider overlayHider) throws ParseException {
+
+		protected void doRun(final Hider overlayHider) throws ParseException,
+				FileNotFoundException {
 			class Item {
 				@Nullable private final HighlightedString string;
 				private boolean isLastItem;
@@ -377,7 +385,9 @@ public final class PreviewPanel extends Composite {
 		public TextThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
-		protected void doRun(Hider overlayHider) throws ParseException {
+
+		protected void doRun(Hider overlayHider) throws ParseException,
+				FileNotFoundException {
 			HighlightedString string = doc.getHighlightedText();
 			setTextSafely(string, startCount, false);
 			// TODO now: catch OutOfMemoryErrors
@@ -404,13 +414,16 @@ public final class PreviewPanel extends Composite {
 			catch (ParseException e) {
 				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
+			catch (FileNotFoundException e) {
+				setError("Error: " + e.getMessage(), startCount); // TODO i18n
+			}
 			finally {
 				hider.hide();
 			}
 		}
 		
 		protected abstract void doRun(@NotNull Hider overlayHider)
-				throws ParseException;
+				throws ParseException, FileNotFoundException;
 	}
 	
 }

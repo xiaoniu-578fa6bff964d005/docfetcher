@@ -49,7 +49,7 @@ public final class OutlookMailFactory {
 	                               	@NotNull Query query,
 	                               	boolean isPhraseQuery,
 									@NotNull String emailPath)
-			throws ParseException {
+			throws ParseException, FileNotFoundException {
 		String[] leftMiddle_right = Util.splitPathLast(emailPath);
 		try {
 			String[] left_middle = UtilModel.splitAtExisting(
@@ -66,9 +66,6 @@ public final class OutlookMailFactory {
 			
 			return new OutlookMailResource(
 				config, query, isPhraseQuery, unpackCache, emailId, email);
-		}
-		catch (FileNotFoundException e) {
-			throw new ParseException(e); // TODO i18n
 		}
 		catch (PSTException e) {
 			throw new ParseException(e); // TODO i18n
