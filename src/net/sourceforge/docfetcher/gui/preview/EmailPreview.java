@@ -25,7 +25,6 @@ import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -68,18 +67,23 @@ final class EmailPreview extends Composite {
 	
 	private final DateFormat dateFormat = new SimpleDateFormat();
 	
+	@NotNull private HighlightingToolBarWithTextViewer toolBarWithTextViewer;
+	@NotNull private Composite headerComp;
+	
 	@NotNull private StyledText fromField;
 	@NotNull private StyledText toField;
 	@NotNull private StyledText subjectField;
 	@NotNull private StyledText dateField;
-	@NotNull private HighlightingText bodyBox;
-	@NotNull private Composite headerComp;
+	@NotNull private StyledText[] allFields;
 	
 	public EmailPreview(@NotNull Composite parent) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
 
 		CTabFolder tabFolder = TabFolderFactory.create(this, false, false, true);
+		
+		toolBarWithTextViewer = new HighlightingToolBarWithTextViewer(tabFolder);
+		tabFolder.setTopRight(toolBarWithTextViewer.getToolBar());
 
 		CTabItem tabItem = new CTabItem(tabFolder, SWT.NONE);
 		tabItem.setText("Email");
@@ -100,8 +104,8 @@ final class EmailPreview extends Composite {
 		Label sep = new Label(comp, SWT.SEPARATOR | SWT.HORIZONTAL);
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
-		bodyBox = new HighlightingText(comp);
-		bodyBox.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		toolBarWithTextViewer.createTextViewer(comp).setLayoutData(
+			new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		return comp;
 	}
@@ -120,6 +124,10 @@ final class EmailPreview extends Composite {
 		subjectField = createHeaderField(comp);
 		Label dateLabel = createHeaderLabel(comp, "Date:"); // TODO i18n
 		dateField = createHeaderField(comp);
+		
+		allFields = new StyledText[] {
+			fromField, toField, subjectField, dateField
+		};
 		
 		int firstColWidth1 = fromLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		int firstColWidth2 = subjectLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
@@ -181,7 +189,7 @@ final class EmailPreview extends Composite {
 			toField.setToolTipText("");
 		subjectField.setText(mailResource.getSubject());
 		dateField.setText(dateFormat.format(mailResource.getDate()));
-		bodyBox.setText(mailResource.getBody());
+		toolBarWithTextViewer.setText(mailResource.getBody());
 		
 		// TODO now: set attachments -> maybe do this in separate threads;
 		// archives and other unparsable files: show 'open' button
@@ -190,13 +198,10 @@ final class EmailPreview extends Composite {
 	}
 
 	public void clear() {
-		StyledText[] fields = {
-				fromField, toField, subjectField, dateField
-		};
-		for (StyledText st : fields)
+		for (StyledText st : allFields)
 			st.setText("");
 		toField.setToolTipText("");
-		bodyBox.clear();
+		toolBarWithTextViewer.clear();
 	}
 
 }
