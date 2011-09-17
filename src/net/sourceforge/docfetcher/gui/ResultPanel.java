@@ -11,14 +11,19 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.FileResource;
+import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -215,13 +220,70 @@ public final class ResultPanel {
 		
 		menuManager.add(new MenuAction("open_parent") {
 			public boolean isEnabled() {
-				List<ResultDocument> sel = viewer.getSelection();
-				return sel.size() == 1;
+				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				// TODO now
+				Set<File> files = new LinkedHashSet<File>();
+				Set<String> missing = new LinkedHashSet<String>();
+				
+				for (ResultDocument doc : viewer.getSelection()) {
+					String path = doc.getPath();
+					try {
+						File parent = getParent(path);
+						if (files.size() == UtilGui.OPEN_LIMIT) {
+							AppUtil.showError("open_limit", true, true); // TODO i18n
+							return;
+						}
+						files.add(parent);
+					}
+					catch (FileNotFoundException e) {
+						missing.add(path);
+					}
+				}
+				
+				// Abort with an error message if any files are missing
+				if (!missing.isEmpty()) {
+					String items = Util.join("\n", missing);
+					String msg = "Files or folders not found:" + "\n" + items; // TODO i18n
+					AppUtil.showError(msg, true, false);
+					return;
+				}
+				
+				// Open files or directories
+				for (File file : files)
+					Util.launch(file);
+				
 				if (SettingsConf.Bool.HideOnOpen.get())
 					evtHideInSystemTray.fire(null);
+				
+			}
+			@NotNull
+			private File getParent(@NotNull String path)
+					throws FileNotFoundException {
+				/*
+				 * The possible cases:
+				 * - Path points to an ordinary file
+				 * - Path points to an archive entry
+				 * - Path points to an item in a PST file
+				 * 
+				 * In each case, the target may or may not exist.
+				 */
+				String[] pathParts = UtilModel.splitAtExisting(path, "");
+				
+				if (pathParts[1].length() == 0) // Existing ordinary file
+					return Util.getParentFile(path);
+				
+				File leftFile = new File(pathParts[0]);
+				if (leftFile.isDirectory())
+					// File, archive entry or PST item does not exist
+					throw new FileNotFoundException();
+				
+				// Existing PST item
+				if (Util.hasExtension(pathParts[0], "pst"))
+					return Util.getParentFile(leftFile);
+				
+				// Existing archive entry -> return the archive
+				return leftFile;
 			}
 		});
 		

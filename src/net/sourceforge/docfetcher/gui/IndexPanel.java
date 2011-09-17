@@ -321,12 +321,10 @@ public final class IndexPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				final int limit = 10;
-				List<ViewNode> selection = viewer.getSelection();
-				BoundedList<File> files = new BoundedList<File>(limit, false);
+				BoundedList<File> files = new BoundedList<File>(UtilGui.OPEN_LIMIT, false);
 				Set<File> missing = new LinkedHashSet<File>();
 				
-				for (ViewNode element : selection) {
+				for (ViewNode element : viewer.getSelection()) {
 					if (element instanceof LuceneIndex) {
 						LuceneIndex index = (LuceneIndex) element;
 						File rootFile = index.getRootFile();

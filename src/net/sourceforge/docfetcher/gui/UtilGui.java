@@ -32,6 +32,8 @@ public final class UtilGui {
 	private UtilGui() {
 	}
 	
+	static final int OPEN_LIMIT = 10;
+	
 	/**
 	 * Adds a {@link MouseTrackListener} to the given control that highlights
 	 * the background when the mouse hovers over the control.

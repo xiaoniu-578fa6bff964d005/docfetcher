@@ -59,7 +59,6 @@ public final class FileFactory {
 	}
 	
 	// thrown parse exception has localized error message
-	// thread-safe method
 	@NotNull
 	@ThreadSafe
 	public FileResource createFile(	@NotNull IndexingConfig config,

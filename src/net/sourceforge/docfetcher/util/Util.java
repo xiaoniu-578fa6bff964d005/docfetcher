@@ -619,8 +619,24 @@ public final class Util {
 	 * {@link File#getParentFile()}, this method will not return null if the
 	 * given file was constructed with a relative path.
 	 */
+	@NotNull
 	@SuppressAjWarnings
-	public static File getParentFile(File file) {
+	public static File getParentFile(@NotNull File file) {
+		Util.checkNotNull(file);
+		File parent = file.getParentFile();
+		if (parent == null)
+			parent = file.getAbsoluteFile().getParentFile();
+		return parent;
+	}
+	
+	/**
+	 * @see #getParentFile(File)
+	 */
+	@NotNull
+	@SuppressAjWarnings
+	public static File getParentFile(@NotNull String path) {
+		Util.checkNotNull(path);
+		File file = new File(path);
 		File parent = file.getParentFile();
 		if (parent == null)
 			parent = file.getAbsoluteFile().getParentFile();
