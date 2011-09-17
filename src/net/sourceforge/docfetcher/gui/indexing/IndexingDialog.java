@@ -38,6 +38,8 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.gui.DropDownMenuManager;
+import net.sourceforge.docfetcher.util.gui.MenuAction;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
@@ -57,6 +59,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * @author Tran Nam Quang
@@ -112,23 +115,43 @@ public final class IndexingDialog implements Dialog {
 		
 		// TODO i18n for all buttons
 		
-		// Create Add-Directory button
-		tif.image(Img.FOLDER.get()).toolTip("add_to_queue")
-				.listener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
+		final ToolItem addItem = tif.image(Img.ADD.get())
+				.toolTip("add_to_queue").create();
+		
+		addItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				DropDownMenuManager menuManager = new DropDownMenuManager(
+					addItem, tabFolder);
+				
+				menuManager.add(new MenuAction(
+					Img.FOLDER.get(), "Add Folder...") {
+					public void run() {
 						IndexPanel.createFileTaskFromDialog(
-							shell, indexRegistry, null);
+							shell, indexRegistry, null, true);
 					}
-				}).create();
+				});
 
-		// Create Add-Outlook button
-		tif.image(Img.EMAIL.get()).toolTip("add_to_queue")
-				.listener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
+				menuManager.addSeparator();
+
+				menuManager.add(new MenuAction(
+					Img.PACKAGE.get(), "Add Archive...") {
+					public void run() {
+						IndexPanel.createFileTaskFromDialog(
+							shell, indexRegistry, null, false);
+					}
+				});
+
+				menuManager.add(new MenuAction(
+					Img.EMAIL.get(), "Add Outlook PST...") {
+					public void run() {
 						IndexPanel.createOutlookTaskFromDialog(
 							shell, indexRegistry, null);
 					}
-				}).create();
+				});
+				
+				menuManager.show();
+			}
+		});
 		
 		tif.image(Img.HIDE.get()).toolTip("Minimize To Status Bar")
 				.listener(new SelectionAdapter() {

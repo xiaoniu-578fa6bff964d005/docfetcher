@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.UtilGlobal;
+import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.indexing.IndexingDialog;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory;
@@ -184,9 +185,32 @@ public final class IndexPanel {
 		// TODO pre-release: check that enabled states of menu items are set correctly
 		// TODO pre-release: check that keyboard shortcuts of menu items are set correctly
 		// TODO i18n menu item labels
-		menuManager.add(new MenuAction("Create Index...") {
+		
+		Menu indexSubMenu = menuManager.addSubmenu(new MenuAction(
+			"Create Index From"));
+		
+		menuManager.add(indexSubMenu, new MenuAction(
+			Img.FOLDER.get(), "Folder...") {
 			public void run() {
 				createFileTaskFromDialog(
+					tree.getShell(), indexRegistry, dialogFactory, true);
+			}
+		});
+		
+		menuManager.addSeparator(indexSubMenu);
+		
+		menuManager.add(indexSubMenu, new MenuAction(
+			Img.PACKAGE.get(), "Archive...") {
+			public void run() {
+				createFileTaskFromDialog(
+					tree.getShell(), indexRegistry, dialogFactory, false);
+			}
+		});
+		
+		menuManager.add(indexSubMenu, new MenuAction(
+			Img.EMAIL.get(), "Outlook PST...") {
+			public void run() {
+				createOutlookTaskFromDialog(
 					tree.getShell(), indexRegistry, dialogFactory);
 			}
 		});
@@ -453,18 +477,27 @@ public final class IndexPanel {
 
 	public static void createFileTaskFromDialog(@NotNull final Shell shell,
 												@NotNull final IndexRegistry indexRegistry,
-												@Nullable final DialogFactory dialogFactory) {
+												@Nullable final DialogFactory dialogFactory,
+												final boolean dirNotFile) {
 		String lastPath = SettingsConf.Str.LastIndexedFolder.get();
 		if (!new File(lastPath).exists())
 			lastPath = SettingsConf.Str.LastIndexedFolder.defaultValue;
 
 		new InputLoop<Void>() {
 			protected String getNewValue(String lastValue) {
-				DirectoryDialog dialog = new DirectoryDialog(shell);
-				dialog.setText("scope_folder_title"); // TODO i18n
-				dialog.setMessage("scope_folder_msg"); // TODO i18n
-				dialog.setFilterPath(lastValue);
-				return dialog.open();
+				if (dirNotFile) {
+					DirectoryDialog dialog = new DirectoryDialog(shell);
+					dialog.setText("scope_folder_title"); // TODO i18n
+					dialog.setMessage("scope_folder_msg"); // TODO i18n
+					dialog.setFilterPath(lastValue);
+					return dialog.open();
+				}
+				else {
+					FileDialog dialog = new FileDialog(shell);
+					dialog.setText("scope_folder_title"); // TODO i18n
+					dialog.setFilterPath(lastValue);
+					return dialog.open();
+				}
 			}
 
 			protected String getDenyMessage(String newValue) {

@@ -62,6 +62,9 @@ public final class ToolItemFactory {
 		return item;
 	}
 	
+	/**
+	 * Allowed styles: PUSH, CHECK, RADIO, SEPARATOR, DROP_DOWN
+	 */
 	@NotNull
 	public ToolItemFactory style(int style) {
 		this.style = style;

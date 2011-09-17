@@ -118,6 +118,17 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			}
 			else {
 				SolidArchiveFactory factory = config.getSolidArchiveFactory(rootFile.getName());
+				if (factory == null) {
+					/*
+					 * This happens when the user tries to index a file that
+					 * isn't an archive.
+					 * 
+					 * TODO i18n: target may be an archive whose format isn't
+					 * supported
+					 */
+					report(ErrorType.NOT_AN_ARCHIVE, reporter, null);
+					return false;
+				}
 				SolidArchiveContext context = new SolidArchiveContext(
 					config, zipDetector, writer, reporter, null, cancelable,
 					false);
@@ -150,7 +161,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 	
 	private void report(@NotNull ErrorType errorType,
 	                    @NotNull IndexingReporter reporter,
-						@NotNull Exception e) {
+						@Nullable Exception e) {
 		FileFolder rootFolder = getRootFolder();
 		IndexingError error = new IndexingError(errorType, rootFolder, e);
 		rootFolder.setError(error);
