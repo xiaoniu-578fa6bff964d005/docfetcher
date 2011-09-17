@@ -57,6 +57,7 @@ public enum Img implements FilenameProvider {
 	FILE ("file.gif"),
 	EMAIL ("email.gif"),
 	PACKAGE ("package.gif"),
+	CLIPBOARD ("clipboard.gif"),
 	ADD ("add.gif"),
 	BROWSER ("browser.gif"),
 	BUILDING_BLOCKS ("building_blocks.gif"),

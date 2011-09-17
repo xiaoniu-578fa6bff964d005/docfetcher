@@ -215,6 +215,15 @@ public final class IndexPanel {
 			}
 		});
 		
+		// TODO now: Implement keyboard shortcut
+		menuManager.add(indexSubMenu, new MenuAction(
+			Img.CLIPBOARD.get(), "Clipboard...\tCtrl+V") {
+			public void run() {
+				createTaskFromClipboard(
+					tree.getShell(), indexRegistry, dialogFactory);
+			}
+		});
+		
 		menuManager.addSeparator();
 		
 		class UpdateOrRebuildAction extends MenuAction {
@@ -596,6 +605,36 @@ public final class IndexPanel {
 			localAppData, "Microsoft/Outlook/Outlook.pst");
 		File pstFile = new File(pstFilePath);
 		return pstFile.isFile() ? pstFile : null;
+	}
+	
+	public static void createTaskFromClipboard(	@NotNull final Shell shell,
+												@NotNull final IndexRegistry indexRegistry,
+												@Nullable final DialogFactory dialogFactory) {
+		List<File> files = Util.getFilesFromClipboard();
+		if (files == null) {
+			AppUtil.showError("No files found on the clipboard.", true, true); // TODO i18n
+			return;
+		}
+		if (files.isEmpty())
+			throw new IllegalStateException();
+		
+		IndexingConfig config = new IndexingConfig();
+		File indexParentDir = indexRegistry.getIndexParentDir();
+		File file = files.get(0); // Ignore all but the first file
+		
+		LuceneIndex index;
+		if (Util.hasExtension(file.getName(), "pst"))
+			index = new OutlookIndex(config, indexParentDir, file);
+		else
+			index = new FileIndex(config, indexParentDir, file);
+		
+		Rejection rejection = indexRegistry.getQueue().addTask(
+			index, IndexAction.CREATE);
+		
+		if (rejection != null)
+			AppUtil.showError("Rejected!", true, true); // TODO i18n
+		else if (dialogFactory != null)
+			dialogFactory.open();
 	}
 
 }

@@ -30,6 +30,11 @@ import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -1170,6 +1175,66 @@ public final class Util {
 	
 	public static boolean isInterrupted() {
 		return Thread.currentThread().isInterrupted();
+	}
+
+	/**
+	 * Returns an array of files from the system clipboard, or null if there are
+	 * no files on the clipboard. This method should not be called from a
+	 * non-GUI thread, and it should not be called before an SWT display has
+	 * been created.
+	 */
+	@Nullable
+	public static List<File> getFilesFromClipboard() {
+		assertSwtThread();
+		Clipboard clipboard = new Clipboard(Display.getDefault());
+		try {
+			TransferData[] types = clipboard.getAvailableTypes();
+			for (TransferData type : types) {
+				if (!FileTransfer.getInstance().isSupportedType(type))
+					continue;
+
+				Object data = clipboard.getContents(FileTransfer.getInstance());
+				if (data == null || !(data instanceof String[]))
+					continue;
+
+				String[] paths = (String[]) data;
+				List<File> files = new ArrayList<File>(paths.length);
+				for (String path : paths)
+					files.add(new File(path));
+				return files;
+			}
+			return null;
+		}
+		finally {
+			clipboard.dispose();
+		}
+	}
+
+	/**
+	 * Replaces the contents of the given clipboard with the given text and
+	 * returns the clipboard. If the given clipboard is null, it will be
+	 * created. This will only work if an SWT Display has been created.
+	 */
+	public static void setClipboard(@NotNull Collection<File> files) {
+		Util.checkNotNull(files);
+		Clipboard clipboard = new Clipboard(Display.getCurrent());
+		Transfer[] types = new Transfer[] {
+				TextTransfer.getInstance(),
+				FileTransfer.getInstance()
+		};
+		StringBuilder sb = new StringBuilder();
+		String[] filePaths = new String[files.size()];
+		int i = 0;
+		for (File file : files) {
+			if (i != 0)
+				sb.append("\n");
+			String path = Util.getSystemAbsPath(file);
+			sb.append(path);
+			filePaths[i] = path;
+			i++;
+		}
+		clipboard.setContents(new Object[] {sb.toString(), filePaths}, types);
+		clipboard.dispose();
 	}
 
 }

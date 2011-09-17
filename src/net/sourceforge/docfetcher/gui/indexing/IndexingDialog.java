@@ -149,6 +149,14 @@ public final class IndexingDialog implements Dialog {
 					}
 				});
 				
+				menuManager.add(new MenuAction(
+					Img.CLIPBOARD.get(), "Add From Clipboard...") {
+					public void run() {
+						IndexPanel.createTaskFromClipboard(
+							shell, indexRegistry, null);
+					}
+				});
+				
 				menuManager.show();
 			}
 		});
