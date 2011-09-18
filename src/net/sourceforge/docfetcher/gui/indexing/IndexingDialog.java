@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.io.File;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
@@ -307,11 +308,17 @@ public final class IndexingDialog implements Dialog {
 	}
 
 	private void addTab(@NotNull final Task task, boolean selectTab) {
-		// TODO now: set tab title, icon and tooltip
+		// Create an configure tab item
 		final CTabItem tabItem = new CTabItem(tabFolder, SWT.CLOSE);
-		tabItem.setText("Test");
-		tabItem.setImage(Img.DOCFETCHER_16.get());
 		tabItem.setData(task);
+		File rootFile = task.getLuceneIndex().getRootFile();
+		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
+		tabItem.setText(Util.truncate(nameOrLetter));
+		tabItem.setToolTipText(Util.getSystemAbsPath(rootFile));
+		if (task.is(TaskState.READY))
+			tabItem.setImage(Img.TREE.get());
+		else
+			tabItem.setImage(Img.CHECK.get());
 		
 		/*
 		 * The tab item's control will not be disposed when the tab item is

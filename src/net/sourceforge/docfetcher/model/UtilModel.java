@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -86,22 +84,6 @@ public final class UtilModel {
 		return ImmutableMap.copyOf(map);
 	}
 	
-	private static Pattern drivePattern = Pattern.compile("([a-zA-Z]):.*");
-
-	/**
-	 * Returns the drive letter at the beginning of the given Windows path, or
-	 * null if the path doesn't start with a drive letter.
-	 * <p>
-	 * Example: For "C:\Windows" this method returns "C".
-	 */
-	@VisibleForPackageGroup
-	public static String getDriveLetter(String path) {
-		Matcher m = drivePattern.matcher(path);
-		if (m.matches())
-			return m.group(1);
-		return null;
-	}
-
 	/**
 	 * Returns a relative path that allows navigation from the absolute source
 	 * path {@code srcPath} to the absolute destination path {@code dstPath}.

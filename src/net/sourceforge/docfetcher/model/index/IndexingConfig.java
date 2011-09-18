@@ -143,8 +143,8 @@ public class IndexingConfig implements Serializable {
 		if (absPath.equals(userDirPath))
 			return "";
 		if (isWindows()) {
-			String d1 = UtilModel.getDriveLetter(userDirPath);
-			String d2 = UtilModel.getDriveLetter(absPath);
+			String d1 = Util.getDriveLetter(userDirPath);
+			String d2 = Util.getDriveLetter(absPath);
 			if (! d1.equals(d2))
 				return absPath;
 		}

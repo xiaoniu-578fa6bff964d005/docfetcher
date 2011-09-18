@@ -172,21 +172,11 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 	private static File getIndexDir(@Nullable File indexParentDir,
 									@NotNull File rootFile,
 									boolean isWindows) {
-		if (indexParentDir == null) return null; // We'll write into RAM
+		if (indexParentDir == null)
+			return null; // We'll write into RAM
+		
 		long id = Util.getTimestamp();
-		String rootName = rootFile.getName();
-
-		/*
-		 * The filename of a drive such as "C:" is an empty string, so we'll use
-		 * the drive letter. Note: Do not use absolute files here, because this
-		 * would turn "C:" into the working directory! (Strange but true.)
-		 */
-		if (isWindows && rootName.equals("")
-				&& Util.getParentFile(rootFile) == null) {
-			String driveLetter = UtilModel.getDriveLetter(rootFile.getPath());
-			if (driveLetter != null) rootName = driveLetter;
-		}
-
+		String rootName = Util.getNameOrLetter(rootFile, "");
 		return new File(indexParentDir, rootName + "_" + id);
 	}
 

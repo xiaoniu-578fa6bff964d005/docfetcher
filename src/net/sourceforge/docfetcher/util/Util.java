@@ -21,12 +21,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
-
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -223,6 +224,16 @@ public final class Util {
 		}
 		parts.add(sb.toString());
 		return parts;
+	}
+	
+	/**
+	 * Shortens the given string if its length exceeds a fixed limit.
+	 */
+	@NotNull
+	public static String truncate(@NotNull String str) {
+		if (str.length() > 32)
+			return str.substring(0, 32) + "..."; //$NON-NLS-1$
+		return str;
 	}
 	
 	public static <T> boolean equals(@NotNull Collection<T> col, @NotNull T[] a) {
@@ -744,6 +755,47 @@ public final class Util {
 			if (filename.endsWith("." + ext.toLowerCase()))
 				return true;
 		return false;
+	}
+	
+	/**
+	 * Returns the name of the given file. In contrast to the default
+	 * {@link File#getName()} method, this method will return a drive letter
+	 * instead of an empty string if the given file is a Windows root such as
+	 * "C:". The {@code letterSuffix} argument is a string that will be appended
+	 * to the drive letter, if one is returned.
+	 */
+	@NotNull
+	public static String getNameOrLetter(	@NotNull File file,
+											@NotNull String letterSuffix) {
+		/*
+		 * Note: Do not use absolute files here, because this would turn "C:"
+		 * into the working directory! (Strange but true.)
+		 */
+		Util.checkNotNull(file, letterSuffix);
+		String filename = file.getName();
+		if (IS_WINDOWS && filename.length() == 0 && getParentFile(file) == null) {
+			String driveLetter = getDriveLetter(file.getPath());
+			if (driveLetter != null)
+				return driveLetter + letterSuffix;
+		}
+		return filename;
+	}
+	
+	private static Pattern drivePattern = Pattern.compile("([a-zA-Z]):.*");
+	
+	/**
+	 * Returns the drive letter at the beginning of the given Windows path, or
+	 * null if the path doesn't start with a drive letter.
+	 * <p>
+	 * Example: For "C:\Windows" this method returns "C".
+	 */
+	@Nullable
+	public static String getDriveLetter(@NotNull String path) {
+		Util.checkNotNull(path);
+		Matcher m = Util.drivePattern.matcher(path);
+		if (m.matches())
+			return m.group(1);
+		return null;
 	}
 	
 	public static void assertSwtThread() {
