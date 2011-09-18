@@ -30,7 +30,7 @@ final class MultiFileLauncher {
 	
 	public void addFile(@NotNull File file) {
 		Util.checkNotNull(file);
-		if (!files.containsEq(file))
+		if (!files.contains(file))
 			files.add(file);
 	}
 	

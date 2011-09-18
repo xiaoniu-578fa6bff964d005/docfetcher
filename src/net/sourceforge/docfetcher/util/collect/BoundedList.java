@@ -12,19 +12,18 @@
 package net.sourceforge.docfetcher.util.collect;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import net.sourceforge.docfetcher.util.Util;
-import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+
+import com.google.common.collect.ForwardingCollection;
 
 /**
  * @author Tran Nam Quang
  */
-public final class BoundedList<T> implements Iterable<T> {
+public final class BoundedList<T> extends ForwardingCollection<T> {
 	
 	private final int capacity;
 	private final boolean removeEldest;
@@ -40,9 +39,14 @@ public final class BoundedList<T> implements Iterable<T> {
 		this.capacity = capacity;
 		this.removeEldest = removeEldest;
 	}
+	
+	protected Collection<T> delegate() {
+		return list;
+	}
 
-	public void add(@NotNull T element) {
+	public boolean add(@NotNull T element) {
 		Util.checkNotNull(element);
+		boolean added = capacity > 0;
 		if (removeEldest) {
 			list.add(element);
 			if (list.size() > capacity)
@@ -51,14 +55,18 @@ public final class BoundedList<T> implements Iterable<T> {
 		else {
 			if (list.size() < capacity)
 				list.add(element);
+			else
+				added = false;
 		}
 		virtualSize++;
+		return added;
 	}
 	
-	public void addAll(@NotNull Collection<T> elements) {
+	public boolean addAll(@NotNull Collection<? extends T> elements) {
 		Util.checkNotNull(elements);
 		if (elements.isEmpty())
-			return;
+			return false;
+		boolean added = capacity > 0;
 		if (removeEldest) {
 			list.addAll(elements);
 			while (list.size() > capacity)
@@ -68,12 +76,16 @@ public final class BoundedList<T> implements Iterable<T> {
 			int diff = capacity - list.size();
 			assert diff >= 0;
 			if (diff > 0) {
-				Iterator<T> it = elements.iterator();
+				Iterator<? extends T> it = elements.iterator();
 				for (int i = 0; i < diff && it.hasNext(); i++)
 					list.add(it.next());
 			}
+			else {
+				added = false;
+			}
 		}
 		virtualSize += elements.size();
+		return added;
 	}
 	
 	@NotNull
@@ -87,38 +99,6 @@ public final class BoundedList<T> implements Iterable<T> {
 	
 	public int getCapacity() {
 		return capacity;
-	}
-	
-	public int size() {
-		return list.size();
-	}
-	
-	@NotNull
-	public List<T> removeAll() {
-		List<T> ret = list;
-		list = new LinkedList<T>();
-		virtualSize = 0;
-		return ret;
-	}
-	
-	public boolean isEmpty() {
-		return list.isEmpty();
-	}
-	
-	public boolean containsEq(@NotNull T element) {
-		Util.checkNotNull(element);
-		for (T candidate : list)
-			if (candidate.equals(element))
-				return true;
-		return false;
-	}
-	
-	public boolean containsId(@NotNull T element) {
-		Util.checkNotNull(element);
-		for (T candidate : list)
-			if (candidate == element)
-				return true;
-		return false;
 	}
 	
 	@NotNull
@@ -138,11 +118,48 @@ public final class BoundedList<T> implements Iterable<T> {
 			}
 		};
 	}
-	
-	@Immutable
-	@NotNull
-	public List<T> unmodifiableList() {
-		return Collections.unmodifiableList(list);
+
+	public boolean remove(Object o) {
+		boolean removed = list.remove(o);
+		if (removed)
+			virtualSize--;
+		assert virtualSize >= 0;
+		return removed;
+	}
+
+	public boolean removeAll(Collection<?> c) {
+		Iterator<T> it = list.iterator();
+		boolean changed = false;
+		while (it.hasNext()) {
+			T next = it.next();
+			if (c.contains(next)) {
+				it.remove();
+				virtualSize--;
+				changed = true;
+			}
+		}
+		assert virtualSize >= 0;
+		return changed;
+	}
+
+	public boolean retainAll(Collection<?> c) {
+		Iterator<T> it = list.iterator();
+		boolean changed = false;
+		while (it.hasNext()) {
+			T next = it.next();
+			if (!c.contains(next)) {
+				it.remove();
+				virtualSize--;
+				changed = true;
+			}
+		}
+		assert virtualSize >= 0;
+		return changed;
+	}
+
+	public void clear() {
+		list.clear();
+		virtualSize = 0;
 	}
 
 }

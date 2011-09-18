@@ -12,11 +12,10 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.util.Util;
-import net.sourceforge.docfetcher.util.annotations.Immutable;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.BoundedList;
@@ -27,17 +26,8 @@ import net.sourceforge.docfetcher.util.collect.BoundedList;
 public final class DelegatingReporter extends IndexingReporter {
 
 	public interface ExistingMessagesHandler {
-		// Method is called under lock of DelegatingReporter
-		public void handleMessages(	@Immutable @NotNull List<IndexingInfo> infos,
-									@Immutable @NotNull List<IndexingError> errors);
-	}
-
-	public interface ExistingMessagesProvider {
-		@NotNull
-		public List<IndexingInfo> getInfos();
-
-		@NotNull
-		public List<IndexingError> getErrors();
+		public void handleMessages(	@MutableCopy @NotNull List<IndexingInfo> infos,
+									@MutableCopy @NotNull List<IndexingError> errors);
 	}
 
 	@Nullable private IndexingReporter delegate;
@@ -51,17 +41,25 @@ public final class DelegatingReporter extends IndexingReporter {
 		errors = new ArrayList<IndexingError>();
 	}
 
-	public synchronized void attachDelegate(@NotNull IndexingReporter delegate,
-											@NotNull ExistingMessagesHandler handler) {
+	public void attachDelegate(	@NotNull IndexingReporter delegate,
+								@NotNull ExistingMessagesHandler handler) {
 		Util.checkNotNull(delegate, handler);
 		Util.checkThat(this.delegate == null);
-		this.delegate = delegate;
-		if (start != null)
-			delegate.setStartTime(start);
-		if (end != null)
-			delegate.setEndTime(end);
-		handler.handleMessages(
-			infos.unmodifiableList(), Collections.unmodifiableList(errors));
+		
+		List<IndexingInfo> infoSnapshot;
+		List<IndexingError> errorSnapshot;
+		
+		synchronized (this) {
+			this.delegate = delegate;
+			if (start != null)
+				delegate.setStartTime(start);
+			if (end != null)
+				delegate.setEndTime(end);
+			infoSnapshot = new ArrayList<IndexingInfo>(infos);
+			errorSnapshot = new ArrayList<IndexingError>(errors);
+		}
+		
+		handler.handleMessages(infoSnapshot, errorSnapshot);
 	}
 
 	public synchronized void detachDelegate(@NotNull IndexingReporter delegate) {
