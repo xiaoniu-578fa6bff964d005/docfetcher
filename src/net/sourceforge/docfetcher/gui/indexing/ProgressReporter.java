@@ -30,6 +30,8 @@ final class ProgressReporter extends IndexingReporter {
 	 * take care when calculating filesizes for HTML pairs!
 	 */
 	
+	// TODO i18n
+	
 	private final ProgressPanel progressPanel;
 	private long start = 0;
 	@Nullable private IndexingInfo lastInfo;
@@ -50,15 +52,21 @@ final class ProgressReporter extends IndexingReporter {
 	}
 	
 	public void info(@NotNull IndexingInfo info) {
-		progressPanel.append(info.getTreeNode().getDisplayName());
+		progressPanel.append(getMessage(info));
 		lastInfo = info;
 	}
 	
 	public void subInfo(int current, int total) {
 		Util.checkThat(lastInfo != null);
-		String message = lastInfo.getTreeNode().getDisplayName();
+		String message = getMessage(lastInfo);
 		message = String.format("%s [%d/%d]", message, current, total);
 		progressPanel.replaceLast(message);
+	}
+	
+	@NotNull
+	private String getMessage(@NotNull IndexingInfo info) {
+		String displayName = info.getTreeNode().getDisplayName();
+		return String.format("%,d\t %s", info.getNumber(), displayName);
 	}
 	
 	public void fail(@NotNull IndexingError error) {

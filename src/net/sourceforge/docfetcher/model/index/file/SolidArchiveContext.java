@@ -17,6 +17,7 @@ import java.util.Map;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveTree.FailReporter;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -44,8 +45,10 @@ final class SolidArchiveContext extends FileContext implements FailReporter {
 	                              	@NotNull IndexingReporter reporter,
 	                              	@Nullable String originalPath,
 	                              	@NotNull Cancelable cancelable,
+	                              	@NotNull MutableInt fileCount,
 	                              	boolean isTempArchive) {
-		super(config, zipDetector, writer, reporter, originalPath, cancelable);
+		super(config, zipDetector, writer, reporter, originalPath, cancelable,
+			fileCount);
 		this.isTempArchive = isTempArchive;
 	}
 	
@@ -59,6 +62,7 @@ final class SolidArchiveContext extends FileContext implements FailReporter {
 				superContext.getReporter(),
 				originalPath,
 				superContext.getStopper(),
+				superContext.getFileCount(),
 				isTempArchive
 		);
 	}

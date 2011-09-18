@@ -24,6 +24,7 @@ import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -38,25 +39,28 @@ import de.schlichtherle.truezip.file.TFile;
  */
 class FileContext {
 	
-	@NotNull private final IndexingConfig config;
-	@NotNull private final TArchiveDetector zipDetector;
-	@NotNull private final LuceneDocWriter writer;
+	private final IndexingConfig config;
+	private final TArchiveDetector zipDetector;
+	private final LuceneDocWriter writer;
 	@NotNull private IndexingReporter reporter;
 	@Nullable private final String originalPath;
-	@NotNull private final Cancelable cancelable;
+	private final Cancelable cancelable;
+	private final MutableInt fileCount;
 
 	protected FileContext(	@NotNull IndexingConfig config,
 							@NotNull TArchiveDetector zipDetector,
 							@NotNull LuceneDocWriter writer,
 							@Nullable IndexingReporter reporter,
 							@Nullable String originalPath,
-							@NotNull Cancelable cancelable) {
-		Util.checkNotNull(config, zipDetector, writer, cancelable);
+							@NotNull Cancelable cancelable,
+							@NotNull MutableInt fileCount) {
+		Util.checkNotNull(config, zipDetector, writer, cancelable, fileCount);
 		this.config = config;
 		this.zipDetector = zipDetector;
 		this.writer = writer;
 		this.originalPath = originalPath;
 		this.cancelable = cancelable;
+		this.fileCount = fileCount;
 		setReporter(reporter);
 	}
 	
@@ -68,7 +72,8 @@ class FileContext {
 				superContext.writer,
 				superContext.reporter,
 				originalPath,
-				superContext.cancelable
+				superContext.cancelable,
+				superContext.fileCount
 		);
 	}
 	
@@ -108,8 +113,14 @@ class FileContext {
 		return cancelable.isCanceled();
 	}
 	
+	@NotNull
 	protected final Cancelable getStopper() {
 		return cancelable;
+	}
+	
+	@NotNull
+	protected final MutableInt getFileCount() {
+		return fileCount;
 	}
 	
 	// returns success
@@ -182,8 +193,9 @@ class FileContext {
 		}
 	}
 	
-	public final void info(@NotNull InfoType type, @NotNull TreeNode treeNode) {
-		reporter.info(new IndexingInfo(type, treeNode));
+	public void info(@NotNull InfoType type, @NotNull TreeNode treeNode) {
+		fileCount.increment();
+		reporter.info(new IndexingInfo(type, treeNode, fileCount.get()));
 	}
 	
 	// Reports the given error and saves it in the given tree node

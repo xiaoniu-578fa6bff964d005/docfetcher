@@ -31,13 +31,15 @@ public final class IndexingInfo {
 	
 	private final InfoType infoType;
 	private final TreeNode treeNode;
+	private final int number;
 	
 	@Nullable private int[] percentage;
 	
-	public IndexingInfo(@NotNull InfoType infoType, @NotNull TreeNode treeNode) {
+	public IndexingInfo(@NotNull InfoType infoType, @NotNull TreeNode treeNode, int number) {
 		Util.checkNotNull(infoType, treeNode);
 		this.infoType = infoType;
 		this.treeNode = treeNode;
+		this.number = number;
 	}
 
 	@NotNull
@@ -49,6 +51,10 @@ public final class IndexingInfo {
 	@NotNull
 	public TreeNode getTreeNode() {
 		return treeNode;
+	}
+	
+	public int getNumber() {
+		return number;
 	}
 
 	@Nullable

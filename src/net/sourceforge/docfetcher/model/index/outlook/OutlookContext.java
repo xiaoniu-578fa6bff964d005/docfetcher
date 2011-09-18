@@ -17,6 +17,7 @@ import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -36,6 +37,7 @@ final class OutlookContext {
 	private final IndexWriterAdapter writer;
 	private final IndexingReporter reporter;
 	private final Cancelable cancelable;
+	private final MutableInt fileCount = new MutableInt(0);
 
 	public OutlookContext(	@NotNull IndexingConfig config,
 	                      	@NotNull IndexWriterAdapter writer,
@@ -56,7 +58,8 @@ final class OutlookContext {
 	public void index(	@NotNull MailDocument doc,
 						@NotNull PSTMessage email,
 						boolean added) throws IndexingException {
-		reporter.info(new IndexingInfo(InfoType.EXTRACTING, doc));
+		fileCount.increment();
+		reporter.info(new IndexingInfo(InfoType.EXTRACTING, doc, fileCount.get()));
 		try {
 			doc.setError(null);
 			Document luceneDoc = createLuceneDoc(doc, email); // might store some errors

@@ -27,6 +27,7 @@ import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -107,13 +108,16 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 
 		try {
 			writer = new SimpleDocWriter(getLuceneDir());
+			MutableInt fileCount = new MutableInt(0);
+			
 			/*
 			 * The user-defined zip extensions have higher priority, so we'll
 			 * check for folders and zip archives first.
 			 */
 			if (rootFile.isDirectory()) {
 				FileContext context = new FileContext(
-					config, zipDetector, writer, reporter, null, cancelable);
+					config, zipDetector, writer, reporter, null, cancelable,
+					fileCount);
 				visitDirOrZip(context, rootFolder, rootFile);
 			}
 			else {
@@ -131,7 +135,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 				}
 				SolidArchiveContext context = new SolidArchiveContext(
 					config, zipDetector, writer, reporter, null, cancelable,
-					false);
+					fileCount, false);
 				SolidArchiveTree<?> archiveTree = factory.createSolidArchiveTree(
 					context, rootFile);
 				visitSolidArchive(context, rootFolder, archiveTree);
