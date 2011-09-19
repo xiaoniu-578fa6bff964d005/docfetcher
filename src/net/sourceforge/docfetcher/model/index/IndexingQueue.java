@@ -96,7 +96,6 @@ public final class IndexingQueue {
 				try {
 					assert !indexRegistry.getIndexes().contains(luceneIndex);
 					indexRegistry.addIndex(luceneIndex);
-					indexRegistry.save(luceneIndex);
 				}
 				finally {
 					writeLock.unlock();
@@ -422,6 +421,7 @@ public final class IndexingQueue {
 	// The listeners are not detached if the cancel handler returns null on the active task
 	// Warning: Cancel handler is called under lock, so caller must take possible
 	// lock-ordering deadlocks into account.
+	// The given removed listener is *not* notified of any removed tasks.
 	@ThreadSafe
 	public void removeAll(	@NotNull CancelHandler handler,
 							@NotNull Event.Listener<Task> addedListener,
@@ -440,12 +440,8 @@ public final class IndexingQueue {
 			writeLock.unlock();
 		}
 		
-		/*
-		 * We can't call evtRemoved.fire(task) here since the removed listener
-		 * is not attached to evtRemoved anymore.
-		 */
 		for (Task task : removedTasks)
-			removedListener.update(task);
+			evtRemoved.fire(task);
 	}
 	
 	// returns 'proceed', fills the given list with removed tasks
