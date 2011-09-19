@@ -332,8 +332,6 @@ public final class IndexRegistry {
 				protected void handleEvent(File targetFile, EventType eventType) {
 					if (!targetFile.getName().equals(SER_FILENAME))
 						return;
-					if (eventType != EventType.MODIFIED)
-						return;
 					executor.schedule(new Runnable() {
 						public void run() {
 							reload();
