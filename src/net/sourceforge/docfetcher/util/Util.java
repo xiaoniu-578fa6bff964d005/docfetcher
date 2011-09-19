@@ -930,6 +930,42 @@ public final class Util {
 	}
 	
 	/**
+	 * Creates a new list from the given collection and elements. The given
+	 * collection is added first to the returned list.
+	 * 
+	 * @see #createListReverse(Collection, Object...)
+	 */
+	@MutableCopy
+	@NotNull
+	public static <T> List<T> createList(	@NotNull Collection<T> col,
+											@NotNull T... elements) {
+		Util.checkNotNull(col, elements);
+		List<T> newList = new ArrayList<T>(col.size() + elements.length);
+		newList.addAll(col);
+		for (T element : elements)
+			newList.add(element);
+		return newList;
+	}
+	
+	/**
+	 * Creates a new list from the given collection and elements. The given
+	 * elements are added first to the returned list.
+	 * 
+	 * @see #createList(Collection, Object...)
+	 */
+	@MutableCopy
+	@NotNull
+	public static <T> List<T> createListReversed(	@NotNull Collection<T> col,
+													@NotNull T... elements) {
+		Util.checkNotNull(col, elements);
+		List<T> newList = new ArrayList<T>(col.size() + elements.length);
+		for (T element : elements)
+			newList.add(element);
+		newList.addAll(col);
+		return newList;
+	}
+	
+	/**
 	 * Runs the given {@code Runnable} in a way that avoids throwing errors of
 	 * the type {@link SWT#ERROR_THREAD_INVALID_ACCESS}. This is useful for
 	 * running GUI-accessing code from non-GUI threads.

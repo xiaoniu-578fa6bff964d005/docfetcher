@@ -636,5 +636,9 @@ public final class IndexPanel {
 		else if (dialogFactory != null)
 			dialogFactory.open();
 	}
+	
+	public void openIndexingDialog() {
+		dialogFactory.open();
+	}
 
 }

@@ -96,7 +96,7 @@ public final class Main {
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
-	private static StatusBarPart indexingDialogStatusBarPart;
+	private static StatusBarPart indexingStatus;
 	private static SystemTrayHider systemTrayHider;
 
 	private Main() {
@@ -198,16 +198,23 @@ public final class Main {
 
 		final StatusBar statusBar = new StatusBar(shell) {
 			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
-				indexingDialogStatusBarPart = new StatusBarPart(statusBar);
-				indexingDialogStatusBarPart.setContents(Img.INDEXING.get(), "Indexing...");
-				indexingDialogStatusBarPart.setVisible(false);
+				indexingStatus = new StatusBarPart(statusBar, true);
+				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
+				indexingStatus.setVisible(false);
 				
-				StatusBarPart part2 = new StatusBarPart(statusBar);
-				part2.setContents(Img.INDEXING.get(), "Web Interface");
+				indexingStatus.evtClicked.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						indexPanel.openIndexingDialog();
+						indexingStatus.setVisible(false);
+					}
+				});
+				
+				StatusBarPart webInterfaceStatus = new StatusBarPart(statusBar, true);
+				webInterfaceStatus.setContents(Img.INDEXING.get(), "Web Interface");
 
 				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
-				parts.add(indexingDialogStatusBarPart);
-				parts.add(part2);
+				parts.add(indexingStatus);
+				parts.add(webInterfaceStatus);
 				return parts;
 			}
 		};
@@ -493,8 +500,8 @@ public final class Main {
 	}
 	
 	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
-		indexingDialogStatusBarPart.setVisible(true);
-		Rectangle dest = indexingDialogStatusBarPart.getBounds();
+		indexingStatus.setVisible(true);
+		Rectangle dest = indexingStatus.getBounds();
 		dest = display.map(shell, null, dest);
 		MovingBox movingBox = new MovingBox(shell, src, dest, 0.2, 40);
 		movingBox.start();
