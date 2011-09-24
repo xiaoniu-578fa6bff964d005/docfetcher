@@ -87,11 +87,10 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		return DocumentType.FILE;
 	}
 
-	// returns success
-	public boolean update(	@NotNull IndexingReporter reporter,
-							@NotNull Cancelable cancelable) {
+	public IndexingResult update(	@NotNull IndexingReporter reporter,
+									@NotNull Cancelable cancelable) {
 		if (cancelable.isCanceled())
-			return false;
+			return IndexingResult.SUCCESS_UNCHANGED;
 		
 		reporter.setStartTime(System.currentTimeMillis());
 		IndexingConfig config = getConfig();
@@ -107,21 +106,35 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		File rootFile = new TFile(rootFolder.getPath(), zipDetector);
 
 		try {
-			writer = new SimpleDocWriter(getLuceneDir());
-			MutableInt fileCount = new MutableInt(0);
-			
 			/*
 			 * The user-defined zip extensions have higher priority, so we'll
 			 * check for folders and zip archives first.
 			 */
 			if (rootFile.isDirectory()) {
+				/*
+				 * Return immediately if the root file is a zip archive and it
+				 * wasn't modified.
+				 */
+				Long newLastModified = getZipArchiveLastModified(config, rootFile);
+				if (UtilModel.isUnmodifiedArchive(rootFolder, newLastModified))
+					return IndexingResult.SUCCESS_UNCHANGED;
+				rootFolder.setLastModified(newLastModified);
+				
+				writer = new SimpleDocWriter(getLuceneDir());
 				FileContext context = new FileContext(
 					config, zipDetector, writer, reporter, null, cancelable,
-					fileCount);
+					new MutableInt(0));
 				visitDirOrZip(context, rootFolder, rootFile);
 			}
 			else {
-				SolidArchiveFactory factory = config.getSolidArchiveFactory(rootFile.getName());
+				// Return immediately if the root file wasn't modified
+				long newLastModified = rootFile.lastModified();
+				if (UtilModel.isUnmodifiedArchive(rootFolder, newLastModified))
+					return IndexingResult.SUCCESS_UNCHANGED;
+				rootFolder.setLastModified(newLastModified);
+				
+				SolidArchiveFactory factory = config
+						.getSolidArchiveFactory(rootFile.getName());
 				if (factory == null) {
 					/*
 					 * This happens when the user tries to index a file that
@@ -131,18 +144,20 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 					 * supported
 					 */
 					report(ErrorType.NOT_AN_ARCHIVE, reporter, null);
-					return false;
+					return IndexingResult.FAILURE;
 				}
+				
+				writer = new SimpleDocWriter(getLuceneDir());
 				SolidArchiveContext context = new SolidArchiveContext(
 					config, zipDetector, writer, reporter, null, cancelable,
-					fileCount, false);
+					new MutableInt(0), false);
 				SolidArchiveTree<?> archiveTree = factory.createSolidArchiveTree(
 					context, rootFile);
 				visitSolidArchive(context, rootFolder, archiveTree);
 			}
 
 			writer.optimize();
-			return true;
+			return IndexingResult.SUCCESS_CHANGED;
 		}
 		catch (ArchiveEncryptedException e) {
 			report(ErrorType.ARCHIVE_ENCRYPTED, reporter, e);
@@ -160,7 +175,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			Closeables.closeQuietly(writer);
 			reporter.setEndTime(System.currentTimeMillis());
 		}
-		return false;
+		return IndexingResult.FAILURE;
 	}
 	
 	private void report(@NotNull ErrorType errorType,
@@ -187,9 +202,12 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 	@NotNull
 	private static FileFolder getRootFolder(@NotNull IndexingConfig config,
 											@NotNull File rootFile) {
-		Long lastModified = getZipArchiveLastModified(config, rootFile);
+		/*
+		 * The last-modified field of the root folder is set to null so that it
+		 * is detected as "modified" the first time the update method is called.
+		 */
 		String path = config.getStorablePath(rootFile);
-		return new FileFolder(rootFile.getName(), path, lastModified);
+		return new FileFolder(rootFile.getName(), path, null);
 	}
 
 	/**
@@ -212,14 +230,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			return file.lastModified();
 		}
 		return null;
-	}
-
-	private static boolean isUnmodifiedArchive(	@NotNull FileFolder folder,
-												@Nullable Long newLastModified) {
-		Long oldLastModified = folder.getLastModified();
-		if (oldLastModified != null && newLastModified != null
-				&& oldLastModified.equals(newLastModified)) return true;
-		return false;
 	}
 
 	@NotNull
@@ -353,7 +363,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 					folder.putSubFolder(subFolder);
 				}
 				else { // Folder already registered, check modification state
-					if (isUnmodifiedArchive(subFolder, newLastModified))
+					if (UtilModel.isUnmodifiedArchive(subFolder, newLastModified))
 						return;
 					subFolder.setLastModified(newLastModified);
 					subFolder.setError(null);
@@ -440,7 +450,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 			parentFolder.putSubFolder(archiveFolder);
 		}
 		else { // Found registered archive
-			if (isUnmodifiedArchive(archiveFolder, newLastModified))
+			if (UtilModel.isUnmodifiedArchive(archiveFolder, newLastModified))
 				return true; // Don't recurse into unmodified archive
 			archiveFolder.setLastModified(newLastModified);
 			archiveFolder.setError(null);

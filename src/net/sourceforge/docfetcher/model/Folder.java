@@ -85,15 +85,22 @@ public abstract class Folder
 	
 	private final String path;
 	
+	/**
+	 * The last time this object was modified. Null if the object has no last
+	 * modified field (e.g. regular folder).
+	 */
+	@Nullable private Long lastModified;
+	
 	/*
 	 * This field is marked as volatile because it will be accessed from another
 	 * thread during search.
 	 */
 	private volatile boolean isChecked = true;
 	
-	public Folder(@NotNull String name, @NotNull String path) {
+	public Folder(@NotNull String name, @NotNull String path, @Nullable Long lastModified) {
 		super(name, name);
 		this.path = UtilModel.normalizePath(path);
+		this.lastModified = lastModified;
 	}
 	
 	@Nullable
@@ -111,6 +118,15 @@ public abstract class Folder
 	@NotNull
 	public final String getPath() {
 		return path;
+	}
+	
+	@Nullable
+	public final Long getLastModified() {
+		return lastModified;
+	}
+	
+	public final void setLastModified(@Nullable Long lastModified) {
+		this.lastModified = lastModified;
 	}
 	
 	// will replace document with identical name;

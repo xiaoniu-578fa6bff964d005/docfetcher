@@ -21,6 +21,7 @@ import java.util.concurrent.locks.Lock;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
+import net.sourceforge.docfetcher.model.TreeIndex.IndexingResult;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
 import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
@@ -157,7 +158,7 @@ public final class IndexingQueue {
 			indexRegistry.getSearcher().replaceLuceneSearcher();
 			luceneIndex.clear();
 		}
-		boolean success = task.update(); // Long-running process
+		IndexingResult result = task.update(); // Long-running process
 
 		boolean doDelete = false;
 		boolean fireRemoved = false;
@@ -173,7 +174,8 @@ public final class IndexingQueue {
 				 * then indexes could magically disappear at any time.
 				 */
 				assert !task.is(CancelAction.DISCARD);
-				if (task.getDeletion() == null) {
+				if (task.getDeletion() == null
+						|| result != IndexingResult.SUCCESS_UNCHANGED) {
 					indexRegistry.save(luceneIndex);
 					indexRegistry.getSearcher().replaceLuceneSearcher();
 				}
@@ -182,7 +184,7 @@ public final class IndexingQueue {
 				}
 				fireRemoved = tasks.remove(task);
 			}
-			else if (!success) {
+			else if (result == IndexingResult.FAILURE) {
 				doDelete = true;
 			}
 			else if (task.is(CancelAction.DISCARD)) {
@@ -191,7 +193,8 @@ public final class IndexingQueue {
 			}
 			else {
 				indexRegistry.addIndex(luceneIndex);
-				indexRegistry.save(luceneIndex);
+				if (result == IndexingResult.SUCCESS_CHANGED)
+					indexRegistry.save(luceneIndex);
 				boolean keep = task.is(CancelAction.KEEP);
 				boolean noErrors = true; // TODO now: take collected errors into account
 				if (keep || noErrors || shutdown)

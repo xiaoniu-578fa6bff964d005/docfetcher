@@ -249,5 +249,14 @@ public final class UtilModel {
 	public static String normalizePath(@NotNull String path) {
 		return Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
 	}
+
+	public static boolean isUnmodifiedArchive(	@NotNull Folder<?, ?> folder,
+												@Nullable Long newLastModified) {
+		Long oldLastModified = folder.getLastModified();
+		if (oldLastModified != null && newLastModified != null
+				&& oldLastModified.equals(newLastModified))
+			return true;
+		return false;
+	}
 	
 }

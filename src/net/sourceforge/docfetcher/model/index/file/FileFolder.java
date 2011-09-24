@@ -35,30 +35,14 @@ public class FileFolder extends Folder<FileDocument, FileFolder> {
 		}
 	}
 	
-	/**
-	 * The last time this object was modified. A null value indicates this is a
-	 * regular folder while a non-null value represents an archive.
-	 */
-	@Nullable private Long lastModified;
-
 	public FileFolder(	@NotNull String name,
 						@NotNull String path,
 						@Nullable Long lastModified) {
-		super(name, path);
-		this.lastModified = lastModified;
-	}
-
-	@Nullable
-	public final Long getLastModified() {
-		return lastModified;
+		super(name, path, lastModified);
 	}
 	
 	public final boolean isArchive() {
-		return lastModified != null;
-	}
-	
-	public final void setLastModified(@Nullable Long lastModified) {
-		this.lastModified = lastModified;
+		return getLastModified() != null;
 	}
 
 }

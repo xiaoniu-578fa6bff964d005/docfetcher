@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+import net.sourceforge.docfetcher.model.TreeIndex.IndexingResult;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.Event;
@@ -50,7 +51,9 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	@NotNull
 	public Folder<?, ?> getRootFolder();
 	
-	public boolean update(IndexingReporter reporter, Cancelable cancelable);
+	@NotNull
+	public IndexingResult update(	@NotNull IndexingReporter reporter,
+									@NotNull Cancelable cancelable);
 	
 	@NotNull
 	public Directory getLuceneDir() throws IOException;

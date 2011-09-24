@@ -37,6 +37,12 @@ public abstract class TreeIndex <
 	F extends Folder<D, F>,
 	C extends IndexingConfig> implements LuceneIndex {
 	
+	public enum IndexingResult {
+		SUCCESS_CHANGED,
+		SUCCESS_UNCHANGED,
+		FAILURE,
+	}
+	
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	@NotNull private final F rootFolder;
@@ -55,9 +61,9 @@ public abstract class TreeIndex <
 			ramIndexDir = new RAMDirectory();
 	}
 	
-	// returns success
-	public abstract boolean update(	@NotNull IndexingReporter reporter,
-									@NotNull Cancelable cancelable);
+	@NotNull
+	public abstract IndexingResult update(	@NotNull IndexingReporter reporter,
+											@NotNull Cancelable cancelable);
 
 	@NotNull
 	public final C getConfig() {
@@ -110,6 +116,13 @@ public abstract class TreeIndex <
 	}
 	
 	private void clear(boolean removeTopLevel) {
+		/*
+		 * Setting the last-modified field to null will cause the next index
+		 * update to detect this index as modified. Without this, if the index
+		 * is about to be rebuilt, the rebuild operation will fail.
+		 */
+		rootFolder.setLastModified(null);
+		
 		rootFolder.removeChildren();
 		if (fileIndexDir != null) {
 			try {

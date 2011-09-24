@@ -19,6 +19,7 @@ import java.util.Map;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.TreeIndex;
+import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
@@ -93,10 +94,10 @@ public final class OutlookIndex extends TreeIndex
 		return DocumentType.OUTLOOK;
 	}
 	
-	public boolean update(@NotNull IndexingReporter reporter,
-	                      @NotNull Cancelable cancelable) {
+	public IndexingResult update(	@NotNull IndexingReporter reporter,
+									@NotNull Cancelable cancelable) {
 		if (cancelable.isCanceled())
-			return false;
+			return IndexingResult.SUCCESS_UNCHANGED;
 		
 		reporter.setStartTime(System.currentTimeMillis());
 		MailFolder rootFolder = getRootFolder();
@@ -104,6 +105,16 @@ public final class OutlookIndex extends TreeIndex
 		IndexWriterAdapter writer = null;
 		
 		try {
+			/*
+			 * Return immediately if the last-modified field of the PST file
+			 * hasn't changed.
+			 */
+			File rootFile = new File(rootFolder.getPath());
+			long newLastModified = rootFile.lastModified();
+			if (UtilModel.isUnmodifiedArchive(rootFolder, newLastModified))
+				return IndexingResult.SUCCESS_UNCHANGED;
+			rootFolder.setLastModified(newLastModified);
+			
 			writer = new IndexWriterAdapter(getLuceneDir());
 			OutlookContext context = new OutlookContext(
 					getConfig(), writer, reporter, cancelable
@@ -124,7 +135,7 @@ public final class OutlookIndex extends TreeIndex
 			}.getSimplifiedRoot(getRootFolder());
 			
 			writer.optimize();
-			return true;
+			return IndexingResult.SUCCESS_CHANGED;
 		}
 		catch (PSTException e) {
 			report(reporter, e);
@@ -139,7 +150,7 @@ public final class OutlookIndex extends TreeIndex
 			Closeables.closeQuietly(writer);
 			reporter.setEndTime(System.currentTimeMillis());
 		}
-		return false;
+		return IndexingResult.FAILURE;
 	}
 	
 	private void report(@NotNull IndexingReporter reporter,

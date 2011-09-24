@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model.index;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
+import net.sourceforge.docfetcher.model.TreeIndex.IndexingResult;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -87,7 +88,8 @@ public final class Task {
 		queue.setReady(this);
 	}
 
-	boolean update() {
+	@NotNull
+	IndexingResult update() {
 		return index.update(reporter, new Cancelable() {
 			public boolean isCanceled() {
 				return cancelAction != null;
