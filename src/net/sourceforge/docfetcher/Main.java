@@ -443,8 +443,7 @@ public final class Main {
 						comp.layout();
 					}
 				});
-				// TODO now: move this method to GuiUtil?
-				// UtilDF.addMouseHighlighter(item);
+				Util.addMouseHighlighter(item);
 				return item;
 			}
 

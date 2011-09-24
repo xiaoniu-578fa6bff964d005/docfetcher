@@ -70,7 +70,7 @@ public class StatusBar extends Composite {
 						evtClicked.fire(null);
 					}
 				});
-				UtilGui.addMouseHighlighter(label);
+				Util.addMouseHighlighter(label);
 			}
 			else {
 				evtClicked = null;

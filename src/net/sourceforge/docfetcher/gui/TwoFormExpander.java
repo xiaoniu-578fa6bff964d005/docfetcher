@@ -148,7 +148,7 @@ public abstract class TwoFormExpander extends Composite {
 				itemLeftBottom0, itemRightBottom0,
 		};
 		for (final Label item : items)
-			UtilGui.addMouseHighlighter(item);
+			Util.addMouseHighlighter(item);
 	}
 	
 	@NotNull

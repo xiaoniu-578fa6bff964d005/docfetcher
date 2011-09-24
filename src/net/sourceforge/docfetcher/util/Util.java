@@ -28,6 +28,8 @@ import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.gui.Col;
+
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -42,6 +44,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -1328,6 +1332,21 @@ public final class Util {
 		
 		clipboard.setContents(new Object[] {sb.toString(), filePaths}, types);
 		clipboard.dispose();
+	}
+
+	/**
+	 * Adds a {@link MouseTrackListener} to the given control that highlights
+	 * the background when the mouse hovers over the control.
+	 */
+	public static void addMouseHighlighter(@NotNull final Control control) {
+		control.addMouseTrackListener(new MouseTrackAdapter() {
+			public void mouseEnter(MouseEvent e) {
+				control.setBackground(Col.WIDGET_HIGHLIGHT_SHADOW.get());
+			}
+			public void mouseExit(MouseEvent e) {
+				control.setBackground(null);
+			}
+		});
 	}
 
 }

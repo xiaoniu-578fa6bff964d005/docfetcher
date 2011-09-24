@@ -15,9 +15,6 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -33,21 +30,6 @@ public final class UtilGui {
 	}
 	
 	static final int OPEN_LIMIT = 10;
-	
-	/**
-	 * Adds a {@link MouseTrackListener} to the given control that highlights
-	 * the background when the mouse hovers over the control.
-	 */
-	static void addMouseHighlighter(final Control control) {
-		control.addMouseTrackListener(new MouseTrackAdapter() {
-			public void mouseEnter(MouseEvent e) {
-				control.setBackground(Col.WIDGET_HIGHLIGHT_SHADOW.get());
-			}
-			public void mouseExit(MouseEvent e) {
-				control.setBackground(null);
-			}
-		});
-	}
 	
 	/**
 	 * Paints a border around the given Control. This can be used as a

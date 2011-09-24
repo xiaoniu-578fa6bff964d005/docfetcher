@@ -14,37 +14,25 @@ package net.sourceforge.docfetcher.gui;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.gui.Col;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 
-class ToolBarFormHeader extends Composite {
+class ToolBarFormHeader extends CustomBorderComposite {
 	
-	@NotNull private final Label imageLabel;
-	@NotNull private final Label textLabel;
+	private final Label imageLabel;
+	private final Label textLabel;
 	@Nullable private final Composite toolBar;
 	
-	@NotNull private Color bgCol;
-	@NotNull private Color borderCol;
-
 	public ToolBarFormHeader(Composite parent) {
-		super(parent, SWT.NONE);
-		setLayout(Util.createGridLayout(3, false, 5, 5));
+		super(parent);
+		GridLayout gridLayout = Util.createGridLayout(3, false, 3, 5);
+		gridLayout.marginLeft = 3;
+		setLayout(gridLayout);
 		
 		imageLabel = new Label(this, SWT.NONE);
 		imageLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
@@ -58,71 +46,7 @@ class ToolBarFormHeader extends Composite {
 		createToolBar(toolBar);
 		toolBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		
-		updateColorScheme();
 		updateLayout();
-		
-		// Update colors on theme changes
-		getDisplay().addListener(SWT.Settings, new Listener() {
-			public void handleEvent(Event event) {
-				updateColorScheme();
-			}
-		});
-		
-		// Draw borders
-		PaintListener borderPainter = new PaintListener() {
-			public void paintControl(PaintEvent e) {
-				Point size = ((Control)e.widget).getSize();
-				e.gc.setForeground(borderCol);
-				e.gc.drawRectangle(0, 0, size.x - 1, size.y - 1);
-			}
-		};
-		addPaintListener(borderPainter);
-		toolBar.addPaintListener(borderPainter);
-		
-		// Dispose colors
-		addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				bgCol.dispose();
-				borderCol.dispose();
-			}
-		});
-	}
-	
-	/**
-	 * Creates a background and border color, and sets them on the various
-	 * widgets. The background color is based on the title background color, but
-	 * with adjusted saturation and brightness. The border color is derived from
-	 * the custom background color by reducing the brightness to 75%.
-	 */
-	private void updateColorScheme() {
-		float[] titleHsb = Col.TITLE_BACKGROUND.get().getRGB().getHSB();
-		float hue = titleHsb[0];
-		float sat = Math.min(0.2f, titleHsb[1]);
-		float br = Col.WIDGET_BACKGROUND.get().getRGB().getHSB()[2];
-		
-		RGB newBgRGB = new RGB(hue, sat, br);
-		RGB newBorderRGB = new RGB(hue, sat, br * 0.75f);
-		
-		// Compare new colors with cached colors
-		if (bgCol != null) {
-			assert borderCol != null;
-			RGB oldBgRGB = bgCol.getRGB();
-			if (oldBgRGB.equals(newBgRGB)) {
-				return;
-			}
-			else {
-				bgCol.dispose();
-				borderCol.dispose();
-			}
-		}
-		
-		bgCol = new Color(getDisplay(), newBgRGB);
-		borderCol = new Color(getDisplay(), newBorderRGB);
-		
-		// Set background color
-		imageLabel.setBackground(bgCol);
-		setBackground(bgCol);
-		textLabel.setBackground(bgCol);
 	}
 	
 	private void updateLayout() {

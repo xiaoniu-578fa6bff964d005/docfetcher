@@ -52,7 +52,7 @@ final class ThinArrowButton extends Canvas {
 			btHeight = tmp;
 		}
 		
-		UtilGui.addMouseHighlighter(this);
+		Util.addMouseHighlighter(this);
 		
 		// Draw the arrow
 		addPaintListener(new PaintListener() {
