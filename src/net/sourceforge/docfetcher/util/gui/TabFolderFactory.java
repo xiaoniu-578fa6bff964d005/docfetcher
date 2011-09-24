@@ -113,11 +113,15 @@ public final class TabFolderFactory {
 			if (Util.contains(part, CTabFolderRenderer.PART_HEADER)) {
 				int tabHeight = tabFolder.getTabHeight();
 				gc.setForeground(borderCol.get());
+				/*
+				 * The drawn line must be shifted down by 1 pixel, otherwise it
+				 * will overlap with the tabfolder menu.
+				 */
 				gc.drawLine(
 						bounds.x,
-						bounds.y + tabHeight,
+						bounds.y + tabHeight + 1,
 						bounds.x + bounds.width,
-						bounds.y + tabHeight
+						bounds.y + tabHeight + 1
 				);
 				return;
 			}

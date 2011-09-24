@@ -95,7 +95,7 @@ final class EmailPreview extends Composite {
 	
 	@NotNull
 	private Control createEmailTab(@NotNull Composite parent) {
-		Composite comp = new Composite(parent, SWT.BORDER);
+		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(Util.createGridLayout(1, false, 0, 0));
 		
 		headerComp = createEmailHeader(comp);
