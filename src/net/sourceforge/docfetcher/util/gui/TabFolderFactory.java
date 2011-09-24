@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.util.gui;
 
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -23,8 +24,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
-public class TabFolderFactory {
+public final class TabFolderFactory {
 	
 	private TabFolderFactory() {}
 	
@@ -35,32 +39,42 @@ public class TabFolderFactory {
 		int style = SWT.BORDER;
 		if (close)
 			style |= SWT.CLOSE;
-		CTabFolder tabFolder;
+		final CTabFolder tabFolder;
 		if (curvyTabs) {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setSimple(false);
 			if (coloredTabs) {
-				// TODO now: listen to SWT.Settings event -> put this in the changelog
-				Color colBack = Col.TITLE_BACKGROUND.get();
-				Color colFront = Col.TITLE_FOREGROUND.get();
-				if (! colFront.equals(colBack)) {
-					tabFolder.setSelectionBackground(colBack);
-					tabFolder.setSelectionForeground(colFront);
-				}
+				updateColors(tabFolder);
+				
+				// Adapt colors to OS theme changes
+				tabFolder.getDisplay().addListener(SWT.Settings, new Listener() {
+					public void handleEvent(Event event) {
+						updateColors(tabFolder);
+					}
+				});
 			}
 		} else {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setRenderer(new CustomRenderer(tabFolder, coloredTabs));
 		}
-		increaseTabHeight(tabFolder);
-		return tabFolder;
-	}
-	
-	private static void increaseTabHeight(CTabFolder tabFolder) {
-		GC gc = new GC(tabFolder.getDisplay());
+		
+		// Increase tab height
+		Display display = tabFolder.getDisplay();
+		GC gc = new GC(display);
 		int fontHeight = gc.getFontMetrics().getHeight();
 		tabFolder.setTabHeight(fontHeight * 2);
 		gc.dispose();
+		
+		return tabFolder;
+	}
+
+	private static void updateColors(@NotNull CTabFolder tabFolder) {
+		Color colBack = Col.TITLE_BACKGROUND.get();
+		Color colFront = Col.TITLE_FOREGROUND.get();
+		if (!colFront.equals(colBack)) {
+			tabFolder.setSelectionBackground(colBack);
+			tabFolder.setSelectionForeground(colFront);
+		}
 	}
 	
 	private static class CustomRenderer extends CTabFolderRenderer {
@@ -75,21 +89,25 @@ public class TabFolderFactory {
 			// Tab states
 			boolean isHot = Util.contains(state, SWT.HOT);
 			boolean isSelected = Util.contains(state, SWT.SELECTED);
-			if (Col.TITLE_FOREGROUND.get().equals(Col.TITLE_BACKGROUND.get()))
-				coloredTabs = false; // colored tabs sometimes make the text indiscernible
+			boolean doUseColoredTabs = coloredTabs;
+			if (coloredTabs && Col.TITLE_FOREGROUND.get().equals(Col.TITLE_BACKGROUND.get()))
+				doUseColoredTabs = false; // colored tabs sometimes make the text indiscernible
 			
 			// Color definitions
-			Col borderCol = coloredTabs ?
-					Col.TITLE_BACKGROUND : Col.WIDGET_NORMAL_SHADOW;
+			Col borderCol = doUseColoredTabs
+				? Col.TITLE_BACKGROUND
+				: Col.WIDGET_NORMAL_SHADOW;
 			Col backCol = null;
 			if (isHot || isSelected)
-				backCol = coloredTabs ?
-						Col.TITLE_BACKGROUND : Col.WIDGET_HIGHLIGHT_SHADOW;
+				backCol = doUseColoredTabs
+					? Col.TITLE_BACKGROUND
+					: Col.WIDGET_HIGHLIGHT_SHADOW;
 			else
 				backCol = Col.WIDGET_BACKGROUND;
 			Col shadowCol = Col.WIDGET_DARK_SHADOW;
-			Col textCol = coloredTabs && (isSelected || isHot) ?
-					Col.TITLE_FOREGROUND : Col.WIDGET_FOREGROUND;
+			Col textCol = doUseColoredTabs && (isSelected || isHot)
+				? Col.TITLE_FOREGROUND
+				: Col.WIDGET_FOREGROUND;
 			
 			// Draw separating line between tabs and body
 			if (Util.contains(part, CTabFolderRenderer.PART_HEADER)) {

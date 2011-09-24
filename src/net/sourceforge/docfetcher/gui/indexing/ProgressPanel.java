@@ -90,7 +90,6 @@ public final class ProgressPanel {
 		
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
-				// TODO websearch: verify that this is the correct usage for virtual tables
 				TableItem item = (TableItem) event.item;
 				item.setText(tableItems.get(event.index));
 			}

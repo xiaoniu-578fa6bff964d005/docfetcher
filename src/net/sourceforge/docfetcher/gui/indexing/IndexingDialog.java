@@ -84,15 +84,8 @@ public final class IndexingDialog implements Dialog {
 
 	public IndexingDialog(	@NotNull final Shell parentShell,
 							@NotNull final IndexRegistry indexRegistry) {
-		this.indexRegistry = Util.checkNotNull(indexRegistry);
-
-		// TODO now
-//		// Open the indexing dialog only if DocFetcher doesn't hide in the system tray
-//		if (DocFetcher.getInstance().getShell().isVisible()) {
-//			shell.open();
-//			tabFolder.setSelectionBackground(UtilGUI.getColor(SWT.COLOR_TITLE_BACKGROUND));
-//			tabFolder.setSelectionForeground(UtilGUI.getColor(SWT.COLOR_TITLE_FOREGROUND));
-//		}
+		Util.checkNotNull(parentShell, indexRegistry);
+		this.indexRegistry = indexRegistry;
 
 		// Create shell
 		int style = SWT.SHELL_TRIM;
@@ -173,9 +166,6 @@ public final class IndexingDialog implements Dialog {
 						evtDialogMinimized.fire(bounds);
 					}
 				}).create();
-
-		// TODO now: maybe try computeSize() instead of getSize()?
-//		tabFolder.setTabHeight((int) (toolBar.getSize().y * 1.5)); // A factor of 1.0 would crop the add button image.
 
 		// For some unknown reason, the focus always goes to the ToolBar items
 		toolBar.addFocusListener(new FocusAdapter() {
