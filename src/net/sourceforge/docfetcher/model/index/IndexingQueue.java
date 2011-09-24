@@ -56,15 +56,18 @@ public final class IndexingQueue {
 		REDUNDANT_UPDATE,
 		SHUTDOWN,
 	}
+	
+	// may be called from a different thread
+	public final Event<Void> evtQueueEmpty = new Event<Void>();
 
 	private final Event<Task> evtAdded = new Event<Task>();
 	private final Event<Task> evtRemoved = new Event<Task>();
 
 	private final Thread thread;
 	private final IndexRegistry indexRegistry;
-	private final LinkedList<Task> tasks = new LinkedList<Task>();
+	private final LinkedList<Task> tasks = new LinkedList<Task>(); // guarded by lock
 
-	private volatile boolean shutdown = false;
+	private volatile boolean shutdown = false; // guarded by lock
 	final Lock readLock;
 	final Lock writeLock;
 	private final Condition readyTaskAvailable;
@@ -87,19 +90,23 @@ public final class IndexingQueue {
 		 */
 		evtRemoved.add(new Event.Listener<Task>() {
 			public void update(Task task) {
-				if (!task.is(IndexAction.REBUILD))
-					return;
-				if (!task.is(TaskState.NOT_READY) && !task.is(TaskState.READY))
-					return;
+				boolean isQueueEmpty;
 				LuceneIndex luceneIndex = task.getLuceneIndex();
 				writeLock.lock();
 				try {
-					assert !indexRegistry.getIndexes().contains(luceneIndex);
-					indexRegistry.addIndex(luceneIndex);
+					boolean isRebuild = task.is(IndexAction.REBUILD);
+					boolean notStartedYet = task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
+					if (isRebuild && notStartedYet) {
+						assert !indexRegistry.getIndexes().contains(luceneIndex);
+						indexRegistry.addIndex(luceneIndex);
+					}
+					isQueueEmpty = tasks.isEmpty();
 				}
 				finally {
 					writeLock.unlock();
 				}
+				if (isQueueEmpty)
+					evtQueueEmpty.fire(null);
 			}
 		});
 		

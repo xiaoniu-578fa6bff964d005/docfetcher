@@ -78,6 +78,14 @@ public class StatusBar extends Composite {
 		}
 		
 		/**
+		 * Returns the receiver's underlying SWT control.
+		 */
+		@NotNull
+		public Control getControl() {
+			return label;
+		}
+		
+		/**
 		 * Returns whether this part is visible.
 		 */
 		public boolean isVisible() {

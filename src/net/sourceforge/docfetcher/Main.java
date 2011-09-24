@@ -330,6 +330,23 @@ public final class Main {
 					 * registry.
 					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
+					
+					/*
+					 * Remove indexing hint from the status bar when the task
+					 * queue has been emptied. This covers those situations
+					 * where the indexing dialog has been minimized to the
+					 * status bar and the last task in the queue has just been
+					 * completed.
+					 */
+					indexRegistry.getQueue().evtQueueEmpty.add(new Event.Listener<Void>() {
+						public void update(Void eventData) {
+							Util.runSwtSafe(indexingStatus.getControl(), new Runnable() {
+								public void run() {
+									indexingStatus.setVisible(false);
+								}
+							});
+						}
+					});
 				}
 				catch (IOException e) {
 					// Wait until the display is available
