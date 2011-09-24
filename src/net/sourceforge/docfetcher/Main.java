@@ -202,10 +202,15 @@ public final class Main {
 				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
 				indexingStatus.setVisible(false);
 				
+				indexPanel.evtIndexingDialogOpened.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						indexingStatus.setVisible(false);
+					}
+				});
+				
 				indexingStatus.evtClicked.add(new Event.Listener<Void>() {
 					public void update(Void eventData) {
 						indexPanel.openIndexingDialog();
-						indexingStatus.setVisible(false);
 					}
 				});
 				

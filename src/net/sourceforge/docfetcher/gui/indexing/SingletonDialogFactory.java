@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -94,10 +95,11 @@ public abstract class SingletonDialogFactory<D extends Dialog> {
 		@NotNull
 		public Shell getShell();
 	}
+	
+	public final Event<Void> evtDialogOpened = new Event<Void>();
 
 	private final Shell parentShell;
-	@Nullable
-	private D dialog;
+	@Nullable private D dialog;
 
 	public SingletonDialogFactory(@NotNull Shell parentShell) {
 		this.parentShell = Util.checkNotNull(parentShell);
@@ -107,6 +109,7 @@ public abstract class SingletonDialogFactory<D extends Dialog> {
 	public final D open() {
 		if (dialog != null) {
 			dialog.getShell().open();
+			evtDialogOpened.fire(null);
 			return dialog;
 		}
 
@@ -118,6 +121,7 @@ public abstract class SingletonDialogFactory<D extends Dialog> {
 			}
 		});
 		shell.open();
+		evtDialogOpened.fire(null);
 		return dialog;
 	}
 

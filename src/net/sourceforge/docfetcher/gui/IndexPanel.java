@@ -75,6 +75,7 @@ public final class IndexPanel {
 	public final Event<Void> evtCheckStatesChanged = new Event<Void>();
 	public final Event<Set<String>> evtListDocuments = new Event<Set<String>>();
 	public final Event<Rectangle> evtIndexingDialogMinimized = new Event<Rectangle>();
+	public final Event<Void> evtIndexingDialogOpened = new Event<Void>();
 
 	private final SimpleTreeViewer<ViewNode> viewer;
 	private final Tree tree;
@@ -97,6 +98,12 @@ public final class IndexPanel {
 				return indexingDialog;
 			}
 		};
+		
+		dialogFactory.evtDialogOpened.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				evtIndexingDialogOpened.fire(eventData);
+			}
+		});
 		
 		final Comparator<ViewNode> viewNodeComparator = new Comparator<ViewNode>() {
 			public int compare(ViewNode o1, ViewNode o2) {
@@ -255,10 +262,8 @@ public final class IndexPanel {
 				for (LuceneIndex index : sel) {
 					Rejection rejection = queue.addTask(index, action);
 					
-					// Assert that rebuild tasks are never rejected
-					assert action == IndexAction.REBUILD
-						? rejection == null
-						: true;
+					if (action == IndexAction.REBUILD)
+						assert rejection == null;
 				}
 			}
 		}
