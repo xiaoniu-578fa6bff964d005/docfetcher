@@ -25,8 +25,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TreeEvent;
@@ -58,6 +56,7 @@ public abstract class SimpleTreeViewer<E> {
 	
 	public SimpleTreeViewer(@NotNull final Tree tree) {
 		this.tree = Util.checkNotNull(tree);
+		
 		tree.addTreeListener(new TreeListener() {
 			public void treeExpanded(TreeEvent e) {
 				loadNextButOneLevel((TreeItem) e.item);
@@ -66,10 +65,14 @@ public abstract class SimpleTreeViewer<E> {
 				disposeNextButOneLevel((TreeItem) e.item);
 			}
 		});
-		tree.addMouseListener(new MouseAdapter() {
-			public void mouseDoubleClick(MouseEvent e) {
-				TreeItem item = tree.getItem(new Point(e.x, e.y));
-				if (item == null) return;
+		
+		/*
+		 * Expand or collapse node on double-click or after the spacebar has
+		 * been pressed.
+		 */
+		tree.addSelectionListener(new SelectionAdapter() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+				TreeItem item = (TreeItem) e.item;
 				if (item.getExpanded()) {
 					item.setExpanded(false);
 					disposeNextButOneLevel(item);
@@ -80,6 +83,11 @@ public abstract class SimpleTreeViewer<E> {
 				}
 			}
 		});
+		
+		/*
+		 * For tree viewers with checkboxes, propagate check state changes from
+		 * widgets to model elements.
+		 */
 		if (Util.contains(tree.getStyle(), SWT.CHECK)) {
 			tree.addSelectionListener(new SelectionAdapter() {
 				@SuppressWarnings("unchecked")
