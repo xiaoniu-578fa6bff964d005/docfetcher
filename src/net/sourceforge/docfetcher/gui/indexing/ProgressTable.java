@@ -244,5 +244,14 @@ final class ProgressTable {
 			}
 		});
 	}
+	
+	@ThreadSafe
+	public void scrollToBottom() {
+		Util.runSwtSafe(table, new Runnable() {
+			public void run() {
+				table.setTopIndex(Integer.MAX_VALUE);
+			}
+		});
+	}
 
 }

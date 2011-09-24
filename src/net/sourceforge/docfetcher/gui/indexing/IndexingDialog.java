@@ -381,10 +381,23 @@ public final class IndexingDialog implements Dialog {
 		task.attachReporter(reporter, new ExistingMessagesHandler() {
 			public void handleMessages(	List<IndexingInfo> infos,
 										List<IndexingError> errors) {
-				// TODO now: fill outer reporter with info and error messages
-				// info objects may have percentages set
+				/*
+				 * Dangerous section: This method runs under the lock of the
+				 * DelegatingReporter instance, so beware of lock-ordering
+				 * deadlocks.
+				 */
+				for (IndexingInfo info : infos)
+					reporter.info(info);
+				for (IndexingError error : errors)
+					reporter.fail(error);
 			}
 		});
+		
+		/*
+		 * For unknown reasons, without this line the progress table won't
+		 * scroll to the bottom until the next message comes in.
+		 */
+		progressPanel.getProgressTable().scrollToBottom();
 		
 		progressPanel.getControl().addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {

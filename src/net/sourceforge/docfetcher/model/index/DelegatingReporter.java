@@ -41,25 +41,21 @@ public final class DelegatingReporter extends IndexingReporter {
 		errors = new ArrayList<IndexingError>();
 	}
 
-	public void attachDelegate(	@NotNull IndexingReporter delegate,
-								@NotNull ExistingMessagesHandler handler) {
+	// delegate and handler are called under lock of receiver, so beware of lock-ordering deadlocks!
+	public synchronized void attachDelegate(@NotNull IndexingReporter delegate,
+											@NotNull ExistingMessagesHandler handler) {
 		Util.checkNotNull(delegate, handler);
 		Util.checkThat(this.delegate == null);
 		
-		List<IndexingInfo> infoSnapshot;
-		List<IndexingError> errorSnapshot;
+		this.delegate = delegate;
+		if (start != null)
+			delegate.setStartTime(start);
+		if (end != null)
+			delegate.setEndTime(end);
 		
-		synchronized (this) {
-			this.delegate = delegate;
-			if (start != null)
-				delegate.setStartTime(start);
-			if (end != null)
-				delegate.setEndTime(end);
-			infoSnapshot = new ArrayList<IndexingInfo>(infos);
-			errorSnapshot = new ArrayList<IndexingError>(errors);
-		}
-		
-		handler.handleMessages(infoSnapshot, errorSnapshot);
+		List<IndexingInfo> infoCopy = new ArrayList<IndexingInfo>(infos);
+		List<IndexingError> errorCopy = new ArrayList<IndexingError>(errors);
+		handler.handleMessages(infoCopy, errorCopy);
 	}
 
 	public synchronized void detachDelegate(@NotNull IndexingReporter delegate) {

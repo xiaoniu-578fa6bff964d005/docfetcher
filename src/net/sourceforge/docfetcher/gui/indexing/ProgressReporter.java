@@ -54,7 +54,11 @@ final class ProgressReporter extends IndexingReporter {
 	}
 	
 	public void info(@NotNull IndexingInfo info) {
-		progressTable.append(getMessage(info));
+		String message = getMessage(info);
+		int[] percentage = info.getPercentage();
+		if (percentage != null)
+			message = String.format("%s [%d/%d]", message, percentage[0], percentage[1]);
+		progressTable.append(message);
 		lastInfo = info;
 	}
 	

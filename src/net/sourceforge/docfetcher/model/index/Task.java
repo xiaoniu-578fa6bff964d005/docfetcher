@@ -100,6 +100,7 @@ public final class Task {
 		return index;
 	}
 
+	// delegate and handler are called under lock of DelegatingReporter instance, so beware of lock-ordering deadlocks!
 	public void attachReporter(	@NotNull IndexingReporter delegate,
 								@NotNull ExistingMessagesHandler handler) {
 		reporter.attachDelegate(delegate, handler);
