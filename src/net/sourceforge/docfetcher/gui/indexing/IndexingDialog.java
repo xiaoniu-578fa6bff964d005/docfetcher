@@ -374,9 +374,7 @@ public final class IndexingDialog implements Dialog {
 	private void switchToProgressPanel(	@NotNull final Task task,
 										@NotNull final CTabItem tabItem,
 										@NotNull final IndexingConfig config) {
-		int lineCountLimit = ProgramConf.Int.MaxLinesInProgressPanel.get();
-		final ProgressPanel progressPanel = new ProgressPanel(
-			tabFolder, lineCountLimit);
+		ProgressPanel progressPanel = new ProgressPanel(tabFolder);
 		tabItem.setControl(progressPanel.getControl());
 		final ProgressReporter reporter = new ProgressReporter(progressPanel);
 		

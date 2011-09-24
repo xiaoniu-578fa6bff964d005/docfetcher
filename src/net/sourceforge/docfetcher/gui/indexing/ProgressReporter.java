@@ -32,12 +32,14 @@ final class ProgressReporter extends IndexingReporter {
 	
 	// TODO i18n
 	
-	private final ProgressPanel progressPanel;
+	private final ProgressTable progressTable;
+	private final ErrorTable errorTable;
 	private long start = 0;
 	@Nullable private IndexingInfo lastInfo;
 
-	public ProgressReporter(ProgressPanel progressPanel) {
-		this.progressPanel = progressPanel;
+	public ProgressReporter(@NotNull ProgressPanel progressPanel) {
+		progressTable = progressPanel.getProgressTable();
+		errorTable = progressPanel.getErrorTable();
 	}
 	
 	public void setStartTime(long time) {
@@ -47,12 +49,12 @@ final class ProgressReporter extends IndexingReporter {
 	public void setEndTime(long time) {
 		long duration = (time - start) / 1000;
 		String msg = "Duration: " + duration + " s";
-		progressPanel.append(msg);
+		progressTable.append(msg);
 		Util.println(msg);
 	}
 	
 	public void info(@NotNull IndexingInfo info) {
-		progressPanel.append(getMessage(info));
+		progressTable.append(getMessage(info));
 		lastInfo = info;
 	}
 	
@@ -60,7 +62,7 @@ final class ProgressReporter extends IndexingReporter {
 		Util.checkThat(lastInfo != null);
 		String message = getMessage(lastInfo);
 		message = String.format("%s [%d/%d]", message, current, total);
-		progressPanel.replaceLast(message);
+		progressTable.replaceLast(message);
 	}
 	
 	@NotNull
@@ -70,8 +72,9 @@ final class ProgressReporter extends IndexingReporter {
 	}
 	
 	public void fail(@NotNull IndexingError error) {
-		progressPanel.append("ERROR " + error.getErrorType().name() + ": "
+		progressTable.append("ERROR " + error.getErrorType().name() + ": "
 				+ error.getTreeNode().getDisplayName());
+		errorTable.addError(error);
 	}
 
 }

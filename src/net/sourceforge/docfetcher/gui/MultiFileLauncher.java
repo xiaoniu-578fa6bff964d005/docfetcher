@@ -18,12 +18,14 @@ import java.util.Set;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.collect.BoundedList;
 
 /**
  * @author Tran Nam Quang
  */
-final class MultiFileLauncher {
+@VisibleForPackageGroup
+public final class MultiFileLauncher {
 	
 	private final BoundedList<File> files = new BoundedList<File>(UtilGui.OPEN_LIMIT, false);
 	private final Set<String> missing = new LinkedHashSet<String>();

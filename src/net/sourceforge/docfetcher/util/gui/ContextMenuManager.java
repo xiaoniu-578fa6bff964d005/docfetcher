@@ -138,6 +138,8 @@ public final class ContextMenuManager {
 					action.run();
 			}
 		});
+		if (action.isDefaultItem())
+			submenu.setDefaultItem(item);
 	}
 	
 	public void addSeparator() {

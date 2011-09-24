@@ -37,7 +37,11 @@ public class MenuAction {
 	public boolean isEnabled() {
 		return true;
 	}
-
+	
+	public boolean isDefaultItem() {
+		return false;
+	}
+	
 	@Nullable
 	public final Image getImage() {
 		return image;

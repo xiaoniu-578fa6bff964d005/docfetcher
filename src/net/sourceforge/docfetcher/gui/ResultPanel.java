@@ -223,6 +223,9 @@ public final class ResultPanel {
 			public void run() {
 				launchFiles(viewer.getSelection());
 			}
+			public boolean isDefaultItem() {
+				return true;
+			}
 		});
 		
 		menuManager.add(new MenuAction("open_parent") {

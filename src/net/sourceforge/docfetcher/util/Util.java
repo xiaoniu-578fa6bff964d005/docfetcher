@@ -1305,11 +1305,15 @@ public final class Util {
 	 */
 	public static void setClipboard(@NotNull Collection<File> files) {
 		Util.checkNotNull(files);
+		if (files.isEmpty())
+			return;
+		
 		Clipboard clipboard = new Clipboard(Display.getCurrent());
 		Transfer[] types = new Transfer[] {
 				TextTransfer.getInstance(),
 				FileTransfer.getInstance()
 		};
+		
 		StringBuilder sb = new StringBuilder();
 		String[] filePaths = new String[files.size()];
 		int i = 0;
@@ -1321,6 +1325,7 @@ public final class Util {
 			filePaths[i] = path;
 			i++;
 		}
+		
 		clipboard.setContents(new Object[] {sb.toString(), filePaths}, types);
 		clipboard.dispose();
 	}

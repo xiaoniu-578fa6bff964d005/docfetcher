@@ -19,17 +19,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.docfetcher.util.Event;
-import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Description;
 import net.sourceforge.docfetcher.util.ConfLoader.Storable;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -274,22 +277,35 @@ public final class SettingsConf {
 	@Description("# Comma-separated lists of table column widths.")
 	public static enum ColumnWidths implements Storable {
 		ResultPanel (250, 75, 75, 200, 75, 350, 100, 100),
+		IndexingErrorTable (200, 500),
 		;
 
+		private final Event<Table> evtChanged = new Event<Table>();
 		public final int[] defaultValue;
 		private int[] value;
 
 		ColumnWidths(int... defaultValue) {
 			value = this.defaultValue = defaultValue;
 		}
-		public void bind(Table table) {
-			TableColumn[] columns = table.getColumns();
+
+		/**
+		 * Binds the enumeration's values to the column widths of the given
+		 * table, i.e. the column widths are initialized with the stored values
+		 * and the values are updated when the column widths change.
+		 * <p>
+		 * This method supports binding multiple tables to the same enumeration:
+		 * If multiple tables are bound, the column widths are synchronized
+		 * across all bound tables.
+		 */
+		public void bind(@NotNull final Table table) {
+			final TableColumn[] columns = table.getColumns();
 			int colLength = columns.length;
-			assert colLength > 0;
+			Util.checkThat(colLength > 0);
 			if (colLength != value.length) {
-				assert colLength == defaultValue.length;
+				Util.checkThat(colLength == defaultValue.length);
 				value = defaultValue;
 			}
+			
 			for (int i = 0; i < colLength; i++) {
 				final TableColumn col = columns[i];
 				final int index = i;
@@ -297,9 +313,27 @@ public final class SettingsConf {
 				col.addControlListener(new ControlAdapter() {
 					public void controlResized(ControlEvent e) {
 						value[index] = col.getWidth();
+						evtChanged.fire(table);
 					}
 				});
 			}
+			
+			// Update column widths if they have been changed in other tables
+			final Event.Listener<Table> changeListener = new Event.Listener<Table>() {
+				public void update(Table eventData) {
+					if (eventData == table)
+						return;
+					Util.checkThat(columns.length == table.getColumnCount());
+					for (int i = 0; i < columns.length; i++)
+						columns[i].setWidth(value[i]);
+				}
+			};
+			evtChanged.add(changeListener);
+			table.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					evtChanged.remove(changeListener);
+				}
+			});
 		}
 		public void load(String str) {
 			value = Util.toIntArray(str, value);
@@ -311,15 +345,27 @@ public final class SettingsConf {
 
 	@Description("# Comma-separated lists of sash weights.")
 	public static enum SashWeights implements Storable {
+		ProgressPanel (2, 1),
 		;
 
+		private final Event<SashForm> evtChanged = new Event<SashForm>();
 		public final int[] defaultValue;
 		private int[] value;
 
 		SashWeights(int... defaultValue) {
 			value = this.defaultValue = defaultValue;
 		}
-		public void bind(final SashForm sash) {
+		
+		/**
+		 * Binds the enumeration's values to the weights of the given sash form,
+		 * i.e. the sash weights are initialized with the stored values and the
+		 * values are updated when the sash weights change.
+		 * <p>
+		 * This method supports binding multiple sash forms to the same
+		 * enumeration: If multiple sash forms are bound, the sash weights are
+		 * synchronized across all bound sash forms.
+		 */
+		public void bind(@NotNull final SashForm sash) {
 			int[] weights = sash.getWeights();
 			assert weights.length > 0;
 			if (weights.length != value.length) {
@@ -333,10 +379,37 @@ public final class SettingsConf {
 					control.addControlListener(new ControlAdapter() {
 						public void controlResized(ControlEvent e) {
 							value[index] = sash.getWeights()[index];
+							
+							/*
+							 * The event must be fired with asyncExec, otherwise
+							 * we'll get some nasty visual artifacts.
+							 */
+							Util.runAsyncExec(sash, new Runnable() {
+								public void run() {
+									evtChanged.fire(sash);
+								}
+							});
 						}
 					});
 			}
 			sash.setWeights(weights);
+			
+			// Update sash weights if they have been changed in other sash forms
+			final Event.Listener<SashForm> changeListener = new Event.Listener<SashForm>() {
+				public void update(SashForm eventData) {
+					if (eventData == sash)
+						return;
+					if (Arrays.equals(sash.getWeights(), value))
+						return;
+					sash.setWeights(value);
+				}
+			};
+			evtChanged.add(changeListener);
+			sash.addDisposeListener(new DisposeListener() {
+				public void widgetDisposed(DisposeEvent e) {
+					evtChanged.remove(changeListener);
+				}
+			});
 		}
 		public void load(String str) {
 			value = Util.toIntArray(str, value);
