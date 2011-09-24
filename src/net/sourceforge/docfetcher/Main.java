@@ -340,7 +340,7 @@ public final class Main {
 					 */
 					indexRegistry.getQueue().evtQueueEmpty.add(new Event.Listener<Void>() {
 						public void update(Void eventData) {
-							Util.runSwtSafe(indexingStatus.getControl(), new Runnable() {
+							Util.runAsyncExec(indexingStatus.getControl(), new Runnable() {
 								public void run() {
 									indexingStatus.setVisible(false);
 								}

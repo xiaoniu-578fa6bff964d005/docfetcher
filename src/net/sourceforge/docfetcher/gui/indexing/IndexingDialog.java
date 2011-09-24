@@ -57,6 +57,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
@@ -78,6 +79,7 @@ public final class IndexingDialog implements Dialog {
 	private final Shell shell;
 	private final CTabFolder tabFolder;
 	private final IndexRegistry indexRegistry;
+	private boolean childDialogOpen = false;
 	
 	@NotNull private Event.Listener<Task> addedListener;
 	@NotNull private Event.Listener<Task> removedListener;
@@ -101,10 +103,24 @@ public final class IndexingDialog implements Dialog {
 		boolean curvyTabs = ProgramConf.Bool.CurvyTabs.get();
 		boolean coloredTabs = ProgramConf.Bool.ColoredTabs.get();
 		tabFolder = TabFolderFactory.create(shell, true, curvyTabs, coloredTabs);
-
+		
 		// Create tabfolder toolbar
 		ToolBar toolBar = new ToolBar(tabFolder, SWT.FLAT);
 		tabFolder.setTopRight(toolBar);
+		initToolBarMenu(toolBar);
+
+		// For some unknown reason, the focus always goes to the ToolBar items
+		toolBar.addFocusListener(new FocusAdapter() {
+			public void focusGained(FocusEvent e) {
+				tabFolder.forceFocus();
+			}
+		});
+		
+		initEventHandlers();
+	}
+
+	@NotNull
+	private void initToolBarMenu(@NotNull ToolBar toolBar) {
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
 		// TODO i18n for all buttons
@@ -114,31 +130,57 @@ public final class IndexingDialog implements Dialog {
 		
 		addItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				abstract class ChildDialogAction extends MenuAction {
+					public ChildDialogAction(Image image, String label) {
+						super(image, label);
+					}
+					public final void run() {
+						// Only one child dialog can be open at any time
+						assert !childDialogOpen;
+						
+						childDialogOpen = true;
+						boolean success = doRun();
+						childDialogOpen = false;
+						
+						/*
+						 * If all existing tasks have been completed while the
+						 * child dialog was open and the user cancelled the
+						 * child dialog, close the indexing dialog.
+						 */
+						if (!success && tabFolder.getItemCount() == 0) {
+							indexRegistry.getQueue().removeListeners(
+								addedListener, removedListener);
+							shell.dispose();
+						}
+					}
+					protected abstract boolean doRun();
+				}
+				
 				DropDownMenuManager menuManager = new DropDownMenuManager(
 					addItem, tabFolder);
 				
-				menuManager.add(new MenuAction(
+				menuManager.add(new ChildDialogAction(
 					Img.FOLDER.get(), "Add Folder...") {
-					public void run() {
-						IndexPanel.createFileTaskFromDialog(
+					public boolean doRun() {
+						return IndexPanel.createFileTaskFromDialog(
 							shell, indexRegistry, null, true);
 					}
 				});
 
 				menuManager.addSeparator();
 
-				menuManager.add(new MenuAction(
+				menuManager.add(new ChildDialogAction(
 					Img.PACKAGE.get(), "Add Archive...") {
-					public void run() {
-						IndexPanel.createFileTaskFromDialog(
+					public boolean doRun() {
+						return IndexPanel.createFileTaskFromDialog(
 							shell, indexRegistry, null, false);
 					}
 				});
 
-				menuManager.add(new MenuAction(
+				menuManager.add(new ChildDialogAction(
 					Img.EMAIL.get(), "Add Outlook PST...") {
-					public void run() {
-						IndexPanel.createOutlookTaskFromDialog(
+					public boolean doRun() {
+						return IndexPanel.createOutlookTaskFromDialog(
 							shell, indexRegistry, null);
 					}
 				});
@@ -166,15 +208,6 @@ public final class IndexingDialog implements Dialog {
 						evtDialogMinimized.fire(bounds);
 					}
 				}).create();
-
-		// For some unknown reason, the focus always goes to the ToolBar items
-		toolBar.addFocusListener(new FocusAdapter() {
-			public void focusGained(FocusEvent e) {
-				tabFolder.forceFocus();
-			}
-		});
-		
-		initEventHandlers();
 	}
 	
 	private void initEventHandlers() {
@@ -183,7 +216,9 @@ public final class IndexingDialog implements Dialog {
 				assert !shell.isDisposed();
 				Util.runSwtSafe(tabFolder, new Runnable() {
 					public void run() {
-						addTab(task, !task.is(IndexAction.UPDATE));
+						boolean isUpdate = task.is(IndexAction.UPDATE);
+						boolean noTabs = tabFolder.getItemCount() == 0;
+						addTab(task, !isUpdate || noTabs);
 					}
 				});
 			}
@@ -201,8 +236,11 @@ public final class IndexingDialog implements Dialog {
 							}
 						}
 						
-						// If there are no more tabs, close the indexing dialog
-						if (tabFolder.getItemCount() == 0) {
+						/*
+						 * If there are no more tabs and no child dialogs are
+						 * open, close the indexing dialog.
+						 */
+						if (!childDialogOpen && tabFolder.getItemCount() == 0) {
 							indexRegistry.getQueue().removeListeners(
 								addedListener, removedListener);
 							shell.dispose();
@@ -218,8 +256,11 @@ public final class IndexingDialog implements Dialog {
 		 */
 		indexRegistry.getQueue().addListeners(new ExistingTasksHandler() {
 			public void handleExistingTasks(List<Task> tasks) {
-				for (Task task : tasks)
-					addTab(task, false);
+				boolean selectTab = tabFolder.getItemCount() == 0;
+				for (Task task : tasks) {
+					addTab(task, selectTab);
+					selectTab = false;
+				}
 			}
 		}, addedListener, removedListener);
 		

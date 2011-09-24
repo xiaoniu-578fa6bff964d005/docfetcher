@@ -489,15 +489,15 @@ public final class IndexPanel {
 		return indexRegistry;
 	}
 
-	public static void createFileTaskFromDialog(@NotNull final Shell shell,
-												@NotNull final IndexRegistry indexRegistry,
-												@Nullable final DialogFactory dialogFactory,
-												final boolean dirNotFile) {
+	public static boolean createFileTaskFromDialog(	@NotNull final Shell shell,
+													@NotNull final IndexRegistry indexRegistry,
+													@Nullable final DialogFactory dialogFactory,
+													final boolean dirNotFile) {
 		String lastPath = SettingsConf.Str.LastIndexedFolder.get();
 		if (!new File(lastPath).exists())
 			lastPath = SettingsConf.Str.LastIndexedFolder.defaultValue;
 
-		new InputLoop<Void>() {
+		Object success = new InputLoop<Object>() {
 			protected String getNewValue(String lastValue) {
 				if (dirNotFile) {
 					DirectoryDialog dialog = new DirectoryDialog(shell);
@@ -527,19 +527,21 @@ public final class IndexPanel {
 				return "Rejected!"; // TODO i18n
 			}
 
-			protected Void onAccept(String newValue) {
+			protected Object onAccept(String newValue) {
 				String absPath = Util.getSystemAbsPath(newValue);
 				SettingsConf.Str.LastIndexedFolder.set(absPath); // TODO test
 				if (dialogFactory != null)
 					dialogFactory.open();
-				return null;
+				return new Object();
 			}
 		}.run(lastPath);
+		
+		return success != null;
 	}
 
-	public static void createOutlookTaskFromDialog(	@NotNull final Shell shell,
-													@NotNull final IndexRegistry indexRegistry,
-													@Nullable final DialogFactory dialogFactory) {
+	public static boolean createOutlookTaskFromDialog(	@NotNull final Shell shell,
+														@NotNull final IndexRegistry indexRegistry,
+														@Nullable final DialogFactory dialogFactory) {
 		String lastPath = SettingsConf.Str.LastIndexedPSTFile.get();
 		if (!lastPath.equals("") && !new File(lastPath).isFile())
 			lastPath = SettingsConf.Str.LastIndexedPSTFile.defaultValue;
@@ -553,7 +555,7 @@ public final class IndexPanel {
 				lastPath = pstFile.getPath();
 		}
 
-		new InputLoop<Void>() {
+		Object success = new InputLoop<Object>() {
 			protected String getNewValue(String lastValue) {
 				FileDialog dialog = new FileDialog(shell);
 				// TODO i18n set dialog text and message
@@ -585,6 +587,8 @@ public final class IndexPanel {
 				return null;
 			}
 		}.run(lastPath);
+		
+		return success != null;
 	}
 
 	/**
