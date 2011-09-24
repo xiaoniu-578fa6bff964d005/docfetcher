@@ -345,12 +345,24 @@ public final class IndexingDialog implements Dialog {
 
 			configPanel.evtRunButtonClicked.add(new Event.Listener<IndexingConfig>() {
 				public void update(final IndexingConfig config) {
-					// TODO now: update tab image
-					// switch to next waiting tab
-
+					tabItem.setImage(Img.TREE.get());
 					configPanel.dispose();
 					switchToProgressPanel(task, tabItem, config);
 					task.setReady();
+					
+					/*
+					 * Switch to next waiting tab. This is thread-safe
+					 * even though it's a check-then-act operation
+					 * because only the user can change the task state
+					 * from 'not ready' to 'ready'.
+					 */
+					for (CTabItem candidateItem : tabFolder.getItems()) {
+						Task candidateTask = (Task) candidateItem.getData();
+						if (!candidateTask.is(TaskState.READY)) {
+							tabFolder.setSelection(candidateItem);
+							break;
+						}
+					}
 				}
 			});
 		}
