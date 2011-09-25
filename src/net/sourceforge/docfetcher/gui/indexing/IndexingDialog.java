@@ -59,6 +59,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
@@ -97,8 +98,8 @@ public final class IndexingDialog implements Dialog {
 		shell = new Shell(parentShell, style);
 		shell.setText("index_management"); // TODO i18n
 		shell.setImage(Img.INDEXING_DIALOG.get());
-		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
 		shell.setLayout(Util.createFillLayout(5));
+		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
 
 		// Create tabfolder
 		boolean curvyTabs = ProgramConf.Bool.CurvyTabs.get();
@@ -412,6 +413,18 @@ public final class IndexingDialog implements Dialog {
 
 		if (selectTab)
 			tabFolder.setSelection(tabItem);
+		
+		/*
+		 * Without the following workaround, if the preset shell height is too
+		 * small, the buttons on the lower part of the dialog might be cut off,
+		 * leaving new users wondering how to start the indexing. The workaround
+		 * is to force the shell height to be equal to or greater than the
+		 * computed shell height.
+		 */
+		Point currentSize = shell.getSize();
+		Point computedSize = shell.computeSize(currentSize.x, SWT.DEFAULT);
+		if (computedSize.y > currentSize.y)
+			shell.setSize(currentSize.x, computedSize.y);
 	}
 
 	private void switchToProgressPanel(	@NotNull final Task task,

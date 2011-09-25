@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.util.gui;
+package net.sourceforge.docfetcher.util.gui.viewer;
 
 import java.util.ArrayList;
 import java.util.Collection;

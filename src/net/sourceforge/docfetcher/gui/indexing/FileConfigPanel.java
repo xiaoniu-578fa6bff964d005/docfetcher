@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Text;
  */
 final class FileConfigPanel extends ConfigPanel {
 	
+	@NotNull private Button useRelativePathsBt;
 	private final Button runBt;
 
 	public FileConfigPanel(	@NotNull Composite parent,
@@ -78,8 +79,12 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createFillLayout(5));
 			}
 			protected void createContents(Group parent) {
-				Label label = new Label(parent, SWT.NONE);
-				label.setText("TODO");
+				new PatternTable(parent, config) {
+					protected boolean useRelativePaths() {
+						return useRelativePathsBt.getSelection();
+					}
+				};
+				// TODO initialize pattern table from config object
 			}
 		}.getGroup();
 		
@@ -89,8 +94,9 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 			protected void createContents(Group parent) {
 				Util.createCheckButton(parent, "ipref_detect_html_pairs");
-				Util.createCheckButton(parent, "Use relative paths if possible");
+				useRelativePathsBt = Util.createCheckButton(parent, "Use relative paths if possible");
 				Util.createCheckButton(parent, "Watch folder for file changes");
+				// TODO initialize button states from config object
 			}
 		}.getGroup();
 		

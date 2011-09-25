@@ -278,6 +278,7 @@ public final class SettingsConf {
 	public static enum ColumnWidths implements Storable {
 		ResultPanel (250, 75, 75, 200, 75, 350, 100, 100),
 		IndexingErrorTable (200, 500),
+		PatternTable (200, 75, 75),
 		;
 
 		private final Event<Table> evtChanged = new Event<Table>();

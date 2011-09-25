@@ -40,12 +40,15 @@ public final class LazyImageCache {
 	
 	@Nullable private Map<String, Image> imageMap = Maps.newHashMap();
 	private final Display display;
-	private final String imageDir;
+	private final File imageDir;
 	
 	public LazyImageCache(@NotNull Display display, @NotNull String imageDir) {
 		Util.checkNotNull(display, imageDir);
+		
+		this.imageDir = new File(imageDir);
+		Util.checkThat(this.imageDir.isDirectory());
 		this.display = display;
-		this.imageDir = imageDir;
+		
 		display.disposeExec(new Runnable() {
 			public void run() {
 				for (Image image : imageMap.values())

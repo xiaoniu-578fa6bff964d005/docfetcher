@@ -18,7 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
 /**
@@ -74,6 +76,32 @@ public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 		return this;
 	}
 	
+	/**
+	 * Returns the value of the <b>first</b> occurrence of the given key, or
+	 * null if there is no mapping for the given key.
+	 */
+	@Nullable
+	public V getValue(@NotNull K key) {
+		Util.checkNotNull(key);
+		for (Entry<K, V> entry : list)
+			if (entry.key.equals(key))
+				return entry.value;
+		return null;
+	}
+	
+	/**
+	 * Returns the key of the <b>first</b> occurrence of the given value, or
+	 * null if there is no mapping for the given value.
+	 */
+	@Nullable
+	public K getKey(@NotNull V value) {
+		Util.checkNotNull(value);
+		for (Entry<K, V> entry : list)
+			if (entry.value.equals(value))
+				return entry.key;
+		return null;
+	}
+	
 	public int size() {
 		return list.size();
 	}
@@ -82,9 +110,68 @@ public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 		return list.isEmpty();
 	}
 	
+	public boolean containsKey(@NotNull K key) {
+		return getValue(key) != null;
+	}
+	
+	public boolean containsValue(@NotNull V value) {
+		return getKey(value) != null;
+	}
+	
+	public boolean removeKey(@NotNull K key) {
+		Util.checkNotNull(key);
+		Iterator<Entry<K, V>> it = list.iterator();
+		boolean removed = false;
+		while (it.hasNext()) {
+			Entry<K, V> entry = it.next();
+			if (entry.key.equals(key)) {
+				it.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	public boolean removeValue(@NotNull V value) {
+		Util.checkNotNull(value);
+		Iterator<Entry<K, V>> it = list.iterator();
+		boolean removed = false;
+		while (it.hasNext()) {
+			Entry<K, V> entry = it.next();
+			if (entry.value.equals(value)) {
+				it.remove();
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	@NotNull
+	public Entry<K, V> getEntry(int index) {
+		return list.get(index);
+	}
+	
 	@NotNull
 	public Iterator<Entry<K, V>> iterator() {
 		return list.iterator();
+	}
+	
+	@MutableCopy
+	@NotNull
+	public List<K> getKeys() {
+		List<K> keys = new ArrayList<K>(list.size());
+		for (Entry<K, V> entry : list)
+			keys.add(entry.key);
+		return keys;
+	}
+	
+	@MutableCopy
+	@NotNull
+	public List<V> getValues() {
+		List<V> values = new ArrayList<V>(list.size());
+		for (Entry<K, V> entry : list)
+			values.add(entry.value);
+		return values;
 	}
 	
 	public void sort(@NotNull Comparator<Entry<K, V>> comparator) {

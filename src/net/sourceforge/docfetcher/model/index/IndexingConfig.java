@@ -138,6 +138,15 @@ public final class IndexingConfig implements Serializable {
 	 */
 	@NotNull
 	public final String getStorablePath(@NotNull File file) {
+		return getStorablePath(file, useRelativePaths);
+	}
+	
+	/**
+	 * @see #getStorablePath(File)
+	 */
+	@NotNull
+	public final String getStorablePath(@NotNull File file,
+										boolean useRelativePaths) {
 		String absPath = Util.getAbsPath(file);
 		if (! isPortable)
 			return absPath;

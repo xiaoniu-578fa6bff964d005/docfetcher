@@ -35,8 +35,8 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.FileIconCache;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
-import net.sourceforge.docfetcher.util.gui.VirtualTableViewer;
-import net.sourceforge.docfetcher.util.gui.VirtualTableViewer.Column;
+import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer;
+import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;

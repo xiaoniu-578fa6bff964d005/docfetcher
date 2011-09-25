@@ -59,6 +59,8 @@ public enum Img implements FilenameProvider {
 	PACKAGE ("package.gif"),
 	CLIPBOARD ("clipboard.gif"),
 	ADD ("add.gif"),
+	REMOVE ("remove.gif"),
+	LIST ("list.gif"), // TODO pre-release: Currently not used
 	CHECK ("check.gif"),
 	TREE ("tree.gif"),
 	BROWSER ("browser.gif"),

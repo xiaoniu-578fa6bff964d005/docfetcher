@@ -47,6 +47,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -408,6 +409,20 @@ public final class Util {
 											@NotNull SelectionListener listener) {
 		Button bt = new Button(parent, SWT.PUSH);
 		bt.setText(label);
+		bt.addSelectionListener(listener);
+		return bt;
+	}
+	
+	@NotNull
+	public static Button createPushButton(	@NotNull Composite parent,
+											@NotNull Image image,
+											@Nullable String toolTip,
+											@NotNull SelectionListener listener) {
+		Util.checkNotNull(image);
+		Button bt = new Button(parent, SWT.PUSH);
+		bt.setImage(image);
+		if (toolTip != null)
+			bt.setToolTipText(toolTip);
 		bt.addSelectionListener(listener);
 		return bt;
 	}
