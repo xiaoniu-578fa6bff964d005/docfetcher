@@ -42,6 +42,7 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
 public final class ProgramConf {
 	
 	// TODO pre-release: remove unused entries
+	// TODO pre-release: reset entries whose values where changed for development purposes (e.g. fix window sizes)
 
 	public static enum Bool implements Loadable {
 		FixWindowSizes (false),
@@ -68,6 +69,7 @@ public final class ProgramConf {
 		SearchBoxMaxWidth (200, 0),
 		MaxResultsTotal (10000, 1),
 		WebInterfacePageSize (50, 1),
+		PatternTableHeight (4, 1),
 		;
 
 		private int value;

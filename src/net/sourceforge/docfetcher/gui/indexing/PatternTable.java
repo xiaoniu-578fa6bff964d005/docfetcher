@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -82,7 +83,8 @@ abstract class PatternTable extends Composite {
 		};
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		tableGridData.minimumHeight = table.getItemHeight() * 5; // +1 for column header
+		int factor = ProgramConf.Int.PatternTableHeight.get() + 1; // +1 for column header
+		tableGridData.minimumHeight = table.getItemHeight() * factor;
 		table.setLayoutData(tableGridData);
 		
 		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
