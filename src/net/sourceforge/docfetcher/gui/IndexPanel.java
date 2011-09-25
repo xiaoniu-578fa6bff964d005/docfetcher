@@ -30,7 +30,6 @@ import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.ViewNode;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.IndexingQueue.Rejection;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
@@ -46,7 +45,7 @@ import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.InputLoop;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
-import net.sourceforge.docfetcher.util.gui.SimpleTreeViewer;
+import net.sourceforge.docfetcher.util.gui.viewer.SimpleTreeViewer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
@@ -515,11 +514,9 @@ public final class IndexPanel {
 			}
 
 			protected String getDenyMessage(String newValue) {
-				IndexingConfig config = new IndexingConfig();
 				File indexParentDir = indexRegistry.getIndexParentDir();
 				File targetFile = new File(newValue);
-				FileIndex index = new FileIndex(
-					config, indexParentDir, targetFile);
+				FileIndex index = new FileIndex(indexParentDir, targetFile);
 				Rejection rejection = indexRegistry.getQueue().addTask(
 					index, IndexAction.CREATE);
 				if (rejection == null)
@@ -567,11 +564,9 @@ public final class IndexPanel {
 			}
 
 			protected String getDenyMessage(String newValue) {
-				IndexingConfig config = new IndexingConfig();
 				File indexParentDir = indexRegistry.getIndexParentDir();
 				File pstFile = new File(newValue);
-				OutlookIndex index = new OutlookIndex(
-					config, indexParentDir, pstFile);
+				OutlookIndex index = new OutlookIndex(indexParentDir, pstFile);
 				Rejection rejection = indexRegistry.getQueue().addTask(
 					index, IndexAction.CREATE);
 				if (rejection == null)
@@ -627,15 +622,14 @@ public final class IndexPanel {
 		if (files.isEmpty())
 			throw new IllegalStateException();
 		
-		IndexingConfig config = new IndexingConfig();
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		File file = files.get(0); // Ignore all but the first file
 		
 		LuceneIndex index;
 		if (Util.hasExtension(file.getName(), "pst"))
-			index = new OutlookIndex(config, indexParentDir, file);
+			index = new OutlookIndex(indexParentDir, file);
 		else
-			index = new FileIndex(config, indexParentDir, file);
+			index = new FileIndex(indexParentDir, file);
 		
 		Rejection rejection = indexRegistry.getQueue().addTask(
 			index, IndexAction.CREATE);

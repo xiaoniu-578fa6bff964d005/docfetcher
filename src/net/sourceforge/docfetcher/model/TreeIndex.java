@@ -34,8 +34,7 @@ import com.google.common.io.Files;
 @SuppressWarnings("serial")
 public abstract class TreeIndex <
 	D extends Document<D, F>,
-	F extends Folder<D, F>,
-	C extends IndexingConfig> implements LuceneIndex {
+	F extends Folder<D, F>> implements LuceneIndex {
 	
 	public enum IndexingResult {
 		SUCCESS_CHANGED,
@@ -43,30 +42,52 @@ public abstract class TreeIndex <
 		FAILURE,
 	}
 	
+	private final IndexingConfig config;
+	private final F rootFolder;
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
-	@NotNull private final F rootFolder;
-	@NotNull private C config;
 	
 	// if indexDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir
-	protected TreeIndex(@NotNull C config,
-						@Nullable File indexDir,
-						@NotNull F rootFolder) {
-		Util.checkNotNull(config, rootFolder);
-		this.config = config;
-		this.fileIndexDir = indexDir;
-		this.rootFolder = rootFolder;
-		if (indexDir == null)
+	protected TreeIndex(@Nullable File indexParentDir,
+	                    @NotNull File rootFile) {
+		Util.checkNotNull(rootFile);
+		this.config = new IndexingConfig(rootFile);
+		
+		String path = config.getStorablePath(rootFile);
+		rootFolder = createRootFolder(rootFile.getName(), path);
+		Util.checkNotNull(rootFolder);
+		
+		/*
+		 * The last-modified field of the root folder is set to null so that it
+		 * is detected as "modified" the first time the update method is called.
+		 */
+		Util.checkThat(rootFolder.getLastModified() == null);
+		
+		if (indexParentDir == null) {
+			fileIndexDir = null;
 			ramIndexDir = new RAMDirectory();
+		}
+		else {
+			long id = Util.getTimestamp();
+			String indexDirName = getIndexDirName(rootFile) + "_" + id;
+			fileIndexDir = new File(indexParentDir, indexDirName);
+		}
 	}
+	
+	@NotNull
+	protected abstract String getIndexDirName(@NotNull File rootFile);
+	
+	@NotNull
+	protected abstract F createRootFolder(	@NotNull String name,
+											@NotNull String path);
 	
 	@NotNull
 	public abstract IndexingResult update(	@NotNull IndexingReporter reporter,
 											@NotNull Cancelable cancelable);
 
 	@NotNull
-	public final C getConfig() {
+	public final IndexingConfig getConfig() {
 		return config;
 	}
 	

@@ -21,7 +21,6 @@ import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.TreeIndex;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
@@ -42,8 +41,7 @@ import com.pff.PSTMessage;
  * @author Tran Nam Quang
  */
 @SuppressWarnings("serial")
-public final class OutlookIndex extends TreeIndex
-	<MailDocument, MailFolder, IndexingConfig> {
+public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 	
 	/*
 	 * Tests indicate we can directly retrieve any message via its ID, but not
@@ -58,32 +56,19 @@ public final class OutlookIndex extends TreeIndex
 	
 	private MailFolder simplifiedRootFolder;
 	
-	public OutlookIndex(@NotNull IndexingConfig config,
-						@Nullable File indexParentDir,
-						@NotNull File pstFile) {
-		super(
-				config,
-				getIndexDir(indexParentDir, pstFile),
-				getRootFolder(config, pstFile)
-		);
-		Util.checkNotNull(pstFile);
-	}
-	
-	@Nullable
-	private static File getIndexDir(@Nullable File indexParentDir,
-									@NotNull File pstFile) {
-		if (indexParentDir == null)
-			return null; // We'll write into RAM
-		String pstName = Util.splitFilename(pstFile)[0];
-		long id = Util.getTimestamp();
-		return new File(indexParentDir, pstName + "_" + id);
+	public OutlookIndex(@Nullable File indexParentDir, @NotNull File pstFile) {
+		super(indexParentDir, pstFile);
 	}
 	
 	@NotNull
-	private static MailFolder getRootFolder(@NotNull IndexingConfig config,
-											@NotNull File pstFile) {
-		String path = config.getStorablePath(pstFile);
-		return new MailFolder(pstFile.getName(), path);
+	protected String getIndexDirName(@NotNull File pstFile) {
+		return Util.splitFilename(pstFile)[0];
+	}
+	
+	@NotNull
+	protected MailFolder createRootFolder(	@NotNull String name,
+											@NotNull String path) {
+		return new MailFolder(name, path);
 	}
 	
 	public boolean isEmailIndex() {

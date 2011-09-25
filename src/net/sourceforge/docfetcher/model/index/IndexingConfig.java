@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.file.FileFilter;
@@ -26,23 +28,21 @@ import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 
 /**
  * @author Tran Nam Quang
  */
-@VisibleForPackageGroup
 @SuppressWarnings("serial")
-public class IndexingConfig implements Serializable {
+public final class IndexingConfig implements Serializable {
 	
 	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO now: add more zip extensions
 	private static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
 	private static final FileFilter defaultFileFilter = new FileFilter();
 	private static final Pattern defaultMimePattern = Pattern.compile("");
 	
+	private final File rootFile;
 	@Nullable private String userDirPath;
-	@Nullable private Boolean isWindows;
 	@Nullable private File tempDir;
 	@NotNull private Pattern mimePattern = defaultMimePattern;
 	private boolean isPortable = AppUtil.isPortable();
@@ -52,6 +52,21 @@ public class IndexingConfig implements Serializable {
 	private boolean watchFolders = true;
 	@NotNull private Collection<String> textExtensions = defaultTextExtensions;
 	@NotNull private Collection<String> zipExtensions = defaultZipExtensions;
+	
+	@VisibleForTesting
+	public IndexingConfig() {
+		this.rootFile = new File("");
+	}
+	
+	public IndexingConfig(@NotNull File rootFile) {
+		Util.checkNotNull(rootFile);
+		this.rootFile = rootFile;
+	}
+	
+	@NotNull
+	public File getRootFile() {
+		return rootFile;
+	}
 
 	public final boolean isPortable() {
 		return isPortable;
@@ -73,20 +88,6 @@ public class IndexingConfig implements Serializable {
 			this.userDirPath = null;
 		else
 			this.userDirPath = Util.getAbsPath(userDirPath);
-	}
-
-	public final boolean isWindows() {
-		if (isWindows == null)
-			return Util.IS_WINDOWS;
-		return isWindows;
-	}
-
-	/**
-	 * Sets whether the indexing methods should assume they are running on
-	 * Windows. If the argument is null, Windows will be detected automatically.
-	 */
-	public final void setWindows(@Nullable Boolean isWindows) {
-		this.isWindows = isWindows;
 	}
 
 	@NotNull
@@ -142,7 +143,7 @@ public class IndexingConfig implements Serializable {
 		String userDirPath = getUserDirPath();
 		if (absPath.equals(userDirPath))
 			return "";
-		if (isWindows()) {
+		if (Util.IS_WINDOWS) {
 			String d1 = Util.getDriveLetter(userDirPath);
 			String d2 = Util.getDriveLetter(absPath);
 			if (! d1.equals(d2))

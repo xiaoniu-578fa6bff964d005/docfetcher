@@ -46,7 +46,7 @@ import de.schlichtherle.truezip.fs.FsSyncException;
  * @author Tran Nam Quang
  */
 @SuppressWarnings("serial")
-public final class FileIndex extends TreeIndex<FileDocument, FileFolder, IndexingConfig> {
+public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 
 	/*
 	 * General exception handling policy used here:
@@ -70,13 +70,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 
 	// if indexParentDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir
-	public FileIndex(	@NotNull IndexingConfig config,
-						@Nullable File indexParentDir,
-						@NotNull File rootFile) {
-		super(config,
-			getIndexDir(indexParentDir, rootFile, config.isWindows()),
-			getRootFolder(config, rootFile));
-		Util.checkNotNull(rootFile);
+	public FileIndex(@Nullable File indexParentDir, @NotNull File rootFile) {
+		super(indexParentDir, rootFile);
 	}
 
 	public boolean isEmailIndex() {
@@ -187,27 +182,15 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder, Indexin
 		reporter.fail(error);
 	}
 
-	@Nullable
-	private static File getIndexDir(@Nullable File indexParentDir,
-									@NotNull File rootFile,
-									boolean isWindows) {
-		if (indexParentDir == null)
-			return null; // We'll write into RAM
-		
-		long id = Util.getTimestamp();
-		String rootName = Util.getNameOrLetter(rootFile, "");
-		return new File(indexParentDir, rootName + "_" + id);
+	@NotNull
+	protected String getIndexDirName(@NotNull File rootFile) {
+		return Util.getNameOrLetter(rootFile, "");
 	}
 
 	@NotNull
-	private static FileFolder getRootFolder(@NotNull IndexingConfig config,
-											@NotNull File rootFile) {
-		/*
-		 * The last-modified field of the root folder is set to null so that it
-		 * is detected as "modified" the first time the update method is called.
-		 */
-		String path = config.getStorablePath(rootFile);
-		return new FileFolder(rootFile.getName(), path, null);
+	protected FileFolder createRootFolder(	@NotNull String name,
+											@NotNull String path) {
+		return new FileFolder(name, path, null);
 	}
 
 	/**

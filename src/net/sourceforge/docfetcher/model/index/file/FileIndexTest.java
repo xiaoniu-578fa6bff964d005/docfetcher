@@ -21,7 +21,6 @@ import java.util.List;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -56,9 +55,7 @@ public final class FileIndexTest {
 		};
 		
 		for (File file : files) {
-			IndexingConfig config = new IndexingConfig();
-
-			FileIndex index = new FileIndex(config, null, file);
+			FileIndex index = new FileIndex(null, file);
 			index.update(new IndexingReporter(), NullCancelable.getInstance());
 			Directory luceneDir = index.getLuceneDir();
 
@@ -90,8 +87,7 @@ public final class FileIndexTest {
 		subFile2.createNewFile();
 		Files.copy(TestFiles.simple_7z.get(), subFile3);
 		
-		IndexingConfig config = new IndexingConfig();
-		FileIndex index = new FileIndex(config, null, tempDir);
+		FileIndex index = new FileIndex(null, tempDir);
 		final CountingReporter reporter = new CountingReporter();
 		
 		// Index update should not detect any changes when nothing was modified
@@ -146,8 +142,7 @@ public final class FileIndexTest {
 		for (boolean reversed : new boolean[] {false, true}) {
 			int i = 0;
 			for (File modifiedFile : files.subList(1, files.size())) {
-				IndexingConfig config = new IndexingConfig();
-				FileIndex index = new FileIndex(config, null, tempDir);
+				FileIndex index = new FileIndex(null, tempDir);
 				
 				File file1 = reversed ? modifiedFile : originalFile;
 				File file2 = reversed ? originalFile : modifiedFile;
@@ -193,8 +188,7 @@ public final class FileIndexTest {
 		Files.write("Hello World", textFile, Charsets.UTF_8);
 		
 		// Create index
-		IndexingConfig config = new IndexingConfig();
-		FileIndex index = new FileIndex(config, null, tempDir);
+		FileIndex index = new FileIndex(null, tempDir);
 		index.update(new IndexingReporter(), NullCancelable.getInstance());
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
@@ -217,8 +211,7 @@ public final class FileIndexTest {
 		File textFile = new File(tempDir, "test.txt");
 		Files.write("Hello World", textFile, Charsets.UTF_8);
 		
-		IndexingConfig config = new IndexingConfig();
-		FileIndex index = new FileIndex(config, null, tempDir);
+		FileIndex index = new FileIndex(null, tempDir);
 		index.update(new IndexingReporter(), NullCancelable.getInstance());
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
@@ -250,8 +243,7 @@ public final class FileIndexTest {
 			File target = new File(tempDir, "target.7z");
 			Files.copy(oldFile, target);
 			
-			IndexingConfig config = new IndexingConfig();
-			FileIndex index = new FileIndex(config, null, tempDir);
+			FileIndex index = new FileIndex(null, tempDir);
 			index.update(new IndexingReporter(), NullCancelable.getInstance());
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 			
@@ -270,8 +262,7 @@ public final class FileIndexTest {
 	@Test
 	public void testIndexUpdateOnNestedHtml() throws Exception {
 		File dir = TestFiles.index_update_html_in_html.get();
-		IndexingConfig config = new IndexingConfig();
-		FileIndex index = new FileIndex(config, null, dir);
+		FileIndex index = new FileIndex(null, dir);
 		
 		index.update(new IndexingReporter(), NullCancelable.getInstance());
 		UtilModel.assertDocCount(index.getLuceneDir(), 2);

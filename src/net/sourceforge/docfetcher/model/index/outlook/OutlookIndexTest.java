@@ -16,7 +16,6 @@ import java.io.File;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.AppUtil;
 
@@ -34,10 +33,9 @@ public final class OutlookIndexTest {
 	
 	@Test
 	public void testSimple() throws Exception {
-		IndexingConfig config = new IndexingConfig();
 		File pstFile = TestFiles.outlook_test.get();
 		
-		OutlookIndex index = new OutlookIndex(config, null, pstFile);
+		OutlookIndex index = new OutlookIndex(null, pstFile);
 		index.update(new IndexingReporter(), NullCancelable.getInstance());
 		Directory luceneDir = index.getLuceneDir();
 		
