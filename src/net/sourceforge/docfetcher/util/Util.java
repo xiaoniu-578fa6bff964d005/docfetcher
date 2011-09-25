@@ -46,16 +46,20 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
@@ -377,6 +381,35 @@ public final class Util {
 		FormLayout layout = new FormLayout();
 		layout.marginWidth = layout.marginHeight = margin;
 		return layout;
+	}
+	
+	@NotNull
+	public static Text createLabeledGridText(	@NotNull Composite parent,
+											@NotNull String labelText) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(labelText);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
+		Text text = new Text(parent, SWT.BORDER | SWT.SINGLE);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		return text;
+	}
+	
+	@NotNull
+	public static Button createCheckButton(	@NotNull Composite parent,
+											@NotNull String label) {
+		Button bt = new Button(parent, SWT.CHECK);
+		bt.setText(label);
+		return bt;
+	}
+	
+	@NotNull
+	public static Button createPushButton(	@NotNull Composite parent,
+											@NotNull String label,
+											@NotNull SelectionListener listener) {
+		Button bt = new Button(parent, SWT.PUSH);
+		bt.setText(label);
+		bt.addSelectionListener(listener);
+		return bt;
 	}
 
 	/**

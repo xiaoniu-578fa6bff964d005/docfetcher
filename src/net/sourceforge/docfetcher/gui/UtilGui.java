@@ -11,10 +11,14 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -54,6 +58,18 @@ public final class UtilGui {
 	 */
 	public static boolean isEnterKey(int keyCode){
 		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
+	}
+
+	/**
+	 * Attaches a focus listener to the given StyledText that clears the
+	 * selection and resets the caret position when the StyledText looses focus.
+	 */
+	public static void clearSelectionOnFocusLost(@NotNull final StyledText styledText) {
+		styledText.addFocusListener(new FocusAdapter() {
+			public void focusLost(FocusEvent e) {
+				styledText.setSelection(0);
+			}
+		});
 	}
 
 }

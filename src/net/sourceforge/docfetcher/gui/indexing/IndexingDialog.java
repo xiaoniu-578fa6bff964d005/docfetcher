@@ -22,6 +22,7 @@ import net.sourceforge.docfetcher.gui.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
@@ -342,7 +343,8 @@ public final class IndexingDialog implements Dialog {
 		// Create an configure tab item
 		final CTabItem tabItem = new CTabItem(tabFolder, SWT.CLOSE);
 		tabItem.setData(task);
-		File rootFile = task.getLuceneIndex().getRootFile();
+		LuceneIndex index = task.getLuceneIndex();
+		File rootFile = index.getRootFile();
 		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
 		tabItem.setText(Util.truncate(nameOrLetter));
 		tabItem.setToolTipText(Util.getSystemAbsPath(rootFile));
@@ -363,16 +365,17 @@ public final class IndexingDialog implements Dialog {
 			}
 		});
 
-		IndexingConfig config = task.getLuceneIndex().getConfig();
+		IndexingConfig config = index.getConfig();
 		
 		if (task.is(IndexAction.UPDATE) || !task.is(TaskState.NOT_READY)) {
 			switchToProgressPanel(task, tabItem, config);
 		}
 		else {
 			final ConfigPanel configPanel;
-			if (task.getLuceneIndex() instanceof FileIndex)
-				configPanel = new FileConfigPanel(tabFolder, config);
-			else if (task.getLuceneIndex() instanceof OutlookIndex)
+			String path = index.getRootFolder().getPath();
+			if (index instanceof FileIndex)
+				configPanel = new FileConfigPanel(tabFolder, path, config);
+			else if (index instanceof OutlookIndex)
 				configPanel = new OutlookConfigPanel(tabFolder, config);
 			else
 				throw new IllegalStateException();

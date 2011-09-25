@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf.Font;
 import net.sourceforge.docfetcher.enums.SystemConf;
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -29,8 +30,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
@@ -162,20 +161,10 @@ final class EmailPreview extends Composite {
 		st.setBackground(Col.WIDGET_BACKGROUND.get());
 		st.setForeground(Col.WIDGET_FOREGROUND.get());
 		Util.registerSelectAllKey(st);
-		
-		/*
-		 * Clear selection and reset caret position when the text field looses
-		 * focus.
-		 */
-		st.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				st.setSelection(0);
-			}
-		});
-		
+		UtilGui.clearSelectionOnFocusLost(st);
 		return st;
 	}
-	
+
 	public void setEmail(@NotNull MailResource mailResource) {
 		// TODO now: Make email addresses clickable -> use HighlightedString to encode links?
 		// TODO now: If loading info from the document repository failed, try to load it from the Lucene index

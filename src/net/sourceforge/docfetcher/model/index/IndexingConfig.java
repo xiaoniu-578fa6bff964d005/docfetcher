@@ -226,6 +226,11 @@ public class IndexingConfig implements Serializable {
 		this.textExtensions = textExtensions == null ? defaultTextExtensions : textExtensions;
 	}
 	
+	@NotNull
+	public Collection<String> getZipExtensions() {
+		return zipExtensions;
+	}
+	
 	public void setZipExtensions(@Nullable Collection<String> zipExtensions) {
 		this.zipExtensions = zipExtensions == null ? defaultZipExtensions : zipExtensions;
 	}
