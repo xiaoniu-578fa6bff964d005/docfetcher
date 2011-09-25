@@ -371,7 +371,7 @@ public final class Searcher {
 			Filter[] indexFilters = new Filter[webQuery.indexes.size()];
 			int i = 0;
 			for (LuceneIndex index : webQuery.indexes) {
-				String path = index.getRootFile().getPath();
+				String path = index.getRootFolder().getPath();
 				String uid = index.getDocumentType().createUniqueId(path);
 				Term prefix = new Term(Fields.UID.key(), uid + "/");
 				indexFilters[i++] = new PrefixFilter(prefix);

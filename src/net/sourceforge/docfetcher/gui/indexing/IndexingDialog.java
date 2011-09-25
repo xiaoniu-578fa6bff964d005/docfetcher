@@ -372,9 +372,8 @@ public final class IndexingDialog implements Dialog {
 		}
 		else {
 			final ConfigPanel configPanel;
-			String path = index.getRootFolder().getPath();
 			if (index instanceof FileIndex)
-				configPanel = new FileConfigPanel(tabFolder, path, config);
+				configPanel = new FileConfigPanel(tabFolder, config);
 			else if (index instanceof OutlookIndex)
 				configPanel = new OutlookConfigPanel(tabFolder, config);
 			else

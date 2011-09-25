@@ -41,10 +41,9 @@ final class FileConfigPanel extends ConfigPanel {
 	private final Button runBt;
 
 	public FileConfigPanel(	@NotNull Composite parent,
-	                       	@NotNull String path,
 	                       	@NotNull final IndexingConfig config) {
 		super(parent);
-		Util.checkNotNull(path, config);
+		Util.checkNotNull(config);
 		
 		// TODO i18n
 		
@@ -54,7 +53,7 @@ final class FileConfigPanel extends ConfigPanel {
 		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
 		StyledText targetField = new StyledText(targetComp, targetStyle);
 		setGridData(targetField, true, true);
-		targetField.setText(path);
+		targetField.setText(Util.getSystemAbsPath(config.getRootFile()));
 		targetField.setForeground(Col.DARK_GRAY.get());
 		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
 		UtilGui.clearSelectionOnFocusLost(targetField);

@@ -79,8 +79,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		return DocumentType.OUTLOOK;
 	}
 	
-	public IndexingResult update(	@NotNull IndexingReporter reporter,
-									@NotNull Cancelable cancelable) {
+	protected IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
+										@NotNull Cancelable cancelable) {
 		if (cancelable.isCanceled())
 			return IndexingResult.SUCCESS_UNCHANGED;
 		

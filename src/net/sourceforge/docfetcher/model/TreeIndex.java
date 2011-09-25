@@ -43,7 +43,7 @@ public abstract class TreeIndex <
 	}
 	
 	private final IndexingConfig config;
-	private final F rootFolder;
+	@Nullable private F rootFolder;
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	
@@ -53,16 +53,6 @@ public abstract class TreeIndex <
 	                    @NotNull File rootFile) {
 		Util.checkNotNull(rootFile);
 		this.config = new IndexingConfig(rootFile);
-		
-		String path = config.getStorablePath(rootFile);
-		rootFolder = createRootFolder(rootFile.getName(), path);
-		Util.checkNotNull(rootFolder);
-		
-		/*
-		 * The last-modified field of the root folder is set to null so that it
-		 * is detected as "modified" the first time the update method is called.
-		 */
-		Util.checkThat(rootFolder.getLastModified() == null);
 		
 		if (indexParentDir == null) {
 			fileIndexDir = null;
@@ -83,17 +73,37 @@ public abstract class TreeIndex <
 											@NotNull String path);
 	
 	@NotNull
-	public abstract IndexingResult update(	@NotNull IndexingReporter reporter,
-											@NotNull Cancelable cancelable);
+	public final IndexingResult update(	@NotNull IndexingReporter reporter,
+										@NotNull Cancelable cancelable) {
+		if (rootFolder == null) {
+			File rootFile = config.getRootFile();
+			String path = config.getStorablePath(rootFile);
+			rootFolder = createRootFolder(rootFile.getName(), path);
+			Util.checkNotNull(rootFolder);
+			
+			/*
+			 * The last-modified field of the root folder is set to null so that it
+			 * is detected as "modified" the first time the update method is called.
+			 */
+			Util.checkThat(rootFolder.getLastModified() == null);
+		}
+		return doUpdate(reporter, cancelable);
+	}
+	
+	@NotNull
+	protected abstract IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
+												@NotNull Cancelable cancelable);
 
 	@NotNull
 	public final IndexingConfig getConfig() {
 		return config;
 	}
 	
+	// Returns the root file the receiver was initialized with. The path of the
+	// returned file does *not* take the 'use relative paths' setting into account.
 	@NotNull
 	public final File getRootFile() {
-		return new File(rootFolder.getPath());
+		return config.getRootFile();
 	}
 	
 	@Nullable
@@ -115,16 +125,19 @@ public abstract class TreeIndex <
 	
 	@NotNull
 	public final F getRootFolder() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder;
 	}
 	
 	@NotNull
 	public final String getDisplayName() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder.getDisplayName();
 	}
 	
 	@NotNull
 	public final Iterable<ViewNode> getChildren() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder.getChildren();
 	}
 	
@@ -137,14 +150,6 @@ public abstract class TreeIndex <
 	}
 	
 	private void clear(boolean removeTopLevel) {
-		/*
-		 * Setting the last-modified field to null will cause the next index
-		 * update to detect this index as modified. Without this, if the index
-		 * is about to be rebuilt, the rebuild operation will fail.
-		 */
-		rootFolder.setLastModified(null);
-		
-		rootFolder.removeChildren();
 		if (fileIndexDir != null) {
 			try {
 				if (removeTopLevel)
@@ -160,18 +165,29 @@ public abstract class TreeIndex <
 			assert ramIndexDir != null;
 			ramIndexDir = new RAMDirectory();
 		}
+		
+		/*
+		 * The root folder must be nullified because (1) the 'use relative
+		 * paths' setting in the configuration object might have changed, and
+		 * (2) the last-modified field of the root folder must be cleared so
+		 * that the next index update will detect the root folder as modified.
+		 */
+		rootFolder = null;
 	}
 	
 	public final boolean isChecked() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder.isChecked();
 	}
 	
 	public final void setChecked(boolean isChecked) {
+		Util.checkNotNull(rootFolder);
 		rootFolder.setChecked(isChecked);
 	}
 	
 	@NotNull
 	public final TreeCheckState getTreeCheckState() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder.getTreeCheckState();
 	}
 	
@@ -182,6 +198,7 @@ public abstract class TreeIndex <
 	@ImmutableCopy
 	@NotNull
 	public final List<String> getDocumentIds() {
+		Util.checkNotNull(rootFolder);
 		return rootFolder.getDocumentIds();
 	}
 	

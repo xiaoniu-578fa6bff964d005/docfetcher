@@ -73,6 +73,17 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 	public FileIndex(@Nullable File indexParentDir, @NotNull File rootFile) {
 		super(indexParentDir, rootFile);
 	}
+	
+	@NotNull
+	protected String getIndexDirName(@NotNull File rootFile) {
+		return Util.getNameOrLetter(rootFile, "");
+	}
+
+	@NotNull
+	protected FileFolder createRootFolder(	@NotNull String name,
+											@NotNull String path) {
+		return new FileFolder(name, path, null);
+	}
 
 	public boolean isEmailIndex() {
 		return false;
@@ -82,8 +93,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		return DocumentType.FILE;
 	}
 
-	public IndexingResult update(	@NotNull IndexingReporter reporter,
-									@NotNull Cancelable cancelable) {
+	protected IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
+										@NotNull Cancelable cancelable) {
 		if (cancelable.isCanceled())
 			return IndexingResult.SUCCESS_UNCHANGED;
 		
@@ -180,17 +191,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		IndexingError error = new IndexingError(errorType, rootFolder, e);
 		rootFolder.setError(error);
 		reporter.fail(error);
-	}
-
-	@NotNull
-	protected String getIndexDirName(@NotNull File rootFile) {
-		return Util.getNameOrLetter(rootFile, "");
-	}
-
-	@NotNull
-	protected FileFolder createRootFolder(	@NotNull String name,
-											@NotNull String path) {
-		return new FileFolder(name, path, null);
 	}
 
 	/**

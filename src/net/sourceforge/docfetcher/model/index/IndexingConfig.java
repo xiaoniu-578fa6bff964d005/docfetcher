@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.file.FileFilter;
@@ -28,6 +26,9 @@ import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+
+import com.google.common.annotations.VisibleForTesting;
+
 import de.schlichtherle.truezip.file.TArchiveDetector;
 
 /**
@@ -63,6 +64,7 @@ public final class IndexingConfig implements Serializable {
 		this.rootFile = rootFile;
 	}
 	
+	// Warning: path of returned file may not be consistent with 'useRelativePaths' setting
 	@NotNull
 	public File getRootFile() {
 		return rootFile;
