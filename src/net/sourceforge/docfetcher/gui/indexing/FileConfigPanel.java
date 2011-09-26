@@ -93,10 +93,15 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
 			protected void createContents(Group parent) {
-				Util.createCheckButton(parent, "ipref_detect_html_pairs");
+				Button htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
 				useRelativePathsBt = Util.createCheckButton(parent, "Use relative paths if possible");
-				Util.createCheckButton(parent, "Watch folder for file changes");
-				// TODO initialize button states from config object
+				Button watchFolderBt = Util.createCheckButton(parent, "Watch folder for file changes");
+				Button detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
+				
+				htmlPairingBt.setSelection(config.isHtmlPairing());
+				useRelativePathsBt.setSelection(config.isUseRelativePaths());
+				watchFolderBt.setSelection(config.isWatchFolders());
+//				detectExecArchivesBt.setSelection(...) // TODO
 			}
 		}.getGroup();
 		

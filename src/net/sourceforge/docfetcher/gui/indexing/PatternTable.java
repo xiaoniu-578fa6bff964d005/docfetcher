@@ -122,6 +122,7 @@ abstract class PatternTable extends Composite {
 		});
 		
 		Table table = tableViewer.getControl();
+		table.setLinesVisible(true);
 		SettingsConf.ColumnWidths.PatternTable.bind(table);
 		
 		table.addSelectionListener(new SelectionAdapter() {
