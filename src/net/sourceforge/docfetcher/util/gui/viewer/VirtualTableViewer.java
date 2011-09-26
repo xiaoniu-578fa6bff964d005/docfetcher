@@ -69,6 +69,7 @@ public abstract class VirtualTableViewer<E> {
 	
 	public VirtualTableViewer(@NotNull Composite parent, int style) {
 		table = new Table(parent, style | SWT.VIRTUAL);
+		table.setHeaderVisible(true);
 		
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {

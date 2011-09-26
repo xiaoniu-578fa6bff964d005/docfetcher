@@ -72,6 +72,7 @@ public final class SimpleTableViewer<E> {
 	public SimpleTableViewer(@NotNull Composite parent, int style) {
 		Util.checkThat(!Util.contains(style, SWT.VIRTUAL));
 		table = new Table(parent, style);
+		table.setHeaderVisible(true);
 	}
 	
 	@NotNull

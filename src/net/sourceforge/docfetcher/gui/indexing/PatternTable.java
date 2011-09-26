@@ -123,7 +123,6 @@ abstract class PatternTable extends Composite {
 		
 		Table table = tableViewer.getControl();
 		SettingsConf.ColumnWidths.PatternTable.bind(table);
-		table.setHeaderVisible(true);
 		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

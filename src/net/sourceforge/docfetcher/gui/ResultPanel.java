@@ -102,8 +102,6 @@ public final class ResultPanel {
 			}
 		};
 		
-		viewer.getControl().setHeaderVisible(true);
-		
 		// Open result document on double-click
 		viewer.getControl().addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {

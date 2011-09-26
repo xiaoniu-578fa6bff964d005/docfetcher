@@ -87,13 +87,11 @@ public abstract class PagedTableViewer<E> {
 	private List<List<E>> pages = emptyPages;
 	
 	public PagedTableViewer(@NotNull Composite parent, int style) {
-		this(new Table(parent, style));
-	}
-	
-	public PagedTableViewer(@NotNull final Table table) {
-		if (Util.contains(table.getStyle(), SWT.VIRTUAL))
+		if (Util.contains(style, SWT.VIRTUAL))
 			throw new IllegalArgumentException("This class does not support virtual tables.");
-		this.table = table;
+		
+		table = new Table(parent, style);
+		table.setHeaderVisible(true);
 		
 		table.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("unchecked")
