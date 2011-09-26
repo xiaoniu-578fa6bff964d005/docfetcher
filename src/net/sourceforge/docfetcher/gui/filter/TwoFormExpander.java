@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.filter;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.util.Util;

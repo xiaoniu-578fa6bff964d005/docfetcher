@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.filter;
 
 import static org.junit.Assert.assertEquals;
 

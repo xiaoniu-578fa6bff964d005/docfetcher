@@ -9,8 +9,9 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.filter;
 
+import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;

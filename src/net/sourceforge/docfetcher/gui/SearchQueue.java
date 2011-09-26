@@ -21,6 +21,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.sourceforge.docfetcher.gui.ResultPanel.HeaderMode;
+import net.sourceforge.docfetcher.gui.filter.FileTypePanel;
+import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
+import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.TreeCheckState;

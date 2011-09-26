@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.model.search;
 
 import java.util.Collection;
 
-import net.sourceforge.docfetcher.gui.FilesizeUnit;
+import net.sourceforge.docfetcher.gui.filter.FilesizeUnit;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.util.Util;

@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.filter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import java.util.Set;
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.MultiFileLauncher;
 import net.sourceforge.docfetcher.gui.indexing.IndexingDialog;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory;
 import net.sourceforge.docfetcher.model.Folder;

@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.enums.SystemConf;
-import net.sourceforge.docfetcher.gui.IndexPanel;
+import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;

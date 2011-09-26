@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.filter;
 
 import java.util.Comparator;
 import net.sourceforge.docfetcher.model.parse.Parser;

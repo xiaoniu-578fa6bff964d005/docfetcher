@@ -40,7 +40,7 @@ public final class UtilGui {
 	 * replacement for the ugly native border of Composites with SWT.BORDER
 	 * style on Windows with classic theme turned on.
 	 */
-	static void paintBorder(final Control control) {
+	public static void paintBorder(final Control control) {
 		control.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				Point size = control.getSize();
