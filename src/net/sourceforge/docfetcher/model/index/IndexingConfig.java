@@ -32,17 +32,19 @@ import com.google.common.annotations.VisibleForTesting;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 
 /**
+ * Should not be subclassed outside the package group of this class.
+ * 
  * @author Tran Nam Quang
  */
 @SuppressWarnings("serial")
-public final class IndexingConfig implements Serializable {
+public class IndexingConfig implements Serializable {
 	
 	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO now: add more zip extensions
 	private static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
 	private static final FileFilter defaultFileFilter = new FileFilter();
 	private static final Pattern defaultMimePattern = Pattern.compile("");
 	
-	private final File rootFile;
+	@NotNull private File rootFile;
 	@Nullable private String userDirPath;
 	@Nullable private File tempDir;
 	@NotNull private Pattern mimePattern = defaultMimePattern;
@@ -61,12 +63,11 @@ public final class IndexingConfig implements Serializable {
 	
 	public IndexingConfig(@NotNull File rootFile) {
 		Util.checkNotNull(rootFile);
-		this.rootFile = rootFile;
+		this.rootFile = new File(getStorablePath(rootFile));
 	}
 	
-	// Warning: path of returned file may not be consistent with 'useRelativePaths' setting
 	@NotNull
-	public File getRootFile() {
+	public final File getRootFile() {
 		return rootFile;
 	}
 
@@ -113,8 +114,14 @@ public final class IndexingConfig implements Serializable {
 	}
 
 	public final void setUseRelativePaths(boolean useRelativePaths) {
+		if (this.useRelativePaths == useRelativePaths)
+			return;
+		rootFile = new File(getStorablePath(rootFile, useRelativePaths));
 		this.useRelativePaths = useRelativePaths;
+		onRootFileChanged();
 	}
+	
+	protected void onRootFileChanged() {}
 
 	/**
 	 * For the given file, a path is returned that can be stored without
@@ -208,52 +215,52 @@ public final class IndexingConfig implements Serializable {
 	}
 	
 	@NotNull
-	public FileFilter getFileFilter() {
+	public final FileFilter getFileFilter() {
 		return fileFilter;
 	}
 
-	public void setFileFilter(@Nullable FileFilter fileFilter) {
+	public final void setFileFilter(@Nullable FileFilter fileFilter) {
 		this.fileFilter = fileFilter == null ? defaultFileFilter : fileFilter;
 	}
 	
 	@NotNull
-	public Collection<String> getHtmlExtensions() {
+	public final Collection<String> getHtmlExtensions() {
 		return ProgramConf.StrList.HtmlExtensions.get();
 	}
 	
-	public boolean isHtmlPairing() {
+	public final boolean isHtmlPairing() {
 		return htmlPairing;
 	}
 
-	public void setHtmlPairing(boolean htmlPairing) {
+	public final void setHtmlPairing(boolean htmlPairing) {
 		this.htmlPairing = htmlPairing;
 	}
 	
 	@NotNull
-	public Collection<String> getTextExtensions() {
+	public final Collection<String> getTextExtensions() {
 		return textExtensions;
 	}
 	
-	public void setTextExtensions(@Nullable Collection<String> textExtensions) {
+	public final void setTextExtensions(@Nullable Collection<String> textExtensions) {
 		this.textExtensions = textExtensions == null ? defaultTextExtensions : textExtensions;
 	}
 	
 	@NotNull
-	public Collection<String> getZipExtensions() {
+	public final Collection<String> getZipExtensions() {
 		return zipExtensions;
 	}
 	
-	public void setZipExtensions(@Nullable Collection<String> zipExtensions) {
+	public final void setZipExtensions(@Nullable Collection<String> zipExtensions) {
 		this.zipExtensions = zipExtensions == null ? defaultZipExtensions : zipExtensions;
 	}
 
 	@NotNull
-	public TArchiveDetector createZipDetector() {
+	public final TArchiveDetector createZipDetector() {
 		return new TArchiveDetector(Util.join("|", zipExtensions));
 	}
 
 	// Accepts filenames and filepaths
-	public boolean isArchive(@NotNull String filename) {
+	public final boolean isArchive(@NotNull String filename) {
 		String ext = Util.getExtension(filename);
 		if (ext.equals("7z") || ext.equals("rar") || ext.equals("exe"))
 			return true;
@@ -262,7 +269,7 @@ public final class IndexingConfig implements Serializable {
 	
 	// Accepts filenames and filepaths
 	@Nullable
-	public SolidArchiveFactory getSolidArchiveFactory(@NotNull String filename) {
+	public final SolidArchiveFactory getSolidArchiveFactory(@NotNull String filename) {
 		/*
 		 * JUnRar does not seem to support SFX RAR archives, but TrueZIP and
 		 * J7Zip do support SFX Zip and SFX 7z archives, respectively.
@@ -276,15 +283,15 @@ public final class IndexingConfig implements Serializable {
 	}
 	
 	// Accepts filenames and filepaths
-	public boolean isSolidArchive(@NotNull String filename) {
+	public final boolean isSolidArchive(@NotNull String filename) {
 		return getSolidArchiveFactory(filename) != null;
 	}
 	
-	public boolean isWatchFolders() {
+	public final  boolean isWatchFolders() {
 		return watchFolders;
 	}
 	
-	public void setWatchFolders(boolean watchFolders) {
+	public final void setWatchFolders(boolean watchFolders) {
 		this.watchFolders = watchFolders;
 	}
 

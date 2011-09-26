@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.List;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -43,7 +42,7 @@ public abstract class TreeIndex <
 	}
 	
 	private final IndexingConfig config;
-	@Nullable private F rootFolder;
+	@NotNull private F rootFolder;
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	
@@ -52,7 +51,15 @@ public abstract class TreeIndex <
 	protected TreeIndex(@Nullable File indexParentDir,
 	                    @NotNull File rootFile) {
 		Util.checkNotNull(rootFile);
-		this.config = new IndexingConfig(rootFile);
+		
+		this.config = new IndexingConfig(rootFile) {
+			@Override
+			protected void onRootFileChanged() {
+				File rootFile = config.getRootFile();
+				rootFolder = createRootFolder(rootFile.getName(), rootFile.getPath());
+				Util.checkNotNull(rootFolder);
+			}
+		};
 		
 		if (indexParentDir == null) {
 			fileIndexDir = null;
@@ -71,36 +78,12 @@ public abstract class TreeIndex <
 	@NotNull
 	protected abstract F createRootFolder(	@NotNull String name,
 											@NotNull String path);
-	
-	@NotNull
-	public final IndexingResult update(	@NotNull IndexingReporter reporter,
-										@NotNull Cancelable cancelable) {
-		if (rootFolder == null) {
-			File rootFile = config.getRootFile();
-			String path = config.getStorablePath(rootFile);
-			rootFolder = createRootFolder(rootFile.getName(), path);
-			Util.checkNotNull(rootFolder);
-			
-			/*
-			 * The last-modified field of the root folder is set to null so that it
-			 * is detected as "modified" the first time the update method is called.
-			 */
-			Util.checkThat(rootFolder.getLastModified() == null);
-		}
-		return doUpdate(reporter, cancelable);
-	}
-	
-	@NotNull
-	protected abstract IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
-												@NotNull Cancelable cancelable);
 
 	@NotNull
 	public final IndexingConfig getConfig() {
 		return config;
 	}
 	
-	// Returns the root file the receiver was initialized with. The path of the
-	// returned file does *not* take the 'use relative paths' setting into account.
 	@NotNull
 	public final File getRootFile() {
 		return config.getRootFile();
@@ -125,19 +108,16 @@ public abstract class TreeIndex <
 	
 	@NotNull
 	public final F getRootFolder() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder;
 	}
 	
 	@NotNull
 	public final String getDisplayName() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder.getDisplayName();
 	}
 	
 	@NotNull
 	public final Iterable<ViewNode> getChildren() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder.getChildren();
 	}
 	
@@ -167,27 +147,22 @@ public abstract class TreeIndex <
 		}
 		
 		/*
-		 * The root folder must be nullified because (1) the 'use relative
-		 * paths' setting in the configuration object might have changed, and
-		 * (2) the last-modified field of the root folder must be cleared so
-		 * that the next index update will detect the root folder as modified.
+		 * The last-modified field of the root folder must be cleared so that
+		 * the next index update will detect the root folder as modified.
 		 */
-		rootFolder = null;
+		rootFolder.setLastModified(null);
 	}
 	
 	public final boolean isChecked() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder.isChecked();
 	}
 	
 	public final void setChecked(boolean isChecked) {
-		Util.checkNotNull(rootFolder);
 		rootFolder.setChecked(isChecked);
 	}
 	
 	@NotNull
 	public final TreeCheckState getTreeCheckState() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder.getTreeCheckState();
 	}
 	
@@ -198,7 +173,6 @@ public abstract class TreeIndex <
 	@ImmutableCopy
 	@NotNull
 	public final List<String> getDocumentIds() {
-		Util.checkNotNull(rootFolder);
 		return rootFolder.getDocumentIds();
 	}
 	

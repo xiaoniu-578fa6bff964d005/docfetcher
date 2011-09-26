@@ -93,8 +93,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		return DocumentType.FILE;
 	}
 
-	protected IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
-										@NotNull Cancelable cancelable) {
+	public IndexingResult update(	@NotNull IndexingReporter reporter,
+									@NotNull Cancelable cancelable) {
 		if (cancelable.isCanceled())
 			return IndexingResult.SUCCESS_UNCHANGED;
 		
