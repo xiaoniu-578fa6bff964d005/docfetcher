@@ -63,7 +63,7 @@ abstract class RegexTestPanel extends Composite {
 				if (filepath == null)
 					return;
 				File file = new File(filepath);
-				filepath = config.getStorablePath(file, useRelativePaths());
+				filepath = config.getStorablePath(file, storeRelativePaths());
 				fileBox.setText(filepath);
 			}
 		});
@@ -87,7 +87,7 @@ abstract class RegexTestPanel extends Composite {
 		updateLabel();
 	}
 	
-	protected abstract boolean useRelativePaths();
+	protected abstract boolean storeRelativePaths();
 	
 	private void updateLabel() {
 		label.setText(matches()

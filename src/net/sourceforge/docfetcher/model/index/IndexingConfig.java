@@ -49,7 +49,7 @@ public class IndexingConfig implements Serializable {
 	@Nullable private File tempDir;
 	@NotNull private Pattern mimePattern = defaultMimePattern;
 	private boolean isPortable = AppUtil.isPortable();
-	private boolean useRelativePaths;
+	private boolean storeRelativePaths;
 	@NotNull private FileFilter fileFilter = defaultFileFilter;
 	private boolean htmlPairing = true;
 	private boolean watchFolders = true;
@@ -109,15 +109,15 @@ public class IndexingConfig implements Serializable {
 		this.tempDir = tempDir;
 	}
 
-	public final boolean isUseRelativePaths() {
-		return useRelativePaths;
+	public final boolean isStoreRelativePaths() {
+		return storeRelativePaths;
 	}
 
-	public final void setUseRelativePaths(boolean useRelativePaths) {
-		if (this.useRelativePaths == useRelativePaths)
+	public final void setStoreRelativePaths(boolean storeRelativePaths) {
+		if (this.storeRelativePaths == storeRelativePaths)
 			return;
-		rootFile = new File(getStorablePath(rootFile, useRelativePaths));
-		this.useRelativePaths = useRelativePaths;
+		rootFile = new File(getStorablePath(rootFile, storeRelativePaths));
+		this.storeRelativePaths = storeRelativePaths;
 		onRootFileChanged();
 	}
 	
@@ -127,7 +127,7 @@ public class IndexingConfig implements Serializable {
 	 * For the given file, a path is returned that can be stored without
 	 * breaking program portability. More specifically, this method returns
 	 * either an absolute path or a path relative to the current directory,
-	 * depending on the value of {@link #isUseRelativePaths()}.
+	 * depending on the value of {@link #isStoreRelativePaths()}.
 	 * <p>
 	 * There are some exceptions to this rule:
 	 * <ul>
@@ -145,7 +145,7 @@ public class IndexingConfig implements Serializable {
 	 */
 	@NotNull
 	public final String getStorablePath(@NotNull File file) {
-		return getStorablePath(file, useRelativePaths);
+		return getStorablePath(file, storeRelativePaths);
 	}
 	
 	/**
@@ -153,7 +153,7 @@ public class IndexingConfig implements Serializable {
 	 */
 	@NotNull
 	public final String getStorablePath(@NotNull File file,
-										boolean useRelativePaths) {
+										boolean storeRelativePaths) {
 		String absPath = Util.getAbsPath(file);
 		if (! isPortable)
 			return absPath;
@@ -167,7 +167,7 @@ public class IndexingConfig implements Serializable {
 			if (! d1.equals(d2))
 				return absPath;
 		}
-		if (useRelativePaths || Util.contains(userDirPath, absPath))
+		if (storeRelativePaths || Util.contains(userDirPath, absPath))
 			return UtilModel.getRelativePath(userDirPath, absPath);
 		return absPath;
 	}

@@ -45,7 +45,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 	// otherwise original path must be the "real" absolute path of this archive,
 	// e.g.
 	// /home/username/outer-archive.7z/inner-archive.7z
-	// useRelativePath only has effect if originalPath is null
+	// isStoreRelativePaths only has effect if originalPath is null
 	// user is responsible for closing the archive via this.close()
 	// Note: Cannot handle TrueZIP archive entries!!!
 	public SevenZipTree(@NotNull File archiveFile,

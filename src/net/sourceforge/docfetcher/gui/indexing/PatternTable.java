@@ -50,8 +50,8 @@ abstract class PatternTable extends Composite {
 		final IndexingConfig config = new IndexingConfig();
 		
 		new PatternTable(shell, config) {
-			protected boolean useRelativePaths() {
-				return config.isUseRelativePaths();
+			protected boolean storeRelativePaths() {
+				return config.isStoreRelativePaths();
 			}
 		};
 
@@ -77,8 +77,8 @@ abstract class PatternTable extends Composite {
 		Control buttonPanel = createButtonPanel();
 		
 		regexTestPanel = new RegexTestPanel(this, config) {
-			protected boolean useRelativePaths() {
-				return PatternTable.this.useRelativePaths();
+			protected boolean storeRelativePaths() {
+				return PatternTable.this.storeRelativePaths();
 			}
 		};
 		
@@ -161,6 +161,6 @@ abstract class PatternTable extends Composite {
 		return comp;
 	}
 	
-	protected abstract boolean useRelativePaths();
+	protected abstract boolean storeRelativePaths();
 	
 }

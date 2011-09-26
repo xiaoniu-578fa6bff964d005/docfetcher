@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Text;
  */
 final class FileConfigPanel extends ConfigPanel {
 	
-	@NotNull private Button useRelativePathsBt;
+	@NotNull private Button storeRelativePathsBt;
 	private final Button runBt;
 
 	public FileConfigPanel(	@NotNull Composite parent,
@@ -80,8 +80,8 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 			protected void createContents(Group parent) {
 				new PatternTable(parent, config) {
-					protected boolean useRelativePaths() {
-						return useRelativePathsBt.getSelection();
+					protected boolean storeRelativePaths() {
+						return storeRelativePathsBt.getSelection();
 					}
 				};
 				// TODO initialize pattern table from config object
@@ -94,12 +94,12 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 			protected void createContents(Group parent) {
 				Button htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
-				useRelativePathsBt = Util.createCheckButton(parent, "Use relative paths if possible");
+				storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
 				Button watchFolderBt = Util.createCheckButton(parent, "Watch folder for file changes");
-				Button detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
+				Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
 				
 				htmlPairingBt.setSelection(config.isHtmlPairing());
-				useRelativePathsBt.setSelection(config.isUseRelativePaths());
+				storeRelativePathsBt.setSelection(config.isStoreRelativePaths());
 				watchFolderBt.setSelection(config.isWatchFolders());
 //				detectExecArchivesBt.setSelection(...) // TODO
 			}
