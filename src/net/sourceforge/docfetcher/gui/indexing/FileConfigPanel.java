@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.util.Collection;
+
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.Util;
@@ -23,6 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -64,13 +67,37 @@ final class FileConfigPanel extends ConfigPanel {
 		
 		Group extGroup = new GroupWrapper(this, "File extensions") {
 			protected void createLayout(Group parent) {
-				parent.setLayout(Util.createGridLayout(2, false, 7, 7));
+				GridLayout gridLayout = Util.createGridLayout(3, false, 7, 0);
+				gridLayout.verticalSpacing = 5;
+				parent.setLayout(gridLayout);
 			}
 			protected void createContents(Group parent) {
-				Text textExtField = Util.createLabeledGridText(parent, "Plain text:");
-				Text zipExtField = Util.createLabeledGridText(parent, "Zip archives:");
-				textExtField.setText(Util.join(" ", config.getTextExtensions()));
-				zipExtField.setText(Util.join(" ", config.getZipExtensions()));
+				createExtField(
+					parent, "Plain text:", config.getTextExtensions(),
+					new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent e) {
+							// TODO now: implement
+						}
+					});
+				createExtField(
+					parent, "Zip archives:", config.getZipExtensions(),
+					new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent e) {
+							// TODO now: implement
+						}
+					});
+			}
+			@NotNull
+			private Text createExtField(@NotNull Composite parent,
+										@NotNull String label,
+										@NotNull Collection<String> extensions,
+										@NotNull SelectionListener listener) {
+				Text field = Util.createLabeledGridText(parent, label);
+				((GridData)field.getLayoutData()).horizontalIndent = 5;
+				field.setText(Util.join(" ", extensions));
+				Util.createPushButton(parent, "...", listener).setLayoutData(
+					new GridData(SWT.FILL, SWT.FILL, false, true));
+				return field;
 			}
 		}.getGroup();
 		
@@ -84,7 +111,7 @@ final class FileConfigPanel extends ConfigPanel {
 						return storeRelativePathsBt.getSelection();
 					}
 				};
-				// TODO initialize pattern table from config object
+				// TODO now: initialize pattern table from config object
 			}
 		}.getGroup();
 		
@@ -101,7 +128,7 @@ final class FileConfigPanel extends ConfigPanel {
 				htmlPairingBt.setSelection(config.isHtmlPairing());
 				storeRelativePathsBt.setSelection(config.isStoreRelativePaths());
 				watchFolderBt.setSelection(config.isWatchFolders());
-//				detectExecArchivesBt.setSelection(...) // TODO
+//				detectExecArchivesBt.setSelection(...) // TODO now: introduce config field
 			}
 		}.getGroup();
 		

@@ -77,7 +77,7 @@ abstract class RegexTestPanel extends Composite {
 		setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.bottom().right().applyTo(fileChooserBt);
-		fdf.left().right(fileChooserBt).applyTo(fileBox);
+		fdf.margin(0).left(0, 5).right(fileChooserBt).applyTo(fileBox);
 		fdf.reset().left().right().top().bottom(fileBox).applyTo(label);
 	}
 	
