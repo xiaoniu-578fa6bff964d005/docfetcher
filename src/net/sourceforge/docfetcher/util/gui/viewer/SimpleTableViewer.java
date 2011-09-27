@@ -62,12 +62,14 @@ public final class SimpleTableViewer<E> {
 		@Nullable protected Image getImage(E element) { return null; }
 		@Nullable protected Color getForeground(E element) { return null; }
 		@Nullable protected Color getBackground(E element) { return null; }
+		@Nullable protected ColumnEditSupport<E> getEditSupport() { return null; }
 	}
 	
 	private final Table table;
 	private final List<Column<E>> columns = new ArrayList<Column<E>>();
 	private final ListMap<E, TableItem> elementToItemMap = ListMap.create();
 	private final ItemDisposeListener itemDisposeListener = new ItemDisposeListener();
+	@Nullable private TableEditSupport<E> editSupport;
 	
 	public SimpleTableViewer(@NotNull Composite parent, int style) {
 		Util.checkThat(!Util.contains(style, SWT.VIRTUAL));
@@ -152,6 +154,17 @@ public final class SimpleTableViewer<E> {
 	@NotNull
 	public List<E> getElements() {
 		return elementToItemMap.getKeys();
+	}
+	
+	// Implementors should override Column.getEditSupport() for each editable column
+	public void enableEditSupport() {
+		if (editSupport != null)
+			return;
+		editSupport = new TableEditSupport<E>(table) {
+			protected ColumnEditSupport<E> getColumnEditSupport(int columnIndex) {
+				return columns.get(columnIndex).getEditSupport();
+			}
+		};
 	}
 	
 	private final class ItemDisposeListener implements DisposeListener {

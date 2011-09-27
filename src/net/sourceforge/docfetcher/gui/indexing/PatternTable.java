@@ -14,11 +14,16 @@ package net.sourceforge.docfetcher.gui.indexing;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.indexing.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.gui.indexing.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
+import net.sourceforge.docfetcher.util.gui.viewer.ColumnEditSupport;
+import net.sourceforge.docfetcher.util.gui.viewer.ColumnEditSupport.ComboEditSupport;
+import net.sourceforge.docfetcher.util.gui.viewer.ColumnEditSupport.TextEditSupport;
 import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer;
 import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer.Column;
 
@@ -84,7 +89,7 @@ abstract class PatternTable extends Composite {
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		int factor = ProgramConf.Int.PatternTableHeight.get() + 1; // +1 for column header
-		tableGridData.minimumHeight = table.getItemHeight() * factor;
+		tableGridData.minimumHeight = table.getItemHeight() * factor + 5;
 		table.setLayoutData(tableGridData);
 		
 		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -94,10 +99,18 @@ abstract class PatternTable extends Composite {
 	@NotNull
 	private Table createTable() {
 		tableViewer = new SimpleTableViewer<PatternAction>(this, SWT.BORDER | SWT.MULTI);
+		tableViewer.enableEditSupport();
 		
 		tableViewer.addColumn(new Column<PatternAction>("Pattern (regex)") {
 			protected String getLabel(PatternAction element) {
 				return element.getRegex();
+			}
+			protected ColumnEditSupport<PatternAction> getEditSupport() {
+				return new TextEditSupport<PatternAction>() {
+					protected void setText(PatternAction element, String text) {
+						element.setRegex(text);
+					}
+				};
 			}
 		});
 		
@@ -109,6 +122,17 @@ abstract class PatternTable extends Composite {
 				}
 				throw new IllegalStateException();
 			}
+			protected ColumnEditSupport<PatternAction> getEditSupport() {
+				return new ComboEditSupport<PatternAction, MatchTarget>(MatchTarget.class) {
+					protected void setChoice(	PatternAction element,
+												MatchTarget target) {
+						element.setTarget(target);
+					}
+					protected String toString(MatchTarget enumInstance) {
+						return enumInstance.displayName;
+					}
+				};
+			}
 		});
 		
 		tableViewer.addColumn(new Column<PatternAction>("Action") {
@@ -118,6 +142,17 @@ abstract class PatternTable extends Composite {
 				case DETECT_MIME: return "Detect mime type (slower)";
 				}
 				throw new IllegalStateException();
+			}
+			protected ColumnEditSupport<PatternAction> getEditSupport() {
+				return new ComboEditSupport<PatternAction, MatchAction>(MatchAction.class) {
+					protected void setChoice(	PatternAction element,
+												MatchAction action) {
+						element.setAction(action);
+					}
+					protected String toString(MatchAction enumInstance) {
+						return enumInstance.displayName;
+					}
+				};
 			}
 		});
 		

@@ -19,12 +19,28 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
  */
 final class PatternAction {
 	
+	// TODO i18n
+	
 	enum MatchTarget {
-		FILENAME, FILEPATH,
+		FILENAME ("Filename"),
+		FILEPATH ("Path"),
+		;
+		public final String displayName;
+
+		private MatchTarget(String displayName) {
+			this.displayName = displayName;
+		}
 	}
 	
 	enum MatchAction {
-		EXCLUDE, DETECT_MIME
+		EXCLUDE ("Exclude"),
+		DETECT_MIME ("Detect mime type (slower)"),
+		;
+		public final String displayName;
+
+		private MatchAction(String displayName) {
+			this.displayName = displayName;
+		}
 	}
 	
 	@NotNull private String regex = "regex";

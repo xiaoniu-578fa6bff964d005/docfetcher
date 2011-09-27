@@ -100,7 +100,7 @@ public final class IndexingDialog implements Dialog {
 		shell.setImage(Img.INDEXING_DIALOG.get());
 		shell.setLayout(Util.createFillLayout(5));
 		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
-
+		
 		// Create tabfolder
 		boolean curvyTabs = ProgramConf.Bool.CurvyTabs.get();
 		boolean coloredTabs = ProgramConf.Bool.ColoredTabs.get();

@@ -1397,4 +1397,12 @@ public final class Util {
 		});
 	}
 
+	/**
+	 * Returns whether the given key code represents the Enter key, which can be
+	 * either the 'normal' Enter key or the Enter key on the numpad.
+	 */
+	public static boolean isEnterKey(int keyCode){
+		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
+	}
+
 }

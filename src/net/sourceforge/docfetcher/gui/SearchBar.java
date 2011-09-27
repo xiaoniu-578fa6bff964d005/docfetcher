@@ -57,7 +57,7 @@ public final class SearchBar {
 		searchBox.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				String query = searchBox.getText().trim();
-				if (!query.isEmpty() && UtilGui.isEnterKey(e.keyCode))
+				if (!query.isEmpty() && Util.isEnterKey(e.keyCode))
 					evtSearch.fire(query);
 			}
 		});

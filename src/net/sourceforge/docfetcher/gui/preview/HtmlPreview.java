@@ -17,7 +17,6 @@ import java.net.URI;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
-import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -117,7 +116,7 @@ final class HtmlPreview extends ToolBarForm {
 		
 		locationBar.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-				if (UtilGui.isEnterKey(e.keyCode))
+				if (Util.isEnterKey(e.keyCode))
 					browser.setUrl(locationBar.getText());
 			}
 		});

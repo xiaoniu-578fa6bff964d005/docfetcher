@@ -15,7 +15,6 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.Col;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -50,14 +49,6 @@ public final class UtilGui {
 				e.gc.drawRectangle(1, 1, size.x - 3, size.y - 3);
 			}
 		});
-	}
-
-	/**
-	 * Returns whether the given key code represents the Enter key, which can be
-	 * either the 'normal' Enter key or the Enter key on the numpad.
-	 */
-	public static boolean isEnterKey(int keyCode){
-		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
 	}
 
 	/**
