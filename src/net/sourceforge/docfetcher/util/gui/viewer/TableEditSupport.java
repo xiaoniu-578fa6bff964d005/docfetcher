@@ -55,7 +55,7 @@ abstract class TableEditSupport<E> {
 		
 		table.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("unchecked")
-			public void mouseUp(MouseEvent e) {
+			public void mouseDown(MouseEvent e) {
 				Control previousEditor = tableEditor.getEditor();
 				if (previousEditor != null)
 					previousEditor.dispose();
