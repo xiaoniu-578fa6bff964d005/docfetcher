@@ -12,7 +12,6 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
 
@@ -22,6 +21,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Tran Nam Quang
@@ -30,12 +30,14 @@ final class OutlookConfigPanel extends ConfigPanel {
 	
 	public OutlookConfigPanel(	@NotNull Composite parent,
 								@NotNull final IndexingConfig config) {
-		super(parent);
-		Util.checkNotNull(config);
-		
+		super(parent, config);
+	}
+	
+	protected Control createContents(Composite parent) {
 		// TODO now: implement Outlook config panel
-		setLayout(new RowLayout());
-		Button bt = new Button(this, SWT.PUSH);
+		Composite comp = new Composite(parent, SWT.NONE);
+		comp.setLayout(new RowLayout());
+		Button bt = new Button(comp, SWT.PUSH);
 		bt.setText("Run");
 		bt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -43,7 +45,8 @@ final class OutlookConfigPanel extends ConfigPanel {
 				evtRunButtonClicked.fire(config);
 			}
 		});
-		setBackground(Col.CYAN.get());
+		comp.setBackground(Col.CYAN.get());
+		return comp;
 	}
 
 }

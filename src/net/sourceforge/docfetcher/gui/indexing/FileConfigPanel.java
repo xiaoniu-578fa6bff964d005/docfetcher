@@ -18,7 +18,6 @@ import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
-import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.GroupWrapper;
 
 import org.eclipse.swt.SWT;
@@ -26,7 +25,6 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -42,16 +40,17 @@ import org.eclipse.swt.widgets.Text;
 final class FileConfigPanel extends ConfigPanel {
 	
 	@NotNull private Button storeRelativePathsBt;
-	private final Button runBt;
 
 	public FileConfigPanel(	@NotNull Composite parent,
-	                       	@NotNull final IndexingConfig config) {
-		super(parent);
-		Util.checkNotNull(config);
-		
+	                       	@NotNull IndexingConfig config) {
+		super(parent, config);
+	}
+	
+	protected Control createContents(Composite parent) {
 		// TODO i18n
+		Composite comp = new Composite(parent, SWT.NONE);
 		
-		Composite targetComp = new Composite(this, SWT.NONE);
+		Composite targetComp = new Composite(comp, SWT.NONE);
 		targetComp.setLayout(Util.createGridLayout(1, false, 0, 0));
 		
 		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
@@ -65,7 +64,7 @@ final class FileConfigPanel extends ConfigPanel {
 		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
 		setGridData(targetSeparator, true, false);
 		
-		Group extGroup = new GroupWrapper(this, "File extensions") {
+		Group extGroup = new GroupWrapper(comp, "File extensions") {
 			protected void createLayout(Group parent) {
 				GridLayout gridLayout = Util.createGridLayout(3, false, 7, 0);
 				gridLayout.verticalSpacing = 5;
@@ -101,7 +100,7 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}.getGroup();
 		
-		Group patternGroup = new GroupWrapper(this, "Exclude files / detect mime type") {
+		Group patternGroup = new GroupWrapper(comp, "Exclude files / detect mime type") {
 			protected void createLayout(Group parent) {
 				parent.setLayout(Util.createFillLayout(5));
 			}
@@ -115,7 +114,7 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}.getGroup();
 		
-		Group miscGroup = new GroupWrapper(this, "Miscellaneous") {
+		Group miscGroup = new GroupWrapper(comp, "Miscellaneous") {
 			protected void createLayout(Group parent) {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
@@ -132,43 +131,15 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}.getGroup();
 		
-		Composite buttonComp = new Composite(this, SWT.NONE);
-		
-		Button helpBt = Util.createPushButton(buttonComp, "help", new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
-			}
-		});
-		
-		Button resetBt = Util.createPushButton(buttonComp, "restore_defaults", new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
-			}
-		});
-		
-		runBt = Util.createPushButton(buttonComp, "run", new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				evtRunButtonClicked.fire(config);
-			}
-		});
-		
-		Label blankSpaceBottom = new Label(this, SWT.NONE);
-		
 		GridLayout gridLayout = Util.createGridLayout(1, false, 0, 10);
 		gridLayout.marginTop = 5;
-		setLayout(gridLayout);
+		comp.setLayout(gridLayout);
 		setGridData(targetComp, true, false);
 		setGridData(extGroup, true, false);
 		setGridData(patternGroup, true, false);
 		setGridData(miscGroup, true, false);
-		setGridData(buttonComp, true, false);
-		setGridData(blankSpaceBottom, true, true);
 		
-		buttonComp.setLayout(new FormLayout());
-		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.top().bottom().margin(0).minWidth(75).applyTo(helpBt);
-		fdf.left(helpBt).applyTo(resetBt);
-		fdf.unleft().right().applyTo(runBt);
+		return comp;
 	}
 	
 	private static void setGridData(@NotNull Control control,
@@ -179,8 +150,4 @@ final class FileConfigPanel extends ConfigPanel {
 			grabExcessVerticalSpace));
 	}
 	
-	public boolean setFocus() {
-		return runBt.setFocus();
-	}
-
 }

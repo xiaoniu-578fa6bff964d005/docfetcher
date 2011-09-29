@@ -13,20 +13,87 @@ package net.sourceforge.docfetcher.gui.indexing;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.gui.ConfigComposite;
+import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Tran Nam Quang
  */
-abstract class ConfigPanel extends Composite {
+abstract class ConfigPanel {
 
 	public final Event<IndexingConfig> evtRunButtonClicked = new Event<IndexingConfig>();
+	
+	private final Composite comp;
+	protected final IndexingConfig config;
+	@NotNull private Button runBt;
 
-	public ConfigPanel(@NotNull Composite parent) {
-		super(parent, SWT.NONE);
+	public ConfigPanel(@NotNull Composite parent,
+	                   @NotNull IndexingConfig config) {
+		Util.checkNotNull(config);
+		this.config = config;
+		
+		// Must use composition rather than inheritance here because the subclasses
+		// need the config object while creating their widgets
+		comp = new ConfigComposite(parent, SWT.V_SCROLL) {
+			protected Control createContents(Composite parent) {
+				return ConfigPanel.this.createContents(parent);
+			};
+			protected Control createButtonArea(Composite parent) {
+				return ConfigPanel.this.createButtonArea(parent);
+			}
+			public final boolean setFocus() {
+				return runBt.setFocus();
+			}
+		};
+	}
+	
+	@NotNull
+	public final Control getControl() {
+		return comp;
+	}
+	
+	@NotNull
+	protected abstract Control createContents(@NotNull Composite parent);
+	
+	protected final Control createButtonArea(Composite parent) {
+		// TODO i18n
+		Composite comp = new Composite(parent, SWT.NONE);
+		
+		Button helpBt = Util.createPushButton(comp, "help", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// TODO now: implement
+			}
+		});
+		
+		Button resetBt = Util.createPushButton(comp, "restore_defaults", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// TODO now: implement
+			}
+		});
+		
+		runBt = Util.createPushButton(comp, "run", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				evtRunButtonClicked.fire(config);
+			}
+		});
+		
+		comp.setLayout(new FormLayout());
+		FormDataFactory fdf = FormDataFactory.getInstance();
+		fdf.margin(0).top().bottom().minWidth(75).applyTo(helpBt);
+		fdf.left(helpBt).applyTo(resetBt);
+		fdf.unleft().right().applyTo(runBt);
+		
+		return comp;
 	}
 
 }
