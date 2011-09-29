@@ -92,8 +92,8 @@ abstract class PatternTable extends Composite {
 		tableGridData.minimumHeight = table.getItemHeight() * factor + 5;
 		table.setLayoutData(tableGridData);
 		
-		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-		regexTestPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 2));
+		regexTestPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 	}
 	
 	@NotNull
@@ -190,6 +190,20 @@ abstract class PatternTable extends Composite {
 				for (PatternAction patternAction : tableViewer.getSelection())
 					tableViewer.remove(patternAction);
 				regexTestPanel.setPatternActions(tableViewer.getSelection());
+			}
+		});
+		
+		Util.createPushButton(
+			comp, Img.ARROW_UP.get(), "Move Up", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// TODO now: implement
+			}
+		});
+		
+		Util.createPushButton(
+			comp, Img.ARROW_DOWN.get(), "Move Down", new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// TODO now: implement
 			}
 		});
 		
