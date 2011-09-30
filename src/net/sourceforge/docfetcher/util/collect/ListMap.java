@@ -29,8 +29,8 @@ import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 	
 	public static final class Entry<K, V> {
-		private final K key;
-		private final V value;
+		private K key;
+		private V value;
 		
 		private Entry(K key, V value) {
 			this.key = key;
@@ -144,6 +144,32 @@ public final class ListMap<K, V> implements Iterable<Entry<K, V>> {
 			}
 		}
 		return removed;
+	}
+	
+	public void replaceKey(@NotNull K newKey, @NotNull V value) {
+		Util.checkNotNull(newKey, value);
+		boolean foundValue = false;
+		for (Entry<K, V> entry : list) {
+			if (entry.value.equals(value)) {
+				entry.key = newKey;
+				foundValue = true;
+			}
+		}
+		if (!foundValue)
+			list.add(new Entry<K, V>(newKey, value));
+	}
+	
+	public void replaceValue(@NotNull K key, @NotNull V newValue) {
+		Util.checkNotNull(key, newValue);
+		boolean foundKey = false;
+		for (Entry<K, V> entry : list) {
+			if (entry.key.equals(key)) {
+				entry.value = newValue;
+				foundKey = true;
+			}
+		}
+		if (!foundKey)
+			list.add(new Entry<K, V>(key, newValue));
 	}
 	
 	@NotNull

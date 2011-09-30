@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.util.gui.viewer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public final class SimpleTableViewer<E> {
 	
 	private final Table table;
 	private final List<Column<E>> columns = new ArrayList<Column<E>>();
-	private final ListMap<E, TableItem> elementToItemMap = ListMap.create();
+	private final ListMap<E, TableItem> elementToItemMap = ListMap.create(); // elements are in same order as table items
 	private final ItemDisposeListener itemDisposeListener = new ItemDisposeListener();
 	@Nullable private TableEditSupport<E> editSupport;
 	
@@ -107,14 +108,7 @@ public final class SimpleTableViewer<E> {
 		if (elementToItemMap.containsKey(element))
 			return;
 		TableItem item = new TableItem(table, SWT.NONE);
-		for (int iCol = 0; iCol < columns.size(); iCol++) {
-			Column<E> column = columns.get(iCol);
-			item.setText(iCol, column.getLabel(element));
-			item.setImage(iCol, column.getImage(element));
-			item.setForeground(iCol, column.getForeground(element));
-			item.setBackground(iCol, column.getBackground(element));
-		}
-		item.setData(element);
+		updateItem(element, item);
 		item.addDisposeListener(itemDisposeListener);
 		elementToItemMap.add(element, item);
 	}
@@ -124,6 +118,60 @@ public final class SimpleTableViewer<E> {
 		
 		// This will automatically remove the element from the map
 		elementToItemMap.getValue(element).dispose();
+	}
+	
+	private void updateItem(@NotNull E element, @NotNull TableItem item) {
+		for (int iCol = 0; iCol < columns.size(); iCol++) {
+			Column<E> column = columns.get(iCol);
+			item.setText(iCol, column.getLabel(element));
+			item.setImage(iCol, column.getImage(element));
+			item.setForeground(iCol, column.getForeground(element));
+			item.setBackground(iCol, column.getBackground(element));
+		}
+		item.setData(element);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void move(@NotNull E element, boolean upNotDown) {
+		Util.checkNotNull(element);
+		
+		TableItem item = elementToItemMap.getValue(element);
+		int index = table.indexOf(item);
+		assert index >= 0;
+		
+		if (index == 0 && upNotDown)
+			return;
+		if (index == table.getItemCount() - 1 && !upNotDown)
+			return;
+		
+		if (editSupport != null)
+			editSupport.cancelEditing();
+		
+		int adjacentIndex = index + (upNotDown ? -1 : 1);
+		TableItem adjacentItem = table.getItem(adjacentIndex);
+		E adjacentElement = (E) adjacentItem.getData();
+		
+		// Must preserve correct order of keys in element-to-item map
+		updateItem(element, adjacentItem);
+		updateItem(adjacentElement, item);
+		elementToItemMap.replaceKey(element, adjacentItem);
+		elementToItemMap.replaceKey(adjacentElement, item);
+		
+		List<TableItem> selection = Arrays.asList(table.getSelection());
+		if (!selection.isEmpty()) {
+			boolean itemSelected = selection.contains(item);
+			boolean adjacentItemSelected = selection.contains(adjacentItem);
+			
+			if (itemSelected)
+				table.select(adjacentIndex);
+			else
+				table.deselect(adjacentIndex);
+			
+			if (adjacentItemSelected)
+				table.select(index);
+			else
+				table.deselect(index);
+		}
 	}
 	
 	public int getItemCount() {

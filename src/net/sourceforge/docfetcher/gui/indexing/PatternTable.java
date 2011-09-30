@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.util.List;
+
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
@@ -98,7 +100,11 @@ abstract class PatternTable extends Composite {
 	
 	@NotNull
 	private Table createTable() {
-		tableViewer = new SimpleTableViewer<PatternAction>(this, SWT.BORDER | SWT.MULTI);
+		/*
+		 * Note: The table has SWT.SINGLE style because moving more than one
+		 * element up or down at once is currently not supported.
+		 */
+		tableViewer = new SimpleTableViewer<PatternAction>(this, SWT.BORDER | SWT.SINGLE);
 		tableViewer.enableEditSupport();
 		
 		tableViewer.addColumn(new Column<PatternAction>("Pattern (regex)") {
@@ -196,14 +202,18 @@ abstract class PatternTable extends Composite {
 		Util.createPushButton(
 			comp, Img.ARROW_UP.get(), "Move Up", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				List<PatternAction> sel = tableViewer.getSelection();
+				if (sel.size() == 1)
+					tableViewer.move(sel.get(0), true);
 			}
 		});
 		
 		Util.createPushButton(
 			comp, Img.ARROW_DOWN.get(), "Move Down", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				List<PatternAction> sel = tableViewer.getSelection();
+				if (sel.size() == 1)
+					tableViewer.move(sel.get(0), false);
 			}
 		});
 		

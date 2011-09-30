@@ -58,9 +58,7 @@ abstract class TableEditSupport<E> {
 		table.addMouseListener(new MouseAdapter() {
 			@SuppressWarnings("unchecked")
 			public void mouseDown(MouseEvent e) {
-				Control previousEditor = tableEditor.getEditor();
-				if (previousEditor != null)
-					previousEditor.dispose();
+				cancelEditing();
 				
 				final TableItem item = table.getItem(new Point(e.x, e.y));
 				if (item == null)
@@ -184,9 +182,6 @@ abstract class TableEditSupport<E> {
 		});
 		
 		combo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				saver.run();
-			}
 			public void widgetDefaultSelected(SelectionEvent e) {
 				saver.run();
 			}
@@ -199,6 +194,12 @@ abstract class TableEditSupport<E> {
 		});
 		
 		return combo;
+	}
+	
+	public final void cancelEditing() {
+		Control editor = tableEditor.getEditor();
+		if (editor != null)
+			editor.dispose();
 	}
 	
 	@Nullable
