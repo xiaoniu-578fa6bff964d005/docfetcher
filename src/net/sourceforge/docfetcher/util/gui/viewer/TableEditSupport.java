@@ -31,6 +31,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -122,6 +124,15 @@ abstract class TableEditSupport<E> {
 				comp.dispose();
 			}
 		};
+		
+		editor.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE) {
+					e.doit = false;
+					comp.dispose(); // Cancel editing
+				}
+			}
+		});
 		
 		editor.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
