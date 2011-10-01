@@ -66,6 +66,7 @@ public final class ParseService {
 	 * single instance of it.
 	 */
 	private static final MagicMimeMimeDetector mimeDetector = new MagicMimeMimeDetector();
+	private static final String FILENAME_PARSER = "FilenameParser";
 	
 	private static final TextParser textParser;
 	private static final HtmlParser htmlParser;
@@ -100,9 +101,10 @@ public final class ParseService {
 			try {
 				List<String> mimeTypes = getPossibleMimeTypes(file);
 				for (Parser parser : parsers) {
+					if (Collections.disjoint(mimeTypes, parser.getTypes()))
+						continue;
 					try {
-						if (! Collections.disjoint(mimeTypes, parser.getTypes()))
-							return doParse(config, parser, file, reporter, cancelable);
+						return doParse(config, parser, file, reporter, cancelable);
 					} catch (ParseException e) {
 						// Try next parser
 					}
@@ -113,9 +115,11 @@ public final class ParseService {
 			}
 		}
 		Parser parser = findParser(config, file.getName());
-		if (parser == null)
-			throw new ParseException(new ParserNotFoundException());
-		return doParse(config, parser, file, reporter, cancelable);
+		if (parser != null)
+			return doParse(config, parser, file, reporter, cancelable);
+		if (config.isIndexFilenames())
+			return new ParseResult(filename).setParserName(FILENAME_PARSER);
+		throw new ParseException(new ParserNotFoundException());
 	}
 
 	// accepts TrueZIP files
@@ -184,7 +188,6 @@ public final class ParseService {
 	}
 	
 	// does not accept TrueZIP files
-	// can only handle files, not emails or other types
 	// may throw OutOfMemoryErrors
 	@NotNull
 	public static String renderText(@NotNull IndexingConfig config,
@@ -192,6 +195,10 @@ public final class ParseService {
 									@NotNull String parserName)
 			throws ParseException {
 		Util.checkThat(! (file instanceof TFile));
+		if (parserName.equals(FILENAME_PARSER)) {
+			assert config.isIndexFilenames();
+			return "";
+		}
 		NullCancelable cancelable = NullCancelable.getInstance();
 		for (Parser parser : parsers) {
 			if (!parser.getClass().getSimpleName().equals(parserName))
@@ -237,10 +244,10 @@ public final class ParseService {
 	
 	public static boolean canParseByName(	@NotNull IndexingConfig config,
 											@NotNull String filename) {
-		return findParser(config, filename) != null;
+		return config.isIndexFilenames() || findParser(config, filename) != null;
 	}
 	
-	// accepts TrueZIP files, returns false on IOExceptions
+	// accepts TrueZIP files
 	@MutableCopy
 	@NotNull
 	private static List<String> getPossibleMimeTypes(@NotNull File file)

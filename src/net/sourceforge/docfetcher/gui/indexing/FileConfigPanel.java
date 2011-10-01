@@ -121,11 +121,13 @@ final class FileConfigPanel extends ConfigPanel {
 			protected void createContents(Group parent) {
 				Button htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
 				Button detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
+				Button indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
 				storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
-				Button watchFolderBt = Util.createCheckButton(parent, "Watch folder for file changes");
+				Button watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
 				
 				htmlPairingBt.setSelection(config.isHtmlPairing());
 				detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
+				indexFilenameBt.setSelection(config.isIndexFilenames());
 				storeRelativePathsBt.setSelection(config.isStoreRelativePaths());
 				watchFolderBt.setSelection(config.isWatchFolders());
 			}

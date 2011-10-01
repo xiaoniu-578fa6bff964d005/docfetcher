@@ -73,6 +73,7 @@ public class IndexingConfig implements Serializable {
 	@NotNull private List<String> zipExtensions = defaultZipExtensions;
 	@NotNull private List<String> textExtensions = defaultTextExtensions;
 	private boolean detectExecutableArchives = false;
+	private boolean indexFilenames = true;
 	
 	@VisibleForTesting
 	public IndexingConfig() {
@@ -97,12 +98,20 @@ public class IndexingConfig implements Serializable {
 		this.isPortable = isPortable;
 	}
 	
-	public boolean isDetectExecutableArchives() {
+	public final boolean isDetectExecutableArchives() {
 		return detectExecutableArchives;
 	}
 
-	public void setDetectExecutableArchives(boolean detectExecutableArchives) {
+	public final void setDetectExecutableArchives(boolean detectExecutableArchives) {
 		this.detectExecutableArchives = detectExecutableArchives;
+	}
+	
+	public final boolean isIndexFilenames() {
+		return indexFilenames;
+	}
+
+	public final void setIndexFilenames(boolean indexFilenames) {
+		this.indexFilenames = indexFilenames;
 	}
 
 	@NotNull
