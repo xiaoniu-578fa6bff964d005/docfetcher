@@ -825,12 +825,20 @@ public final class Util {
 	@NotNull
 	public static String getNameOrLetter(	@NotNull File file,
 											@NotNull String letterSuffix) {
+		Util.checkNotNull(file, letterSuffix);
+		String filename = file.getName();
+		
+		/*
+		 * Special case: If the file was created as 'new File("")', then its
+		 * filename will be an empty string.
+		 */
+		if (file.getAbsoluteFile().equals(USER_DIR))
+			return USER_DIR.getName();
+		
 		/*
 		 * Note: Do not use absolute files here, because this would turn "C:"
 		 * into the working directory! (Strange but true.)
 		 */
-		Util.checkNotNull(file, letterSuffix);
-		String filename = file.getName();
 		if (IS_WINDOWS && filename.length() == 0 && getParentFile(file) == null) {
 			String driveLetter = getDriveLetter(file.getPath());
 			if (driveLetter != null)
