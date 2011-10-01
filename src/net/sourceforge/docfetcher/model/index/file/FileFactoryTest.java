@@ -105,6 +105,7 @@ public final class FileFactoryTest {
 		HotColdFileCache unpackCache = new HotColdFileCache(20);
 		FileFactory fileFactory = new FileFactory(unpackCache);
 		IndexingConfig config = new IndexingConfig();
+		config.setDetectExecutableArchives(true);
 		String[] paths = {
 				TestFiles.sfx_zip.getPath() + "/test.txt",
 				TestFiles.sfx_7z.getPath() + "/test.txt"

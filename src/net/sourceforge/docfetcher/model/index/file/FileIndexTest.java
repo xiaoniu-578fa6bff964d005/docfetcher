@@ -56,6 +56,7 @@ public final class FileIndexTest {
 		
 		for (File file : files) {
 			FileIndex index = new FileIndex(null, file);
+			index.getConfig().setDetectExecutableArchives(true);
 			index.update(new IndexingReporter(), NullCancelable.getInstance());
 			Directory luceneDir = index.getLuceneDir();
 
