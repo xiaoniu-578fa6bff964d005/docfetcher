@@ -11,10 +11,15 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.file.FileFilter;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
@@ -39,7 +44,15 @@ import org.eclipse.swt.widgets.Text;
  */
 final class FileConfigPanel extends ConfigPanel {
 	
+	@NotNull private Text textExtField;
+	@NotNull private Text zipExtField;
+	@NotNull private PatternTable patternTable;
+	
+	@NotNull private Button htmlPairingBt;
+	@NotNull private Button detectExecArchivesBt;
+	@NotNull private Button indexFilenameBt;
 	@NotNull private Button storeRelativePathsBt;
+	@NotNull private Button watchFolderBt;
 
 	public FileConfigPanel(	@NotNull Composite parent,
 	                       	@NotNull IndexingConfig config) {
@@ -55,14 +68,14 @@ final class FileConfigPanel extends ConfigPanel {
 		
 		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
 		StyledText targetField = new StyledText(targetComp, targetStyle);
-		setGridData(targetField, true, true);
+		setGridData(targetField, true);
 		targetField.setText(Util.getSystemAbsPath(config.getRootFile()));
 		targetField.setForeground(Col.DARK_GRAY.get());
 		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
 		UtilGui.clearSelectionOnFocusLost(targetField);
 		
 		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
-		setGridData(targetSeparator, true, false);
+		setGridData(targetSeparator, false);
 		
 		Group extGroup = new GroupWrapper(comp, "File extensions") {
 			protected void createLayout(Group parent) {
@@ -71,14 +84,14 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(gridLayout);
 			}
 			protected void createContents(Group parent) {
-				createExtField(
+				textExtField = createExtField(
 					parent, "Plain text:", config.getTextExtensions(),
 					new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent e) {
 							// TODO now: implement
 						}
 					});
-				createExtField(
+				zipExtField = createExtField(
 					parent, "Zip archives:", config.getZipExtensions(),
 					new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent e) {
@@ -105,12 +118,11 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createFillLayout(5));
 			}
 			protected void createContents(Group parent) {
-				new PatternTable(parent, config) {
+				patternTable = new PatternTable(parent, config) {
 					protected boolean storeRelativePaths() {
 						return storeRelativePathsBt.getSelection();
 					}
 				};
-				// TODO now: initialize pattern table from config object
 			}
 		}.getGroup();
 		
@@ -119,11 +131,11 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
 			protected void createContents(Group parent) {
-				Button htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
-				Button detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
-				Button indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
+				htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
+				detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
+				indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
 				storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
-				Button watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
+				watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
 				
 				htmlPairingBt.setSelection(config.isHtmlPairing());
 				detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
@@ -136,20 +148,67 @@ final class FileConfigPanel extends ConfigPanel {
 		GridLayout gridLayout = Util.createGridLayout(1, false, 0, 10);
 		gridLayout.marginTop = 5;
 		comp.setLayout(gridLayout);
-		setGridData(targetComp, true, false);
-		setGridData(extGroup, true, false);
-		setGridData(patternGroup, true, false);
-		setGridData(miscGroup, true, false);
+		setGridData(targetComp, false);
+		setGridData(extGroup, false);
+		setGridData(patternGroup, false);
+		setGridData(miscGroup, false);
 		
 		return comp;
 	}
 	
 	private static void setGridData(@NotNull Control control,
-									boolean grabExcessHorizontalSpace,
 									boolean grabExcessVerticalSpace) {
 		control.setLayoutData(new GridData(
-			SWT.FILL, SWT.FILL, grabExcessHorizontalSpace,
-			grabExcessVerticalSpace));
+			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
+	}
+	
+	@SuppressWarnings("serial")
+	protected void writeToConfig() {
+		// TODO now: Check if target directory still exists
+//		if (! scope.getFile().exists()) {
+//			UtilGUI.showErrorMsg(Msg.target_folder_deleted.value());
+//			return false;
+//		}
+		
+		/*
+		 * Validate all entered regexes and split them into filter and mime
+		 * detection patterns.
+		 */
+		List<PatternAction> patternActions = patternTable.getPatternActions();
+		for (PatternAction patternAction : patternActions) {
+			try {
+				Pattern.compile(patternAction.getRegex());
+			}
+			catch (PatternSyntaxException e) {
+				// TODO now: show warning 'not_a_regex' and return
+				return;
+			}
+		}
+		
+		config.setFileFilter(new FileFilter() {
+			public boolean matches(	String filename,
+									String filepath,
+									boolean isFile) {
+				// TODO now: implement
+				return super.matches(filename, filepath, isFile);
+			}
+		});
+		
+		// TODO now: multiple mime patterns
+		
+		config.setTextExtensions(getExtensions(textExtField));
+		config.setZipExtensions(getExtensions(zipExtField));
+		
+		config.setHtmlPairing(htmlPairingBt.getSelection());
+		config.setDetectExecutableArchives(detectExecArchivesBt.getSelection());
+		config.setIndexFilenames(indexFilenameBt.getSelection());
+		config.setStoreRelativePaths(storeRelativePathsBt.getSelection());
+		config.setWatchFolders(watchFolderBt.getSelection());
+	}
+	
+	@NotNull
+	private static Collection<String> getExtensions(@NotNull Text text) {
+		return Arrays.asList(text.getText().trim().split("[^\\\\p{Alnum}]+"));
 	}
 	
 }

@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Control;
  */
 abstract class ConfigPanel {
 
-	public final Event<IndexingConfig> evtRunButtonClicked = new Event<IndexingConfig>();
+	public final Event<Void> evtRunButtonClicked = new Event<Void>();
 	
 	private final Composite comp;
 	protected final IndexingConfig config;
@@ -65,6 +65,8 @@ abstract class ConfigPanel {
 	@NotNull
 	protected abstract Control createContents(@NotNull Composite parent);
 	
+	protected abstract void writeToConfig();
+	
 	protected final Control createButtonArea(Composite parent) {
 		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -83,7 +85,8 @@ abstract class ConfigPanel {
 		
 		runBt = Util.createPushButton(comp, "run", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				evtRunButtonClicked.fire(config);
+				writeToConfig();
+				evtRunButtonClicked.fire(null);
 			}
 		});
 		

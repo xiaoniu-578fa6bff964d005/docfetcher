@@ -1031,6 +1031,11 @@ public final class Util {
 		return newList;
 	}
 	
+	@NotNull
+	public static <T> List<T> createEmptyList(@NotNull Collection<T> col) {
+		return new ArrayList<T>(col.size());
+	}
+	
 	/**
 	 * Runs the given {@code Runnable} in a way that avoids throwing errors of
 	 * the type {@link SWT#ERROR_THREAD_INVALID_ACCESS}. This is useful for

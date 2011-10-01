@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.gui.indexing.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.viewer.ColumnEditSupport;
@@ -221,5 +222,11 @@ abstract class PatternTable extends Composite {
 	}
 	
 	protected abstract boolean storeRelativePaths();
+	
+	@MutableCopy
+	@NotNull
+	public final List<PatternAction> getPatternActions() {
+		return tableViewer.getElements();
+	}
 	
 }

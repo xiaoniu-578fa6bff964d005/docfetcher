@@ -362,7 +362,7 @@ public final class IndexingDialog implements Dialog {
 			}
 		});
 
-		IndexingConfig config = index.getConfig();
+		final IndexingConfig config = index.getConfig();
 		
 		if (task.is(IndexAction.UPDATE) || !task.is(TaskState.NOT_READY)) {
 			switchToProgressPanel(task, tabItem, config);
@@ -383,8 +383,8 @@ public final class IndexingDialog implements Dialog {
 			 */
 			configPanel.getControl().setFocus();
 
-			configPanel.evtRunButtonClicked.add(new Event.Listener<IndexingConfig>() {
-				public void update(final IndexingConfig config) {
+			configPanel.evtRunButtonClicked.add(new Event.Listener<Void>() {
+				public void update(Void eventData) {
 					tabItem.setImage(Img.TREE.get());
 					configPanel.getControl().dispose();
 					switchToProgressPanel(task, tabItem, config);
