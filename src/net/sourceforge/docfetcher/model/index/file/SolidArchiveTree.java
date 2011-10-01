@@ -107,10 +107,11 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	}
 	
 	/**
-	 * A subclass of HashMap that deprecates the {@link Map#get(Object)} method
-	 * in favor of the more restrictive {@link SafeKeyMap#getValue(K)}. This
-	 * class is useful in situations where it is very easy to use the wrong map
-	 * key, e.g. a File object instead of the file path.
+	 * A subclass of HashMap that deprecates the {@link Map#get(Object)} and
+	 * {@link Map#remove(Object)} methods in favor of the more restrictive
+	 * {@link SafeKeyMap#getValue(K)} and {@link SafeKeyMap#removeKey(K)}
+	 * methods. This class is useful in situations where it is very easy to use
+	 * the wrong map key, e.g. a File object instead of the file path.
 	 */
 	@SuppressWarnings("serial")
 	private static final class SafeKeyMap<K, V> extends HashMap<K, V> {
@@ -121,8 +122,15 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		public V get(Object key) {
 			throw new UnsupportedOperationException();
 		}
+		@Deprecated
+		public V remove(Object key) {
+			throw new UnsupportedOperationException();
+		}
 		public V getValue(K key) {
 			return super.get(key);
+		}
+		public V removeKey(K key) {
+			return super.remove(key);
 		}
 	}
 	
@@ -237,7 +245,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				String name = candidate.getName();
 				String path = candidate.getPath();
 				if (config.getFileFilter().matches(name, path, true)) {
-					entryDataMap.remove(candidate.getPath());
+					entryDataMap.removeKey(candidate.getPath());
 					return true;
 				}
 				/*
@@ -248,7 +256,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					return false;
 				if (ParseService.canParseByName(config, name))
 					return false;
-				entryDataMap.remove(candidate.getPath());
+				entryDataMap.removeKey(candidate.getPath());
 				
 				return true;
 			}
@@ -259,7 +267,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 						candidate.getName(), candidate.getPath(), isArchive
 				);
 				if (matches && isArchive)
-					entryDataMap.remove(candidate.getPath());
+					entryDataMap.removeKey(candidate.getPath());
 				return matches;
 			}
 		});
