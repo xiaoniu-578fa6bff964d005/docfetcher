@@ -777,6 +777,11 @@ public final class Util {
 	public static String getExtension(@NotNull String filename) {
 		return splitFilename(filename)[1];
 	}
+	
+	@NotNull
+	public static String getExtension(@NotNull File file) {
+		return splitFilename(file.getName())[1];
+	}
 
 	/**
 	 * For the given filename and a list of file extensions, this method returns

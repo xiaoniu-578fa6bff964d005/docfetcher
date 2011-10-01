@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -72,6 +73,27 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 	// can be retrieved via getLuceneDir
 	public FileIndex(@Nullable File indexParentDir, @NotNull File rootFile) {
 		super(indexParentDir, rootFile);
+		
+		/*
+		 * If the given file object is a file, adjust the indexing configuration
+		 * as needed.
+		 */
+		if (rootFile.isFile()) {
+			IndexingConfig config = getConfig();
+			String extension = Util.getExtension(rootFile);
+			if (extension.equals("exe")) {
+				config.setDetectExecutableArchives(true);
+			}
+			else if (!config.isSolidArchive(rootFile.getName())
+					&& !IndexingConfig.hiddenZipExtensions.contains(extension)) {
+				List<String> zipExtensions = config.getZipExtensions();
+				if (!zipExtensions.contains(extension)) {
+					List<String> newZipExtensions = Util.createList(
+						zipExtensions, extension);
+					config.setZipExtensions(newZipExtensions);
+				}
+			}
+		}
 	}
 	
 	@NotNull

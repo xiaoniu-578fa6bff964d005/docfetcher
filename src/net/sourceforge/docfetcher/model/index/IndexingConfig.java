@@ -29,11 +29,14 @@ import net.sourceforge.docfetcher.model.index.file.FileFilter;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveFactory;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.FsDriver;
@@ -49,10 +52,10 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 @SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
 	
-	public static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar");
-	public static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	public static final List<String> defaultZipExtensions = Arrays.asList("zip", "jar");
+	public static final List<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
 	
-	private static final List<String> hiddenZipExtensions = Arrays.asList(
+	public static final List<String> hiddenZipExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
 	
 	private static final FileFilter defaultFileFilter = new FileFilter();
@@ -67,8 +70,8 @@ public class IndexingConfig implements Serializable {
 	@NotNull private FileFilter fileFilter = defaultFileFilter;
 	private boolean htmlPairing = true;
 	private boolean watchFolders = true;
-	@NotNull private Collection<String> zipExtensions = defaultZipExtensions;
-	@NotNull private Collection<String> textExtensions = defaultTextExtensions;
+	@NotNull private List<String> zipExtensions = defaultZipExtensions;
+	@NotNull private List<String> textExtensions = defaultTextExtensions;
 	private boolean detectExecutableArchives = false;
 	
 	@VisibleForTesting
@@ -263,25 +266,34 @@ public class IndexingConfig implements Serializable {
 		this.htmlPairing = htmlPairing;
 	}
 	
+	@Immutable
 	@NotNull
-	public final Collection<String> getTextExtensions() {
+	public final List<String> getTextExtensions() {
 		return textExtensions;
 	}
 	
-	public final void setTextExtensions(@Nullable Collection<String> textExtensions) {
-		this.textExtensions = textExtensions == null ? defaultTextExtensions : textExtensions;
+	public final void setTextExtensions(@NotNull Collection<String> textExtensions) {
+		this.textExtensions = immutableUniqueLowerCase(textExtensions);
 	}
 	
 	// Returned collection does not contain 'exe'
+	@Immutable
 	@NotNull
-	public final Collection<String> getZipExtensions() {
+	public final List<String> getZipExtensions() {
 		return zipExtensions;
 	}
-	
-	// Given extensions should not contain 'exe'
+
 	public final void setZipExtensions(@NotNull Collection<String> zipExtensions) {
-		Util.checkThat(!zipExtensions.contains("exe"));
-		this.zipExtensions = zipExtensions;
+		this.zipExtensions = immutableUniqueLowerCase(zipExtensions);
+	}
+	
+	@NotNull
+	private List<String> immutableUniqueLowerCase(@NotNull Collection<String> strings) {
+		Util.checkNotNull(strings);
+		Set<String> set = Sets.newLinkedHashSet();
+		for (String string : strings)
+			set.add(string.toLowerCase());
+		return ImmutableList.copyOf(set);
 	}
 
 	// Returned detector takes 'detect executable archives' setting into account
