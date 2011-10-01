@@ -135,7 +135,7 @@ public abstract class TreeIndex <
 	}
 	
 	private void clear(boolean removeTopLevel) {
-		if (fileIndexDir != null) {
+		if (fileIndexDir != null && fileIndexDir.exists()) {
 			try {
 				if (removeTopLevel)
 					Files.deleteRecursively(fileIndexDir);

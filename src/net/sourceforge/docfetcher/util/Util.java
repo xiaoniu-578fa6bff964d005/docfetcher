@@ -763,11 +763,12 @@ public final class Util {
 		String ext = filename.substring(index + 1).toLowerCase();
 		if (ext.equals("gz")) {
 			int index2 = filename.lastIndexOf('.', index - 1);
-			if (index2 != -1)
+			if (index2 != -1) {
 				return new String[] {
 					filename.substring(0, index2),
 					filename.substring(index2 + 1).toLowerCase()
-			};
+				};
+			}
 		}
 		return new String[] {filename.substring(0, index), ext};
 	}

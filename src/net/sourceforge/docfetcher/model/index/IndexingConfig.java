@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
@@ -39,8 +42,11 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 @SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
 	
-	public static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar"); // TODO now: add more zip extensions
+	public static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar");
 	public static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	
+	private static final List<String> hiddenZipExtensions = Arrays.asList(
+		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
 	
 	private static final FileFilter defaultFileFilter = new FileFilter();
 	private static final Pattern defaultMimePattern = Pattern.compile("");
@@ -274,10 +280,12 @@ public class IndexingConfig implements Serializable {
 	// Returned detector takes 'detect executable archives' setting into account
 	@NotNull
 	public final TArchiveDetector createZipDetector() {
-		String zipPattern = Util.join("|", zipExtensions);
+		Set<String> extensions = new LinkedHashSet<String>();
+		extensions.addAll(zipExtensions);
+		extensions.addAll(hiddenZipExtensions);
 		if (detectExecutableArchives)
-			zipPattern += "|exe";
-		return new TArchiveDetector(zipPattern);
+			extensions.add("exe");
+		return new TArchiveDetector(Util.join("|", extensions));
 	}
 
 	// Accepts filenames and filepaths
@@ -287,6 +295,8 @@ public class IndexingConfig implements Serializable {
 		if (detectExecutableArchives && ext.equals("exe"))
 			return true;
 		if (ext.equals("7z") || ext.equals("rar"))
+			return true;
+		if (hiddenZipExtensions.contains(ext))
 			return true;
 		return zipExtensions.contains(ext);
 	}
