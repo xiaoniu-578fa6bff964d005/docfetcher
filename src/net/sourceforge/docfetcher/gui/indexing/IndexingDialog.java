@@ -201,11 +201,8 @@ public final class IndexingDialog implements Dialog {
 		tif.image(Img.HIDE.get()).toolTip("Minimize To Status Bar")
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						// TODO now: save all indexing config modifications
-						indexRegistry.getQueue().removeListeners(
-							addedListener, removedListener);
 						Rectangle bounds = shell.getBounds();
-						shell.dispose();
+						shell.setVisible(false);
 						evtDialogMinimized.fire(bounds);
 					}
 				}).create();
