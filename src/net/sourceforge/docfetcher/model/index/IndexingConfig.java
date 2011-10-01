@@ -39,8 +39,9 @@ import de.schlichtherle.truezip.file.TArchiveDetector;
 @SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
 	
-	private static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar", "exe"); // TODO now: add more zip extensions
-	private static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	public static final Collection<String> defaultZipExtensions = Arrays.asList("zip", "jar"); // TODO now: add more zip extensions
+	public static final Collection<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	
 	private static final FileFilter defaultFileFilter = new FileFilter();
 	private static final Pattern defaultMimePattern = Pattern.compile("");
 	
@@ -53,8 +54,9 @@ public class IndexingConfig implements Serializable {
 	@NotNull private FileFilter fileFilter = defaultFileFilter;
 	private boolean htmlPairing = true;
 	private boolean watchFolders = true;
-	@NotNull private Collection<String> textExtensions = defaultTextExtensions;
 	@NotNull private Collection<String> zipExtensions = defaultZipExtensions;
+	@NotNull private Collection<String> textExtensions = defaultTextExtensions;
+	private boolean detectExecutableArchives = false;
 	
 	@VisibleForTesting
 	public IndexingConfig() {
@@ -77,6 +79,14 @@ public class IndexingConfig implements Serializable {
 
 	public final void setPortable(boolean isPortable) {
 		this.isPortable = isPortable;
+	}
+	
+	public boolean isDetectExecutableArchives() {
+		return detectExecutableArchives;
+	}
+
+	public void setDetectExecutableArchives(boolean detectExecutableArchives) {
+		this.detectExecutableArchives = detectExecutableArchives;
 	}
 
 	@NotNull
@@ -173,8 +183,12 @@ public class IndexingConfig implements Serializable {
 	}
 	
 	// throws exception if regex is malformed
-	public final void setMimePattern(@Nullable String regex) {
-		mimePattern = regex == null ? defaultMimePattern : Pattern.compile(regex);
+	public final void setMimePattern(@NotNull String regex) {
+		regex = regex.trim();
+		if (regex.isEmpty())
+			mimePattern = defaultMimePattern;
+		else
+			mimePattern = Pattern.compile(regex);
 	}
 	
 	public final boolean matchesMimePattern(@NotNull String filename) {
@@ -245,29 +259,40 @@ public class IndexingConfig implements Serializable {
 		this.textExtensions = textExtensions == null ? defaultTextExtensions : textExtensions;
 	}
 	
+	// Returned collection does not contain 'exe'
 	@NotNull
 	public final Collection<String> getZipExtensions() {
 		return zipExtensions;
 	}
 	
-	public final void setZipExtensions(@Nullable Collection<String> zipExtensions) {
-		this.zipExtensions = zipExtensions == null ? defaultZipExtensions : zipExtensions;
+	// Given extensions should not contain 'exe'
+	public final void setZipExtensions(@NotNull Collection<String> zipExtensions) {
+		Util.checkThat(!zipExtensions.contains("exe"));
+		this.zipExtensions = zipExtensions;
 	}
 
+	// Returned detector takes 'detect executable archives' setting into account
 	@NotNull
 	public final TArchiveDetector createZipDetector() {
-		return new TArchiveDetector(Util.join("|", zipExtensions));
+		String zipPattern = Util.join("|", zipExtensions);
+		if (detectExecutableArchives)
+			zipPattern += "|exe";
+		return new TArchiveDetector(zipPattern);
 	}
 
 	// Accepts filenames and filepaths
+	// Takes 'detect executable archives' setting into account
 	public final boolean isArchive(@NotNull String filename) {
 		String ext = Util.getExtension(filename);
-		if (ext.equals("7z") || ext.equals("rar") || ext.equals("exe"))
+		if (detectExecutableArchives && ext.equals("exe"))
+			return true;
+		if (ext.equals("7z") || ext.equals("rar"))
 			return true;
 		return zipExtensions.contains(ext);
 	}
 	
 	// Accepts filenames and filepaths
+	// Takes 'detect executable archives' setting into account
 	@Nullable
 	public final SolidArchiveFactory getSolidArchiveFactory(@NotNull String filename) {
 		/*
@@ -275,7 +300,9 @@ public class IndexingConfig implements Serializable {
 		 * J7Zip do support SFX Zip and SFX 7z archives, respectively.
 		 */
 		String ext = Util.getExtension(filename);
-		if (ext.equals("7z") || ext.equals("exe"))
+		if (detectExecutableArchives && ext.equals("exe"))
+			return SolidArchiveFactory.SevenZip;
+		if (ext.equals("7z"))
 			return SolidArchiveFactory.SevenZip;
 		if (ext.equals("rar"))
 			return SolidArchiveFactory.Rar;
@@ -287,7 +314,7 @@ public class IndexingConfig implements Serializable {
 		return getSolidArchiveFactory(filename) != null;
 	}
 	
-	public final  boolean isWatchFolders() {
+	public final boolean isWatchFolders() {
 		return watchFolders;
 	}
 	
