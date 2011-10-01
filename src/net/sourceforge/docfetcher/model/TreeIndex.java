@@ -55,11 +55,10 @@ public abstract class TreeIndex <
 		this.config = new IndexingConfig(rootFile) {
 			@Override
 			protected void onRootFileChanged() {
-				File rootFile = config.getRootFile();
-				rootFolder = createRootFolder(rootFile.getName(), rootFile.getPath());
-				Util.checkNotNull(rootFolder);
+				updateRootFolder();
 			}
 		};
+		updateRootFolder();
 		
 		if (indexParentDir == null) {
 			fileIndexDir = null;
@@ -70,6 +69,12 @@ public abstract class TreeIndex <
 			String indexDirName = getIndexDirName(rootFile) + "_" + id;
 			fileIndexDir = new File(indexParentDir, indexDirName);
 		}
+	}
+	
+	private void updateRootFolder() {
+		File rootFile = config.getRootFile();
+		rootFolder = createRootFolder(rootFile.getName(), rootFile.getPath());
+		Util.checkNotNull(rootFolder);
 	}
 	
 	@NotNull
