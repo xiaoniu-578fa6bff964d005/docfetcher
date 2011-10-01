@@ -45,6 +45,18 @@ public final class FileIndexTest {
 	}
 	
 	@Test
+	public void testClearIndex() {
+		File file = TestFiles.archive_zip_rar_7z.get();
+		FileIndex index = new FileIndex(null, file);
+		CountingReporter reporter = new CountingReporter();
+		index.update(reporter, NullCancelable.getInstance());
+		assertEquals(reporter.counter, 1);
+		index.clear();
+		index.update(reporter, NullCancelable.getInstance());
+		assertEquals(reporter.counter, 2);
+	}
+	
+	@Test
 	public void testNestedUpdate() throws Exception {
 		File rarFile = TestFiles.sfx_rar.get();
 		File[] files = {

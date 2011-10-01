@@ -156,6 +156,7 @@ public abstract class TreeIndex <
 		 * the next index update will detect the root folder as modified.
 		 */
 		rootFolder.setLastModified(null);
+		rootFolder.removeChildren();
 	}
 	
 	public final boolean isChecked() {
