@@ -148,7 +148,7 @@ public final class TabFolderFactory {
 					bounds.x + margin + hotShift,
 					bounds.y + margin + hotShift + vShift,
 					bounds.width - margin*2,
-					bounds.height - margin*2 - 1
+					bounds.height - margin*2 + hotShift
 			);
 			
 			// Draw tab shadow
@@ -163,7 +163,18 @@ public final class TabFolderFactory {
 
 			// Draw tab border
 			gc.setForeground(borderCol.get());
-			gc.drawRectangle(rectShifted);
+			if (isHot) {
+				gc.drawRectangle(rectShifted);
+			}
+			else {
+				// Draw a rectangle without the lower border
+				gc.drawPolyline(new int[] {
+					rectShifted.x, rectShifted.y + rectShifted.height,
+					rectShifted.x, rectShifted.y,
+					rectShifted.x + rectShifted.width, rectShifted.y,
+					rectShifted.x + rectShifted.width, rectShifted.y + rectShifted.height,
+				});
+			}
 			
 			// Draw tab image
 			Image image = item.getImage();
