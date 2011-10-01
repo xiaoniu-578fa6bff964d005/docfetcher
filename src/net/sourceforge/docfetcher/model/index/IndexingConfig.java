@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -31,8 +33,13 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsDriverProvider;
+import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 
 /**
  * Should not be subclassed outside the package group of this class.
@@ -280,12 +287,31 @@ public class IndexingConfig implements Serializable {
 	// Returned detector takes 'detect executable archives' setting into account
 	@NotNull
 	public final TArchiveDetector createZipDetector() {
+		/*
+		 * Create an extended copy of the default driver map where all
+		 * user-defined extensions not known to TrueZIP are associated with the
+		 * zip driver.
+		 */
+		final Map<FsScheme, FsDriver> driverMap = Maps.newHashMap(FsDriverLocator.SINGLETON.get());
+		FsDriver zipDriver = driverMap.get(FsScheme.create("zip"));
+		for (String ext : zipExtensions) {
+			FsScheme scheme = FsScheme.create(ext);
+			if (!driverMap.containsKey(scheme))
+				driverMap.put(scheme, zipDriver);
+		}
+		
+		FsDriverProvider driverProvider = new FsDriverProvider() {
+			public Map<FsScheme, FsDriver> get() {
+				return Collections.unmodifiableMap(driverMap);
+			}
+		};
+		
 		Set<String> extensions = new LinkedHashSet<String>();
 		extensions.addAll(zipExtensions);
 		extensions.addAll(hiddenZipExtensions);
 		if (detectExecutableArchives)
 			extensions.add("exe");
-		return new TArchiveDetector(Util.join("|", extensions));
+		return new TArchiveDetector(driverProvider, Util.join("|", extensions));
 	}
 
 	// Accepts filenames and filepaths
