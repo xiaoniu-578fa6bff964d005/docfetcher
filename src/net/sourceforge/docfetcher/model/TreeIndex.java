@@ -135,15 +135,17 @@ public abstract class TreeIndex <
 	}
 	
 	private void clear(boolean removeTopLevel) {
-		if (fileIndexDir != null && fileIndexDir.exists()) {
-			try {
-				if (removeTopLevel)
-					Files.deleteRecursively(fileIndexDir);
-				else
-					Files.deleteDirectoryContents(fileIndexDir);
-			}
-			catch (IOException e) {
-				Util.printErr(e);
+		if (fileIndexDir != null) {
+			if (fileIndexDir.exists()) {
+				try {
+					if (removeTopLevel)
+						Files.deleteRecursively(fileIndexDir);
+					else
+						Files.deleteDirectoryContents(fileIndexDir);
+				}
+				catch (IOException e) {
+					Util.printErr(e);
+				}
 			}
 		}
 		else {
