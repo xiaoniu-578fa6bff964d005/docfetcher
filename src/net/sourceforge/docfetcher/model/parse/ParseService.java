@@ -29,6 +29,8 @@ import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
@@ -93,11 +95,17 @@ public final class ParseService {
 	@NotNull
 	public static ParseResult parse(@NotNull IndexingConfig config,
 	                                @NotNull String filename,
+	                                @NotNull String filepath,
 	                                @NotNull File file,
 	                                @NotNull IndexingReporter reporter,
 	                                @NotNull Cancelable cancelable)
 			throws ParseException {
-		if (config.matchesMimePattern(filename)) {
+		// Search for appropriate parser by mimetype
+		for (PatternAction patternAction : config.getPatternActions()) {
+			if (patternAction.getAction() != MatchAction.DETECT_MIME)
+				continue;
+			if (!patternAction.matches(filename, filepath, true))
+				continue;
 			try {
 				List<String> mimeTypes = getPossibleMimeTypes(file);
 				for (Parser parser : parsers) {
@@ -105,7 +113,8 @@ public final class ParseService {
 						continue;
 					try {
 						return doParse(config, parser, file, reporter, cancelable);
-					} catch (ParseException e) {
+					}
+					catch (ParseException e) {
 						// Try next parser
 					}
 				}
@@ -114,11 +123,16 @@ public final class ParseService {
 				// Ignore and continue with detecting the type by filename
 			}
 		}
+		
+		// Search for appropriate parser by filename
 		Parser parser = findParser(config, file.getName());
 		if (parser != null)
 			return doParse(config, parser, file, reporter, cancelable);
+		
+		// Fall back to filename parser if allowed
 		if (config.isIndexFilenames())
 			return new ParseResult(filename).setParserName(FILENAME_PARSER);
+		
 		throw new ParseException(new ParserNotFoundException());
 	}
 

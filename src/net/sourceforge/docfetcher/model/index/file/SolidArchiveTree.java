@@ -29,6 +29,8 @@ import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
 import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.util.Util;
@@ -211,7 +213,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 						intermediatePath = child.getPath();
 					}
 					parent = child;
-				} else { // inner path part corresponds to a file
+				}
+				else { // inner path part corresponds to a file
 					long lastModified = entryReader.getLastModified(entry);
 					final String childPath;
 					if (config.isArchive(innerPart)) {
@@ -244,31 +247,50 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			public boolean matches(FileDocument candidate) {
 				String name = candidate.getName();
 				String path = candidate.getPath();
-				if (config.getFileFilter().matches(name, path, true)) {
+				
+				for (PatternAction patternAction : config.getPatternActions()) {
+					switch (patternAction.getAction()) {
+					case EXCLUDE:
+						if (patternAction.matches(name, path, true)) {
+							entryDataMap.removeKey(candidate.getPath());
+							return true;
+						}
+						break;
+					case DETECT_MIME:
+						/*
+						 * If the mime pattern matches, we'll check the mime pattern
+						 * again later, right before parsing.
+						 */
+						if (patternAction.matches(name, path, true))
+							return false;
+						break;
+					default:
+						throw new IllegalStateException();
+					}
+				}
+				
+				if (!ParseService.canParseByName(config, name)) {
 					entryDataMap.removeKey(candidate.getPath());
 					return true;
 				}
-				/*
-				 * If the mime pattern matches, we'll check the mime pattern
-				 * again later, right before parsing.
-				 */
-				if (config.matchesMimePattern(name))
-					return false;
-				if (ParseService.canParseByName(config, name))
-					return false;
-				entryDataMap.removeKey(candidate.getPath());
-				
-				return true;
+				return false;
 			}
 		}, new Predicate<FileFolder>() {
 			public boolean matches(FileFolder candidate) {
+				String name = candidate.getName();
+				String path = candidate.getPath();
 				boolean isArchive = candidate.isArchive();
-				boolean matches = config.getFileFilter().matches(
-						candidate.getName(), candidate.getPath(), isArchive
-				);
-				if (matches && isArchive)
-					entryDataMap.removeKey(candidate.getPath());
-				return matches;
+				
+				for (PatternAction patternAction : config.getPatternActions()) {
+					if (patternAction.getAction() == MatchAction.EXCLUDE) {
+						if (patternAction.matches(name, path, isArchive)) {
+							if (isArchive)
+								entryDataMap.removeKey(candidate.getPath());
+							return true;
+						}
+					}
+				}
+				return false;
 			}
 		});
 	}

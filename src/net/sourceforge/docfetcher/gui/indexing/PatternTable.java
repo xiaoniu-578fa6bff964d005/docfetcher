@@ -16,9 +16,10 @@ import java.util.List;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.gui.indexing.PatternAction.MatchAction;
-import net.sourceforge.docfetcher.gui.indexing.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
@@ -125,7 +126,7 @@ abstract class PatternTable extends Composite {
 			protected String getLabel(PatternAction element) {
 				switch (element.getTarget()) {
 				case FILENAME: return "Filename";
-				case FILEPATH: return "Path";
+				case PATH: return "Path";
 				}
 				throw new IllegalStateException();
 			}

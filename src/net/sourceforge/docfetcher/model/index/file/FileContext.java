@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.MutableInt;
+import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -133,7 +134,7 @@ class FileContext {
 		try {
 			// Text extraction; may throw OutOfMemoryErrors
 			ParseResult parseResult = ParseService.parse(
-				config, doc.getName(), file, reporter, cancelable);
+				config, doc.getName(), doc.getPath(), file, reporter, cancelable);
 			
 			/*
 			 * If we detect a cancel request at this point, the request probably
@@ -229,24 +230,36 @@ class FileContext {
 	public final boolean skip(@NotNull TFile fileOrDir) {
 		String filename = fileOrDir.getName();
 		String filepath = getDirOrZipPath(fileOrDir);
+		
 		boolean isFileOrSolidArchive = fileOrDir.isFile();
 		boolean isZipArchiveOrFolder = !isFileOrSolidArchive;
 		boolean isZipArchive = isZipArchiveOrFolder
 			? UtilModel.isZipArchive(fileOrDir)
 			: false;
 		boolean isFileOrArchive = isFileOrSolidArchive || isZipArchive;
-		if (config.getFileFilter().matches(filename, filepath, isFileOrArchive))
-			return true;
-		/*
-		 * If the mime pattern matches, we'll check the mime pattern again later
-		 * (right before parsing) in order to determine whether to detect the
-		 * filetype by filename or by mimetype.
-		 */
 		boolean isFile = isFileOrSolidArchive
 				&& !config.isSolidArchive(filename);
-		if (isFile && !config.matchesMimePattern(filename))
-			return !ParseService.canParseByName(config, filename);
-		return false;
+		
+		for (PatternAction patternAction : config.getPatternActions()) {
+			switch (patternAction.getAction()) {
+			case EXCLUDE:
+				if (patternAction.matches(filename, filepath, isFileOrArchive))
+					return true;
+				break;
+			case DETECT_MIME:
+				/*
+				 * If the mime pattern matches, we'll check the mime pattern
+				 * again later (right before parsing) in order to determine
+				 * whether to detect the filetype by filename or by mimetype.
+				 */
+				if (isFile && patternAction.matches(filename, filepath, isFile))
+					return false;
+				break;
+			default:
+				throw new IllegalStateException();
+			}
+		}
+		return isFile && !ParseService.canParseByName(config, filename);
 	}
 
 }

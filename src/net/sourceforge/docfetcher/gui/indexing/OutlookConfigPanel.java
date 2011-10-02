@@ -42,11 +42,15 @@ final class OutlookConfigPanel extends ConfigPanel {
 		bt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				// TODO now: only fire event if configuration is valid
-				evtRunButtonClicked.fire(config);
+				evtRunButtonClicked.fire(null);
 			}
 		});
 		comp.setBackground(Col.CYAN.get());
 		return comp;
+	}
+	
+	protected void writeToConfig() {
+		// TODO now: implement
 	}
 
 }

@@ -9,21 +9,27 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui.indexing;
+package net.sourceforge.docfetcher.model.index;
+
+import java.io.Serializable;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 /**
  * @author Tran Nam Quang
  */
-final class PatternAction {
+@SuppressWarnings("serial")
+public final class PatternAction implements Serializable {
 	
 	// TODO i18n
 	
-	enum MatchTarget {
+	public enum MatchTarget {
 		FILENAME ("Filename"),
-		FILEPATH ("Path"),
+		PATH ("Path"),
 		;
 		public final String displayName;
 
@@ -32,7 +38,7 @@ final class PatternAction {
 		}
 	}
 	
-	enum MatchAction {
+	public enum MatchAction {
 		EXCLUDE ("Exclude"),
 		DETECT_MIME ("Detect mime type (slower)"),
 		;
@@ -44,14 +50,54 @@ final class PatternAction {
 	}
 	
 	@NotNull private String regex = "regex";
+	@Nullable private transient Pattern pattern;
+	
 	@NotNull private MatchTarget target = MatchTarget.FILENAME;
 	@NotNull private MatchAction action = MatchAction.EXCLUDE;
 	
 	public PatternAction() {
 	}
+	
+	// might throw PatternSyntaxException
+	public boolean matches(	@NotNull String filename,
+							@NotNull String filepath,
+							boolean isFile) {
+		// TODO post-release-1.1: patterns are currently not applied to regular directories
+		if (!isFile)
+			return false;
+		
+		if (pattern == null) // Will be null after serialization
+			pattern = Pattern.compile(regex);
+		
+		switch (target) {
+		case FILENAME:
+			return pattern.matcher(filename).matches();
+		case PATH:
+			return pattern.matcher(filepath).matches();
+		default:
+			throw new IllegalStateException();
+		}
+	}
 
+	// Allows invalid regexes
 	public void setRegex(@NotNull String regex) {
-		this.regex = Util.checkNotNull(regex);
+		Util.checkNotNull(regex);
+		if (this.regex.equals(regex))
+			return;
+		this.regex = regex;
+		pattern = null;
+	}
+	
+	public boolean validateRegex() {
+		if (pattern != null)
+			return true;
+		try {
+			pattern = Pattern.compile(regex);
+			return true;
+		}
+		catch (PatternSyntaxException e) {
+			return false;
+		}
 	}
 
 	@NotNull

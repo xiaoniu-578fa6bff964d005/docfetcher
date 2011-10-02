@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+
 import net.contentobjects.jnotify.JNotify;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.file.FileDocument;
 import net.sourceforge.docfetcher.model.index.file.FileFolder;
@@ -330,12 +332,30 @@ public final class FolderWatcher {
 			// Ignore target if it's matched by the user-defined filter
 			IndexingConfig config = watchedIndex.getConfig();
 			String path = config.getStorablePath(target);
-			if (!isDeleted && config.getFileFilter().matches(name, path, isFile))
-				return false;
+			
+			// Apply exclusion filters
+			boolean mimeMatch = false;
+			outer: {
+				for (PatternAction patternAction : config.getPatternActions()) {
+					switch (patternAction.getAction()) {
+					case EXCLUDE:
+						if (!isDeleted && patternAction.matches(name, path, isFile))
+							return false;
+						break;
+					case DETECT_MIME:
+						if (patternAction.matches(name, path, isFile)) {
+							mimeMatch = true;
+							break outer;
+						}
+						break;
+					default:
+						throw new IllegalStateException();
+					}
+				}
+			}
 			
 			// Ignore unparsable files
-			if (isFile && !config.isArchive(name)
-					&& !config.matchesMimePattern(name)
+			if (isFile && !config.isArchive(name) && !mimeMatch
 					&& !ParseService.canParseByName(config, name))
 				return false;
 			

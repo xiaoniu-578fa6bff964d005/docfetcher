@@ -21,11 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.UtilModel;
-import net.sourceforge.docfetcher.model.index.file.FileFilter;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveFactory;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
@@ -58,22 +56,20 @@ public class IndexingConfig implements Serializable {
 	public static final List<String> hiddenZipExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
 	
-	private static final FileFilter defaultFileFilter = new FileFilter();
-	private static final Pattern defaultMimePattern = Pattern.compile("");
-	
 	@NotNull private File rootFile;
 	@Nullable private String userDirPath;
 	@Nullable private File tempDir;
-	@NotNull private Pattern mimePattern = defaultMimePattern;
 	private boolean isPortable = AppUtil.isPortable();
-	private boolean storeRelativePaths;
-	@NotNull private FileFilter fileFilter = defaultFileFilter;
-	private boolean htmlPairing = true;
-	private boolean watchFolders = true;
+	
 	@NotNull private List<String> zipExtensions = defaultZipExtensions;
 	@NotNull private List<String> textExtensions = defaultTextExtensions;
+	@NotNull private List<PatternAction> patternActions = Collections.emptyList();
+	
+	private boolean htmlPairing = true;
 	private boolean detectExecutableArchives = false;
 	private boolean indexFilenames = true;
+	private boolean storeRelativePaths = false;
+	private boolean watchFolders = true;
 	
 	@VisibleForTesting
 	public IndexingConfig() {
@@ -207,25 +203,13 @@ public class IndexingConfig implements Serializable {
 		return absPath;
 	}
 	
-	// throws exception if regex is malformed
-	public final void setMimePattern(@NotNull String regex) {
-		regex = regex.trim();
-		if (regex.isEmpty())
-			mimePattern = defaultMimePattern;
-		else
-			mimePattern = Pattern.compile(regex);
-	}
-	
-	public final boolean matchesMimePattern(@NotNull String filename) {
-		return mimePattern.matcher(filename).matches();
-	}
-	
 	@NotNull
 	public final File createDerivedTempFile(@NotNull String filename)
 			throws IndexingException {
 		try {
 			return Util.createDerivedTempFile(filename, getTempDir());
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IndexingException(e);
 		}
 	}
@@ -251,15 +235,6 @@ public class IndexingConfig implements Serializable {
 	private static String toMegabyteString(Long bytes) {
 		double megabytes = (double) bytes / (1024 * 1024);
 		return String.format("%.1f", megabytes);
-	}
-	
-	@NotNull
-	public final FileFilter getFileFilter() {
-		return fileFilter;
-	}
-
-	public final void setFileFilter(@Nullable FileFilter fileFilter) {
-		this.fileFilter = fileFilter == null ? defaultFileFilter : fileFilter;
 	}
 	
 	@NotNull
@@ -303,6 +278,16 @@ public class IndexingConfig implements Serializable {
 		for (String string : strings)
 			set.add(string.toLowerCase());
 		return ImmutableList.copyOf(set);
+	}
+
+	@Immutable
+	@NotNull
+	public final List<PatternAction> getPatternActions() {
+		return patternActions;
+	}
+
+	public final void setPatternActions(@NotNull List<PatternAction> patternActions) {
+		this.patternActions = Collections.unmodifiableList(patternActions);
 	}
 
 	// Returned detector takes 'detect executable archives' setting into account

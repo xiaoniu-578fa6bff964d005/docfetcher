@@ -121,8 +121,9 @@ final class OutlookContext {
 					throws ParseException {
 				// TODO now: Don't try to parse all files -> call ParseService.canParse
 				// TODO post-release-1.1: Maybe recurse into archive attachments
+				String filepath = Util.joinPath(doc.getPath(), filename);
 				ParseResult parseResult = ParseService.parse(
-					config, filename, tempFile, reporter, cancelable);
+					config, filename, filepath, tempFile, reporter, cancelable);
 				luceneDoc.add(Fields.createContent(parseResult.getContent()));
 				StringBuilder metadata = parseResult.getMetadata();
 				metadata.append(filename);

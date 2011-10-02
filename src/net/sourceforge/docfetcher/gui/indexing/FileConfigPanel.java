@@ -14,12 +14,9 @@ package net.sourceforge.docfetcher.gui.indexing;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.model.index.file.FileFilter;
+import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
@@ -162,7 +159,6 @@ final class FileConfigPanel extends ConfigPanel {
 			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
 	}
 	
-	@SuppressWarnings("serial")
 	protected void writeToConfig() {
 		// TODO now: Check if target directory still exists
 //		if (! scope.getFile().exists()) {
@@ -176,28 +172,15 @@ final class FileConfigPanel extends ConfigPanel {
 		 */
 		List<PatternAction> patternActions = patternTable.getPatternActions();
 		for (PatternAction patternAction : patternActions) {
-			try {
-				Pattern.compile(patternAction.getRegex());
-			}
-			catch (PatternSyntaxException e) {
+			if (!patternAction.validateRegex()) {
 				// TODO now: show warning 'not_a_regex' and return
 				return;
 			}
 		}
 		
-		config.setFileFilter(new FileFilter() {
-			public boolean matches(	String filename,
-									String filepath,
-									boolean isFile) {
-				// TODO now: implement
-				return super.matches(filename, filepath, isFile);
-			}
-		});
-		
-		// TODO now: multiple mime patterns
-		
 		config.setTextExtensions(getExtensions(textExtField));
 		config.setZipExtensions(getExtensions(zipExtField));
+		config.setPatternActions(patternActions);
 		
 		config.setHtmlPairing(htmlPairingBt.getSelection());
 		config.setDetectExecutableArchives(detectExecArchivesBt.getSelection());

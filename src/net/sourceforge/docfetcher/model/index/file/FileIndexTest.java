@@ -101,6 +101,7 @@ public final class FileIndexTest {
 		Files.copy(TestFiles.simple_7z.get(), subFile3);
 		
 		FileIndex index = new FileIndex(null, tempDir);
+		index.getConfig().setIndexFilenames(false);
 		final CountingReporter reporter = new CountingReporter();
 		
 		// Index update should not detect any changes when nothing was modified
@@ -156,6 +157,7 @@ public final class FileIndexTest {
 			int i = 0;
 			for (File modifiedFile : files.subList(1, files.size())) {
 				FileIndex index = new FileIndex(null, tempDir);
+				index.getConfig().setIndexFilenames(false);
 				
 				File file1 = reversed ? modifiedFile : originalFile;
 				File file2 = reversed ? originalFile : modifiedFile;
