@@ -11,7 +11,6 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,9 +27,6 @@ import net.sourceforge.docfetcher.util.gui.GroupWrapper;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -38,23 +34,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * @author Tran Nam Quang
  */
 final class FileConfigPanel extends ConfigPanel {
 	
-	@NotNull private Text textExtField;
-	@NotNull private Text zipExtField;
+	@NotNull private FileExtensionGroupWrapper extGroupWrapper;
 	@NotNull private PatternTable patternTable;
-	
 	@NotNull private Button htmlPairingBt;
 	@NotNull private Button detectExecArchivesBt;
 	@NotNull private Button indexFilenameBt;
 	@NotNull private Button storeRelativePathsBt;
 	@NotNull private Button watchFolderBt;
-
+	
 	public FileConfigPanel(	@NotNull Composite parent,
 	                       	@NotNull IndexingConfig config) {
 		super(parent, config);
@@ -78,41 +71,8 @@ final class FileConfigPanel extends ConfigPanel {
 		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
 		setGridData(targetSeparator, false);
 		
-		Group extGroup = new GroupWrapper(comp, "File extensions") {
-			protected void createLayout(Group parent) {
-				GridLayout gridLayout = Util.createGridLayout(3, false, 7, 0);
-				gridLayout.verticalSpacing = 5;
-				parent.setLayout(gridLayout);
-			}
-			protected void createContents(Group parent) {
-				textExtField = createExtField(
-					parent, "Plain text:", config.getTextExtensions(),
-					new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent e) {
-							// TODO now: implement
-						}
-					});
-				zipExtField = createExtField(
-					parent, "Zip archives:", config.getZipExtensions(),
-					new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent e) {
-							// TODO now: implement
-						}
-					});
-			}
-			@NotNull
-			private Text createExtField(@NotNull Composite parent,
-										@NotNull String label,
-										@NotNull Collection<String> extensions,
-										@NotNull SelectionListener listener) {
-				Text field = Util.createLabeledGridText(parent, label);
-				((GridData)field.getLayoutData()).horizontalIndent = 5;
-				field.setText(Util.join(" ", extensions));
-				Util.createPushButton(parent, "...", listener).setLayoutData(
-					new GridData(SWT.FILL, SWT.FILL, false, true));
-				return field;
-			}
-		}.getGroup();
+		extGroupWrapper = new FileExtensionGroupWrapper(comp, config);
+		Group extGroup = extGroupWrapper.getGroup();
 		
 		Group patternGroup = new GroupWrapper(comp, "Exclude files / detect mime type") {
 			protected void createLayout(Group parent) {
@@ -181,7 +141,7 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}
 		
-		Collection<String> textExtensions = getExtensions(textExtField);
+		Collection<String> textExtensions = extGroupWrapper.getTextExtensions();
 		
 		String msg = "You've entered the following plain text extensions: %s. " +
 		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as simple text files." +
@@ -190,7 +150,7 @@ final class FileConfigPanel extends ConfigPanel {
 		if (!confirmExtensionOverride(textExtensions, msg))
 			return false;
 		
-		Collection<String> zipExtensions = getExtensions(zipExtField);
+		Collection<String> zipExtensions = extGroupWrapper.getZipExtensions();
 		
 		msg = "You've entered the following zip extensions: %s. " +
 		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as zip archives. " +
@@ -226,11 +186,6 @@ final class FileConfigPanel extends ConfigPanel {
 				return false;
 		}
 		return true;
-	}
-	
-	@NotNull
-	private static Collection<String> getExtensions(@NotNull Text text) {
-		return Arrays.asList(text.getText().trim().split("[^\\p{Alnum}]+"));
 	}
 	
 }

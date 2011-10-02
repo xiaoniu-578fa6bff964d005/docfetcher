@@ -204,16 +204,16 @@ public final class Util {
 	 * separator. This method basically splits the given string at those
 	 * occurrences of the separator that aren't escaped with a backslash.
 	 * <p>
-	 * Special case: If the given string is an empty string, an empty list is
-	 * returned.
-	 *
+	 * Special case: If the given string is an empty or a blank string, an empty
+	 * list is returned.
+	 * 
 	 * @see Util#encodeStrings(String, char)
 	 */
 	@MutableCopy
 	@NotNull
 	public static List<String> decodeStrings(char sep, @NotNull String str) {
 		Util.checkNotNull(str);
-		if (str.isEmpty())
+		if (str.trim().isEmpty())
 			return new ArrayList<String>(0);
 		boolean precedingBackslash = false;
 		List<String> parts = new ArrayList<String>();
