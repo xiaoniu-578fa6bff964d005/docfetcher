@@ -49,8 +49,9 @@ final class OutlookConfigPanel extends ConfigPanel {
 		return comp;
 	}
 	
-	protected void writeToConfig() {
+	protected boolean writeToConfig() {
 		// TODO now: implement
+		return true;
 	}
 
 }

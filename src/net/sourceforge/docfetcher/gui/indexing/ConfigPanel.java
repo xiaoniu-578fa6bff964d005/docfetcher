@@ -65,7 +65,8 @@ abstract class ConfigPanel {
 	@NotNull
 	protected abstract Control createContents(@NotNull Composite parent);
 	
-	protected abstract void writeToConfig();
+	// returns success
+	protected abstract boolean writeToConfig();
 	
 	protected final Control createButtonArea(Composite parent) {
 		// TODO i18n
@@ -85,8 +86,8 @@ abstract class ConfigPanel {
 		
 		runBt = Util.createPushButton(comp, "run", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				writeToConfig();
-				evtRunButtonClicked.fire(null);
+				if (writeToConfig())
+					evtRunButtonClicked.fire(null);
 			}
 		});
 		

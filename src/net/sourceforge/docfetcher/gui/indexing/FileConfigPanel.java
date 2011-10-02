@@ -14,9 +14,11 @@ package net.sourceforge.docfetcher.gui.indexing;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
@@ -159,22 +161,21 @@ final class FileConfigPanel extends ConfigPanel {
 			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
 	}
 	
-	protected void writeToConfig() {
-		// TODO now: Check if target directory still exists
-//		if (! scope.getFile().exists()) {
-//			UtilGUI.showErrorMsg(Msg.target_folder_deleted.value());
-//			return false;
-//		}
+	protected boolean writeToConfig() {
+		// Check that the target file or directory still exists
+		if (!config.getRootFile().exists()) {
+			AppUtil.showError("target_folder_deleted", true, true);
+			return false;
+		}
 		
-		/*
-		 * Validate all entered regexes and split them into filter and mime
-		 * detection patterns.
-		 */
+		// Validate the regexes
 		List<PatternAction> patternActions = patternTable.getPatternActions();
 		for (PatternAction patternAction : patternActions) {
 			if (!patternAction.validateRegex()) {
-				// TODO now: show warning 'not_a_regex' and return
-				return;
+				String regex = patternAction.getRegex();
+				String msg = "Malformed regular expression: " + regex;
+				AppUtil.showError(msg, true, true);
+				return false;
 			}
 		}
 		
@@ -187,6 +188,8 @@ final class FileConfigPanel extends ConfigPanel {
 		config.setIndexFilenames(indexFilenameBt.getSelection());
 		config.setStoreRelativePaths(storeRelativePathsBt.getSelection());
 		config.setWatchFolders(watchFolderBt.getSelection());
+		
+		return true;
 	}
 	
 	@NotNull
