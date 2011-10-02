@@ -280,9 +280,7 @@ public final class IndexPanel {
 				List<LuceneIndex> selectedIndexes = getSelectedIndexes();
 				assert !selectedIndexes.isEmpty();
 				// TODO i18n
-				int ans = AppUtil.showConfirmation(
-					"remove_sel_indexes", false);
-				if (ans == SWT.OK)
+				if (AppUtil.showConfirmation("remove_sel_indexes", false))
 					indexRegistry.removeIndexes(selectedIndexes, true);
 			}
 		});
@@ -300,9 +298,8 @@ public final class IndexPanel {
 				if (toRemove.isEmpty())
 					return;
 				// TODO i18n; also display the indexes to be removed
-				int ans = AppUtil.showConfirmation(
-					"remove_orphaned_indexes_msg", false);
-				if (ans == SWT.OK)
+				String msg = "remove_orphaned_indexes_msg";
+				if (AppUtil.showConfirmation(msg, false))
 					indexRegistry.removeIndexes(toRemove, true);
 			}
 		});
@@ -547,9 +544,9 @@ public final class IndexPanel {
 		File pstFile = getOutlookPSTFile();
 		if (pstFile != null) {
 			// TODO now: On Windows, if the path is very long, the message dialog's width is too large
+			// TODO now: Don't open the file chooser if the user clicks OK on this message dialog
 			String msg = "PST file found: " + pstFile + ". Index this file?";
-			int ans = AppUtil.showConfirmation(msg, false); // TODO i18n
-			if (ans == SWT.OK)
+			if (AppUtil.showConfirmation(msg, false)) // TODO i18n
 				lastPath = pstFile.getPath();
 		}
 

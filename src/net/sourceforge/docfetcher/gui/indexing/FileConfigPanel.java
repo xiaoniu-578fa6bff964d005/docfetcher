@@ -222,7 +222,7 @@ final class FileConfigPanel extends ConfigPanel {
 		
 		if (!overridingExtensions.isEmpty()) {
 			message = String.format(message, Util.join(", ", overridingExtensions));
-			if (AppUtil.showConfirmation(message, true) != SWT.OK)
+			if (!AppUtil.showConfirmation(message, true))
 				return false;
 		}
 		return true;
