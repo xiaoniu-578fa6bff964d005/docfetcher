@@ -18,9 +18,11 @@ import java.util.List;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.collect.LazyList;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.GroupWrapper;
 
@@ -179,8 +181,25 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}
 		
-		config.setTextExtensions(getExtensions(textExtField));
-		config.setZipExtensions(getExtensions(zipExtField));
+		Collection<String> textExtensions = getExtensions(textExtField);
+		
+		String msg = "You've entered the following plain text extensions: %s. " +
+		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as simple text files." +
+		"\n\nThis is probably not what you want because the built-in support will generally give better text extraction results. Do you still want " +
+		"to continue?";
+		if (!confirmExtensionOverride(textExtensions, msg))
+			return false;
+		
+		Collection<String> zipExtensions = getExtensions(zipExtField);
+		
+		msg = "You've entered the following zip extensions: %s. " +
+		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as zip archives. " +
+		"Do you still want to continue?";
+		if (!confirmExtensionOverride(zipExtensions, msg))
+			return false;
+		
+		config.setTextExtensions(textExtensions);
+		config.setZipExtensions(zipExtensions);
 		config.setPatternActions(patternActions);
 		
 		config.setHtmlPairing(htmlPairingBt.getSelection());
@@ -192,9 +211,26 @@ final class FileConfigPanel extends ConfigPanel {
 		return true;
 	}
 	
+	// given message must have one %s placeholder for inserting the overriding file extensions
+	private boolean confirmExtensionOverride(	@NotNull Collection<String> extensions,
+												@NotNull String message) {
+		LazyList<String> overridingExtensions = new LazyList<String>();
+		for (String extension : extensions)
+			if (ParseService.isBuiltInExtension(config, extension))
+				if (!overridingExtensions.contains(extension))
+					overridingExtensions.add(extension);
+		
+		if (!overridingExtensions.isEmpty()) {
+			message = String.format(message, Util.join(", ", overridingExtensions));
+			if (AppUtil.showConfirmation(message, true) != SWT.OK)
+				return false;
+		}
+		return true;
+	}
+	
 	@NotNull
 	private static Collection<String> getExtensions(@NotNull Text text) {
-		return Arrays.asList(text.getText().trim().split("[^\\\\p{Alnum}]+"));
+		return Arrays.asList(text.getText().trim().split("[^\\p{Alnum}]+"));
 	}
 	
 }

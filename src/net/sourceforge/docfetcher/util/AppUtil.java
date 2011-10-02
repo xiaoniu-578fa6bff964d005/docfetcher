@@ -332,14 +332,14 @@ public final class AppUtil {
 	 * This method may be called from a non-GUI thread. It should not be called
 	 * before the first shell is created.
 	 */
-	public static int showConfirmation(final String message, final boolean isSevere) {
+	public static int showConfirmation(final String message, final boolean warningNotQuestion) {
 		checkConstInitialized();
 		ensureDisplay();
 		class MyRunnable implements Runnable {
 			private int answer = -1;
 			public void run() {
 				int style = SWT.OK | SWT.CANCEL;
-				style |= isSevere ? SWT.ICON_WARNING : SWT.ICON_QUESTION;
+				style |= warningNotQuestion ? SWT.ICON_WARNING : SWT.ICON_QUESTION;
 				MessageBox msgBox = new MessageBox(getActiveShell(), style);
 				msgBox.setText(Msg.confirm_operation.value);
 				msgBox.setMessage(message);

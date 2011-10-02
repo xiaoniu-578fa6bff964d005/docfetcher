@@ -261,6 +261,23 @@ public final class ParseService {
 		return config.isIndexFilenames() || findParser(config, filename) != null;
 	}
 	
+	public static boolean isBuiltInExtension(	@NotNull IndexingConfig config,
+												@NotNull String extension) {
+		for (Parser parser : parsers) {
+			Collection<String> exts;
+			if (parser == textParser)
+				continue;
+			else if (parser == htmlParser)
+				exts = config.getHtmlExtensions();
+			else
+				exts = parser.getExtensions();
+			for (String candidateExt : exts)
+				if (candidateExt.toLowerCase().equals(extension))
+					return true;
+		}
+		return false;
+	}
+	
 	// accepts TrueZIP files
 	@MutableCopy
 	@NotNull
