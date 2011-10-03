@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -101,6 +103,18 @@ final class FileExtensionGroupWrapper {
 	}
 	
 	private void onChooserButtonClicked(@NotNull final Text field) {
+		// TODO i18n
+		File rootFile = config.getRootFile();
+		if (rootFile.isFile()) {
+			AppUtil.showError("Sorry, listing file extensions inside archives is not supported.", true, true);
+			return;
+		}
+		
+		if (!rootFile.exists()) {
+			AppUtil.showError("File not found: " + rootFile.getPath(), true, true);
+			return;
+		}
+		
 		FileExtensionChooser chooser = extChooserFactory.createChooser();
 		try {
 			Collection<String> extsOld = getExtensions(field);
