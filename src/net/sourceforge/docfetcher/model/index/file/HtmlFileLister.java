@@ -59,18 +59,17 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 	private void runWithoutHtmlPairing() {
 		for (File fileOrDir : Util.listFiles(parentDir)) {
 			if (isStopped()) return;
-			if (Util.isSymLink(fileOrDir) || skip(fileOrDir))
-				continue;
-			if (Util.isJunctionOrSymlink(fileOrDir))
-				continue;
-			boolean isFile;
 			try {
-				isFile = fileOrDir.isFile();
+				if (Util.isSymLink(fileOrDir) || skip(fileOrDir))
+					continue;
 			}
 			catch (AssertionError e) {
 				handleCharConversionException(e, fileOrDir);
 				continue;
 			}
+			if (Util.isJunctionOrSymlink(fileOrDir))
+				continue;
+			boolean isFile = fileOrDir.isFile();
 			if (isFile) {
 				if (isHtmlFile(fileOrDir))
 					handleHtmlPair(fileOrDir, null);
