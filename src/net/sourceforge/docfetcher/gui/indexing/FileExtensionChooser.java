@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -36,7 +37,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -198,8 +198,7 @@ final class FileExtensionChooser {
 			thread.start();
 		}
 		
-		Point size = shell.computeSize(SWT.DEFAULT, 400);
-		Util.setCenteredBounds(shell, size.x, size.y);
+		SettingsConf.ShellBounds.FileExtensionChooser.bind(shell);
 		shell.open();
 		
 		Display display = shell.getDisplay();

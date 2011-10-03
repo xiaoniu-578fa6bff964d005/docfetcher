@@ -237,6 +237,7 @@ public final class SettingsConf {
 	public static enum ShellBounds implements Storable {
 		MainWindow (-1, -1, 640, 480),
 		IndexingDialog (-1, -1, 450, 500),
+		FileExtensionChooser (-1, -1, 300, 450),
 		;
 
 		public final int[] defaultValue;
