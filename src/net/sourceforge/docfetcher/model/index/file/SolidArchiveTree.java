@@ -100,11 +100,17 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		private int index; // archive entry index
 		private long size; // uncompressed filesize
 		private final String innerPath;
+		private final boolean isEncrypted;
 		@Nullable private File file; // unpacked temporary file
-		public EntryData(int index, long size, @NotNull String innerPath) {
+
+		public EntryData(	int index,
+							long size,
+							@NotNull String innerPath,
+							boolean isEncrypted) {
 			this.index = index;
 			this.size = size;
 			this.innerPath = innerPath;
+			this.isEncrypted = isEncrypted;
 		}
 	}
 	
@@ -187,14 +193,6 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		// Build tree structure from flat list of paths
 		for (int i = 0; archiveIt.hasNext(); i++) {
 			E entry = archiveIt.next();
-			if (entryReader.isEncrypted(entry)) {
-				/*
-				 * The name and path of the archive entry may be encrypted,
-				 * so we'll report the name and path of the archive.
-				 */
-				failReporter.fail(ErrorType.ARCHIVE_ENTRY_ENCRYPTED, archiveFolder, null);
-				continue;
-			}
 			FileFolder parent = archiveFolder;
 			
 			String innerPath = entryReader.getInnerPath(entry);
@@ -209,7 +207,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 						intermediatePath = Util.joinPath(intermediatePath, innerPart);
 						child = new FileFolder(innerPart, intermediatePath, null);
 						parent.putSubFolder(child);
-					} else {
+					}
+					else {
 						intermediatePath = child.getPath();
 					}
 					parent = child;
@@ -217,6 +216,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				else { // inner path part corresponds to a file
 					long lastModified = entryReader.getLastModified(entry);
 					final String childPath;
+					TreeNode childNode;
+					
 					if (config.isArchive(innerPart)) {
 						String fullPath = Util.joinPath(
 							archiveFolder.getPath(), innerPath);
@@ -224,13 +225,22 @@ abstract class SolidArchiveTree<E> implements Closeable {
 							innerPart, fullPath, lastModified);
 						parent.putSubFolder(child);
 						childPath = child.getPath();
-					} else {
+						childNode = child;
+					}
+					else {
 						FileDocument child = new FileDocument(
 							parent, innerPart, lastModified);
 						childPath = child.getPath();
+						childNode = child;
 					}
+					
 					long unpackedSize = entryReader.getUnpackedSize(entry);
-					EntryData entryData = new EntryData(i, unpackedSize, innerPath);
+					boolean isEncrypted = entryReader.isEncrypted(entry);
+					if (isEncrypted)
+						failReporter.fail(ErrorType.ARCHIVE_ENTRY_ENCRYPTED, childNode, null);
+					
+					EntryData entryData = new EntryData(
+						i, unpackedSize, innerPath, isEncrypted);
 					entryDataMap.put(childPath, entryData);
 				}
 			}
@@ -476,8 +486,16 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	@Nullable
 	public final File getFile(@NotNull TreeNode treeNode) {
 		EntryData entryData = entryDataMap.getValue(treeNode.getPath());
-		if (entryData == null) return null;
+		if (entryData == null)
+			return null;
 		return entryData.file;
+	}
+	
+	public final boolean isEncrypted(@NotNull TreeNode treeNode) {
+		EntryData entryData = entryDataMap.getValue(treeNode.getPath());
+		if (entryData == null)
+			return false;
+		return entryData.isEncrypted;
 	}
 	
 	public final void deleteUnpackedFiles() {
@@ -490,7 +508,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	@Nullable
 	public final String getArchiveEntryPath(@NotNull TreeNode treeNode) {
 		EntryData entryData = entryDataMap.getValue(treeNode.getPath());
-		if (entryData == null) return null;
+		if (entryData == null)
+			return null;
 		return entryData.innerPath;
 	}
 

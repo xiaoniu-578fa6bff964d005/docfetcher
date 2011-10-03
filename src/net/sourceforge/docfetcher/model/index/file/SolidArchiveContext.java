@@ -11,14 +11,18 @@
 
 package net.sourceforge.docfetcher.model.index.file;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveTree.FailReporter;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -71,8 +75,17 @@ final class SolidArchiveContext extends FileContext implements FailReporter {
 		return getConfig();
 	}
 	
-	public boolean hasEntriesToUnpack() {
-		return addedDocs.size() + modifiedDocs.size() + nestedArchives.size() > 0;
+	@MutableCopy
+	@NotNull
+	public List<TreeNode> getUnpackList() {
+		int size = addedDocs.size() + modifiedDocs.size() + nestedArchives.size();
+		List<TreeNode> unpackList = new ArrayList<TreeNode>(size);
+		if (size > 0) {
+			unpackList.addAll(addedDocs.keySet());
+			unpackList.addAll(modifiedDocs.keySet());
+			unpackList.addAll(nestedArchives.keySet());
+		}
+		return unpackList;
 	}
 	
 	public boolean isTempArchive() {

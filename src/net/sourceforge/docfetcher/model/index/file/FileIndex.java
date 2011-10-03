@@ -35,7 +35,6 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 
@@ -505,15 +504,15 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		FileFolder newArchiveFolder = archiveTree.getArchiveFolder();
 		try {
 			// Collect files to unpack
-			visitSolidArchiveFolder(context, archiveFolder, newArchiveFolder);
-			if (!context.hasEntriesToUnpack()) return;
-			Iterable<TreeNode> unpackEntries = Iterables.concat(
-				context.addedDocs.keySet(), context.modifiedDocs.keySet(),
-				context.nestedArchives.keySet());
+			visitSolidArchiveFolder(
+				context, archiveTree, archiveFolder, newArchiveFolder);
+			List<TreeNode> unpackList = context.getUnpackList();
+			if (unpackList.isEmpty())
+				return;
 
 			// Unpack added and modified files
 			context.info(InfoType.UNPACKING, archiveFolder);
-			archiveTree.unpack(unpackEntries, null);
+			archiveTree.unpack(unpackList, null);
 		}
 		catch (IOException e) {
 			archiveFolder.removeChildren();
@@ -571,6 +570,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 
 	@RecursiveMethod
 	private static void visitSolidArchiveFolder(@NotNull final SolidArchiveContext context,
+	                                            @NotNull final SolidArchiveTree<?> archiveTree,
 												@NotNull final FileFolder oldFolder,
 												@NotNull FileFolder newFolder)
 			throws IndexingException {
@@ -598,7 +598,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			// New documents
 			protected void handleOnlyRight(@NotNull FileDocument doc) {
 				oldFolder.putDocument(doc);
-				context.addedDocs.put(doc, oldFolder);
+				if (!archiveTree.isEncrypted(doc))
+					context.addedDocs.put(doc, oldFolder);
 			}
 
 			// Already registered documents
@@ -611,7 +612,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				 * contents of the HTML folder.
 				 */
 				oldFolder.putDocument(newDoc);
-				context.modifiedDocs.put(newDoc, oldFolder);
+				if (!archiveTree.isEncrypted(newDoc))
+					context.modifiedDocs.put(newDoc, oldFolder);
 			}
 		}.run();
 
@@ -634,18 +636,20 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			protected void handleOnlyRight(@NotNull FileFolder newSubFolder) {
 				oldFolder.putSubFolder(newSubFolder);
 				if (newSubFolder.isArchive()) {
-					context.nestedArchives.put(newSubFolder, oldFolder);
+					if (!archiveTree.isEncrypted(newSubFolder))
+						context.nestedArchives.put(newSubFolder, oldFolder);
 				}
 				else {
 					new FileFolderVisitor<Exception>(newSubFolder) {
 						public void visitDocument(	FileFolder parent,
 													FileDocument fileDocument) {
-							context.addedDocs.put(fileDocument, parent);
+							if (!archiveTree.isEncrypted(fileDocument))
+								context.addedDocs.put(fileDocument, parent);
 						}
 
 						protected void visitFolder(	FileFolder parent,
 													FileFolder folder) {
-							if (folder.isArchive())
+							if (folder.isArchive() && !archiveTree.isEncrypted(folder))
 								context.nestedArchives.put(folder, parent);
 						}
 					}.runSilently();
@@ -661,7 +665,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				if (rightModified == null) { // recurse into ordinary folder
 					try {
 						visitSolidArchiveFolder(
-							context, oldSubFolder, newSubFolder);
+							context, archiveTree, oldSubFolder, newSubFolder);
 					}
 					catch (IndexingException e) {
 						stop(e);
@@ -676,7 +680,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 					 * this point, as the corresponding child files are still
 					 * compressed.
 					 */
-					context.nestedArchives.put(oldSubFolder, oldFolder);
+					if (!archiveTree.isEncrypted(oldSubFolder))
+						context.nestedArchives.put(oldSubFolder, oldFolder);
 				}
 			}
 		}.run();
