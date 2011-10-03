@@ -144,7 +144,11 @@ public abstract class Folder
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
 	public synchronized final void putSubFolder(@NotNull F folder) {
-		Util.checkThat(folder.path.startsWith(path + "/"));
+		if (path.isEmpty()) // Current working directory
+			Util.checkThat(!folder.path.startsWith("/"));
+		else
+			Util.checkThat(folder.path.startsWith(path + "/"));
+		
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
 		if (folder.parent != null)

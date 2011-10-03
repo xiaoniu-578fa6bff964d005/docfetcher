@@ -350,8 +350,8 @@ public final class IndexingQueue {
 				for (LuceneIndex index0 : indexesInRegistry) {
 					if (index0 instanceof OutlookIndex)
 						continue;
-					File f1 = index0.getRootFile();
-					File f2 = task.getLuceneIndex().getRootFile();
+					File f1 = index0.getAbsoluteRootFile();
+					File f2 = task.getLuceneIndex().getAbsoluteRootFile();
 					if (Util.equals(f1, f2))
 						return Rejection.SAME_IN_REGISTRY;
 					if (isOverlapping(f1, f2))
@@ -371,8 +371,8 @@ public final class IndexingQueue {
 					if (!(queueTask.getLuceneIndex() instanceof FileIndex))
 						continue;
 
-					File f1 = queueTask.getLuceneIndex().getRootFile();
-					File f2 = index.getRootFile();
+					File f1 = queueTask.getLuceneIndex().getAbsoluteRootFile();
+					File f2 = index.getAbsoluteRootFile();
 
 					if (isOverlapping(f1, f2))
 						return Rejection.OVERLAP_WITH_QUEUE;
@@ -409,16 +409,16 @@ public final class IndexingQueue {
 
 	@NotThreadSafe
 	static boolean sameTarget(@NotNull Task task1, @NotNull Task task2) {
-		File target1 = task1.getLuceneIndex().getRootFile();
-		File target2 = task2.getLuceneIndex().getRootFile();
+		File target1 = task1.getLuceneIndex().getAbsoluteRootFile();
+		File target2 = task2.getLuceneIndex().getAbsoluteRootFile();
 		return Util.equals(target1, target2);
 	}
 
 	@NotThreadSafe
 	private static boolean sameTarget(	@NotNull LuceneIndex index,
 										@NotNull Task task) {
-		File target1 = index.getRootFile();
-		File target2 = task.getLuceneIndex().getRootFile();
+		File target1 = index.getAbsoluteRootFile();
+		File target2 = task.getLuceneIndex().getAbsoluteRootFile();
 		return Util.equals(target1, target2);
 	}
 

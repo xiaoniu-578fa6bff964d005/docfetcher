@@ -127,11 +127,16 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		SimpleDocWriter writer = null;
 
 		/*
-		 * We're creating the root file each time to avoid keeping a permanent
-		 * reference.
+		 * Wrap the stored root file in a TFile to enable zip archive support.
+		 * 
+		 * Note that both the path of the rootFolder object and the path of the
+		 * stored root file will be empty if the root corresponds to the current
+		 * working directory. This is why the TFile is initialized with an
+		 * absolute file here: Otherwise TrueZIP would fail to recognize that
+		 * it's an existing directory.
 		 */
 		TArchiveDetector zipDetector = config.createZipDetector();
-		File rootFile = new TFile(rootFolder.getPath(), zipDetector);
+		TFile rootFile = new TFile(config.getAbsoluteRootFile(), zipDetector);
 
 		try {
 			/*

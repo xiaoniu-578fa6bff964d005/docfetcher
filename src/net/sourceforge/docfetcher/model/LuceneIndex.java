@@ -42,12 +42,18 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public File getIndexDir();
 	
 	/**
-	 * Returns the file or directory containing the user's files (i.e. the
-	 * document repository that was indexed).
+	 * Returns the absolute file or directory containing the user's files (i.e.
+	 * the document repository that was indexed).
 	 */
 	@NotNull
-	public File getRootFile();
+	public File getAbsoluteRootFile();
 	
+	/**
+	 * Warning: If the root file corresponds to the current working directory,
+	 * the path of the returned root folder will be an empty string (regardless
+	 * of the 'store relative paths' setting), and calling <code>new
+	 * File("").exists()</code> will return false.
+	 */
 	@NotNull
 	public Folder<?, ?> getRootFolder();
 	

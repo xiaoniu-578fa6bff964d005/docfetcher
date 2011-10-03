@@ -293,7 +293,7 @@ public final class IndexPanel {
 				List<LuceneIndex> indexes = indexRegistry.getIndexes();
 				List<LuceneIndex> toRemove = new ArrayList<LuceneIndex>(indexes.size());
 				for (LuceneIndex index : indexes)
-					if (!index.getRootFile().exists())
+					if (!index.getAbsoluteRootFile().exists())
 						toRemove.add(index);
 				if (toRemove.isEmpty())
 					return;
@@ -358,7 +358,7 @@ public final class IndexPanel {
 				for (ViewNode element : viewer.getSelection()) {
 					if (element instanceof LuceneIndex) {
 						LuceneIndex index = (LuceneIndex) element;
-						File rootFile = index.getRootFile();
+						File rootFile = index.getAbsoluteRootFile();
 						if (!rootFile.exists())
 							launcher.addMissing(rootFile);
 						else

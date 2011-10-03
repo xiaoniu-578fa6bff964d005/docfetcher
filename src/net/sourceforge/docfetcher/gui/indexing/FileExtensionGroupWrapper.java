@@ -54,7 +54,7 @@ final class FileExtensionGroupWrapper {
 										@NotNull IndexingConfig config) {
 		this.config = config;
 		extChooserFactory = new FileExtensionChooser.Factory(
-			parent.getShell(), config.getRootFile());
+			parent.getShell(), config.getAbsoluteRootFile());
 		
 		groupWrapper = new GroupWrapper(parent, "File extensions") {
 			protected void createLayout(Group parent) {
@@ -104,7 +104,7 @@ final class FileExtensionGroupWrapper {
 	
 	private void onChooserButtonClicked(@NotNull final Text field) {
 		// TODO i18n
-		File rootFile = config.getRootFile();
+		File rootFile = config.getAbsoluteRootFile();
 		if (rootFile.isFile()) {
 			AppUtil.showError("Sorry, listing file extensions inside archives is not supported.", true, true);
 			return;

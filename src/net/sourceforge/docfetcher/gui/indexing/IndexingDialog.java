@@ -337,14 +337,18 @@ public final class IndexingDialog implements Dialog {
 	}
 
 	private void addTab(@NotNull final Task task, boolean selectTab) {
-		// Create an configure tab item
+		/*
+		 * Create and configure tab item
+		 */
 		final CTabItem tabItem = new CTabItem(tabFolder, SWT.CLOSE);
 		tabItem.setData(task);
 		LuceneIndex index = task.getLuceneIndex();
-		File rootFile = index.getRootFile();
+		
+		File rootFile = index.getAbsoluteRootFile();
 		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
 		tabItem.setText(Util.truncate(nameOrLetter));
 		tabItem.setToolTipText(Util.getSystemAbsPath(rootFile));
+		
 		if (task.is(TaskState.READY))
 			tabItem.setImage(Img.TREE.get());
 		else

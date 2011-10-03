@@ -73,7 +73,19 @@ public abstract class TreeIndex <
 	
 	private void updateRootFolder() {
 		File rootFile = config.getRootFile();
-		rootFolder = createRootFolder(rootFile.getName(), rootFile.getPath());
+		
+		/*
+		 * Special case: If the root file corresponds to the current working
+		 * directory, both its name and path will be empty strings. In that
+		 * case, we'll leave the path empty, but set a non-empty name.
+		 */
+		String name;
+		if (rootFile.getPath().isEmpty())
+			name = rootFile.getAbsoluteFile().getName();
+		else
+			name = rootFile.getName();
+		
+		rootFolder = createRootFolder(name, rootFile.getPath());
 		Util.checkNotNull(rootFolder);
 	}
 	
@@ -90,8 +102,8 @@ public abstract class TreeIndex <
 	}
 	
 	@NotNull
-	public final File getRootFile() {
-		return config.getRootFile();
+	public final File getAbsoluteRootFile() {
+		return config.getAbsoluteRootFile();
 	}
 	
 	@Nullable

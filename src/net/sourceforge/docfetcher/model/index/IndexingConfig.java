@@ -30,6 +30,7 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -80,12 +81,25 @@ public class IndexingConfig implements Serializable {
 		Util.checkNotNull(rootFile);
 		this.rootFile = new File(getStorablePath(rootFile));
 	}
-	
+
+	/**
+	 * Warning: If the root file corresponds to the current working directory,
+	 * the path of the returned file will be an empty string (regardless of the
+	 * 'store relative paths' setting), and calling {@link File#exists()} on it
+	 * will return false. Use {@link #getAbsoluteRootFile()} instead if
+	 * <code>File.exists()</code> should return true in that case.
+	 */
 	@NotNull
+	@VisibleForPackageGroup
 	public final File getRootFile() {
 		return rootFile;
 	}
-
+	
+	@NotNull
+	public final File getAbsoluteRootFile() {
+		return rootFile.getAbsoluteFile();
+	}
+	
 	public final boolean isPortable() {
 		return isPortable;
 	}

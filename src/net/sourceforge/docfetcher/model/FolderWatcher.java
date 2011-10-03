@@ -197,7 +197,7 @@ public final class FolderWatcher {
 		}
 		
 		for (LuceneIndex index : watchQueueCopy.keySet()) {
-			File rootFile = index.getRootFile();
+			File rootFile = index.getAbsoluteRootFile();
 			
 			// Don't watch read-only files (some might be on a CD-ROM)
 			if (!rootFile.canWrite())
@@ -321,7 +321,7 @@ public final class FolderWatcher {
 				assert !isFile;
 			
 			// Accept if target is an archive root or a PST file
-			if (target.equals(watchedIndex.getRootFile()))
+			if (target.equals(watchedIndex.getAbsoluteRootFile()))
 				return true;
 
 			// Ignore so-called 'temporary owner files' created by MS Word.

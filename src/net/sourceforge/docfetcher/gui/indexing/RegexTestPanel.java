@@ -58,7 +58,7 @@ abstract class RegexTestPanel extends Composite {
 		Button fileChooserBt = Util.createPushButton(this, "...", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-				dialog.setFilterPath(config.getRootFile().getPath());
+				dialog.setFilterPath(config.getAbsoluteRootFile().getPath());
 				dialog.setText("choose_regex_testfile_title");
 				String filepath = dialog.open();
 				if (filepath == null)

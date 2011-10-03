@@ -63,7 +63,7 @@ final class FileConfigPanel extends ConfigPanel {
 		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
 		StyledText targetField = new StyledText(targetComp, targetStyle);
 		setGridData(targetField, true);
-		targetField.setText(Util.getSystemAbsPath(config.getRootFile()));
+		targetField.setText(config.getAbsoluteRootFile().getPath());
 		targetField.setForeground(Col.DARK_GRAY.get());
 		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
 		UtilGui.clearSelectionOnFocusLost(targetField);
@@ -125,7 +125,7 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	protected boolean writeToConfig() {
 		// Check that the target file or directory still exists
-		if (!config.getRootFile().exists()) {
+		if (!config.getAbsoluteRootFile().exists()) {
 			AppUtil.showError("target_folder_deleted", true, true);
 			return false;
 		}
