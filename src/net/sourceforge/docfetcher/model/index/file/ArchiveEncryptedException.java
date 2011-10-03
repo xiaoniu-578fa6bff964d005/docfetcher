@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model.index.file;
 import java.io.File;
 
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import de.schlichtherle.truezip.file.TFile;
 
 /**
  * @author Tran Nam Quang
@@ -25,7 +26,12 @@ final class ArchiveEncryptedException extends Exception {
 	private final String originalPath;
 	
 	public ArchiveEncryptedException(@Nullable File file, @Nullable String originalPath) {
-		this.file = file;
+		/*
+		 * For unknown reasons, serialization will fail with
+		 * "NoClassDefFoundError: java/nio/file/Path" if we try to store TFile
+		 * instances, so a regular file is stored instead.
+		 */
+		this.file = file instanceof TFile ? new File(file.getPath()) : file;
 		this.originalPath = originalPath;
 	}
 	
