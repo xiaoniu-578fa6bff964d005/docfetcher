@@ -28,14 +28,9 @@ public final class PatternAction implements Serializable {
 	// TODO i18n
 	
 	public enum MatchTarget {
-		FILENAME ("Filename"),
-		PATH ("Path"),
+		FILENAME,
+		PATH,
 		;
-		public final String displayName;
-
-		private MatchTarget(String displayName) {
-			this.displayName = displayName;
-		}
 	}
 	
 	public enum MatchAction {

@@ -39,11 +39,12 @@ import org.eclipse.swt.widgets.Text;
 /**
  * @author Tran Nam Quang
  */
-abstract class RegexTestPanel extends Composite {
+final class RegexTestPanel extends Composite {
 	
 	private final Label label;
 	private final Text fileBox;
 	private List<PatternAction> patternActions = Collections.emptyList();
+	private boolean storeRelativePaths;
 
 	// TODO i18n
 	
@@ -64,7 +65,7 @@ abstract class RegexTestPanel extends Composite {
 				if (filepath == null)
 					return;
 				File file = new File(filepath);
-				filepath = config.getStorablePath(file, storeRelativePaths());
+				filepath = config.getStorablePath(file, storeRelativePaths);
 				fileBox.setText(filepath);
 			}
 		});
@@ -82,13 +83,18 @@ abstract class RegexTestPanel extends Composite {
 		fdf.reset().left().right().top().bottom(fileBox).applyTo(label);
 	}
 	
-	public final void setPatternActions(@NotNull List<PatternAction> patternActions) {
+	public void setPatternActions(@NotNull List<PatternAction> patternActions) {
 		Util.checkNotNull(patternActions);
 		this.patternActions = patternActions;
 		updateLabel();
 	}
 	
-	protected abstract boolean storeRelativePaths();
+	public void setStoreRelativePaths(boolean storeRelativePaths) {
+		if (this.storeRelativePaths == storeRelativePaths)
+			return;
+		this.storeRelativePaths = storeRelativePaths;
+		fileBox.setText("");
+	}
 	
 	private void updateLabel() {
 		label.setText(matches()

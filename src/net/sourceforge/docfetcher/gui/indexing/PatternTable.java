@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Table;
 /**
  * @author Tran Nam Quang
  */
-abstract class PatternTable extends Composite {
+final class PatternTable extends Composite {
 	
 	public static void main(String[] args) {
 		Display display = new Display();
@@ -57,12 +57,8 @@ abstract class PatternTable extends Composite {
 		AppUtil.Const.autoInit();
 		
 		final IndexingConfig config = new IndexingConfig();
-		
-		new PatternTable(shell, config) {
-			protected boolean storeRelativePaths() {
-				return config.isStoreRelativePaths();
-			}
-		};
+		PatternTable patternTable = new PatternTable(shell, config);
+		patternTable.setStoreRelativePaths(config.isStoreRelativePaths());
 
 		Util.setCenteredBounds(shell);
 		shell.open();
@@ -75,6 +71,7 @@ abstract class PatternTable extends Composite {
 	
 	@NotNull private SimpleTableViewer<PatternAction> tableViewer;
 	private final RegexTestPanel regexTestPanel;
+	private boolean storeRelativePaths;
 	
 	public PatternTable(@NotNull Composite parent,
 						@NotNull IndexingConfig config) {
@@ -85,11 +82,8 @@ abstract class PatternTable extends Composite {
 		Table table = createTable();
 		Control buttonPanel = createButtonPanel();
 		
-		regexTestPanel = new RegexTestPanel(this, config) {
-			protected boolean storeRelativePaths() {
-				return PatternTable.this.storeRelativePaths();
-			}
-		};
+		regexTestPanel = new RegexTestPanel(this, config);
+		regexTestPanel.setStoreRelativePaths(storeRelativePaths);
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		int factor = ProgramConf.Int.PatternTableHeight.get() + 1; // +1 for column header
@@ -117,6 +111,7 @@ abstract class PatternTable extends Composite {
 				return new TextEditSupport<PatternAction>() {
 					protected void setText(PatternAction element, String text) {
 						element.setRegex(text);
+						updateRegexTestPanel();
 					}
 				};
 			}
@@ -124,22 +119,29 @@ abstract class PatternTable extends Composite {
 		
 		tableViewer.addColumn(new Column<PatternAction>("Match Against") {
 			protected String getLabel(PatternAction element) {
-				switch (element.getTarget()) {
-				case FILENAME: return "Filename";
-				case PATH: return "Path";
-				}
-				throw new IllegalStateException();
+				return getLabel(element.getTarget());
 			}
 			protected ColumnEditSupport<PatternAction> getEditSupport() {
 				return new ComboEditSupport<PatternAction, MatchTarget>(MatchTarget.class) {
 					protected void setChoice(	PatternAction element,
 												MatchTarget target) {
 						element.setTarget(target);
+						updateRegexTestPanel();
 					}
 					protected String toString(MatchTarget enumInstance) {
-						return enumInstance.displayName;
+						return getLabel(enumInstance);
 					}
 				};
+			}
+			private String getLabel(MatchTarget target) {
+				switch (target) {
+				case FILENAME: return "Filename";
+				case PATH:
+					return storeRelativePaths
+						? "Relative path"
+						: "Absolute path";
+				}
+				throw new IllegalStateException();
 			}
 		});
 		
@@ -156,6 +158,7 @@ abstract class PatternTable extends Composite {
 					protected void setChoice(	PatternAction element,
 												MatchAction action) {
 						element.setAction(action);
+						updateRegexTestPanel();
 					}
 					protected String toString(MatchAction enumInstance) {
 						return enumInstance.displayName;
@@ -170,13 +173,17 @@ abstract class PatternTable extends Composite {
 		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				regexTestPanel.setPatternActions(tableViewer.getSelection());
+				updateRegexTestPanel();
 			}
 		});
 		
 		return table;
 	}
-
+	
+	private void updateRegexTestPanel() {
+		regexTestPanel.setPatternActions(tableViewer.getSelection());
+	}
+	
 	@NotNull
 	private Control createButtonPanel() {
 		Composite comp = new Composite(this, SWT.NONE);
@@ -222,11 +229,16 @@ abstract class PatternTable extends Composite {
 		return comp;
 	}
 	
-	protected abstract boolean storeRelativePaths();
+	public void setStoreRelativePaths(boolean storeRelativePaths) {
+		this.storeRelativePaths = storeRelativePaths;
+		regexTestPanel.setStoreRelativePaths(storeRelativePaths);
+		for (PatternAction patternAction : tableViewer.getElements())
+			tableViewer.update(patternAction);
+	}
 	
 	@MutableCopy
 	@NotNull
-	public final List<PatternAction> getPatternActions() {
+	public List<PatternAction> getPatternActions() {
 		return tableViewer.getElements();
 	}
 	

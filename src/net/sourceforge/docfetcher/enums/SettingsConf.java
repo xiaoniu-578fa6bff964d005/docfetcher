@@ -76,6 +76,7 @@ public final class SettingsConf {
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
 		HideOnOpen (true),
+		ShowRelativePathsMessage (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

@@ -120,6 +120,10 @@ public final class SimpleTableViewer<E> {
 		elementToItemMap.getValue(element).dispose();
 	}
 	
+	public void update(@NotNull E element) {
+		updateItem(element, elementToItemMap.getValue(element));
+	}
+	
 	private void updateItem(@NotNull E element, @NotNull TableItem item) {
 		for (int iCol = 0; iCol < columns.size(); iCol++) {
 			Column<E> column = columns.get(iCol);

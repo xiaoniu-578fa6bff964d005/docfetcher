@@ -14,9 +14,11 @@ package net.sourceforge.docfetcher.gui.indexing;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
@@ -27,6 +29,8 @@ import net.sourceforge.docfetcher.util.gui.GroupWrapper;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,11 +83,7 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createFillLayout(5));
 			}
 			protected void createContents(Group parent) {
-				patternTable = new PatternTable(parent, config) {
-					protected boolean storeRelativePaths() {
-						return storeRelativePathsBt.getSelection();
-					}
-				};
+				patternTable = new PatternTable(parent, config);
 			}
 		}.getGroup();
 		
@@ -92,17 +92,7 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
 			protected void createContents(Group parent) {
-				htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
-				detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
-				indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
-				storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
-				watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
-				
-				htmlPairingBt.setSelection(config.isHtmlPairing());
-				detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
-				indexFilenameBt.setSelection(config.isIndexFilenames());
-				storeRelativePathsBt.setSelection(config.isStoreRelativePaths());
-				watchFolderBt.setSelection(config.isWatchFolders());
+				createMiscGroupContents(parent);
 			}
 		}.getGroup();
 		
@@ -121,6 +111,46 @@ final class FileConfigPanel extends ConfigPanel {
 									boolean grabExcessVerticalSpace) {
 		control.setLayoutData(new GridData(
 			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
+	}
+	
+	private void createMiscGroupContents(@NotNull Group parent) {
+		htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
+		detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
+		indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
+		storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
+		watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
+		
+		htmlPairingBt.setSelection(config.isHtmlPairing());
+		detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
+		indexFilenameBt.setSelection(config.isIndexFilenames());
+		watchFolderBt.setSelection(config.isWatchFolders());
+		
+		boolean storeRelativePaths = config.isStoreRelativePaths();
+		patternTable.setStoreRelativePaths(storeRelativePaths);
+		storeRelativePathsBt.setSelection(storeRelativePaths);
+		
+		storeRelativePathsBt.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				onStoreRelativePathsButtonClicked();
+			}
+		});
+	}
+	
+	private void onStoreRelativePathsButtonClicked() {
+		patternTable.setStoreRelativePaths(storeRelativePathsBt.getSelection());
+		
+		if (!SettingsConf.Bool.ShowRelativePathsMessage.get())
+			return;
+		
+		for (PatternAction patternAction : patternTable.getPatternActions()) {
+			if (patternAction.getTarget() != MatchTarget.PATH)
+				continue;
+			String msg = "Changing the 'store relative paths' setting might require adapting " +
+					"some of the regular expressions in the pattern table that are matched against paths.";
+			AppUtil.showInfo(msg);
+			SettingsConf.Bool.ShowRelativePathsMessage.set(false);
+			break;
+		}
 	}
 	
 	protected boolean writeToConfig() {
