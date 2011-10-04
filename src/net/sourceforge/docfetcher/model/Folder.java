@@ -321,6 +321,9 @@ public abstract class Folder
 	@SuppressWarnings("unchecked")
 	public final TreeCheckState getTreeCheckState() {
 		final TreeCheckState state = new TreeCheckState();
+		if (isChecked)
+			state.checkedPaths.add(getPath());
+		state.folderCount++;
 		new FolderVisitor<D, F, Throwable>((F) this) {
 			protected void visitFolder(F parent, F folder) {
 				if (folder.isChecked)
