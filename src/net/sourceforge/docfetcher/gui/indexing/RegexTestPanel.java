@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -41,6 +42,7 @@ import org.eclipse.swt.widgets.Text;
  */
 final class RegexTestPanel extends Composite {
 	
+	private final IndexingConfig config;
 	private final Label label;
 	private final Text fileBox;
 	private List<PatternAction> patternActions = Collections.emptyList();
@@ -52,6 +54,7 @@ final class RegexTestPanel extends Composite {
 							@NotNull final IndexingConfig config) {
 		super(parent, SWT.NONE);
 		Util.checkNotNull(config);
+		this.config = config;
 		label = new Label(this, SWT.NONE);
 		label.setText("regex_matches_file_no");
 		fileBox = new Text(this, SWT.BORDER | SWT.SINGLE);
@@ -93,7 +96,17 @@ final class RegexTestPanel extends Composite {
 		if (this.storeRelativePaths == storeRelativePaths)
 			return;
 		this.storeRelativePaths = storeRelativePaths;
-		fileBox.setText("");
+		
+		String path = fileBox.getText();
+		if (path.isEmpty())
+			return;
+		try {
+			File file = new File(path).getCanonicalFile();
+			fileBox.setText(config.getStorablePath(file, storeRelativePaths));
+		}
+		catch (IOException e) {
+			fileBox.setText("");
+		}
 	}
 	
 	private void updateLabel() {

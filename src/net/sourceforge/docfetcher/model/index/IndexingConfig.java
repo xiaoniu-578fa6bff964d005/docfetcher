@@ -174,15 +174,9 @@ public class IndexingConfig implements Serializable {
 	 * either an absolute path or a path relative to the current directory,
 	 * depending on the value of {@link #isStoreRelativePaths()}.
 	 * <p>
-	 * There are some exceptions to this rule:
-	 * <ul>
-	 * <li>If the program is not portable, this method returns an absolute path.
-	 * <li>If the program is portable and if the given file is equal to or
-	 * inside the current directory, this method returns a relative path.
-	 * <li>If the file and the current directory reside on different drives
-	 * (e.g. "C:\" and "D:\"), this method returns an absolute path. This
-	 * applies to Windows only.
-	 * </ul>
+	 * On Windows, there is one exception: If the file and the current directory
+	 * reside on different drives (e.g. "C:\" and "D:\"), this method returns an
+	 * absolute path.
 	 * <p>
 	 * The separators are always forward slashes (i.e., "/"). This does not
 	 * affect portability since forward slashes are valid path separators on
@@ -200,19 +194,17 @@ public class IndexingConfig implements Serializable {
 	public final String getStorablePath(@NotNull File file,
 										boolean storeRelativePaths) {
 		String absPath = Util.getAbsPath(file);
-		if (! isPortable)
-			return absPath;
 		assert Util.USER_DIR.isAbsolute();
 		String userDirPath = getUserDirPath();
 		if (absPath.equals(userDirPath))
-			return "";
+			return storeRelativePaths ? "" : absPath;
 		if (Util.IS_WINDOWS) {
 			String d1 = Util.getDriveLetter(userDirPath);
 			String d2 = Util.getDriveLetter(absPath);
 			if (! d1.equals(d2))
 				return absPath;
 		}
-		if (storeRelativePaths || Util.contains(userDirPath, absPath))
+		if (storeRelativePaths)
 			return UtilModel.getRelativePath(userDirPath, absPath);
 		return absPath;
 	}
