@@ -182,6 +182,17 @@ abstract class TableEditSupport<E> {
 		});
 		
 		combo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				/*
+				 * This line will end the editing when the user changes the
+				 * selection, either by clicking with the mouse or by pressing
+				 * an arrow key. Ideally, the editing should only end in the
+				 * former case, not in the latter. Unfortunately, the CCombo
+				 * doesn't seem to allow us to distinguish between the two
+				 * cases.
+				 */
+				saver.run();
+			}
 			public void widgetDefaultSelected(SelectionEvent e) {
 				saver.run();
 			}
