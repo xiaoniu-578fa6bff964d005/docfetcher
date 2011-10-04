@@ -97,7 +97,7 @@ final class RegexTestPanel extends Composite {
 			return;
 		this.storeRelativePaths = storeRelativePaths;
 		
-		String path = fileBox.getText();
+		String path = fileBox.getText().trim();
 		if (path.isEmpty())
 			return;
 		try {
