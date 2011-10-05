@@ -272,9 +272,7 @@ public final class ResultDocument {
 	public FileResource getFileResource() throws ParseException,
 			FileNotFoundException {
 		onlyFiles();
-		String path = DocumentType.extractPath(uid);
-		IndexingConfig fileConfig = config;
-		return fileFactory.createFile(fileConfig, path);
+		return fileFactory.createFile(config, getPath());
 	}
 
 	/**
@@ -289,8 +287,7 @@ public final class ResultDocument {
 	public MailResource getMailResource() throws ParseException,
 			FileNotFoundException {
 		onlyEmails();
-		String path = DocumentType.extractPath(uid);
-		return mailFactory.createMail(config, query, isPhraseQuery, path);
+		return mailFactory.createMail(config, query, isPhraseQuery, getPath());
 	}
 
 }

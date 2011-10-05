@@ -97,7 +97,13 @@ public class IndexingConfig implements Serializable {
 	
 	@NotNull
 	public final File getAbsoluteRootFile() {
-		return rootFile.getAbsoluteFile();
+		try {
+			return rootFile.getCanonicalFile();
+		}
+		catch (IOException e) {
+			Util.printErr(e);
+			return rootFile.getAbsoluteFile();
+		}
 	}
 	
 	public final boolean isPortable() {
