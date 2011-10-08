@@ -48,6 +48,7 @@ public final class ProgramConf {
 		FixWindowSizes (false),
 		CurvyTabs (false),
 		ColoredTabs (false),
+		DryRun (false),
 		;
 
 		private boolean value;

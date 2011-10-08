@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.Path;
@@ -130,9 +131,12 @@ public final class ParseService {
 		if (parser != null)
 			return doParse(config, parser, file, reporter, cancelable);
 		
-		// Fall back to filename parser if allowed
+		/*
+		 * Fall back to filename parser if allowed. The filename will be added
+		 * to the contents later.
+		 */
 		if (config.isIndexFilenames())
-			return new ParseResult(filename).setParserName(FILENAME_PARSER);
+			return new ParseResult("").setParserName(FILENAME_PARSER);
 		
 		throw new ParseException(new ParserNotFoundException());
 	}
@@ -145,7 +149,10 @@ public final class ParseService {
 										@NotNull IndexingReporter reporter,
 										@NotNull Cancelable cancelable) throws ParseException {
 		ParseResult result = null;
-		if (parser instanceof StreamParser) {
+		if (ProgramConf.Bool.DryRun.get()) {
+			result = new ParseResult("");
+		}
+		else if (parser instanceof StreamParser) {
 			InputStream in = null;
 			try {
 				if (isZipEntry(file))
