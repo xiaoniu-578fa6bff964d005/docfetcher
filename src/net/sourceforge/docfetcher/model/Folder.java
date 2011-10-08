@@ -128,6 +128,10 @@ public abstract class Folder
 		}
 	}
 	
+	synchronized int getPathHashCode() {
+		return pathHashCode;
+	}
+	
 	@Nullable
 	public synchronized final F getParent() {
 		return parent;
@@ -395,14 +399,10 @@ public abstract class Folder
 	@SuppressWarnings("unchecked")
 	public synchronized final TreeCheckState getTreeCheckState() {
 		final TreeCheckState state = new TreeCheckState();
-		if (isChecked)
-			state.checkedPaths.add(getPath());
-		state.folderCount++;
+		state.add(this, isChecked);
 		new FolderVisitor<D, F, Throwable>((F) this) {
 			protected void visitFolder(F parent, F folder) {
-				if (folder.isChecked)
-					state.checkedPaths.add(folder.getPath());
-				state.folderCount++;
+				state.add(folder, folder.isChecked);
 			}
 		}.runSilently();
 		return state;

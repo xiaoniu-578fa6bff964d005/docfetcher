@@ -488,11 +488,8 @@ public final class IndexRegistry {
 		List<LuceneIndex> localIndexes = getIndexes();
 		
 		TreeCheckState totalState = new TreeCheckState();
-		for (LuceneIndex index : localIndexes) {
-			TreeCheckState indexState = index.getTreeCheckState();
-			totalState.checkedPaths.addAll(indexState.checkedPaths);
-			totalState.folderCount += indexState.folderCount;
-		}
+		for (LuceneIndex index : localIndexes)
+			totalState.add(index.getTreeCheckState());
 		return totalState;
 	}
 

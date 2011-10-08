@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.gui;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
@@ -26,7 +25,6 @@ import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
-import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeCheckState;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
@@ -69,9 +67,8 @@ public final class SearchQueue {
 	@Nullable private volatile Set<String> listDocIds;
 	@Nullable private List<ResultDocument> results;
 	@Nullable private Set<String> checkedParsers;
-	@Nullable private Set<Path> checkedLocations;
+	@Nullable private TreeCheckState treeCheckState;
 	private boolean allParsersChecked;
-	private boolean allLocationsChecked;
 	
 	public SearchQueue(	@NotNull SearchBar searchBar,
 						@NotNull FilesizePanel filesizePanel,
@@ -240,14 +237,8 @@ public final class SearchQueue {
 		}
 		
 		// Build location filter
-		if (checkedLocations == null || queueCopy.contains(GuiEvent.LOCATION)) {
-			checkedLocations = new HashSet<Path>();
-			TreeCheckState treeCheckState = indexRegistry.getTreeCheckState();
-			List<Path> paths = treeCheckState.getCheckedPaths();
-			int folderCount = treeCheckState.getFolderCount();
-			checkedLocations.addAll(paths);
-			allLocationsChecked = paths.size() == folderCount;
-		}
+		if (treeCheckState == null || queueCopy.contains(GuiEvent.LOCATION))
+			treeCheckState = indexRegistry.getTreeCheckState();
 		
 		/*
 		 * No need to update the result panel if the user changed the filter
@@ -277,13 +268,8 @@ public final class SearchQueue {
 						continue;
 				}
 			}
-			if (checkedLocations.isEmpty())
+			if (!treeCheckState.isChecked(doc.getParentPath()))
 				continue;
-			if (!allLocationsChecked) {
-				Path parentPath = doc.getParentPath();
-				if (!checkedLocations.contains(parentPath))
-					continue;
-			}
 			visibleResults.add(doc);
 		}
 		
