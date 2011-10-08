@@ -138,6 +138,7 @@ public class IndexingConfig implements Serializable {
 										boolean storeRelativePaths) {
 		// Path should not start with any of these:
 		// ./   ../   .\   ..\
+		Util.checkNotNull(file);
 		Util.checkThat(!dotSlashPattern.matcher(file.getPath()).matches());
 		
 		if (storeRelativePaths)

@@ -247,14 +247,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		return new FileDocument(parentFolder, file.getName(), file.lastModified());
 	}
 
-	@Nullable
-	private static FileFolder createFileFolder(	@NotNull FileContext context,
-												@Nullable File file,
-												@Nullable Long lastModified) {
-		if (file == null) return null;
-		return new FileFolder(context.getDirOrZipPath(file), lastModified);
-	}
-
 	// Will clean up temporary zip files
 	@RecursiveMethod
 	private static void visitDirOrZip(	@NotNull final FileContext context,
@@ -313,8 +305,11 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 					// HTML pair added
 					if (doc == null) {
 						doc = createFileDoc(folder, htmlFile);
-						doc.setHtmlFolder(createFileFolder(
-							context, htmlDir, null)); // folder may be null
+						FileFolder htmlFolder = htmlDir == null
+							? null
+							: new FileFolder(
+								context.getDirOrZipPath(htmlDir), null);
+						doc.setHtmlFolder(htmlFolder);
 						AppendingContext subContext = new AppendingContext(
 							context);
 						if (!subContext.index(doc, htmlFile, true)) return;
@@ -334,8 +329,11 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 						 * encountered in the on-disk HTML folder to appear as
 						 * 'new', rather than 'modified' or 'removed'.
 						 */
-						doc.setHtmlFolder(createFileFolder(
-							context, htmlDir, null));
+						FileFolder htmlFolder = htmlDir == null
+							? null
+							: new FileFolder(
+								context.getDirOrZipPath(htmlDir), null);
+						doc.setHtmlFolder(htmlFolder);
 						AppendingContext subContext = new AppendingContext(
 							context);
 						if (subContext.index(doc, htmlFile, true)) {
@@ -367,8 +365,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				Long newLastModified = getZipArchiveLastModified(
 					context.getConfig(), dir);
 				if (subFolder == null) { // Folder added
-					subFolder = createFileFolder(context, dir, newLastModified);
-					folder.putSubFolder(subFolder);
+					subFolder = new FileFolder(folder, dir.getName(), newLastModified);
 				}
 				else { // Folder already registered, check modification state
 					if (UtilModel.isUnmodifiedArchive(subFolder, newLastModified))
@@ -453,9 +450,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		FileFolder archiveFolder = parentFolder.getSubFolder(archiveName);
 		long newLastModified = archiveFile.lastModified();
 		if (archiveFolder == null) { // Found new archive
-			archiveFolder = createFileFolder(
-				context, archiveFile, newLastModified);
-			parentFolder.putSubFolder(archiveFolder);
+			archiveFolder = new FileFolder(
+				parentFolder, archiveName, newLastModified);
 		}
 		else { // Found registered archive
 			if (UtilModel.isUnmodifiedArchive(archiveFolder, newLastModified))

@@ -27,6 +27,10 @@ final class MailFolder extends Folder<MailDocument, MailFolder> {
 	
 	private boolean hasDeepContent = false;
 	
+	public MailFolder(@NotNull MailFolder parent, @NotNull String name) {
+		super(parent, name, null);
+	}
+	
 	public MailFolder(@NotNull Path path) {
 		super(path, null);
 	}

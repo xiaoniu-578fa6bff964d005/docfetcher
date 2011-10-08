@@ -161,43 +161,30 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		for (int i = 0; archiveIt.hasNext(); i++) {
 			E entry = archiveIt.next();
 			FileFolder parent = archiveFolder;
-			
 			final String innerPath = entryReader.getInnerPath(entry);
-			Path intermediatePath = archiveFolder.getPath();
 			
 			Iterator<String> it = Util.splitPath(innerPath).iterator();
 			while (it.hasNext()) { // iterate over inner path parts
 				String innerPart = it.next();
-				if (it.hasNext() || entryReader.isDirectory(entry)) { // inner path part corresponds to a directory
+				
+				// Inner path part corresponds to a directory
+				if (it.hasNext() || entryReader.isDirectory(entry)) {
 					FileFolder child = parent.getSubFolder(innerPart);
-					if (child == null) {
-						intermediatePath = intermediatePath.createSubPath(innerPart);
-						child = new FileFolder(intermediatePath, null);
-						parent.putSubFolder(child);
-					}
-					else {
-						intermediatePath = child.getPath();
-					}
+					if (child == null)
+						child = new FileFolder(parent, innerPart, null);
 					parent = child;
 				}
-				else { // inner path part corresponds to a file
-					long lastModified = entryReader.getLastModified(entry);
-					final Path childPath;
+				// Inner path part corresponds to a file
+				else {
 					TreeNode childNode;
-					
-					if (config.isArchive(innerPart)) {
-						Path fullPath = archiveFolder.getPath().createSubPath(innerPath);
-						FileFolder child = new FileFolder(fullPath, lastModified);
-						parent.putSubFolder(child);
-						childPath = child.getPath();
-						childNode = child;
-					}
-					else {
-						FileDocument child = new FileDocument(
+					long lastModified = entryReader.getLastModified(entry);
+					if (config.isArchive(innerPart))
+						childNode = new FileFolder(
 							parent, innerPart, lastModified);
-						childPath = child.getPath();
-						childNode = child;
-					}
+					else
+						childNode = new FileDocument(
+							parent, innerPart, lastModified);
+					Path childPath = childNode.getPath();
 					
 					long unpackedSize = entryReader.getUnpackedSize(entry);
 					boolean isEncrypted = entryReader.isEncrypted(entry);
@@ -227,7 +214,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					switch (patternAction.getAction()) {
 					case EXCLUDE:
 						if (patternAction.matches(name, path, true)) {
-							entryDataMap.removeKey(candidate.getPath());
+							entryDataMap.removeKey(path);
 							return true;
 						}
 						break;
@@ -245,7 +232,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				}
 				
 				if (!ParseService.canParseByName(config, name)) {
-					entryDataMap.removeKey(candidate.getPath());
+					entryDataMap.removeKey(path);
 					return true;
 				}
 				return false;
@@ -260,7 +247,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					if (patternAction.getAction() == MatchAction.EXCLUDE) {
 						if (patternAction.matches(name, path, isArchive)) {
 							if (isArchive)
-								entryDataMap.removeKey(candidate.getPath());
+								entryDataMap.removeKey(path);
 							return true;
 						}
 					}
@@ -379,7 +366,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		final TempFileFactory tempFileFactory;
 		if (tempDir == null) {
 			tempFileFactory = defaultTempFileFactory;
-		} else {
+		}
+		else {
 			assert tempDir.isDirectory();
 			tempFileFactory = new TempFileFactory() {
 				private String tempDirPath = Util.getAbsPath(tempDir);
@@ -389,7 +377,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					File file = new File(tempFilePath);
 					try {
 						Files.createParentDirs(file);
-					} catch (IOException e) {
+					}
+					catch (IOException e) {
 						throw new IndexingException(e);
 					}
 					return file;

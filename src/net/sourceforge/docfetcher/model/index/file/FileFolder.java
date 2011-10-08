@@ -36,6 +36,12 @@ public class FileFolder extends Folder<FileDocument, FileFolder> {
 		}
 	}
 	
+	public FileFolder(	@NotNull FileFolder parent,
+						@NotNull String name,
+						@Nullable Long lastModified) {
+		super(parent, name, lastModified);
+	}
+	
 	public FileFolder(@NotNull Path path, @Nullable Long lastModified) {
 		super(path, lastModified);
 	}

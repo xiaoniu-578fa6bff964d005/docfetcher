@@ -194,7 +194,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 						mail = new MailDocument(
 							folder, id, subject, newLastModified);
 						context.index(mail, pstMail, true);
-					} else if (mail.isModified(newLastModified)) { // Mail modified
+					}
+					else if (mail.isModified(newLastModified)) { // Mail modified
 						/*
 						 * Note: Outlook mails are not immutable, because
 						 * Outlook allows modifying the subject and body, as
@@ -223,11 +224,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 					if (context.isStopped()) break;
 					String foldername = pstSubFolder.getDisplayName();
 					MailFolder subFolder = unseenSubFolders.remove(foldername);
-					if (subFolder == null) {
-						Path path = folder.getPath().createSubPath(foldername);
-						subFolder = new MailFolder(path);
-						folder.putSubFolder(subFolder);
-					}
+					if (subFolder == null)
+						subFolder = new MailFolder(folder, foldername);
 					visitFolder(context, subFolder, pstSubFolder);
 					if (subFolder.hasDeepContent())
 						folder.setHasDeepContent(true);

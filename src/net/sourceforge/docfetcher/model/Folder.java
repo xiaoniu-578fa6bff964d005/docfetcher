@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,11 +77,17 @@ public abstract class Folder
 	 * These maps are set to null when they're empty in order to avoid wasting
 	 * RAM when the tree is very large and has many empty leaf nodes.
 	 */
-	@Nullable private HashMap<String, D> documents; // guarded by 'this' lock
-	@Nullable private HashMap<String, F> subFolders; // guarded by 'this' lock
-	@Nullable private F parent; // guarded by 'this' lock
+	@Nullable private HashMap<String, D> documents;
+	@Nullable private HashMap<String, F> subFolders;
 	
-	@NotNull private Path path;
+	/*
+	 * If this is a root folder, then it has a non-null path and a null parent.
+	 * For non-root folders, it's the exact opposite, i.e. they have a null path
+	 * and a non-null parent. HTML folders and SolidArchiveTree roots are
+	 * treated as root folders.
+	 */
+	@Nullable private F parent;
+	@Nullable private Path path;
 	
 	/**
 	 * The last time this object was modified. Null if the object has no last
@@ -88,46 +95,79 @@ public abstract class Folder
 	 */
 	@Nullable private Long lastModified;
 	
-	/*
-	 * This field is marked as volatile because it will be accessed from another
-	 * thread during search.
-	 */
-	private volatile boolean isChecked = true;
+	private boolean isChecked = true;
 	
-	public Folder(@NotNull Path path, @Nullable Long lastModified) {
+	@SuppressWarnings("unchecked")
+	protected Folder(	@NotNull F parent,
+						@NotNull String name,
+						@Nullable Long lastModified) {
+		super(name);
+		Util.checkNotNull(parent);
+		this.parent = parent;
+		this.lastModified = lastModified;
+		parent.putSubFolder((F) this);
+	}
+	
+	protected Folder(@NotNull Path path, @Nullable Long lastModified) {
 		super(path.getName());
 		this.path = path;
 		this.lastModified = lastModified;
 	}
 	
 	@Nullable
-	public synchronized F getParent() {
+	public synchronized final F getParent() {
 		return parent;
 	}
 	
 	@Nullable
 	@RecursiveMethod
 	@SuppressWarnings("unchecked")
-	public synchronized F getRoot() {
+	public synchronized final F getRoot() {
 		return parent == null ? (F) this : parent.getRoot();
 	}
 
+	// TODO post-release-1.1: This method is somewhat expensive. Try to avoid calling it
+	@SuppressWarnings("unchecked")
 	@NotNull
-	public final Path getPath() {
-		return path;
+	public synchronized final Path getPath() {
+		assert (parent == null) == (path != null);
+		
+		// Just return the path if this instance is a root
+		if (path != null)
+			return path;
+		
+		// Create a list of nodes from the root down to this instance
+		LinkedList<F> list = new LinkedList<F>();
+		list.add((F) this);
+		F current = parent;
+		while (current != null) {
+			list.addFirst(current);
+			current = current.parent;
+		}
+		
+		// Construct path for this instance
+		StringBuilder sb = new StringBuilder();
+		sb.append(list.removeFirst().path.getPath()); // root path
+		for (F node : list) {
+			sb.append("/");
+			sb.append(node.getName());
+		}
+		
+		return new Path(sb.toString());
 	}
 	
-	void setPath(@NotNull Path path) {
+	synchronized final void setPath(@NotNull Path path) {
 		Util.checkNotNull(path);
 		this.path = path;
+		parent = null;
 	}
 	
 	@Nullable
-	public final Long getLastModified() {
+	public synchronized final Long getLastModified() {
 		return lastModified;
 	}
 	
-	public final void setLastModified(@Nullable Long lastModified) {
+	public synchronized final void setLastModified(@Nullable Long lastModified) {
 		this.lastModified = lastModified;
 	}
 	
@@ -145,15 +185,15 @@ public abstract class Folder
 	
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
-	public synchronized final void putSubFolder(@NotNull F folder) {
-		Util.checkThat(path.contains(folder.path));
+	public synchronized final void putSubFolder(@NotNull F subFolder) {
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
-		if (folder.parent != null)
-			folder.parent.subFolders.remove(folder);
-		folder.parent = (F) this;
-		subFolders.put(folder.getName(), folder);
-		evtFolderAdded.fire(new FolderEvent(this, folder));
+		if (subFolder.parent != null)
+			subFolder.parent.subFolders.remove(subFolder);
+		subFolder.parent = (F) this;
+		subFolder.path = null;
+		subFolders.put(subFolder.getName(), subFolder);
+		evtFolderAdded.fire(new FolderEvent(this, subFolder));
 	}
 	
 	/**
@@ -179,8 +219,10 @@ public abstract class Folder
 		if (subFolders != null) {
 			Collection<F> toNotify = subFolders.values();
 			subFolders = null;
-			for (F subFolder : toNotify)
+			for (F subFolder : toNotify) {
+				subFolder.path = subFolder.getPath();
 				subFolder.parent = null;
+			}
 			for (F subFolder : toNotify)
 				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 		}
@@ -188,13 +230,23 @@ public abstract class Folder
 	
 	/**
 	 * Removes the given subfolder from the receiver. Does nothing if the given
-	 * subfolder is null.
+	 * subfolder is null. After it is removed, it will still have a valid path
+	 * that can be obtained via {@link #getPath()}.
 	 */
 	public synchronized final void removeSubFolder(@Nullable F subFolder) {
-		if (subFolders == null || subFolder == null) return;
+		if (subFolders == null || subFolder == null)
+			return;
 		F candidate = subFolders.remove(subFolder.getName());
 		Util.checkThat(candidate == subFolder);
+		
+		/*
+		 * Folder instances must always either have a parent or a path, so we'll
+		 * reconstruct the subfolder's path and set it before we nullify the
+		 * parent.
+		 */
+		subFolder.path = subFolder.getPath();
 		subFolder.parent = null;
+		
 		if (subFolders.isEmpty())
 			subFolders = null;
 		evtFolderRemoved.fire(new FolderEvent(this, subFolder));
@@ -222,6 +274,7 @@ public abstract class Folder
 			F subFolder = subFolderIt.next();
 			if (predicate.apply(subFolder)) {
 				subFolderIt.remove();
+				subFolder.path = subFolder.getPath();
 				subFolder.parent = null;
 				toNotify.add(subFolder);
 			}
@@ -307,17 +360,17 @@ public abstract class Folder
 		return UtilGlobal.<ViewNode>convert(col);
 	}
 	
-	public final boolean isChecked() {
+	public synchronized final boolean isChecked() {
 		return isChecked;
 	}
 	
-	public final void setChecked(boolean isChecked) {
+	public synchronized final void setChecked(boolean isChecked) {
 		this.isChecked = isChecked;
 	}
 	
 	@NotNull
 	@SuppressWarnings("unchecked")
-	public final TreeCheckState getTreeCheckState() {
+	public synchronized final TreeCheckState getTreeCheckState() {
 		final TreeCheckState state = new TreeCheckState();
 		if (isChecked)
 			state.checkedPaths.add(getPath());
@@ -338,7 +391,7 @@ public abstract class Folder
 	
 	@ImmutableCopy
 	@NotNull
-	public final List<String> getDocumentIds() {
+	public synchronized final List<String> getDocumentIds() {
 		if (documents == null)
 			return Collections.emptyList();
 		String[] uids = new String[documents.size()];
@@ -364,7 +417,7 @@ public abstract class Folder
 	@ThreadSafe
 	public final TreeNode findTreeNode(@NotNull Path targetPath) {
 		Util.checkNotNull(targetPath);
-		if (path.equals(targetPath))
+		if (getPath().equals(targetPath))
 			return this;
 		return findTreeNodeUnchecked(targetPath);
 	}
@@ -376,6 +429,11 @@ public abstract class Folder
 	@RecursiveMethod
 	@ThreadSafe
 	private synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
+		/*
+		 * TODO post-release-1.1: since getPath() constructs the returned path
+		 * dynamically, this search algorithm is somewhat inefficient. Maybe
+		 * improve it?
+		 */
 		if (documents != null) {
 			for (D document : documents.values()) {
 				Path path = document.getPath();

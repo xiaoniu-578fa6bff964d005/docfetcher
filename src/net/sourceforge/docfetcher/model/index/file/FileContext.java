@@ -212,7 +212,7 @@ class FileContext {
 	/**
 	 * Returns the original path for the given file, taking into account virtual
 	 * files inside TrueZIP archives. The returned path depends on whether a
-	 * non-null original path for the given indexing context was set.
+	 * non-null original path was set on the receiver.
 	 */
 	@NotNull
 	public final Path getDirOrZipPath(@NotNull File file) {

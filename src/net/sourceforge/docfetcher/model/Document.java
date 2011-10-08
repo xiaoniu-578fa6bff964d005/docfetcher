@@ -52,6 +52,7 @@ public abstract class Document<D extends Document<D, F>, F extends Folder<D, F>>
 		return getType().createUniqueId(getPath());
 	}
 	
+	// TODO post-release-1.1: This method is somewhat expensive. Try to avoid calling it
 	@NotNull
 	public final Path getPath() {
 		return parent.getPath().createSubPath(getName());

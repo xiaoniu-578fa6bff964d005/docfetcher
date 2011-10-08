@@ -29,8 +29,7 @@ public final class FolderTest {
 			String prefix = absolutePath ? "/" : "";
 			
 			FileFolder f1 = new FileFolder(new Path(prefix + "one"), null);
-			FileFolder f2 = new FileFolder(new Path(prefix + "one/two"), null);
-			f1.putSubFolder(f2);
+			FileFolder f2 = new FileFolder(f1, "two", null);
 			FileDocument doc = new FileDocument(f2, "three", 1L);
 			
 			String targetPath = prefix + "one/two/three";
