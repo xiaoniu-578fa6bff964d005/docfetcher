@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -44,7 +45,7 @@ class FileContext {
 	private final TArchiveDetector zipDetector;
 	private final LuceneDocWriter writer;
 	@NotNull private IndexingReporter reporter;
-	@Nullable private final String originalPath;
+	@Nullable private final Path originalPath;
 	private final Cancelable cancelable;
 	private final MutableInt fileCount;
 
@@ -52,7 +53,7 @@ class FileContext {
 							@NotNull TArchiveDetector zipDetector,
 							@NotNull LuceneDocWriter writer,
 							@Nullable IndexingReporter reporter,
-							@Nullable String originalPath,
+							@Nullable Path originalPath,
 							@NotNull Cancelable cancelable,
 							@NotNull MutableInt fileCount) {
 		Util.checkNotNull(config, zipDetector, writer, cancelable, fileCount);
@@ -66,7 +67,7 @@ class FileContext {
 	}
 	
 	protected FileContext(	@NotNull FileContext superContext,
-							@NotNull String originalPath) {
+							@NotNull Path originalPath) {
 		this(
 				superContext.config,
 				superContext.zipDetector,
@@ -106,7 +107,7 @@ class FileContext {
 	}
 	
 	@Nullable
-	public final String getOriginalPath() {
+	public final Path getOriginalPath() {
 		return originalPath;
 	}
 	
@@ -214,13 +215,13 @@ class FileContext {
 	 * non-null original path for the given indexing context was set.
 	 */
 	@NotNull
-	public final String getDirOrZipPath(@NotNull File file) {
+	public final Path getDirOrZipPath(@NotNull File file) {
 		if (originalPath == null)
 			return config.getStorablePath(file);
 		TFile tzFile = (TFile) file;
 		TFile topArchive = tzFile.getTopLevelArchive();
 		String relativePath = UtilModel.getRelativePath(topArchive, tzFile);
-		return Util.joinPath(originalPath, relativePath);
+		return originalPath.createSubPath(relativePath);
 	}
 	
 	/**
@@ -229,7 +230,7 @@ class FileContext {
 	 */
 	public final boolean skip(@NotNull TFile fileOrDir) {
 		String filename = fileOrDir.getName();
-		String filepath = getDirOrZipPath(fileOrDir);
+		Path filepath = getDirOrZipPath(fileOrDir);
 		
 		boolean isFileOrSolidArchive = fileOrDir.isFile();
 		boolean isZipArchiveOrFolder = !isFileOrSolidArchive;

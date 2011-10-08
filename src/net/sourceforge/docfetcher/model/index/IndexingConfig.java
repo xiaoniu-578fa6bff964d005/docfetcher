@@ -23,16 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.file.SolidArchiveFactory;
-import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
-
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -57,10 +54,7 @@ public class IndexingConfig implements Serializable {
 	public static final List<String> hiddenZipExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
 	
-	@NotNull private File rootFile;
-	@Nullable private String userDirPath;
 	@Nullable private File tempDir;
-	private boolean isPortable = AppUtil.isPortable();
 	
 	@NotNull private List<String> zipExtensions = defaultZipExtensions;
 	@NotNull private List<String> textExtensions = defaultTextExtensions;
@@ -71,48 +65,6 @@ public class IndexingConfig implements Serializable {
 	private boolean indexFilenames = true;
 	private boolean storeRelativePaths = false;
 	private boolean watchFolders = true;
-	
-	@VisibleForTesting
-	public IndexingConfig() {
-		this.rootFile = new File("");
-	}
-	
-	public IndexingConfig(@NotNull File rootFile) {
-		Util.checkNotNull(rootFile);
-		this.rootFile = new File(getStorablePath(rootFile));
-	}
-
-	/**
-	 * Warning: If the root file corresponds to the current working directory,
-	 * the path of the returned file will be an empty string (regardless of the
-	 * 'store relative paths' setting), and calling {@link File#exists()} on it
-	 * will return false. Use {@link #getAbsoluteRootFile()} instead if
-	 * <code>File.exists()</code> should return true in that case.
-	 */
-	@NotNull
-	@VisibleForPackageGroup
-	public final File getRootFile() {
-		return rootFile;
-	}
-	
-	@NotNull
-	public final File getAbsoluteRootFile() {
-		try {
-			return rootFile.getCanonicalFile();
-		}
-		catch (IOException e) {
-			Util.printErr(e);
-			return rootFile.getAbsoluteFile();
-		}
-	}
-	
-	public final boolean isPortable() {
-		return isPortable;
-	}
-
-	public final void setPortable(boolean isPortable) {
-		this.isPortable = isPortable;
-	}
 	
 	public final boolean isDetectExecutableArchives() {
 		return detectExecutableArchives;
@@ -128,20 +80,6 @@ public class IndexingConfig implements Serializable {
 
 	public final void setIndexFilenames(boolean indexFilenames) {
 		this.indexFilenames = indexFilenames;
-	}
-
-	@NotNull
-	public final String getUserDirPath() {
-		if (userDirPath == null)
-			return Util.USER_DIR_PATH;
-		return userDirPath;
-	}
-
-	public final void setUserDirPath(@Nullable String userDirPath) {
-		if (userDirPath == null)
-			this.userDirPath = null;
-		else
-			this.userDirPath = Util.getAbsPath(userDirPath);
 	}
 
 	@NotNull
@@ -167,12 +105,11 @@ public class IndexingConfig implements Serializable {
 	public final void setStoreRelativePaths(boolean storeRelativePaths) {
 		if (this.storeRelativePaths == storeRelativePaths)
 			return;
-		rootFile = new File(getStorablePath(rootFile, storeRelativePaths));
 		this.storeRelativePaths = storeRelativePaths;
-		onRootFileChanged();
+		onStoreRelativePathsChanged();
 	}
 	
-	protected void onRootFileChanged() {}
+	protected void onStoreRelativePathsChanged() {}
 
 	/**
 	 * For the given file, a path is returned that can be stored without
@@ -189,30 +126,32 @@ public class IndexingConfig implements Serializable {
 	 * both Windows and Linux.
 	 */
 	@NotNull
-	public final String getStorablePath(@NotNull File file) {
+	public final Path getStorablePath(@NotNull File file) {
 		return getStorablePath(file, storeRelativePaths);
 	}
 	
-	/**
-	 * @see #getStorablePath(File)
-	 */
 	@NotNull
-	public final String getStorablePath(@NotNull File file,
+	public static Path getStorablePath(	@NotNull File file,
 										boolean storeRelativePaths) {
+		if (storeRelativePaths)
+			return new Path(getRelativePathIfPossible(file));
+		else
+			return new Path(Util.getAbsPath(file));
+	}
+	
+	@NotNull
+	private static String getRelativePathIfPossible(@NotNull File file) {
 		String absPath = Util.getAbsPath(file);
 		assert Util.USER_DIR.isAbsolute();
-		String userDirPath = getUserDirPath();
-		if (absPath.equals(userDirPath))
-			return storeRelativePaths ? "" : absPath;
+		if (absPath.equals(Util.USER_DIR_PATH))
+			return "";
 		if (Util.IS_WINDOWS) {
-			String d1 = Util.getDriveLetter(userDirPath);
+			String d1 = Util.getDriveLetter(Util.USER_DIR_PATH);
 			String d2 = Util.getDriveLetter(absPath);
-			if (! d1.equals(d2))
+			if (!d1.equals(d2))
 				return absPath;
 		}
-		if (storeRelativePaths)
-			return UtilModel.getRelativePath(userDirPath, absPath);
-		return absPath;
+		return UtilModel.getRelativePath(Util.USER_DIR_PATH, absPath);
 	}
 	
 	@NotNull
@@ -373,7 +312,12 @@ public class IndexingConfig implements Serializable {
 	}
 	
 	public final void setWatchFolders(boolean watchFolders) {
+		if (this.watchFolders == watchFolders)
+			return;
 		this.watchFolders = watchFolders;
+		onWatchFoldersChanged();
 	}
+	
+	protected void onWatchFoldersChanged() {}
 
 }

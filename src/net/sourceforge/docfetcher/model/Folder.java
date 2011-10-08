@@ -83,7 +83,7 @@ public abstract class Folder
 	@Nullable private HashMap<String, F> subFolders; // guarded by 'this' lock
 	@Nullable private F parent; // guarded by 'this' lock
 	
-	private final String path;
+	@NotNull private Path path;
 	
 	/**
 	 * The last time this object was modified. Null if the object has no last
@@ -97,9 +97,9 @@ public abstract class Folder
 	 */
 	private volatile boolean isChecked = true;
 	
-	public Folder(@NotNull String name, @NotNull String path, @Nullable Long lastModified) {
-		super(name, name);
-		this.path = UtilModel.normalizePath(path);
+	public Folder(@NotNull Path path, @Nullable Long lastModified) {
+		super(path.getName(), path.getName());
+		this.path = path;
 		this.lastModified = lastModified;
 	}
 	
@@ -116,8 +116,13 @@ public abstract class Folder
 	}
 
 	@NotNull
-	public final String getPath() {
+	public final Path getPath() {
 		return path;
+	}
+	
+	void setPath(@NotNull Path path) {
+		Util.checkNotNull(path);
+		this.path = path;
 	}
 	
 	@Nullable
@@ -144,11 +149,7 @@ public abstract class Folder
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
 	public synchronized final void putSubFolder(@NotNull F folder) {
-		if (path.isEmpty()) // Current working directory
-			Util.checkThat(!folder.path.startsWith("/"));
-		else
-			Util.checkThat(folder.path.startsWith(path + "/"));
-		
+		Util.checkThat(path.contains(folder.path));
 		if (subFolders == null)
 			subFolders = Maps.newHashMap();
 		if (folder.parent != null)
@@ -364,9 +365,10 @@ public abstract class Folder
 	 */
 	@Nullable
 	@ThreadSafe
-	public final TreeNode findTreeNode(@NotNull String targetPath) {
+	public final TreeNode findTreeNode(@NotNull Path targetPath) {
 		Util.checkNotNull(targetPath);
-		targetPath = UtilModel.normalizePath(targetPath);
+		if (path.equals(targetPath))
+			return this;
 		return findTreeNodeUnchecked(targetPath);
 	}
 	
@@ -376,22 +378,20 @@ public abstract class Folder
 	@Nullable
 	@RecursiveMethod
 	@ThreadSafe
-	private synchronized TreeNode findTreeNodeUnchecked(@NotNull String targetPath) {
+	private synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
 		if (documents != null) {
 			for (D document : documents.values()) {
-				String path = document.getPath();
-				assert UtilModel.noTrailingSlash(path);
+				Path path = document.getPath();
 				if (targetPath.equals(path))
 					return document;
 			}
 		}
 		if (subFolders != null) {
 			for (F subFolder : subFolders.values()) {
-				String path = subFolder.getPath();
-				assert UtilModel.noTrailingSlash(path);
+				Path path = subFolder.getPath();
 				if (targetPath.equals(path))
 					return subFolder;
-				if (targetPath.startsWith(path + "/"))
+				if (path.contains(targetPath))
 					return subFolder.findTreeNodeUnchecked(targetPath);
 			}
 		}

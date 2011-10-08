@@ -32,25 +32,33 @@ abstract class SimpleJNotifyListener {
 
 	@Nullable private JNotifyListener listener = new JNotifyListener() {
 		public final void fileCreated(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), EventType.CREATED);
+			handleEvent(rootPath, name, EventType.CREATED);
 		}
 
 		public final void fileDeleted(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), EventType.DELETED);
+			handleEvent(rootPath, name, EventType.DELETED);
 		}
 
 		public final void fileModified(int wd, String rootPath, String name) {
-			handleEvent(new File(rootPath, name), EventType.MODIFIED);
+			handleEvent(rootPath, name, EventType.MODIFIED);
 		}
 
 		public final void fileRenamed(	int wd,
 		                              	String rootPath,
 		                              	String oldName,
 		                              	String newName) {
-			handleEvent(new File(rootPath, newName), EventType.RENAMED);
+			handleEvent(rootPath, newName, EventType.RENAMED);
 		}
 	};
 	
+	private void handleEvent(	@NotNull String rootPath,
+								@NotNull String name,
+								@NotNull EventType eventType) {
+		// Calling File.getAbsoluteFile() is probably not necessary, but just in case...
+		handleEvent(new File(rootPath, name).getAbsoluteFile(), eventType);
+	}
+	
+	// The given file is always absolute
 	protected abstract void handleEvent(@NotNull File targetFile,
 										@NotNull EventType eventType);
 	

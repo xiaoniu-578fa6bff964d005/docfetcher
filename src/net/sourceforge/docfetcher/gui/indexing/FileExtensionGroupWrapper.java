@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
@@ -46,15 +46,15 @@ final class FileExtensionGroupWrapper {
 	@NotNull private Text textExtField;
 	@NotNull private Text zipExtField;
 	
-	private final IndexingConfig config;
+	private final LuceneIndex index;
 	private final FileExtensionChooser.Factory extChooserFactory;
 	private final GroupWrapper groupWrapper;
 
 	public FileExtensionGroupWrapper(	@NotNull Composite parent,
-										@NotNull IndexingConfig config) {
-		this.config = config;
+										@NotNull LuceneIndex index) {
+		this.index = index;
 		extChooserFactory = new FileExtensionChooser.Factory(
-			parent.getShell(), config.getAbsoluteRootFile());
+			parent.getShell(), index.getCanonicalRootFile());
 		
 		groupWrapper = new GroupWrapper(parent, "File extensions") {
 			protected void createLayout(Group parent) {
@@ -79,9 +79,9 @@ final class FileExtensionGroupWrapper {
 
 	private void createContents(Group parent) {
 		textExtField = createExtField(
-			parent, "Plain text:", config.getTextExtensions());
+			parent, "Plain text:", index.getConfig().getTextExtensions());
 		zipExtField = createExtField(
-			parent, "Zip archives:", config.getZipExtensions());
+			parent, "Zip archives:", index.getConfig().getZipExtensions());
 	}
 	
 	@NotNull
@@ -104,7 +104,7 @@ final class FileExtensionGroupWrapper {
 	
 	private void onChooserButtonClicked(@NotNull final Text field) {
 		// TODO i18n
-		File rootFile = config.getAbsoluteRootFile();
+		File rootFile = index.getCanonicalRootFile();
 		if (rootFile.isFile()) {
 			AppUtil.showError("Sorry, listing file extensions inside archives is not supported.", true, true);
 			return;

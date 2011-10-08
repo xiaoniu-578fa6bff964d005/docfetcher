@@ -11,15 +11,17 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.io.File;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
+import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
@@ -56,9 +58,9 @@ final class PatternTable extends Composite {
 		Img.initialize(lazyImageCache);
 		AppUtil.Const.autoInit();
 		
-		final IndexingConfig config = new IndexingConfig();
-		PatternTable patternTable = new PatternTable(shell, config);
-		patternTable.setStoreRelativePaths(config.isStoreRelativePaths());
+		FileIndex index = new FileIndex(null, new File(""));
+		PatternTable patternTable = new PatternTable(shell, index);
+		patternTable.setStoreRelativePaths(index.getConfig().isStoreRelativePaths());
 
 		Util.setCenteredBounds(shell);
 		shell.open();
@@ -74,7 +76,7 @@ final class PatternTable extends Composite {
 	private boolean storeRelativePaths;
 	
 	public PatternTable(@NotNull Composite parent,
-						@NotNull IndexingConfig config) {
+						@NotNull LuceneIndex index) {
 		// TODO i18n
 		super(parent, SWT.NONE);
 		setLayout(Util.createGridLayout(2, false, 0, 5));
@@ -82,7 +84,7 @@ final class PatternTable extends Composite {
 		Table table = createTable();
 		Control buttonPanel = createButtonPanel();
 		
-		regexTestPanel = new RegexTestPanel(this, config);
+		regexTestPanel = new RegexTestPanel(this, index);
 		regexTestPanel.setStoreRelativePaths(storeRelativePaths);
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);

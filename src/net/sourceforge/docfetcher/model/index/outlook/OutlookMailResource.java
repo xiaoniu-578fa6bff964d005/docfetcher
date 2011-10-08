@@ -20,6 +20,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.MailResource;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightService;
@@ -48,7 +49,7 @@ public final class OutlookMailResource extends MailResource {
 						@NotNull Query query,
 						boolean isPhraseQuery,
 						@NotNull final HotColdFileCache unpackCache,
-						@NotNull final String emailId,
+						@NotNull final Path emailId,
 						@NotNull PSTMessage email) throws ParseException {
 		Util.checkNotNull(config, unpackCache, email);
 		
@@ -63,7 +64,7 @@ public final class OutlookMailResource extends MailResource {
 			// TODO now: tell attachment visitor to skip a file if it was found in the cache
 			protected void handleAttachment(String filename,
 											File tempFile) throws Exception {
-				String cacheKey = Util.joinPath(emailId, filename);
+				Path cacheKey = emailId.createSubPath(filename);
 				FileResource fileResource = unpackCache.putIfAbsent(cacheKey, tempFile);
 				attachments.add(new Attachment(filename, fileResource));
 			}

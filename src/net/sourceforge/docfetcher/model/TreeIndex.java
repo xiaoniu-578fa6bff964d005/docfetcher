@@ -26,7 +26,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
 @VisibleForPackageGroup
@@ -42,7 +41,7 @@ public abstract class TreeIndex <
 	}
 	
 	private final IndexingConfig config;
-	@NotNull private F rootFolder;
+	private final F rootFolder;
 	@Nullable private final File fileIndexDir;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	
@@ -52,14 +51,30 @@ public abstract class TreeIndex <
 	                    @NotNull File rootFile) {
 		Util.checkNotNull(rootFile);
 		
-		this.config = new IndexingConfig(rootFile) {
+		// Create config
+		this.config = new IndexingConfig() {
 			@Override
-			protected void onRootFileChanged() {
-				updateRootFolder();
+			protected void onStoreRelativePathsChanged() {
+				Path newPath = config.getStorablePath(getCanonicalRootFile());
+				rootFolder.setPath(newPath);
+			}
+			protected void onWatchFoldersChanged() {
+				LuceneIndex.evtWatchFoldersChanged.fire(TreeIndex.this);
 			}
 		};
-		updateRootFolder();
 		
+		// Create root folder
+		try {
+			rootFile = rootFile.getCanonicalFile();
+		}
+		catch (Exception e) {
+			rootFile = rootFile.getAbsoluteFile();
+		}
+		Path newPath = config.getStorablePath(rootFile);
+		rootFolder = createRootFolder(newPath);
+		Util.checkNotNull(rootFolder);
+		
+		// Create index directory or RAM directory
 		if (indexParentDir == null) {
 			fileIndexDir = null;
 			ramIndexDir = new RAMDirectory();
@@ -71,39 +86,20 @@ public abstract class TreeIndex <
 		}
 	}
 	
-	private void updateRootFolder() {
-		File rootFile = config.getRootFile();
-		
-		/*
-		 * Special case: If the root file corresponds to the current working
-		 * directory, both its name and path will be empty strings. In that
-		 * case, we'll leave the path empty, but set a non-empty name.
-		 */
-		String name;
-		if (rootFile.getPath().isEmpty())
-			name = rootFile.getAbsoluteFile().getName();
-		else
-			name = rootFile.getName();
-		
-		rootFolder = createRootFolder(name, rootFile.getPath());
-		Util.checkNotNull(rootFolder);
+	@NotNull
+	public final File getCanonicalRootFile() {
+		return rootFolder.getPath().getCanonicalFile();
 	}
 	
 	@NotNull
 	protected abstract String getIndexDirName(@NotNull File rootFile);
 	
 	@NotNull
-	protected abstract F createRootFolder(	@NotNull String name,
-											@NotNull String path);
+	protected abstract F createRootFolder(@NotNull Path path);
 
 	@NotNull
 	public final IndexingConfig getConfig() {
 		return config;
-	}
-	
-	@NotNull
-	public final File getAbsoluteRootFile() {
-		return config.getAbsoluteRootFile();
 	}
 	
 	@Nullable
@@ -112,7 +108,6 @@ public abstract class TreeIndex <
 	}
 	
 	@NotNull
-	@VisibleForTesting
 	public final Directory getLuceneDir() throws IOException {
 		if (fileIndexDir != null) {
 			assert ramIndexDir == null;
@@ -198,13 +193,6 @@ public abstract class TreeIndex <
 	
 	public final boolean isWatchFolders() {
 		return config.isWatchFolders();
-	}
-	
-	public final void setWatchFolders(boolean watchFolders) {
-		if (config.isWatchFolders() == watchFolders)
-			return;
-		config.setWatchFolders(watchFolders);
-		LuceneIndex.evtWatchFoldersChanged.fire(this);
 	}
 	
 }

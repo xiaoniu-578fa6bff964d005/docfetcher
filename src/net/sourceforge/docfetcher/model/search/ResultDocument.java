@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
@@ -61,8 +62,8 @@ public final class ResultDocument {
 	// Cached values
 	private final String uid;
 	private final boolean isEmail;
-	private String path;
-	private String parentPath;
+	private Path path;
+	private Path parentPath;
 	private long sizeInKB = -1;
 	private String parserName;
 	
@@ -153,16 +154,16 @@ public final class ResultDocument {
 	}
 	
 	@NotNull
-	public String getPath() {
+	public Path getPath() {
 		if (path == null)
 			path =  DocumentType.extractPath(uid);
 		return path;
 	}
 	
 	@NotNull
-	public String getParentPath() {
+	public Path getParentPath() {
 		if (parentPath == null)
-			parentPath = Util.splitPathLast(getPath())[0];
+			parentPath = getPath().splitAtLastSeparator().getLeft();
 		return parentPath;
 	}
 	

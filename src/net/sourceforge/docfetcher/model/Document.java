@@ -11,7 +11,6 @@
 
 package net.sourceforge.docfetcher.model;
 
-import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
@@ -53,8 +52,8 @@ public abstract class Document<D extends Document<D, F>, F extends Folder<D, F>>
 	}
 	
 	@NotNull
-	public final String getPath() {
-		return Util.joinPath(parent.getPath(), getName());
+	public final Path getPath() {
+		return parent.getPath().createSubPath(getName());
 	}
 
 }

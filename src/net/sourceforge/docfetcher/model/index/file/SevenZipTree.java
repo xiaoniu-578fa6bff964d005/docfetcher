@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
@@ -34,7 +35,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 	
 	public SevenZipTree(@NotNull File archiveFile,
 	                    @NotNull IndexingConfig config,
-                        @Nullable String originalPath,
+                        @Nullable Path originalPath,
 						@Nullable FailReporter failReporter) throws IOException,
 			ArchiveEncryptedException {
 		super(archiveFile, config, originalPath, failReporter);
@@ -51,7 +52,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 	public SevenZipTree(@NotNull File archiveFile,
 	                    @NotNull IndexingConfig config,
 	                    boolean isHtmlPairing,
-                        @Nullable String originalPath,
+                        @Nullable Path originalPath,
 						@Nullable FailReporter failReporter) throws IOException,
 			ArchiveEncryptedException {
 		super(archiveFile, config, isHtmlPairing, originalPath, failReporter);

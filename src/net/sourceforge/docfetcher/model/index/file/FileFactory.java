@@ -18,10 +18,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import net.sourceforge.docfetcher.UtilGlobal;
+import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.HotColdFileCache.PermanentFileResource;
-import net.sourceforge.docfetcher.model.FileResource;
+import net.sourceforge.docfetcher.model.Path;
+import net.sourceforge.docfetcher.model.Path.PathParts;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
@@ -31,13 +32,12 @@ import net.sourceforge.docfetcher.model.index.file.FileFolder.FileFolderVisitor;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import SevenZip.Archive.IInArchive;
 import SevenZip.Archive.SevenZipEntry;
 import SevenZip.Archive.SevenZip.Handler;
 
+import com.google.common.base.Predicate;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.common.io.NullOutputStream;
@@ -63,42 +63,49 @@ public final class FileFactory {
 	@NotNull
 	@ThreadSafe
 	public FileResource createFile(	@NotNull IndexingConfig config,
-									@NotNull String path)
+									@NotNull Path path)
 			throws ParseException, FileNotFoundException {
 		Util.checkNotNull(config, path);
-		path = UtilModel.normalizePath(path);
 		
 		try {
-			String[] pathParts = UtilGlobal.splitAtExisting(path);
-			File leftFile = new File(pathParts[0]);
+			PathParts pathParts = path.splitAtExistingFile();
+			File leftFile = pathParts.getLeft().getCanonicalFile();
 			
 			// Input path refers to an ordinary file;
 			// this is the most common case and must therefore return reasonably fast
-			if (pathParts[1].length() == 0)
+			if (pathParts.getRight().isEmpty())
 				return new PermanentFileResource(leftFile);
 			
 			// Input path seems to refer to an archive entry; let's check the cache first
-			String archivePath = Util.getAbsPath(leftFile);
-			String absInputPath = Util.joinPath(archivePath, pathParts[1]);
-			CacheSplitResult splitResult = splitAtCached(absInputPath, "");
+			final FileResource[] cachedResource = new FileResource[1];
+			PathParts cacheSplitParts = path.splitFromRight(new Predicate<Path>() {
+				public boolean apply(Path path) {
+					cachedResource[0] = unpackCache.get(path);
+					return cachedResource[0] != null;
+				}
+			});
 			
 			// Nothing found in cache; attempt to unpack the archive entry
-			if (splitResult == null) {
-				FileResource fileResource = new PermanentFileResource(leftFile);
-				return unpackFromArchive(config, archivePath, fileResource, pathParts[1]);
+			if (cacheSplitParts == null) {
+				FileResource archiveResource = new PermanentFileResource(leftFile);
+				Path archivePath = pathParts.getLeft();
+				String entryPath = pathParts.getRight();
+				return unpackFromArchive(
+					config, archivePath, archiveResource, entryPath);
 			}
 			
 			// Found unpacked ordinary file in cache; just return it
-			if (splitResult.right.length() == 0)
-				return splitResult.fileResource;
+			if (cacheSplitParts.getRight().isEmpty())
+				return cachedResource[0];
 			
 			// Found intermediate archive in cache; need to unpack the remainder
+			Path archivePath = cacheSplitParts.getLeft();
+			String entryPath = cacheSplitParts.getRight();
 			return unpackFromArchive(
-					config,
-					splitResult.left,
-					splitResult.fileResource,
-					splitResult.right
-			);
+				config, archivePath, cachedResource[0], entryPath);
+		}
+		catch (FileNotFoundException e) {
+			throw e; // should not be caught by IOException catch clause
 		}
 		catch (ArchiveEncryptedException e) {
 			throw new ParseException(e); // TODO i18n: add localized error message
@@ -111,45 +118,9 @@ public final class FileFactory {
 		}
 	}
 	
-	private static class CacheSplitResult {
-		private final FileResource fileResource;
-		private final String left;
-		private final String right;
-
-		public CacheSplitResult(@NotNull FileResource fileResource,
-								@NotNull String left,
-								@NotNull String right) {
-			Util.checkNotNull(fileResource, left, right);
-			this.fileResource = fileResource;
-			this.left = left;
-			this.right = right;
-		}
-	}
-	
-	@Nullable
-	@RecursiveMethod
-	private CacheSplitResult splitAtCached(	@NotNull String left,
-											@NotNull String right) {
-		FileResource fileResource = unpackCache.get(left);
-		if (fileResource != null)
-			return new CacheSplitResult(fileResource, left, right);
-		if (! left.contains("/") && ! left.contains("\\")) // reached left end of a relative path
-			return null;
-		String[] leftParts = Util.splitPathLast(left);
-		if (leftParts[0].length() == 0) // reached Unix root
-			return null;
-		if (leftParts[0].matches("[a-zA-Z]:")) // reached Windows root
-			return null;
-		// Move by one path part to the left and recurse
-		if (right.length() == 0)
-			return splitAtCached(leftParts[0], leftParts[1]);
-		String newRight = Util.joinPath(leftParts[1], right);
-		return splitAtCached(leftParts[0], newRight);
-	}
-	
 	@NotNull
 	private FileResource unpackFromArchive(	@NotNull IndexingConfig config,
-											@NotNull String originalArchivePath,
+											@NotNull Path originalArchivePath,
 											@NotNull FileResource archiveResource,
 											@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
@@ -165,13 +136,14 @@ public final class FileFactory {
 
 	@NotNull
 	private FileResource unpackFromSolidArchive(@NotNull IndexingConfig config,
-												@NotNull String originalArchivePath,
+												@NotNull Path originalArchivePath,
 												@NotNull FileResource archiveResource,
 												@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
 			FileNotFoundException, IOException {
 		File archiveFile = archiveResource.getFile();
 		String archiveExt = Util.splitFilename(archiveFile)[1];
+		
 		if (! Util.hasExtension(entryPath, config.getHtmlExtensions())) { // Without HTML pairing
 			if (archiveExt.equals("exe") || archiveExt.equals("7z"))
 				return unpackFrom7zArchive(config, originalArchivePath, archiveResource, entryPath);
@@ -180,7 +152,8 @@ public final class FileFactory {
 				return unpackFromRarArchive(config, originalArchivePath, archiveResource, entryPath);
 			else
 				throw new FileNotFoundException();
-		} else { // With HTML pairing
+		}
+		else { // With HTML pairing
 			/*
 			 * Note: We'll ignore the HTML pairing flag in the config object and
 			 * always leave the HTML pairing on.
@@ -199,7 +172,7 @@ public final class FileFactory {
 	
 	@NotNull
 	private FileResource unpackFromZipArchive(	@NotNull final IndexingConfig config,
-												@NotNull final String originalArchivePath,
+												@NotNull final Path originalArchivePath,
 												@NotNull final FileResource archiveResource,
 												@NotNull final TFile archiveFile,
 												@NotNull final String entryPath)
@@ -220,19 +193,21 @@ public final class FileFactory {
 				try {
 					if (currentPath.equals(entryPath)) { // Exact match on regular file
 						File unpackedFile = maybeUnpackZipEntry(config, file);
-						String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+						Path cacheKey = originalArchivePath.createSubPath(currentPath);
 						result[0] = unpackCache.putIfAbsent(cacheKey, unpackedFile);
 						stop();
-					} else if (entryPath.startsWith(currentPath + "/") // Partial match on solid archive
+					}
+					else if (entryPath.startsWith(currentPath + "/") // Partial match on solid archive
 							&& config.isSolidArchive(file.getName())) {
 						File innerArchiveFile;
 						try {
 							innerArchiveFile = maybeUnpackZipEntry(config, file);
 							TFile.umount(archiveFile);
-						} finally {
+						}
+						finally {
 							archiveResource.dispose();
 						}
-						String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+						Path cacheKey = originalArchivePath.createSubPath(currentPath);
 						FileResource innerArchive = unpackCache.putIfAbsent(cacheKey, innerArchiveFile);
 						String remainingPath = entryPath.substring(currentPath.length() + 1);
 						result[0] = unpackFromSolidArchive(
@@ -243,7 +218,8 @@ public final class FileFactory {
 						);
 						stop();
 					}
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					exception[0] = e;
 					stop();
 				}
@@ -252,12 +228,13 @@ public final class FileFactory {
 											File htmlDir) {
 				String currentPath = getRelativePath(archiveFile, htmlFile);
 				if (! currentPath.equals(entryPath)) return;
-				String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+				Path cacheKey = originalArchivePath.createSubPath(currentPath);
 				try {
 					if (htmlDir == null) {
 						File unpackedFile = maybeUnpackZipEntry(config, htmlFile);
 						result[0] = unpackCache.putIfAbsent(cacheKey, unpackedFile);
-					} else {
+					}
+					else {
 						/*
 						 * Here, we could check whether there's enough disk
 						 * space for unpacking the files, and throw an exception
@@ -274,7 +251,8 @@ public final class FileFactory {
 						tzHtmlDir.cp_r(newHtmlDir);
 						result[0] = unpackCache.putIfAbsent(cacheKey, newHtmlFile, tempDir);
 					}
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					exception[0] = e;
 				}
 				stop();
@@ -293,9 +271,11 @@ public final class FileFactory {
 				try {
 					if (archiveFile.exists()) // Might have been deleted earlier
 						TFile.umount(archiveFile);
-				} catch (FsSyncException e) {
+				}
+				catch (FsSyncException e) {
 					exception[0] = e;
-				} finally {
+				}
+				finally {
 					archiveResource.dispose();
 				}
 			}
@@ -310,7 +290,7 @@ public final class FileFactory {
 		 * If we reach this point with a non-null exception array element, we
 		 * might have forgotten to rethrow exceptions of a particular type.
 		 */
-		assert exception[0] == null;
+		assert exception[0] == null : exception[0].toString();
 		
 		if (result[0] == null)
 			throw new FileNotFoundException();
@@ -342,7 +322,8 @@ public final class FileFactory {
 			File unpackedFile = UtilModel.maybeUnpackZipEntry(config, packedFile);
 			assert unpackedFile != null;
 			return unpackedFile;
-		} catch (IndexingException e) {
+		}
+		catch (IndexingException e) {
 			throw e.getIOException();
 		}
 	}
@@ -350,7 +331,7 @@ public final class FileFactory {
 	// does not support HTML pairing, but is faster and more lightweight
 	@NotNull
 	private FileResource unpackFrom7zArchive(	@NotNull final IndexingConfig config,
-												@NotNull String originalArchivePath,
+												@NotNull Path originalArchivePath,
 												@NotNull FileResource archiveResource,
 												@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
@@ -374,23 +355,26 @@ public final class FileFactory {
 				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
 					File unpackedFile = unpack7zEntry(config, archive, currentPath, i);
-					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+					Path cacheKey = originalArchivePath.createSubPath(currentPath);
 					return unpackCache.putIfAbsent(cacheKey, unpackedFile);
-				} else if (entryPath.startsWith(currentPath + "/")
+				}
+				else if (entryPath.startsWith(currentPath + "/")
 						&& config.isArchive(currentPath)) { // Partial match
 					File innerArchiveFile;
 					try {
 						innerArchiveFile = unpack7zEntry(config, archive, currentPath, i);
-					} finally {
+					}
+					finally {
 						archiveResource.dispose();
 					}
-					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+					Path cacheKey = originalArchivePath.createSubPath(currentPath);
 					String remainingPath = entryPath.substring(currentPath.length() + 1);
 					FileResource innerArchive = unpackCache.putIfAbsent(cacheKey, innerArchiveFile);
 					return unpackFromArchive(config, cacheKey, innerArchive, remainingPath);
 				}
 			}
-		} finally {
+		}
+		finally {
 			archive.close();
 			archiveResource.dispose();
 		}
@@ -408,7 +392,8 @@ public final class FileFactory {
 				String entryName = getLastPathPart(entryPath);
 				try {
 					return unpackedFile = config.createDerivedTempFile(entryName);
-				} catch (IndexingException e) {
+				}
+				catch (IndexingException e) {
 					throw e.getIOException();
 				}
 			}
@@ -421,7 +406,7 @@ public final class FileFactory {
 	// does not support HTML pairing, but is faster and more lightweight
 	@NotNull
 	private FileResource unpackFromRarArchive(	@NotNull IndexingConfig config,
-												@NotNull String originalArchivePath,
+												@NotNull Path originalArchivePath,
 												@NotNull FileResource archiveResource,
 												@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
@@ -431,7 +416,7 @@ public final class FileFactory {
 			File archiveFile = archiveResource.getFile();
 			archive = new Archive(archiveFile);
 			if (archive.isEncrypted())
-				throw new ArchiveEncryptedException(archiveFile, originalArchivePath);
+				throw new ArchiveEncryptedException(archiveFile, originalArchivePath.getPath());
 
 			List<FileHeader> fileHeaders = archive.getFileHeaders();
 			
@@ -489,28 +474,33 @@ public final class FileFactory {
 				
 				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
-					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+					Path cacheKey = originalArchivePath.createSubPath(currentPath);
 					File unpackedFile = unpackRarEntry(config, archive, fh, entryPath);
 					return unpackCache.putIfAbsent(cacheKey, unpackedFile);
-				} else if (entryPath.startsWith(currentPath + "/")
+				}
+				else if (entryPath.startsWith(currentPath + "/")
 						&& config.isArchive(currentPath)) { // Partial match
 					File innerArchiveFile;
 					try {
 						innerArchiveFile = unpackRarEntry(config, archive, fh, entryPath);
-					} finally {
+					}
+					finally {
 						archiveResource.dispose();
 					}
-					String cacheKey = Util.joinPath(originalArchivePath, currentPath);
+					Path cacheKey = originalArchivePath.createSubPath(currentPath);
 					FileResource innerArchive = unpackCache.putIfAbsent(cacheKey, innerArchiveFile);
 					String remainingPath = entryPath.substring(currentPath.length() + 1);
 					return unpackFromArchive(config, cacheKey, innerArchive, remainingPath);
-				} else if (isSolid) { // Not a match
+				}
+				else if (isSolid) { // Not a match
 					archive.extractFile(fh, nullOut);
 				}
 			}
-		} catch (RarException e) {
+		}
+		catch (RarException e) {
 			throw new IOException(e);
-		} finally {
+		}
+		finally {
 			Closeables.closeQuietly(archive);
 			archiveResource.dispose();
 		}
@@ -530,9 +520,11 @@ public final class FileFactory {
 			out = new FileOutputStream(unpackedFile);
 			archive.extractFile(fh, out);
 			return unpackedFile;
-		} catch (IndexingException e) {
+		}
+		catch (IndexingException e) {
 			throw e.getIOException();
-		} finally {
+		}
+		finally {
 			Closeables.closeQuietly(out);
 		}
 	}
@@ -588,30 +580,29 @@ public final class FileFactory {
 			TreeNode treeNode = matchingNode[0];
 			if (treeNode == null)
 				throw new FileNotFoundException();
-			String cacheKey = treeNode.getPath();
+			Path cacheKey = treeNode.getPath();
 			
 			if (matchingNode[0] instanceof FileFolder) { // Inner archive
 				try {
 					archive.unpack(treeNode);
-				} finally {
+				}
+				finally {
 					archiveResource.dispose();
 				}
 				File innerArchiveFile = archive.getFile(treeNode);
 				FileResource innerArchive = unpackCache.putIfAbsent(cacheKey, innerArchiveFile);
 				return unpackFromArchive(
-						config,
-						treeNode.getPath(),
-						innerArchive,
-						remainingPath[0]
-				);
-			} else if (matchingNode[0] instanceof FileDocument) { // File
+					config, cacheKey, innerArchive, remainingPath[0]);
+			}
+			else if (matchingNode[0] instanceof FileDocument) { // File
 				FileDocument htmlDoc = (FileDocument) treeNode;
 				FileFolder htmlFolder = htmlDoc.getHtmlFolder();
 				if (htmlFolder == null) { // Ordinary file or HTML file without HTML folder
 					archive.unpack(treeNode);
 					File htmlFile = archive.getFile(treeNode);
 					return unpackCache.putIfAbsent(cacheKey, htmlFile);
-				} else { // HTML file with HTML folder
+				}
+				else { // HTML file with HTML folder
 					List<FileDocument> docsDeep = htmlFolder.getDocumentsDeep();
 					docsDeep.add(htmlDoc);
 					File tempDir = Files.createTempDir();
@@ -619,10 +610,12 @@ public final class FileFactory {
 					File htmlFile = archive.getFile(htmlDoc);
 					return unpackCache.putIfAbsent(cacheKey, htmlFile, tempDir);
 				}
-			} else {
+			}
+			else {
 				throw new IllegalStateException();
 			}
-		} finally {
+		}
+		finally {
 			Closeables.closeQuietly(archive);
 			archiveResource.dispose();
 		}

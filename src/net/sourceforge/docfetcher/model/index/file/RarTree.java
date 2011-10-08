@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
@@ -38,7 +39,7 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 
 	public RarTree(@NotNull File archiveFile,
 	               @NotNull IndexingConfig config,
-                   @Nullable String originalPath,
+                   @Nullable Path originalPath,
 	               @Nullable FailReporter failReporter)
 			throws IOException, ArchiveEncryptedException {
 		super(archiveFile, config, originalPath, failReporter);
@@ -47,7 +48,7 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 	public RarTree(@NotNull File archiveFile,
 	               @NotNull IndexingConfig config,
 	               boolean isHtmlPairing,
-                   @Nullable String originalPath,
+                   @Nullable Path originalPath,
 	               @Nullable FailReporter failReporter)
 			throws IOException, ArchiveEncryptedException {
 		super(archiveFile, config, isHtmlPairing, originalPath, failReporter);

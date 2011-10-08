@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -55,7 +56,7 @@ public final class PatternAction implements Serializable {
 	
 	// might throw PatternSyntaxException
 	public boolean matches(	@NotNull String filename,
-							@NotNull String filepath,
+							@NotNull Path path,
 							boolean isFile) {
 		// TODO post-release-1.1: patterns are currently not applied to regular directories
 		if (!isFile)
@@ -68,7 +69,7 @@ public final class PatternAction implements Serializable {
 		case FILENAME:
 			return pattern.matcher(filename).matches();
 		case PATH:
-			return pattern.matcher(filepath).matches();
+			return pattern.matcher(path.getPath()).matches();
 		default:
 			throw new IllegalStateException();
 		}

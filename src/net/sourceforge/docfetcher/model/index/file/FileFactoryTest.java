@@ -21,6 +21,7 @@ import java.util.Set;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -53,7 +54,7 @@ public final class FileFactoryTest {
 		for (String path : paths) {
 			HotColdFileCache unpackCache = new HotColdFileCache(20);
 			FileFactory fileFactory = new FileFactory(unpackCache);
-			File file = fileFactory.createFile(config, path).getFile();
+			File file = fileFactory.createFile(config, new Path(path)).getFile();
 			assertTrue(file.exists());
 			file.delete();
 		}
@@ -67,14 +68,14 @@ public final class FileFactoryTest {
 		 * the same file.
 		 */
 		String testFile = TestFiles.archive_entry_7z_zip_rar.getPath();
-		Set<File> files = new HashSet<File> ();
+		Set<File> files = new HashSet<File>();
 		HotColdFileCache unpackCache = new HotColdFileCache(20);
 		FileFactory fileFactory = new FileFactory(unpackCache);
 		IndexingConfig config = new IndexingConfig();
 		for (int i = 0; i < 5; i++) {
-			files.add(fileFactory.createFile(config, testFile).getFile());
+			files.add(fileFactory.createFile(config, new Path(testFile)).getFile());
 			String absPath = Util.getAbsPath(testFile);
-			files.add(fileFactory.createFile(config, absPath).getFile());
+			files.add(fileFactory.createFile(config, new Path(absPath)).getFile());
 		}
 		assertEquals(1, files.size());
 	}
@@ -90,7 +91,7 @@ public final class FileFactoryTest {
 			File archiveCopy = Util.createDerivedTempFile("test.7z", Util.TEMP_DIR);
 			Files.copy(archive, archiveCopy);
 			String path = Util.joinPath(Util.getAbsPath(archiveCopy), "test.txt");
-			FileResource fileResource = fileFactory.createFile(config, path);
+			FileResource fileResource = fileFactory.createFile(config, new Path(path));
 			File tempFile = fileResource.getFile();
 			assertTrue(tempFile.isFile());
 			fileResource.dispose();
@@ -111,7 +112,7 @@ public final class FileFactoryTest {
 				TestFiles.sfx_7z.getPath() + "/test.txt"
 		};
 		for (String path : paths)
-			assertTrue(fileFactory.createFile(config, path).getFile().isFile());
+			assertTrue(fileFactory.createFile(config, new Path(path)).getFile().isFile());
 	}
 	
 	@Test(expected=ParseException.class)
@@ -119,7 +120,7 @@ public final class FileFactoryTest {
 		HotColdFileCache unpackCache = new HotColdFileCache(20);
 		FileFactory fileFactory = new FileFactory(unpackCache);
 		IndexingConfig config = new IndexingConfig();
-		fileFactory.createFile(config, TestFiles.sfx_rar + "/test.txt");
+		fileFactory.createFile(config, new Path(TestFiles.sfx_rar.getPath() + "/test.txt"));
 	}
 
 }

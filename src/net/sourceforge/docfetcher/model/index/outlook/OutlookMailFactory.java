@@ -14,9 +14,10 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.MailResource;
+import net.sourceforge.docfetcher.model.Path;
+import net.sourceforge.docfetcher.model.Path.PathParts;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.util.Util;
@@ -43,28 +44,31 @@ public final class OutlookMailFactory {
 	}
 	
 	// thrown parse exception has localized error message
-	// Path argument should be path to PST file + descriptor node ID
+	// Path argument should be path to PST file + path to folder + descriptor node ID
 	@NotNull
 	public MailResource createMail(	@NotNull IndexingConfig config,
 	                               	@NotNull Query query,
 	                               	boolean isPhraseQuery,
-									@NotNull String emailPath)
+									@NotNull Path emailPath)
 			throws ParseException, FileNotFoundException {
-		String[] leftMiddle_right = Util.splitPathLast(emailPath);
+		PathParts leftMiddle_right = emailPath.splitAtLastSeparator();
 		try {
-			String[] left_middle = UtilGlobal.splitAtExisting(leftMiddle_right[0]);
-			long pstId = Long.valueOf(leftMiddle_right[1]);
+			PathParts left_middle = leftMiddle_right.getLeft().splitAtExistingFile();
+			long pstId = Long.valueOf(leftMiddle_right.getRight());
 			
-			PSTFile pstFile = new PSTFile(left_middle[0]);
+			String absLeft = left_middle.getLeft().getCanonicalPath();
+			PSTFile pstFile = new PSTFile(absLeft);
 			PSTMessage email = (PSTMessage) PSTObject.detectAndLoadPSTObject(
 				pstFile, pstId);
 			
-			String absLeft = Util.getSystemAbsPath(left_middle[0]);
-			String emailId = Util.joinPath(
-				absLeft, left_middle[1], leftMiddle_right[1]);
+			Path emailId = new Path(Util.joinPath(
+				absLeft, left_middle.getRight(), leftMiddle_right.getRight()));
 			
 			return new OutlookMailResource(
 				config, query, isPhraseQuery, unpackCache, emailId, email);
+		}
+		catch (FileNotFoundException e) {
+			throw e; // should not be caught by IOException catch clause
 		}
 		catch (PSTException e) {
 			throw new ParseException(e); // TODO i18n

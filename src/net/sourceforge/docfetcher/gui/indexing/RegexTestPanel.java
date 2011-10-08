@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
@@ -42,7 +44,6 @@ import org.eclipse.swt.widgets.Text;
  */
 final class RegexTestPanel extends Composite {
 	
-	private final IndexingConfig config;
 	private final Label label;
 	private final Text fileBox;
 	private List<PatternAction> patternActions = Collections.emptyList();
@@ -51,10 +52,9 @@ final class RegexTestPanel extends Composite {
 	// TODO i18n
 	
 	public RegexTestPanel(	@NotNull Composite parent,
-							@NotNull final IndexingConfig config) {
+							@NotNull final LuceneIndex index) {
 		super(parent, SWT.NONE);
-		Util.checkNotNull(config);
-		this.config = config;
+		Util.checkNotNull(index);
 		label = new Label(this, SWT.NONE);
 		label.setText("regex_matches_file_no");
 		fileBox = new Text(this, SWT.BORDER | SWT.SINGLE);
@@ -62,14 +62,14 @@ final class RegexTestPanel extends Composite {
 		Button fileChooserBt = Util.createPushButton(this, "...", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-				dialog.setFilterPath(config.getAbsoluteRootFile().getPath());
+				dialog.setFilterPath(index.getCanonicalRootFile().getPath());
 				dialog.setText("choose_regex_testfile_title");
 				String filepath = dialog.open();
 				if (filepath == null)
 					return;
 				File file = new File(filepath);
-				filepath = config.getStorablePath(file, storeRelativePaths);
-				fileBox.setText(filepath);
+				Path newPath = IndexingConfig.getStorablePath(file, storeRelativePaths);
+				fileBox.setText(newPath.getPath());
 			}
 		});
 		
@@ -102,7 +102,8 @@ final class RegexTestPanel extends Composite {
 			return;
 		try {
 			File file = new File(path).getCanonicalFile();
-			fileBox.setText(config.getStorablePath(file, storeRelativePaths));
+			Path newPath = IndexingConfig.getStorablePath(file, storeRelativePaths);
+			fileBox.setText(newPath.getPath());
 		}
 		catch (IOException e) {
 			fileBox.setText("");

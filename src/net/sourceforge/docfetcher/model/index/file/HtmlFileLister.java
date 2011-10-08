@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
@@ -34,8 +35,9 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
  */
 abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 	
-	@NotNull private final File parentDir;
-	@NotNull private final Collection<String> htmlExtensions;
+	private final File parentDir;
+	private final IndexingConfig config;
+	private final Collection<String> htmlExtensions;
 	private final boolean htmlPairing;
 	@Nullable private final IndexingReporter reporter;
 	
@@ -44,6 +46,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 							@Nullable IndexingReporter reporter) {
 		Util.checkNotNull(parentDir, config);
 		this.parentDir = parentDir;
+		this.config = config;
 		this.htmlExtensions = config.getHtmlExtensions();
 		this.htmlPairing = config.isHtmlPairing();
 		this.reporter = reporter;
@@ -166,8 +169,8 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		String filename = file.getName();
 		@SuppressWarnings("serial")
 		TreeNode treeNode = new TreeNode(filename, filename) {
-			public String getPath() {
-				return file.getPath();
+			public Path getPath() {
+				return config.getStorablePath(file);
 			}
 		};
 		reporter.fail(new IndexingError(ErrorType.ENCODING, treeNode, e.getCause()));

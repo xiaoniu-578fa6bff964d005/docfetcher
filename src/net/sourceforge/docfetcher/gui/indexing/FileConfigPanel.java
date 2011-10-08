@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
@@ -53,8 +54,8 @@ final class FileConfigPanel extends ConfigPanel {
 	@NotNull private Button watchFolderBt;
 	
 	public FileConfigPanel(	@NotNull Composite parent,
-	                       	@NotNull IndexingConfig config) {
-		super(parent, config);
+	                       	@NotNull LuceneIndex index) {
+		super(parent, index);
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -67,7 +68,7 @@ final class FileConfigPanel extends ConfigPanel {
 		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
 		StyledText targetField = new StyledText(targetComp, targetStyle);
 		setGridData(targetField, true);
-		targetField.setText(config.getAbsoluteRootFile().getPath());
+		targetField.setText(index.getCanonicalRootFile().getPath());
 		targetField.setForeground(Col.DARK_GRAY.get());
 		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
 		UtilGui.clearSelectionOnFocusLost(targetField);
@@ -75,7 +76,7 @@ final class FileConfigPanel extends ConfigPanel {
 		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
 		setGridData(targetSeparator, false);
 		
-		extGroupWrapper = new FileExtensionGroupWrapper(comp, config);
+		extGroupWrapper = new FileExtensionGroupWrapper(comp, index);
 		Group extGroup = extGroupWrapper.getGroup();
 		
 		Group patternGroup = new GroupWrapper(comp, "Exclude files / detect mime type") {
@@ -83,7 +84,7 @@ final class FileConfigPanel extends ConfigPanel {
 				parent.setLayout(Util.createFillLayout(5));
 			}
 			protected void createContents(Group parent) {
-				patternTable = new PatternTable(parent, config);
+				patternTable = new PatternTable(parent, index);
 			}
 		}.getGroup();
 		
@@ -120,6 +121,8 @@ final class FileConfigPanel extends ConfigPanel {
 		storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
 		watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
 		
+		IndexingConfig config = index.getConfig();
+		
 		htmlPairingBt.setSelection(config.isHtmlPairing());
 		detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
 		indexFilenameBt.setSelection(config.isIndexFilenames());
@@ -155,7 +158,7 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	protected boolean writeToConfig() {
 		// Check that the target file or directory still exists
-		if (!config.getAbsoluteRootFile().exists()) {
+		if (!index.getCanonicalRootFile().exists()) {
 			AppUtil.showError("target_folder_deleted", true, true);
 			return false;
 		}
@@ -188,6 +191,8 @@ final class FileConfigPanel extends ConfigPanel {
 		if (!confirmExtensionOverride(zipExtensions, msg))
 			return false;
 		
+		IndexingConfig config = index.getConfig();
+		
 		config.setTextExtensions(textExtensions);
 		config.setZipExtensions(zipExtensions);
 		config.setPatternActions(patternActions);
@@ -206,7 +211,7 @@ final class FileConfigPanel extends ConfigPanel {
 												@NotNull String message) {
 		LazyList<String> overridingExtensions = new LazyList<String>();
 		for (String extension : extensions)
-			if (ParseService.isBuiltInExtension(config, extension))
+			if (ParseService.isBuiltInExtension(index.getConfig(), extension))
 				if (!overridingExtensions.contains(extension))
 					overridingExtensions.add(extension);
 		

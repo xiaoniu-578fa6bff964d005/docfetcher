@@ -293,7 +293,7 @@ public final class IndexPanel {
 				List<LuceneIndex> indexes = indexRegistry.getIndexes();
 				List<LuceneIndex> toRemove = new ArrayList<LuceneIndex>(indexes.size());
 				for (LuceneIndex index : indexes)
-					if (!index.getAbsoluteRootFile().exists())
+					if (!index.getCanonicalRootFile().exists())
 						toRemove.add(index);
 				if (toRemove.isEmpty())
 					return;
@@ -358,7 +358,7 @@ public final class IndexPanel {
 				for (ViewNode element : viewer.getSelection()) {
 					if (element instanceof LuceneIndex) {
 						LuceneIndex index = (LuceneIndex) element;
-						File rootFile = index.getAbsoluteRootFile();
+						File rootFile = index.getCanonicalRootFile();
 						if (!rootFile.exists())
 							launcher.addMissing(rootFile);
 						else
@@ -366,7 +366,7 @@ public final class IndexPanel {
 					}
 					else {
 						Folder<?, ?> folder = (Folder<?, ?>) element;
-						File rootFile = new File(folder.getRoot().getPath());
+						File rootFile = folder.getRoot().getPath().getCanonicalFile();
 						if (!rootFile.exists())
 							launcher.addMissing(rootFile);
 						else
@@ -463,11 +463,11 @@ public final class IndexPanel {
 	}
 	
 	// Returns nearest parent file that is an existing directory or the
-	// root file
+	// root file. The path of the returned file is in canonical form.
 	@NotNull
 	@RecursiveMethod
 	private static File getNearestFile(@NotNull Folder<?, ?> folder) {
-		File file = new File(folder.getPath());
+		File file = folder.getPath().getCanonicalFile();
 		if (file.exists())
 			return file;
 		Folder<?, ?> parent = folder.getParent();

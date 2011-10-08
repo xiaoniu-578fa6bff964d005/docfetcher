@@ -344,7 +344,7 @@ public final class IndexingDialog implements Dialog {
 		tabItem.setData(task);
 		LuceneIndex index = task.getLuceneIndex();
 		
-		File rootFile = index.getAbsoluteRootFile();
+		File rootFile = index.getCanonicalRootFile();
 		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
 		tabItem.setText(Util.truncate(nameOrLetter));
 		tabItem.setToolTipText(Util.getSystemAbsPath(rootFile));
@@ -374,9 +374,9 @@ public final class IndexingDialog implements Dialog {
 		else {
 			final ConfigPanel configPanel;
 			if (index instanceof FileIndex)
-				configPanel = new FileConfigPanel(tabFolder, config);
+				configPanel = new FileConfigPanel(tabFolder, index);
 			else if (index instanceof OutlookIndex)
-				configPanel = new OutlookConfigPanel(tabFolder, config);
+				configPanel = new OutlookConfigPanel(tabFolder, index);
 			else
 				throw new IllegalStateException();
 			tabItem.setControl(configPanel.getControl());

@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Fields;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -121,9 +122,9 @@ final class OutlookContext {
 					throws ParseException {
 				// TODO now: Don't try to parse all files -> call ParseService.canParse
 				// TODO post-release-1.1: Maybe recurse into archive attachments
-				String filepath = Util.joinPath(doc.getPath(), filename);
+				Path path = doc.getPath().createSubPath(filename);
 				ParseResult parseResult = ParseService.parse(
-					config, filename, filepath, tempFile, reporter, cancelable);
+					config, filename, path, tempFile, reporter, cancelable);
 				luceneDoc.add(Fields.createContent(parseResult.getContent()));
 				StringBuilder metadata = parseResult.getMetadata();
 				metadata.append(filename);
@@ -131,8 +132,8 @@ final class OutlookContext {
 			}
 			protected void handleException(	String filename,
 											Exception e) {
-				final String filepath = Util.joinPath(doc.getPath(), filename);
-				TreeNode attachNode = new AttachNode(filename, filepath);
+				Path path = doc.getPath().createSubPath(filename);
+				TreeNode attachNode = new AttachNode(path);
 
 				// Put error in temporary list and report it
 				if (errors == null)
@@ -156,14 +157,14 @@ final class OutlookContext {
 	 */
 	@SuppressWarnings("serial")
 	private static class AttachNode extends TreeNode implements Serializable {
-		private final String filepath;
+		private final Path path;
 		
-		public AttachNode(String filename, String filepath) {
-			super(filename, filename);
-			this.filepath = filepath;
+		public AttachNode(Path path) {
+			super(path.getName(), path.getName());
+			this.path = path;
 		}
-		public String getPath() {
-			return filepath;
+		public Path getPath() {
+			return path;
 		}
 	}
 	

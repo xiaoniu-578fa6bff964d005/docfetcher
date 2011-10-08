@@ -15,15 +15,14 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Folder;
 import net.sourceforge.docfetcher.model.Folder.FolderEvent;
 import net.sourceforge.docfetcher.model.Folder.Predicate;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -37,6 +36,7 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.util.collect.SafeKeyMap;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -114,36 +114,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		}
 	}
 	
-	/**
-	 * A subclass of HashMap that deprecates the {@link Map#get(Object)} and
-	 * {@link Map#remove(Object)} methods in favor of the more restrictive
-	 * {@link SafeKeyMap#getValue(K)} and {@link SafeKeyMap#removeKey(K)}
-	 * methods. This class is useful in situations where it is very easy to use
-	 * the wrong map key, e.g. a File object instead of the file path.
-	 */
-	@SuppressWarnings("serial")
-	private static final class SafeKeyMap<K, V> extends HashMap<K, V> {
-		public static <K, V> SafeKeyMap<K, V> create() {
-			return new SafeKeyMap<K, V> ();
-		}
-		@Deprecated
-		public V get(Object key) {
-			throw new UnsupportedOperationException();
-		}
-		@Deprecated
-		public V remove(Object key) {
-			throw new UnsupportedOperationException();
-		}
-		public V getValue(K key) {
-			return super.get(key);
-		}
-		public V removeKey(K key) {
-			return super.remove(key);
-		}
-	}
-	
 	private final FileFolder archiveFolder;
-	private final SafeKeyMap<String, EntryData> entryDataMap = SafeKeyMap.create();
+	private final SafeKeyMap<Path, EntryData> entryDataMap = SafeKeyMap.createHashMap();
 	private final TempFileFactory defaultTempFileFactory = new TempFileFactory();
 	private final IndexingConfig config;
 	protected final FailReporter failReporter;
@@ -151,7 +123,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	
 	public SolidArchiveTree(@NotNull File archiveFile,
 	                        @NotNull IndexingConfig config,
-	                        @Nullable String originalPath,
+	                        @Nullable Path originalPath,
 							@Nullable FailReporter failReporter)
 			throws IOException, ArchiveEncryptedException {
 		this(archiveFile, config, config.isHtmlPairing(), originalPath, failReporter);
@@ -160,7 +132,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 	public SolidArchiveTree(@NotNull File archiveFile,
 	                        @NotNull final IndexingConfig config,
 	                        boolean isHtmlPairing,
-	                        @Nullable String originalPath,
+	                        @Nullable Path originalPath,
 							@Nullable FailReporter failReporter)
 			throws IOException, ArchiveEncryptedException {
 		Util.checkNotNull(archiveFile, config);
@@ -168,26 +140,21 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		this.config = config;
 		this.failReporter = failReporter == null ? new NullFailReporter() : failReporter;
 		
-		final String archiveName;
-		final String archivePath;
-		if (originalPath == null) {
-			archiveName = archiveFile.getName();
+		final Path archivePath;
+		if (originalPath == null)
 			archivePath = config.getStorablePath(archiveFile);
-		} else {
-			List<String> pathParts = Util.splitPath(originalPath);
-			archiveName = Util.getLast(pathParts);
+		else
 			archivePath = originalPath;
-		}
 		
 		/*
 		 * Note: The last-modified value of the folder can be null because it
 		 * will not be inserted into the persistent tree structure anyway.
 		 */
-		archiveFolder = new FileFolder(archiveName, archivePath, null);
+		archiveFolder = new FileFolder(archivePath, null);
 		
 		ArchiveIterator<E> archiveIt = getArchiveIterator(archiveFile);
 		if (archiveIt.isEncrypted())
-			throw new ArchiveEncryptedException(archiveFile, archiveFolder.getPath());
+			throw new ArchiveEncryptedException(archiveFile, archivePath.getPath());
 		ArchiveEntryReader<E> entryReader = getArchiveEntryReader();
 		
 		// Build tree structure from flat list of paths
@@ -195,8 +162,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			E entry = archiveIt.next();
 			FileFolder parent = archiveFolder;
 			
-			String innerPath = entryReader.getInnerPath(entry);
-			String intermediatePath = archiveFolder.getPath();
+			final String innerPath = entryReader.getInnerPath(entry);
+			Path intermediatePath = archiveFolder.getPath();
 			
 			Iterator<String> it = Util.splitPath(innerPath).iterator();
 			while (it.hasNext()) { // iterate over inner path parts
@@ -204,8 +171,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				if (it.hasNext() || entryReader.isDirectory(entry)) { // inner path part corresponds to a directory
 					FileFolder child = parent.getSubFolder(innerPart);
 					if (child == null) {
-						intermediatePath = Util.joinPath(intermediatePath, innerPart);
-						child = new FileFolder(innerPart, intermediatePath, null);
+						intermediatePath = intermediatePath.createSubPath(innerPart);
+						child = new FileFolder(intermediatePath, null);
 						parent.putSubFolder(child);
 					}
 					else {
@@ -215,14 +182,12 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				}
 				else { // inner path part corresponds to a file
 					long lastModified = entryReader.getLastModified(entry);
-					final String childPath;
+					final Path childPath;
 					TreeNode childNode;
 					
 					if (config.isArchive(innerPart)) {
-						String fullPath = Util.joinPath(
-							archiveFolder.getPath(), innerPath);
-						FileFolder child = new FileFolder(
-							innerPart, fullPath, lastModified);
+						Path fullPath = archiveFolder.getPath().createSubPath(innerPath);
+						FileFolder child = new FileFolder(fullPath, lastModified);
 						parent.putSubFolder(child);
 						childPath = child.getPath();
 						childNode = child;
@@ -256,7 +221,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		applyFilter(archiveFolder, new Predicate<FileDocument>() {
 			public boolean matches(FileDocument candidate) {
 				String name = candidate.getName();
-				String path = candidate.getPath();
+				Path path = candidate.getPath();
 				
 				for (PatternAction patternAction : config.getPatternActions()) {
 					switch (patternAction.getAction()) {
@@ -288,7 +253,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		}, new Predicate<FileFolder>() {
 			public boolean matches(FileFolder candidate) {
 				String name = candidate.getName();
-				String path = candidate.getPath();
+				Path path = candidate.getPath();
 				boolean isArchive = candidate.isArchive();
 				
 				for (PatternAction patternAction : config.getPatternActions()) {
@@ -393,7 +358,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			new FileFolderVisitor<Exception>((FileDocument) entry) {
 				protected void visitDocument(	FileFolder parent,
 				                             	FileDocument fileDocument) {
-					String path = fileDocument.getPath();
+					Path path = fileDocument.getPath();
 					EntryData entryData = entryDataMap.getValue(path);
 					unpackMap.put(entryData.index, fileDocument);
 					requiredSpace[0] += entryData.size;
@@ -447,7 +412,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			new FileFolderVisitor<Exception>((FileDocument) entry) {
 				protected void visitDocument(	FileFolder parent,
 				                             	FileDocument fileDocument) {
-					String path = fileDocument.getPath();
+					Path path = fileDocument.getPath();
 					EntryData entryData = entryDataMap.getValue(path);
 					entryData.file = indexFileMap.get(entryData.index);
 					assert entryData.file != null;

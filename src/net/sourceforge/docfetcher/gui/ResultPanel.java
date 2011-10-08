@@ -21,10 +21,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.FileResource;
+import net.sourceforge.docfetcher.model.Path;
+import net.sourceforge.docfetcher.model.Path.PathParts;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -164,7 +165,7 @@ public final class ResultPanel {
 		
 		viewer.addColumn(new Column<ResultDocument>("Path") { // TODO i18n
 			protected String getLabel(ResultDocument element) {
-				return element.getPath();
+				return element.getPath().getPath();
 			}
 		});
 		
@@ -233,12 +234,12 @@ public final class ResultPanel {
 			public void run() {
 				MultiFileLauncher launcher = new MultiFileLauncher();
 				for (ResultDocument doc : viewer.getSelection()) {
-					String path = doc.getPath();
+					Path path = doc.getPath();
 					try {
 						launcher.addFile(getParent(path));
 					}
 					catch (FileNotFoundException e) {
-						launcher.addMissing(path);
+						launcher.addMissing(path.getCanonicalPath());
 					}
 				}
 				if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
@@ -246,7 +247,7 @@ public final class ResultPanel {
 				
 			}
 			@NotNull
-			private File getParent(@NotNull String path)
+			private File getParent(@NotNull Path path)
 					throws FileNotFoundException {
 				/*
 				 * The possible cases:
@@ -256,18 +257,18 @@ public final class ResultPanel {
 				 * 
 				 * In each case, the target may or may not exist.
 				 */
-				String[] pathParts = UtilGlobal.splitAtExisting(path);
+				PathParts pathParts = path.splitAtExistingFile();
 				
-				if (pathParts[1].length() == 0) // Existing ordinary file
-					return Util.getParentFile(path);
+				if (pathParts.getRight().isEmpty()) // Existing ordinary file
+					return Util.getParentFile(path.getCanonicalFile());
 				
-				File leftFile = new File(pathParts[0]);
+				File leftFile = pathParts.getLeft().getCanonicalFile();
 				if (leftFile.isDirectory())
 					// File, archive entry or PST item does not exist
 					throw new FileNotFoundException();
 				
 				// Existing PST item
-				if (Util.hasExtension(pathParts[0], "pst"))
+				if (Util.hasExtension(pathParts.getLeft().getName(), "pst"))
 					return Util.getParentFile(leftFile);
 				
 				// Existing archive entry -> return the archive
@@ -340,7 +341,7 @@ public final class ResultPanel {
 					launcher.addFile(fileResource.getFile());
 				}
 				catch (FileNotFoundException e) {
-					launcher.addMissing(doc.getPath());
+					launcher.addMissing(doc.getPath().getCanonicalPath());
 				}
 				catch (ParseException e) {
 					AppUtil.showError(e.getMessage(), true, false);

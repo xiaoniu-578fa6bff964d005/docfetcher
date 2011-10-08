@@ -245,11 +245,6 @@ public final class UtilModel {
 		return lastChar != '/' && lastChar != '\\';
 	}
 	
-	@NotNull
-	public static String normalizePath(@NotNull String path) {
-		return Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
-	}
-
 	public static boolean isUnmodifiedArchive(	@NotNull Folder<?, ?> folder,
 												@Nullable Long newLastModified) {
 		Long oldLastModified = folder.getLastModified();

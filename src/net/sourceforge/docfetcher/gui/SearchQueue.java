@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeCheckState;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
@@ -68,7 +69,7 @@ public final class SearchQueue {
 	@Nullable private volatile Set<String> listDocIds;
 	@Nullable private List<ResultDocument> results;
 	@Nullable private Set<String> checkedParsers;
-	@Nullable private Set<String> checkedLocations;
+	@Nullable private Set<Path> checkedLocations;
 	private boolean allParsersChecked;
 	private boolean allLocationsChecked;
 	
@@ -240,9 +241,9 @@ public final class SearchQueue {
 		
 		// Build location filter
 		if (checkedLocations == null || queueCopy.contains(GuiEvent.LOCATION)) {
-			checkedLocations = new HashSet<String>();
+			checkedLocations = new HashSet<Path>();
 			TreeCheckState treeCheckState = indexRegistry.getTreeCheckState();
-			List<String> paths = treeCheckState.getCheckedPaths();
+			List<Path> paths = treeCheckState.getCheckedPaths();
 			int folderCount = treeCheckState.getFolderCount();
 			checkedLocations.addAll(paths);
 			allLocationsChecked = paths.size() == folderCount;
@@ -279,7 +280,7 @@ public final class SearchQueue {
 			if (checkedLocations.isEmpty())
 				continue;
 			if (!allLocationsChecked) {
-				String parentPath = doc.getParentPath();
+				Path parentPath = doc.getParentPath();
 				if (!checkedLocations.contains(parentPath))
 					continue;
 			}

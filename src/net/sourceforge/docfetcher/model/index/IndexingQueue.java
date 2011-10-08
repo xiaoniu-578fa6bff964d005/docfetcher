@@ -257,10 +257,12 @@ public final class IndexingQueue {
 				|| index instanceof OutlookIndex);
 		
 		Task task = new Task(this, index, action);
+
+		// Check that the given index has the right index directory
 		File taskIndexDir = task.getLuceneIndex().getIndexDir();
 		File taskParentIndexDir = Util.getParentFile(taskIndexDir);
 		File indexParentDir = indexRegistry.getIndexParentDir();
-		Util.checkThat(Util.equals(taskParentIndexDir, indexParentDir));
+		Util.checkThat(taskParentIndexDir.equals(indexParentDir));
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
 
@@ -350,9 +352,9 @@ public final class IndexingQueue {
 				for (LuceneIndex index0 : indexesInRegistry) {
 					if (index0 instanceof OutlookIndex)
 						continue;
-					File f1 = index0.getAbsoluteRootFile();
-					File f2 = task.getLuceneIndex().getAbsoluteRootFile();
-					if (Util.equals(f1, f2))
+					File f1 = index0.getCanonicalRootFile();
+					File f2 = task.getLuceneIndex().getCanonicalRootFile();
+					if (f1.equals(f2))
 						return Rejection.SAME_IN_REGISTRY;
 					if (isOverlapping(f1, f2))
 						return Rejection.OVERLAP_WITH_REGISTRY;
@@ -371,22 +373,22 @@ public final class IndexingQueue {
 					if (!(queueTask.getLuceneIndex() instanceof FileIndex))
 						continue;
 
-					File f1 = queueTask.getLuceneIndex().getAbsoluteRootFile();
-					File f2 = index.getAbsoluteRootFile();
+					File f1 = queueTask.getLuceneIndex().getCanonicalRootFile();
+					File f2 = index.getCanonicalRootFile();
 
 					if (isOverlapping(f1, f2))
 						return Rejection.OVERLAP_WITH_QUEUE;
 
 					if (task.is(IndexAction.REBUILD)
 							&& queueTask.is(IndexAction.UPDATE)) {
-						if (Util.equals(f1, f2)) {
+						if (f1.equals(f2)) {
 							if (queueTask.is(TaskState.INDEXING))
 								queueTask.cancelAction = CancelAction.KEEP;
 							it.remove();
 							removedTasks.add(queueTask);
 						}
 					}
-					else if (Util.equals(f1, f2)) {
+					else if (f1.equals(f2)) {
 						return Rejection.SAME_IN_QUEUE;
 					}
 				}
@@ -409,17 +411,17 @@ public final class IndexingQueue {
 
 	@NotThreadSafe
 	static boolean sameTarget(@NotNull Task task1, @NotNull Task task2) {
-		File target1 = task1.getLuceneIndex().getAbsoluteRootFile();
-		File target2 = task2.getLuceneIndex().getAbsoluteRootFile();
-		return Util.equals(target1, target2);
+		File target1 = task1.getLuceneIndex().getCanonicalRootFile();
+		File target2 = task2.getLuceneIndex().getCanonicalRootFile();
+		return target1.equals(target2);
 	}
 
 	@NotThreadSafe
 	private static boolean sameTarget(	@NotNull LuceneIndex index,
 										@NotNull Task task) {
-		File target1 = index.getAbsoluteRootFile();
-		File target2 = task.getLuceneIndex().getAbsoluteRootFile();
-		return Util.equals(target1, target2);
+		File target1 = index.getCanonicalRootFile();
+		File target2 = task.getLuceneIndex().getCanonicalRootFile();
+		return target1.equals(target2);
 	}
 
 	@NotThreadSafe

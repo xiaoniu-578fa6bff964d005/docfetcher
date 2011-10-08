@@ -462,23 +462,33 @@ public final class Util {
 	 * more.
 	 */
 	public static final CharMatcher fileSepMatcher = CharMatcher.anyOf("/\\").precomputed();
-	
+
 	/**
 	 * Creates a file path by joining the given parts. All leading and trailing
 	 * forward and backward slashes are stripped from the parts, except for the
 	 * first part, where only the trailing slashes are stripped. All backward
 	 * slashes are replaced by forward slashes.
+	 * <p>
+	 * Special case: If only two path parts are given and one of them is empty,
+	 * the other path part is returned, without any additional file separators.
 	 */
 	@NotNull
-	public static String joinPath(@NotNull String... parts) {
+	public static String joinPath(	@NotNull String first,
+									@NotNull String second,
+									@NotNull String... more) {
+		if (more.length == 0) {
+			if (first.isEmpty())
+				return second;
+			if (second.isEmpty())
+				return first;
+		}
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < parts.length; i++) {
-			if (i == 0) {
-				sb.append(fileSepMatcher.trimTrailingFrom(parts[i]));
-			} else {
-				sb.append('/');
-				sb.append(fileSepMatcher.trimFrom(parts[i]));
-			}
+		sb.append(fileSepMatcher.trimTrailingFrom(first));
+		sb.append('/');
+		sb.append(fileSepMatcher.trimFrom(second));
+		for (int i = 0; i < more.length; i++) {
+			sb.append('/');
+			sb.append(fileSepMatcher.trimFrom(more[i]));
 		}
 		return sb.toString().replace('\\', '/');
 	}
@@ -529,26 +539,6 @@ public final class Util {
 			sb.append(it.next().toString());
 		}
 		return sb.toString();
-	}
-	
-	/**
-	 * Splits the given path string at the last path separator character (either
-	 * forward or backward slash). If the given string does not contain path
-	 * separators, the returned array contains the given string and an empty
-	 * string.
-	 */
-	@NotNull
-	public static String[] splitPathLast(@NotNull String string) {
-		for (int i = string.length() - 1; i >= 0; i--) {
-			char c = string.charAt(i);
-			if (c == '/' || c == '\\') {
-				return new String[] {
-					string.substring(0, i),
-					string.substring(i + 1)
-				};
-			}
-		}
-		return new String[] {string, ""};
 	}
 	
 	/**
@@ -1235,10 +1225,6 @@ public final class Util {
 		return Util.createTempFile(
 				nameParts[0], nameParts[1], tempDir
 		);
-	}
-	
-	public static boolean equals(@NotNull File file1, @NotNull File file2) {
-		return file1.getAbsoluteFile().equals(file2.getAbsoluteFile());
 	}
 
 	// TODO now: Debug method; show AspectJ warnings whenever it is used

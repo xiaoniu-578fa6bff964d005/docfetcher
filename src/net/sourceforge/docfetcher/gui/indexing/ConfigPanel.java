@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -34,16 +34,16 @@ abstract class ConfigPanel {
 	public final Event<Void> evtRunButtonClicked = new Event<Void>();
 	
 	private final Composite comp;
-	protected final IndexingConfig config;
+	protected final LuceneIndex index;
 	@NotNull private Button runBt;
 
 	public ConfigPanel(@NotNull Composite parent,
-	                   @NotNull IndexingConfig config) {
-		Util.checkNotNull(config);
-		this.config = config;
+	                   @NotNull LuceneIndex index) {
+		Util.checkNotNull(index);
+		this.index = index;
 		
 		// Must use composition rather than inheritance here because the subclasses
-		// need the config object while creating their widgets
+		// need the index object while creating their widgets
 		comp = new ConfigComposite(parent, SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
 				return ConfigPanel.this.createContents(parent);

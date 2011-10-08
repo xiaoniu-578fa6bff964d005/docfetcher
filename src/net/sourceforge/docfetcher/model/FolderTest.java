@@ -28,19 +28,19 @@ public final class FolderTest {
 		for (boolean absolutePath : new boolean[] { true, false }) {
 			String prefix = absolutePath ? "/" : "";
 			
-			FileFolder f1 = new FileFolder("one", prefix + "one", null);
-			FileFolder f2 = new FileFolder("two", prefix + "one/two", null);
+			FileFolder f1 = new FileFolder(new Path(prefix + "one"), null);
+			FileFolder f2 = new FileFolder(new Path(prefix + "one/two"), null);
 			f1.putSubFolder(f2);
 			FileDocument doc = new FileDocument(f2, "three", 1L);
 			
 			String targetPath = prefix + "one/two/three";
-			assertTrue(doc == f1.findTreeNode(targetPath));
+			assertTrue(doc == f1.findTreeNode(new Path(targetPath)));
 			
 			String wrongPrefix = absolutePath ? "" : "/";
 			String wrongPath = wrongPrefix + "one/two/three";
-			assertNull(f1.findTreeNode(wrongPath));
+			assertNull(f1.findTreeNode(new Path(wrongPath)));
 			
-			assertNull(f1.findTreeNode(prefix + "does/not/exist"));
+			assertNull(f1.findTreeNode(new Path(prefix + "does/not/exist")));
 		}
 	}
 

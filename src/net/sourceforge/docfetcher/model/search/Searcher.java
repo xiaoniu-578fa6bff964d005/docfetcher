@@ -21,12 +21,14 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
+
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
@@ -371,7 +373,7 @@ public final class Searcher {
 			Filter[] indexFilters = new Filter[webQuery.indexes.size()];
 			int i = 0;
 			for (LuceneIndex index : webQuery.indexes) {
-				String path = index.getRootFolder().getPath();
+				Path path = index.getRootFolder().getPath();
 				String uid = index.getDocumentType().createUniqueId(path);
 				Term prefix = new Term(Fields.UID.key(), uid + "/");
 				indexFilters[i++] = new PrefixFilter(prefix);

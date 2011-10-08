@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.NullCancelable;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -95,7 +96,7 @@ public final class ParseService {
 	@NotNull
 	public static ParseResult parse(@NotNull IndexingConfig config,
 	                                @NotNull String filename,
-	                                @NotNull String filepath,
+	                                @NotNull Path filepath,
 	                                @NotNull File file,
 	                                @NotNull IndexingReporter reporter,
 	                                @NotNull Cancelable cancelable)

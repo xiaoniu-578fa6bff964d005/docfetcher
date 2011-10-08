@@ -197,7 +197,7 @@ public final class FolderWatcher {
 		}
 		
 		for (LuceneIndex index : watchQueueCopy.keySet()) {
-			File rootFile = index.getAbsoluteRootFile();
+			File rootFile = index.getCanonicalRootFile();
 			
 			// Don't watch read-only files (some might be on a CD-ROM)
 			if (!rootFile.canWrite())
@@ -321,7 +321,7 @@ public final class FolderWatcher {
 				assert !isFile;
 			
 			// Accept if target is an archive root or a PST file
-			if (target.equals(watchedIndex.getAbsoluteRootFile()))
+			if (target.equals(watchedIndex.getCanonicalRootFile()))
 				return true;
 
 			// Ignore so-called 'temporary owner files' created by MS Word.
@@ -331,7 +331,7 @@ public final class FolderWatcher {
 			
 			// Ignore target if it's matched by the user-defined filter
 			IndexingConfig config = watchedIndex.getConfig();
-			String path = config.getStorablePath(target);
+			Path path = config.getStorablePath(target);
 			
 			// Apply exclusion filters
 			boolean mimeMatch = false;

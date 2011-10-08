@@ -31,16 +31,16 @@ public enum DocumentType {
 	}
 	
 	@NotNull
-	public String createUniqueId(@NotNull String path) {
-		return prefix + Util.checkNotNull(path);
+	public String createUniqueId(@NotNull Path path) {
+		return prefix + path.getPath();
 	}
 	
 	@NotNull
-	public static String extractPath(@NotNull String uid) {
+	public static Path extractPath(@NotNull String uid) {
 		Util.checkNotNull(uid);
 		for (DocumentType type : values())
 			if (uid.startsWith(type.prefix))
-				return uid.substring(type.prefix.length());
+				return new Path(uid.substring(type.prefix.length()));
 		throw new IllegalArgumentException();
 	}
 	

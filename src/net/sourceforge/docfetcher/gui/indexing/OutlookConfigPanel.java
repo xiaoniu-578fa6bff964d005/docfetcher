@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
 
@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Control;
 final class OutlookConfigPanel extends ConfigPanel {
 	
 	public OutlookConfigPanel(	@NotNull Composite parent,
-								@NotNull final IndexingConfig config) {
-		super(parent, config);
+								@NotNull final LuceneIndex index) {
+		super(parent, index);
 	}
 	
 	protected Control createContents(Composite parent) {

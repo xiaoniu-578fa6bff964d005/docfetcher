@@ -18,6 +18,7 @@ import java.util.Map;
 
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.DocumentType;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeIndex;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
@@ -66,9 +67,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 	}
 	
 	@NotNull
-	protected MailFolder createRootFolder(	@NotNull String name,
-											@NotNull String path) {
-		return new MailFolder(name, path);
+	protected MailFolder createRootFolder(@NotNull Path path) {
+		return new MailFolder(path);
 	}
 	
 	public boolean isEmailIndex() {
@@ -94,7 +94,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 			 * Return immediately if the last-modified field of the PST file
 			 * hasn't changed.
 			 */
-			File rootFile = new File(rootFolder.getPath());
+			File rootFile = getCanonicalRootFile();
 			long newLastModified = rootFile.lastModified();
 			if (UtilModel.isUnmodifiedArchive(rootFolder, newLastModified))
 				return IndexingResult.SUCCESS_UNCHANGED;
@@ -104,7 +104,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 			OutlookContext context = new OutlookContext(
 					getConfig(), writer, reporter, cancelable
 			);
-			PSTFile pstFile = new PSTFile(rootFolder.getPath());
+			PSTFile pstFile = new PSTFile(rootFile.getPath());
 			visitFolder(context, rootFolder, pstFile.getRootFolder());
 			
 			simplifiedRootFolder = new TreeRootSimplifier<MailFolder> () {
@@ -224,9 +224,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 					String foldername = pstSubFolder.getDisplayName();
 					MailFolder subFolder = unseenSubFolders.remove(foldername);
 					if (subFolder == null) {
-						String path = Util.joinPath(
-							folder.getPath(), pstSubFolder.getDisplayName());
-						subFolder = new MailFolder(foldername, path);
+						Path path = folder.getPath().createSubPath(foldername);
+						subFolder = new MailFolder(path);
 						folder.putSubFolder(subFolder);
 					}
 					visitFolder(context, subFolder, pstSubFolder);

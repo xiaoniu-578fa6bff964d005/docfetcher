@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.model.index.outlook;
 
 import net.sourceforge.docfetcher.model.Folder;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
@@ -26,9 +27,8 @@ final class MailFolder extends Folder<MailDocument, MailFolder> {
 	
 	private boolean hasDeepContent = false;
 	
-	public MailFolder(	@NotNull String name,
-						@NotNull String path) {
-		super(name, path, null);
+	public MailFolder(@NotNull Path path) {
+		super(path, null);
 	}
 	
 	public void setHasDeepContent(boolean hasDeepContent) {

@@ -88,7 +88,7 @@ final class ErrorTable {
 			public void run() {
 				TableItem item = new TableItem(table, SWT.NONE);
 				String errorType = error.getErrorType().name();
-				String filePath = error.getTreeNode().getPath();
+				String filePath = error.getTreeNode().getPath().getCanonicalPath();
 				item.setText(new String[] {errorType, filePath});
 			}
 		});

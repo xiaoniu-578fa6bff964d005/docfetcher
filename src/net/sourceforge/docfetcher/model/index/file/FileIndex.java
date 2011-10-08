@@ -18,6 +18,7 @@ import java.util.Map;
 
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.DocumentType;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeIndex;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
@@ -101,9 +102,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 	}
 
 	@NotNull
-	protected FileFolder createRootFolder(	@NotNull String name,
-											@NotNull String path) {
-		return new FileFolder(name, path, null);
+	protected FileFolder createRootFolder(@NotNull Path path) {
+		return new FileFolder(path, null);
 	}
 
 	public boolean isEmailIndex() {
@@ -135,7 +135,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		 * it's an existing directory.
 		 */
 		TArchiveDetector zipDetector = config.createZipDetector();
-		TFile rootFile = new TFile(config.getAbsoluteRootFile(), zipDetector);
+		TFile rootFile = new TFile(getCanonicalRootFile(), zipDetector);
 
 		try {
 			/*
@@ -252,8 +252,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 												@Nullable File file,
 												@Nullable Long lastModified) {
 		if (file == null) return null;
-		return new FileFolder(
-			file.getName(), context.getDirOrZipPath(file), lastModified);
+		return new FileFolder(context.getDirOrZipPath(file), lastModified);
 	}
 
 	// Will clean up temporary zip files

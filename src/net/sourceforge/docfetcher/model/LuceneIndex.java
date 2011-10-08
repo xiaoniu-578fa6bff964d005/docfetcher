@@ -42,13 +42,6 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public File getIndexDir();
 	
 	/**
-	 * Returns the absolute file or directory containing the user's files (i.e.
-	 * the document repository that was indexed).
-	 */
-	@NotNull
-	public File getAbsoluteRootFile();
-	
-	/**
 	 * Warning: If the root file corresponds to the current working directory,
 	 * the path of the returned root folder will be an empty string (regardless
 	 * of the 'store relative paths' setting), and calling <code>new
@@ -56,6 +49,13 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	 */
 	@NotNull
 	public Folder<?, ?> getRootFolder();
+	
+	/**
+	 * Returns the file or directory containing the user's files (i.e. the
+	 * document repository that was indexed), in canonical form.
+	 */
+	@NotNull
+	public File getCanonicalRootFile();
 	
 	@NotNull
 	public IndexingResult update(	@NotNull IndexingReporter reporter,
@@ -80,7 +80,5 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public DocumentType getDocumentType();
 	
 	public boolean isWatchFolders();
-	
-	public void setWatchFolders(boolean watchFolders);
 	
 }

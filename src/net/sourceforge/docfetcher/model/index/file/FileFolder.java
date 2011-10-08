@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model.index.file;
 
 import net.sourceforge.docfetcher.model.Folder;
 import net.sourceforge.docfetcher.model.FolderVisitor;
+import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
@@ -35,10 +36,8 @@ public class FileFolder extends Folder<FileDocument, FileFolder> {
 		}
 	}
 	
-	public FileFolder(	@NotNull String name,
-						@NotNull String path,
-						@Nullable Long lastModified) {
-		super(name, path, lastModified);
+	public FileFolder(@NotNull Path path, @Nullable Long lastModified) {
+		super(path, lastModified);
 	}
 	
 	public final boolean isArchive() {

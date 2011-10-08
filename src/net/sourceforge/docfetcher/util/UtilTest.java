@@ -11,14 +11,14 @@
 
 package net.sourceforge.docfetcher.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 
 import org.junit.Test;
 
@@ -54,14 +54,16 @@ public class UtilTest {
 	public void testJoinPath() {
 		String[][] samples = {
 				// expected path output, parts to join
-				{"", ""},
+				{"", "", ""},
+				{"path", "path", ""},
+				{"path", "", "path"},
 				{"path/to/file", "path", "to", "file"},
 				{"path/to/file", "path/", "to", "file/"},
-				{"path", "path"},
 		};
 		for (String[] sample : samples) {
 			String expected = sample[0];
-			String actual = Util.joinPath(Arrays.copyOfRange(sample, 1, sample.length));
+			String[] moreParts = Arrays.copyOfRange(sample, 3, sample.length);
+			String actual = Util.joinPath(sample[1], sample[2], moreParts);
 			assertEquals(expected, actual);
 		}
 	}
@@ -73,32 +75,4 @@ public class UtilTest {
 		assertTrue(file.getName().startsWith("1__"));
 	}
 	
-	@Test
-	public void testSplitPathLast() {
-		List<Sample> samples = new ArrayList<Sample> ();
-		add(samples, "", "", "");
-		add(samples, "/", "", "");
-		add(samples, "path/to/file", "path/to", "file");
-		add(samples, "path/to/file/", "path/to/file", "");
-		add(samples, "path-to-file", "path-to-file", "");
-		add(samples, "/path-to-file", "", "path-to-file");
-		
-		for (Sample sample : samples) {
-			String[] actualOutput = Util.splitPathLast(sample.input);
-			assertArrayEquals(sample.expectedOutput, actualOutput);
-		}
-	}
-	
-	private static void add(List<Sample> samples, String input, String... expectedOutput) {
-		Sample sample = new Sample();
-		sample.input = input;
-		sample.expectedOutput = expectedOutput;
-		samples.add(sample);
-	}
-	
-	private static class Sample {
-		String input;
-		String[] expectedOutput;
-	}
-
 }

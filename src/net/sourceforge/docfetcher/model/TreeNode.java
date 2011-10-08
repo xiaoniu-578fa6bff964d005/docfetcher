@@ -58,11 +58,11 @@ public abstract class TreeNode implements Serializable {
 	}
 	
 	@NotNull
-	public abstract String getPath();
+	public abstract Path getPath();
 	
 	@NotNull
 	public final String toString() {
-		return getPath();
+		return getPath().toString();
 	}
 
 	@Immutable

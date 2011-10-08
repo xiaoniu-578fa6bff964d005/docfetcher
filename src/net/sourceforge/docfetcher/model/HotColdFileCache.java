@@ -20,9 +20,9 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.collect.SafeKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
 /**
@@ -69,8 +69,8 @@ public final class HotColdFileCache {
 										@NotNull File deletable,
 										int useCount) {
 			Util.checkNotNull(file, cache, key, deletable);
-			Util.checkThat(! cache.coldCache.containsKey(key));
-			Util.checkThat(! cache.hotCache.containsKey(key));
+			Util.checkThat(!cache.coldCache.containsKeySafe(key));
+			Util.checkThat(!cache.hotCache.containsKeySafe(key));
 			this.file = file;
 			this.cache = cache;
 			this.key = key;
@@ -109,12 +109,12 @@ public final class HotColdFileCache {
 		}
 	}
 	
-	private final Map<String, TemporaryFileResource> hotCache = Maps.newHashMap();
-	private final ColdCache coldCache;
+	private final SafeKeyMap<String, TemporaryFileResource> hotCache = SafeKeyMap.createHashMap();
+	private final SafeKeyMap<String, TemporaryFileResource> coldCache;
 	
 	public HotColdFileCache(int coldCacheSize) {
 		Util.checkThat(coldCacheSize >= 1);
-		coldCache = new ColdCache(coldCacheSize);
+		coldCache = SafeKeyMap.create(new ColdCache(coldCacheSize));
 	}
 	
 	@VisibleForTesting
@@ -126,10 +126,10 @@ public final class HotColdFileCache {
 	// If item found in cold cache, item is moved to hot cache.
 	// If item found in hot cache, its use count is incremented.
 	@Nullable
-	public synchronized FileResource get(@NotNull String key) {
-		key = key.replace('\\', '/');
-		TemporaryFileResource hotItem = hotCache.get(key);
-		TemporaryFileResource coldItem = coldCache.remove(key); // Remove from cold cache
+	public synchronized FileResource get(@NotNull Path key) {
+		String absKey = key.getCanonicalPath();
+		TemporaryFileResource hotItem = hotCache.getValue(absKey);
+		TemporaryFileResource coldItem = coldCache.removeKey(absKey); // Remove from cold cache
 		
 		// The same resource must not be present in both caches
 		if (hotItem != null && coldItem != null)
@@ -139,18 +139,20 @@ public final class HotColdFileCache {
 			assert hotItem.useCount >= 1;
 			hotItem.useCount++;
 			return new DisposeOnceProxyResource(hotItem);
-		} else if (coldItem != null) {
+		}
+		else if (coldItem != null) {
 			assert coldItem.useCount == 0;
 			coldItem.useCount = 1;
-			hotCache.put(key, coldItem);
+			hotCache.put(absKey, coldItem);
 			return new DisposeOnceProxyResource(coldItem);
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 	
 	@NotNull
-	public synchronized FileResource putIfAbsent(	@NotNull String key,
+	public synchronized FileResource putIfAbsent(	@NotNull Path key,
 													@NotNull File deletableFile) {
 		return putIfAbsent(key, deletableFile, deletableFile);
 	}
@@ -158,28 +160,30 @@ public final class HotColdFileCache {
 	// If the cache already contains the given key,
 	// returns the file resource associated with that key and deletes the given deletable
 	@NotNull
-	public synchronized FileResource putIfAbsent(	@NotNull String key,
+	public synchronized FileResource putIfAbsent(	@NotNull Path key,
 													@NotNull File file,
 													@NotNull File deletable) {
 		Util.checkNotNull(key, file, deletable);
-		key = key.replace('\\', '/');
 		FileResource fileResource = get(key);
 		if (fileResource != null) {
 			try {
 				Files.deleteRecursively(deletable);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				Util.printErr(e);
 			}
 			return new DisposeOnceProxyResource(fileResource);
 		}
-		TemporaryFileResource newFileResource = new TemporaryFileResource(file, this, key, deletable, 1);
-		hotCache.put(key, newFileResource);
+		String absKey = key.getCanonicalPath();
+		TemporaryFileResource newFileResource = new TemporaryFileResource(
+			file, this, absKey, deletable, 1);
+		hotCache.put(absKey, newFileResource);
 		return new DisposeOnceProxyResource(newFileResource);
 	}
 	
-	private synchronized void coolDown(@NotNull String key) {
-		TemporaryFileResource coldItem = coldCache.get(key);
-		TemporaryFileResource hotItem = hotCache.get(key);
+	private synchronized void coolDown(@NotNull String absKey) {
+		TemporaryFileResource coldItem = coldCache.getValue(absKey);
+		TemporaryFileResource hotItem = hotCache.getValue(absKey);
 		
 		// The same resource must not be present in both caches
 		if (hotItem != null && coldItem != null)
@@ -193,8 +197,8 @@ public final class HotColdFileCache {
 		assert hotItem.useCount >= 1;
 		hotItem.useCount = Math.max(0, hotItem.useCount - 1);
 		if (hotItem.useCount == 0) {
-			hotCache.remove(key);
-			coldCache.put(key, hotItem); // Move to front
+			hotCache.removeKey(absKey);
+			coldCache.put(absKey, hotItem); // Move to front
 		}
 	}
 	
@@ -215,7 +219,8 @@ public final class HotColdFileCache {
 			try {
 				// This will delete both files and directories
 				Files.deleteRecursively(fileResource.deletable);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				Util.printErr(e);
 			}
 			return true;

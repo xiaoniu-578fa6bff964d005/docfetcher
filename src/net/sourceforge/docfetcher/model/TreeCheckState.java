@@ -22,12 +22,12 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
  */
 public final class TreeCheckState {
 	
-	List<String> checkedPaths = new ArrayList<String>();
+	List<Path> checkedPaths = new ArrayList<Path>();
 	int folderCount = 0;
 	
 	@MutableCopy
 	@NotNull
-	public List<String> getCheckedPaths() {
+	public List<Path> getCheckedPaths() {
 		return checkedPaths;
 	}
 	
