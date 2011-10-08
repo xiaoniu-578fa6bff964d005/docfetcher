@@ -47,11 +47,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.2.jar" sourcepath="lib/commons-compress/commons-compress-1.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.3.2.jar" sourcepath="lib/truezip/truezip-driver-file-7.3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.3.2.jar" sourcepath="lib/truezip/truezip-driver-tar-7.3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.3.2.jar" sourcepath="lib/truezip/truezip-driver-zip-7.3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.3.2.jar" sourcepath="lib/truezip/truezip-file-7.3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.3.2.jar" sourcepath="lib/truezip/truezip-kernel-7.3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.3.2.jar" sourcepath="lib/truezip/truezip-swing-7.3.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-file-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-tar-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-zip-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.3.3.jar" sourcepath="lib/truezip/truezip-file-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.3.3.jar" sourcepath="lib/truezip/truezip-kernel-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.3.3.jar" sourcepath="lib/truezip/truezip-swing-7.3.3-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
