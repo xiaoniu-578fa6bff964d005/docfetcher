@@ -88,6 +88,7 @@ public abstract class Folder
 	 */
 	@Nullable private F parent;
 	@Nullable private Path path;
+	private int pathHashCode;
 	
 	/**
 	 * The last time this object was modified. Null if the object has no last
@@ -106,12 +107,25 @@ public abstract class Folder
 		this.parent = parent;
 		this.lastModified = lastModified;
 		parent.putSubFolder((F) this);
+		updatePathHashCode();
 	}
 	
 	protected Folder(@NotNull Path path, @Nullable Long lastModified) {
 		super(path.getName());
 		this.path = path;
 		this.lastModified = lastModified;
+		updatePathHashCode();
+	}
+	
+	private void updatePathHashCode() {
+		if (path != null) {
+			pathHashCode = path.getPath().hashCode();
+		}
+		else {
+			String parentPath = parent.getPath().getPath();
+			String thisPath = Util.joinPath(parentPath, getName());
+			pathHashCode = thisPath.hashCode();
+		}
 	}
 	
 	@Nullable
@@ -160,6 +174,7 @@ public abstract class Folder
 		Util.checkNotNull(path);
 		this.path = path;
 		parent = null;
+		updatePathHashCode();
 	}
 	
 	@Nullable
@@ -192,6 +207,7 @@ public abstract class Folder
 			subFolder.parent.subFolders.remove(subFolder);
 		subFolder.parent = (F) this;
 		subFolder.path = null;
+		subFolder.updatePathHashCode();
 		subFolders.put(subFolder.getName(), subFolder);
 		evtFolderAdded.fire(new FolderEvent(this, subFolder));
 	}
@@ -266,6 +282,11 @@ public abstract class Folder
 			documents = null;
 	}
 	
+	/**
+	 * Removes all subfolders from the receiver that satisfy the given
+	 * predicate. The removed subfolders will still have valid paths that can be
+	 * obtained via {@link #getPath()}.
+	 */
 	public synchronized final void removeSubFolders(@NotNull Predicate<F> predicate) {
 		if (subFolders == null) return;
 		Iterator<F> subFolderIt = subFolders.values().iterator();
@@ -323,12 +344,14 @@ public abstract class Folder
 	
 	@Nullable
 	public synchronized final F getSubFolder(String name) {
-		if (subFolders == null) return null;
+		if (subFolders == null)
+			return null;
 		return subFolders.get(name);
 	}
 	
 	public synchronized final int getSubFolderCount() {
-		if (subFolders == null) return 0;
+		if (subFolders == null)
+			return 0;
 		return subFolders.size();
 	}
 	
@@ -432,7 +455,7 @@ public abstract class Folder
 		/*
 		 * TODO post-release-1.1: since getPath() constructs the returned path
 		 * dynamically, this search algorithm is somewhat inefficient. Maybe
-		 * improve it?
+		 * improve it? (Consider using the path hashcode.)
 		 */
 		if (documents != null) {
 			for (D document : documents.values()) {
