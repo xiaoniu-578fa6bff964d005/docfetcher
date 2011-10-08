@@ -31,6 +31,7 @@ import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 
 /**
@@ -41,11 +42,7 @@ import com.google.common.collect.Maps;
 public abstract class Folder
 	<D extends Document<D, F>, F extends Folder<D, F>>
 		extends TreeNode implements ViewNode {
-	
-	public interface Predicate<T> {
-		boolean matches(T candidate);
-	}
-	
+
 	public static final class FolderEvent {
 		public final Folder<?, ?> parent;
 		public final Folder<?, ?> folder;
@@ -208,7 +205,7 @@ public abstract class Folder
 		Iterator<D> docIt = documents.values().iterator();
 		while (docIt.hasNext()) {
 			D doc = docIt.next();
-			if (predicate.matches(doc)) {
+			if (predicate.apply(doc)) {
 				docIt.remove();
 				doc.parent = null;
 			}
@@ -223,7 +220,7 @@ public abstract class Folder
 		List<F> toNotify = new ArrayList<F>(subFolders.size());
 		while (subFolderIt.hasNext()) {
 			F subFolder = subFolderIt.next();
-			if (predicate.matches(subFolder)) {
+			if (predicate.apply(subFolder)) {
 				subFolderIt.remove();
 				subFolder.parent = null;
 				toNotify.add(subFolder);

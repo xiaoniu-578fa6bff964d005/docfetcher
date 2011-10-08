@@ -21,7 +21,6 @@ import java.util.Map;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Folder;
 import net.sourceforge.docfetcher.model.Folder.FolderEvent;
-import net.sourceforge.docfetcher.model.Folder.Predicate;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
@@ -38,6 +37,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.collect.SafeKeyMap;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
@@ -219,7 +219,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		
 		// Apply filters; this should be done after the HTML pairing
 		applyFilter(archiveFolder, new Predicate<FileDocument>() {
-			public boolean matches(FileDocument candidate) {
+			public boolean apply(FileDocument candidate) {
 				String name = candidate.getName();
 				Path path = candidate.getPath();
 				
@@ -251,7 +251,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				return false;
 			}
 		}, new Predicate<FileFolder>() {
-			public boolean matches(FileFolder candidate) {
+			public boolean apply(FileFolder candidate) {
 				String name = candidate.getName();
 				Path path = candidate.getPath();
 				boolean isArchive = candidate.isArchive();
