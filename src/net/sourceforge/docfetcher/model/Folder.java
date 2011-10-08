@@ -98,7 +98,7 @@ public abstract class Folder
 	private volatile boolean isChecked = true;
 	
 	public Folder(@NotNull Path path, @Nullable Long lastModified) {
-		super(path.getName(), path.getName());
+		super(path.getName());
 		this.path = path;
 		this.lastModified = lastModified;
 	}

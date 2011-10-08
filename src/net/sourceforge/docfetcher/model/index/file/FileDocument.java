@@ -37,7 +37,7 @@ public final class FileDocument extends Document<FileDocument, FileFolder> {
 	public FileDocument(@NotNull FileFolder parent,
 	                    @NotNull String name,
 						long lastModified) {
-		super(parent, name, name, lastModified);
+		super(parent, name, null, lastModified);
 	}
 	
 	@NotNull

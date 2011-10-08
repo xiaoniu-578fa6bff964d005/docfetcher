@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.model;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
@@ -28,7 +29,7 @@ public abstract class Document<D extends Document<D, F>, F extends Folder<D, F>>
 	@SuppressWarnings("unchecked")
 	public Document(@NotNull F parent,
 	                @NotNull String name,
-	                @NotNull String displayName,
+	                @Nullable String displayName,
 					long lastModified) {
 		super(name, displayName);
 		parent.putDocument((D) this); // Will set parent field for this instance

@@ -160,7 +160,7 @@ final class OutlookContext {
 		private final Path path;
 		
 		public AttachNode(Path path) {
-			super(path.getName(), path.getName());
+			super(path.getName());
 			this.path = path;
 		}
 		public Path getPath() {

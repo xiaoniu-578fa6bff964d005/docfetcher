@@ -15,14 +15,14 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Tran Nam Quang
@@ -32,17 +32,27 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 public abstract class TreeNode implements Serializable {
 	
 	private final String name;
-	private final String displayName;
+	
+	/*
+	 * This field is optional. If it's null, then the 'name' field will be used
+	 * as a substitute. (The number of instances of this class within the
+	 * application might be enormous, so it's important to avoid wasting RAM
+	 * here.)
+	 */
+	@Nullable private final String displayName;
 	
 	/**
 	 * The indexing errors that occurred on this tree node the last time the
 	 * index was updated. Null if no error occurred during the last update.
 	 */
-	@Nullable private List<IndexingError> errors; // Null instead of empty list to save some RAM
+	@Nullable private List<IndexingError> errors; // Null instead of empty list to save RAM
 	
-	public TreeNode(@NotNull String name,
-					@NotNull String displayName) {
-		Util.checkNotNull(name, displayName);
+	public TreeNode(@NotNull String name) {
+		this(name, null);
+	}
+	
+	public TreeNode(@NotNull String name, @Nullable String displayName) {
+		Util.checkNotNull(name);
 		this.name = name;
 		this.displayName = displayName;
 	}
@@ -54,7 +64,7 @@ public abstract class TreeNode implements Serializable {
 	
 	@NotNull
 	public final String getDisplayName() {
-		return displayName;
+		return displayName == null ? name : displayName;
 	}
 	
 	@NotNull
