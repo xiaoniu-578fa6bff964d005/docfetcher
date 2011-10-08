@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Path;
@@ -53,6 +54,8 @@ public class IndexingConfig implements Serializable {
 	
 	public static final List<String> hiddenZipExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
+	
+	private static final Pattern dotSlashPattern = Pattern.compile("\\.\\.?[/\\\\].*");
 	
 	@Nullable private File tempDir;
 	
@@ -133,6 +136,10 @@ public class IndexingConfig implements Serializable {
 	@NotNull
 	public static Path getStorablePath(	@NotNull File file,
 										boolean storeRelativePaths) {
+		// Path should not start with any of these:
+		// ./   ../   .\   ..\
+		Util.checkThat(!dotSlashPattern.matcher(file.getPath()).matches());
+		
 		if (storeRelativePaths)
 			return new Path(getRelativePathIfPossible(file));
 		else
