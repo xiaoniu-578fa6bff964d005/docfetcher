@@ -140,9 +140,9 @@ public final class Main {
 		// Load program configuration and preferences; load index registry
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
-		loadIndexRegistry();
-
 		display = new Display();
+		loadIndexRegistry(display);
+		
 		shell = new Shell(display);
 		AppUtil.setDisplay(display);
 
@@ -261,8 +261,25 @@ public final class Main {
 				});
 				
 				if (e.doit) {
-					indexRegistry.getSearcher().shutdown();
-					folderWatcher.shutdown();
+					/*
+					 * Note: The getSearcher() call below will block until the
+					 * searcher is available. If we run this inside the GUI
+					 * thread, we won't let go of the GUI lock, causing the
+					 * program to deadlock when the user tries to close the
+					 * program before all indexes have been loaded.
+					 */
+					new Thread() {
+						public void run() {
+							/*
+							 * The folder watcher will be null if the program is
+							 * shut down while loading the indexes
+							 */
+							if (folderWatcher != null)
+								folderWatcher.shutdown();
+							
+							indexRegistry.getSearcher().shutdown();
+						}
+					}.start();
 				}
 			}
 		});
@@ -297,7 +314,7 @@ public final class Main {
 		}
 	}
 
-	private static void loadIndexRegistry() {
+	private static void loadIndexRegistry(@NotNull final Display display) {
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
 			indexParentDir = new File("bin", "indexes");
@@ -315,9 +332,13 @@ public final class Main {
 				try {
 					indexRegistry.load(new Cancelable() {
 						public boolean isCanceled() {
-							return display != null && display.isDisposed();
+							return display.isDisposed();
 						}
 					});
+					
+					// Program may have been shut down while it was loading the indexes
+					if (display.isDisposed())
+						return;
 					
 					/*
 					 * Install folder watches on the user's document folders.
@@ -349,18 +370,10 @@ public final class Main {
 					});
 				}
 				catch (IOException e) {
-					// Wait until the display is available
-					int tries = 0;
-					while (display == null && tries < 100) {
-						tries++;
-						try {
-							Thread.sleep(100);
-						}
-						catch (InterruptedException e1) {
-							break;
-						}
-					}
-					AppUtil.showStackTrace(e);
+					if (display.isDisposed())
+						AppUtil.showStackTraceInOwnDisplay(e);
+					else
+						AppUtil.showStackTrace(e);
 				}
 			}
 		}.start();
