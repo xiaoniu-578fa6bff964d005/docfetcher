@@ -244,4 +244,8 @@ final class PatternTable extends Composite {
 		return tableViewer.getElements();
 	}
 	
+	public void removeAll() {
+		tableViewer.removeAll();
+	}
+	
 }

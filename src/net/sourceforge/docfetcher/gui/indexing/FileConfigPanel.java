@@ -223,4 +223,18 @@ final class FileConfigPanel extends ConfigPanel {
 		return true;
 	}
 	
+	protected void restoreDefaults() {
+		IndexingConfig config = index.getConfig();
+		
+		extGroupWrapper.setTextExtensions(config.getTextExtensions());
+		extGroupWrapper.setZipExtensions(config.getZipExtensions());
+		patternTable.removeAll();
+		
+		htmlPairingBt.setSelection(config.isHtmlPairing());
+		detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());
+		indexFilenameBt.setSelection(config.isIndexFilenames());
+		storeRelativePathsBt.setSelection(config.isStoreRelativePaths());
+		watchFolderBt.setSelection(config.isWatchFolders());
+	}
+	
 }

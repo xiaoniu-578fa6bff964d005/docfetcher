@@ -68,6 +68,8 @@ abstract class ConfigPanel {
 	// returns success
 	protected abstract boolean writeToConfig();
 	
+	protected abstract void restoreDefaults();
+	
 	protected final Control createButtonArea(Composite parent) {
 		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
@@ -75,12 +77,13 @@ abstract class ConfigPanel {
 		Button helpBt = Util.createPushButton(comp, "help", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				// TODO now: implement
+//				UtilFile.launch(Const.HELP_FILE_INDEXING);
 			}
 		});
 		
 		Button resetBt = Util.createPushButton(comp, "restore_defaults", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				restoreDefaults();
 			}
 		});
 		

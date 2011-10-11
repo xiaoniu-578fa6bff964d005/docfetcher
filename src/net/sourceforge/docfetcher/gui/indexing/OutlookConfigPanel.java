@@ -53,5 +53,9 @@ final class OutlookConfigPanel extends ConfigPanel {
 		// TODO now: implement
 		return true;
 	}
+	
+	protected void restoreDefaults() {
+		// TODO now: implement
+	}
 
 }

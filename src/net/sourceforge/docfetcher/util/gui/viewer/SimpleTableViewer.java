@@ -116,8 +116,19 @@ public final class SimpleTableViewer<E> {
 	public void remove(@NotNull E element) {
 		Util.checkNotNull(element);
 		
+		if (editSupport != null)
+			editSupport.cancelEditing();
+		
 		// This will automatically remove the element from the map
 		elementToItemMap.getValue(element).dispose();
+	}
+	
+	public void removeAll() {
+		if (editSupport != null)
+			editSupport.cancelEditing();
+		
+		// This will clear the element-to-item map
+		table.removeAll();
 	}
 	
 	public void update(@NotNull E element) {

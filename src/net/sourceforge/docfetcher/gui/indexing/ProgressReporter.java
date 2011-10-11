@@ -50,7 +50,7 @@ final class ProgressReporter extends IndexingReporter {
 		long duration = (time - start) / 1000;
 		String msg = "Duration: " + duration + " s";
 		progressTable.append(msg);
-		Util.println(msg);
+		Util.println(msg); // TODO pre-release: remove this
 	}
 	
 	public void info(@NotNull IndexingInfo info) {

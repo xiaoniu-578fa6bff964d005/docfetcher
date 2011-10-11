@@ -131,7 +131,7 @@ final class FileExtensionGroupWrapper {
 			field.setText(Util.join(" ", extsNew));
 		}
 		catch (FileNotFoundException e1) {
-			// TODO now
+			// TODO now: Show error message: "File not found: %s"
 			Util.printErr(e1);
 		}
 	}
@@ -139,6 +139,14 @@ final class FileExtensionGroupWrapper {
 	@NotNull
 	public Collection<String> getTextExtensions() {
 		return getExtensions(textExtField);
+	}
+	
+	public void setTextExtensions(@NotNull Collection<String> textExtensions) {
+		textExtField.setText(Util.join(" ", textExtensions));
+	}
+	
+	public void setZipExtensions(Collection<String> zipExtensions) {
+		zipExtField.setText(Util.join(" ", zipExtensions));
 	}
 	
 	@NotNull
