@@ -23,6 +23,11 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
  */
 public final class TreeCheckState {
 	
+	/*
+	 * TODO post-release-1.1: Check for multi-threading issues in this class,
+	 * especially check-then-act operations on Folder objects and the likes.
+	 */
+	
 	private final Set<FolderWrapper> checkedSet = new HashSet<FolderWrapper>();
 	private int folderCount = 0; // includes unchecked and checked folders
 	
@@ -102,6 +107,10 @@ public final class TreeCheckState {
 			return true;
 		}
 		
+		/*
+		 * TODO post-release-1.1: Compute and store the path length as an int
+		 * field in Folder during indexing, instead computing it here.
+		 */
 		private int getPathLength(@NotNull Folder<?, ?> folder) {
 			int count = 0;
 			Folder<?, ?> current = folder;

@@ -114,6 +114,12 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		}
 	}
 	
+	/*
+	 * TODO post-release-1.1: The entry data map still uses Path objects as key.
+	 * This may not be optimal anymore now that the Path is only stored for root
+	 * Folders. (Perhaps this inefficiency has no measurable impact anyway?)
+	 */
+	
 	private final FileFolder archiveFolder;
 	private final SafeKeyMap<Path, EntryData> entryDataMap = SafeKeyMap.createHashMap();
 	private final TempFileFactory defaultTempFileFactory = new TempFileFactory();

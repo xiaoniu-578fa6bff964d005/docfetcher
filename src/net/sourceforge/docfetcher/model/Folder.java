@@ -57,6 +57,11 @@ public abstract class Folder
 		}
 	}
 	
+	/*
+	 * TODO post-release-1.1: Rethink the synchronization used here. Maybe use
+	 * a global static lock for all instances of TreeNode, Folder, Document, etc.?
+	 */
+	
 	// Making these events non-static would lead to trouble with serialization
 	public static final Event<FolderEvent> evtFolderAdded = new Event<FolderEvent>();
 	public static final Event<FolderEvent> evtFolderRemoved = new Event<FolderEvent>();
@@ -455,7 +460,7 @@ public abstract class Folder
 		/*
 		 * TODO post-release-1.1: since getPath() constructs the returned path
 		 * dynamically, this search algorithm is somewhat inefficient. Maybe
-		 * improve it? (Consider using the path hashcode.)
+		 * improve it? (Consider making use of the path hashcode.)
 		 */
 		if (documents != null) {
 			for (D document : documents.values()) {
