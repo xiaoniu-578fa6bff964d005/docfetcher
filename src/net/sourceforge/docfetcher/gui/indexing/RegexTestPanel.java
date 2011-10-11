@@ -111,12 +111,17 @@ final class RegexTestPanel extends Composite {
 	}
 	
 	private void updateLabel() {
-		label.setText(matches()
-			? "regex_matches_file_yes"
-			: "regex_matches_file_no");
+		try {
+			label.setText(matches()
+				? "regex_matches_file_yes"
+				: "regex_matches_file_no");
+		}
+		catch (PatternSyntaxException e) {
+			label.setText("regex_matches_file: (Malformed regex)");
+		}
 	}
 	
-	private boolean matches() {
+	private boolean matches() throws PatternSyntaxException {
 		if (patternActions.isEmpty())
 			return false;
 		
@@ -126,17 +131,12 @@ final class RegexTestPanel extends Composite {
 		String filename = new File(filepath).getName();
 		
 		for (PatternAction patternAction : patternActions) {
-			try {
-				Pattern pattern = Pattern.compile(patternAction.getRegex());
-				String target = patternAction.getTarget() == MatchTarget.FILENAME
-					? filename
-					: filepath;
-				if (pattern.matcher(target).matches())
-					return true;
-			}
-			catch (PatternSyntaxException e) {
-				// Ignore
-			}
+			Pattern pattern = Pattern.compile(patternAction.getRegex());
+			String target = patternAction.getTarget() == MatchTarget.FILENAME
+				? filename
+				: filepath;
+			if (pattern.matcher(target).matches())
+				return true;
 		}
 		return false;
 	}
