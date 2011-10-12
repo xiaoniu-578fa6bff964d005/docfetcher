@@ -76,9 +76,6 @@ public final class Application {
 
 	/** The widths of the sashes in pixels */
 	private static final int sashWidth = 5;
-
-	private static volatile Display display;
-	private static Shell shell;
 	
 	private static volatile IndexRegistry indexRegistry;
 	private static volatile FolderWatcher folderWatcher;
@@ -87,6 +84,7 @@ public final class Application {
 	private static FileTypePanel fileTypePanel;
 	private static IndexPanel indexPanel;
 
+	private static Shell shell;
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
@@ -134,7 +132,7 @@ public final class Application {
 		// Load program configuration and preferences; load index registry
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
-		display = new Display();
+		Display display = new Display();
 		loadIndexRegistry(display);
 		
 		shell = new Shell(display);
@@ -530,7 +528,7 @@ public final class Application {
 	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
 		indexingStatus.setVisible(true);
 		Rectangle dest = indexingStatus.getBounds();
-		dest = display.map(shell, null, dest);
+		dest = shell.getDisplay().map(shell, null, dest);
 		MovingBox movingBox = new MovingBox(shell, src, dest, 0.2, 40);
 		movingBox.start();
 	}
