@@ -11,20 +11,25 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.ConfigComposite;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 /**
  * @author Tran Nam Quang
@@ -37,14 +42,40 @@ abstract class ConfigPanel {
 	protected final LuceneIndex index;
 	@NotNull private Button runBt;
 
-	public ConfigPanel(@NotNull Composite parent,
-	                   @NotNull LuceneIndex index) {
+	protected ConfigPanel(	@NotNull Composite parent,
+							@NotNull LuceneIndex index,
+							boolean fillVertical) {
 		Util.checkNotNull(index);
 		this.index = index;
 		
-		// Must use composition rather than inheritance here because the subclasses
-		// need the index object while creating their widgets
-		comp = new ConfigComposite(parent, SWT.V_SCROLL) {
+		comp = new Composite(parent, SWT.NONE);
+		comp.setLayout(Util.createGridLayout(1, false, 0, 0));
+		
+		Composite targetComp = new Composite(comp, SWT.NONE);
+		UtilGui.setGridData(targetComp, false);
+		targetComp.setLayout(Util.createGridLayout(1, false, 0, 0));
+		
+		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
+		StyledText targetField = new StyledText(targetComp, targetStyle);
+		UtilGui.setGridData(targetField, true);
+		targetField.setText(index.getCanonicalRootFile().getPath());
+		targetField.setForeground(Col.DARK_GRAY.get());
+		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
+		UtilGui.clearSelectionOnFocusLost(targetField);
+		
+		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
+		UtilGui.setGridData(targetSeparator, false);
+		
+		Control configComp = createConfigComposite(comp);
+		GridData gridData = fillVertical
+			? new GridData(SWT.FILL, SWT.FILL, true, true)
+			: new GridData(SWT.FILL, SWT.TOP, true, false);
+		configComp.setLayoutData(gridData);
+	}
+	
+	@NotNull
+	private Composite createConfigComposite(@NotNull Composite parent) {
+		return new ConfigComposite(parent, SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
 				return ConfigPanel.this.createContents(parent);
 			};

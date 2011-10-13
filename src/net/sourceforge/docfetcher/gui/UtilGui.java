@@ -22,6 +22,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -64,6 +65,12 @@ public final class UtilGui {
 				styledText.setSelection(0);
 			}
 		});
+	}
+	
+	public static void setGridData(	@NotNull Control control,
+									boolean grabExcessVerticalSpace) {
+		control.setLayoutData(new GridData(
+			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
 	}
 	
 }

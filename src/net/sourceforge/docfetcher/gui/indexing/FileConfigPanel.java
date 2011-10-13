@@ -25,20 +25,16 @@ import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.LazyList;
-import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.GroupWrapper;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * @author Tran Nam Quang
@@ -55,26 +51,12 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	public FileConfigPanel(	@NotNull Composite parent,
 	                       	@NotNull LuceneIndex index) {
-		super(parent, index);
+		super(parent, index, true);
 	}
 	
 	protected Control createContents(Composite parent) {
 		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
-		
-		Composite targetComp = new Composite(comp, SWT.NONE);
-		targetComp.setLayout(Util.createGridLayout(1, false, 0, 0));
-		
-		int targetStyle = SWT.SINGLE | SWT.READ_ONLY;
-		StyledText targetField = new StyledText(targetComp, targetStyle);
-		setGridData(targetField, true);
-		targetField.setText(index.getCanonicalRootFile().getPath());
-		targetField.setForeground(Col.DARK_GRAY.get());
-		targetField.setBackground(Col.WIDGET_BACKGROUND.get());
-		UtilGui.clearSelectionOnFocusLost(targetField);
-		
-		Label targetSeparator = new Label(targetComp, SWT.SEPARATOR | SWT.HORIZONTAL);
-		setGridData(targetSeparator, false);
 		
 		extGroupWrapper = new FileExtensionGroupWrapper(comp, index);
 		Group extGroup = extGroupWrapper.getGroup();
@@ -100,18 +82,11 @@ final class FileConfigPanel extends ConfigPanel {
 		GridLayout gridLayout = Util.createGridLayout(1, false, 0, 10);
 		gridLayout.marginTop = 5;
 		comp.setLayout(gridLayout);
-		setGridData(targetComp, false);
-		setGridData(extGroup, false);
-		setGridData(patternGroup, false);
-		setGridData(miscGroup, false);
+		UtilGui.setGridData(extGroup, false);
+		UtilGui.setGridData(patternGroup, false);
+		UtilGui.setGridData(miscGroup, false);
 		
 		return comp;
-	}
-	
-	private static void setGridData(@NotNull Control control,
-									boolean grabExcessVerticalSpace) {
-		control.setLayoutData(new GridData(
-			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
 	}
 	
 	private void createMiscGroupContents(@NotNull Group parent) {
