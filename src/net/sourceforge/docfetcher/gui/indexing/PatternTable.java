@@ -201,7 +201,7 @@ final class PatternTable extends Composite {
 		});
 		
 		Util.createPushButton(
-			comp, Img.REMOVE.get(), "Remove selected patterns",
+			comp, Img.REMOVE.get(), "Remove selected pattern",
 			new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PatternAction patternAction : tableViewer.getSelection())
@@ -211,7 +211,7 @@ final class PatternTable extends Composite {
 		});
 		
 		Util.createPushButton(
-			comp, Img.ARROW_UP.get(), "Move Up", new SelectionAdapter() {
+			comp, Img.ARROW_UP.get(), "Increase priority of selected pattern", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				List<PatternAction> sel = tableViewer.getSelection();
 				if (sel.size() == 1)
@@ -220,7 +220,7 @@ final class PatternTable extends Composite {
 		});
 		
 		Util.createPushButton(
-			comp, Img.ARROW_DOWN.get(), "Move Down", new SelectionAdapter() {
+			comp, Img.ARROW_DOWN.get(), "Decrease priority of selected pattern", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				List<PatternAction> sel = tableViewer.getSelection();
 				if (sel.size() == 1)
