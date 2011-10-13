@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
@@ -120,6 +121,22 @@ public final class PreviewPanel extends Composite {
 		setPreviewUnchecked(doc);
 	}
 	
+	@ThreadSafe
+	public void setHtmlFile(@NotNull File file) {
+		Util.checkNotNull(file);
+		Util.assertSwtThread();
+		
+		lastDoc = null;
+		disposeLastResources();
+		requestCount++;
+		setError(null, requestCount);
+		
+		createAndShowHtmlPreview();
+		htmlPreview.setHtmlButtonEnabled(false);
+		clearPreviews(true, true, false);
+		htmlPreview.setFile(file);
+	}
+	
 	@NotThreadSafe
 	private void setPreviewUnchecked(@NotNull ResultDocument doc) {
 		disposeLastResources();
@@ -134,16 +151,7 @@ public final class PreviewPanel extends Composite {
 			new EmailThread(doc, requestCount).start();
 		}
 		else if (doc.isHtmlFile() && SettingsConf.Bool.PreferHtmlPreview.get()) {
-			if (htmlPreview == null) {
-				htmlPreview = new HtmlPreview(stackComp);
-				htmlPreview.evtHtmlToTextBt.add(new Event.Listener<Void>() {
-					public void update(Void eventData) {
-						SettingsConf.Bool.PreferHtmlPreview.set(false);
-						setPreviewUnchecked(lastDoc);
-					}
-				});
-			}
-			moveToTop(htmlPreview);
+			createAndShowHtmlPreview();
 			clearPreviews(true, true, false);
 			new HtmlThread(doc, requestCount).start();
 		}
@@ -158,6 +166,23 @@ public final class PreviewPanel extends Composite {
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
+		
+		if (htmlPreview != null)
+			htmlPreview.setHtmlButtonEnabled(true);
+	}
+	
+	private void createAndShowHtmlPreview() {
+		if (htmlPreview == null) {
+			htmlPreview = new HtmlPreview(stackComp);
+			htmlPreview.evtHtmlToTextBt.add(new Event.Listener<Void>() {
+				public void update(Void eventData) {
+					assert lastDoc != null;
+					SettingsConf.Bool.PreferHtmlPreview.set(false);
+					setPreviewUnchecked(lastDoc);
+				}
+			});
+		}
+		moveToTop(htmlPreview);
 	}
 	
 	// Returns the currently displayed result document, if there is one

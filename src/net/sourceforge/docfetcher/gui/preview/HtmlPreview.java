@@ -206,5 +206,9 @@ final class HtmlPreview extends ToolBarForm {
 		htmlBt.setEnabled(false);
 		htmlBt.setSelection(false);
 	}
+	
+	public void setHtmlButtonEnabled(boolean enabled) {
+		htmlBt.setEnabled(enabled);
+	}
 
 }
