@@ -187,7 +187,7 @@ final class HtmlPreview extends ToolBarForm {
 	/**
 	 * Sets the file to be displayed.
 	 */
-	public void setFile(@NotNull File file) {
+	public void setFile(@NotNull File file, boolean allowSwitchingToTextPreview) {
 		String path = Util.getSystemAbsPath(file);
 		try {
 			String url = file.toURI().toURL().toString();
@@ -197,7 +197,7 @@ final class HtmlPreview extends ToolBarForm {
 			browser.setUrl(path);
 		}
 		locationBar.setText(path);
-		htmlBt.setEnabled(true);
+		htmlBt.setEnabled(allowSwitchingToTextPreview);
 		htmlBt.setSelection(true);
 	}
 
@@ -205,10 +205,6 @@ final class HtmlPreview extends ToolBarForm {
 		browser.setText("");
 		htmlBt.setEnabled(false);
 		htmlBt.setSelection(false);
-	}
-	
-	public void setHtmlButtonEnabled(boolean enabled) {
-		htmlBt.setEnabled(enabled);
 	}
 
 }

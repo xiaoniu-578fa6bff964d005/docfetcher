@@ -507,6 +507,16 @@ public final class Application {
 				systemTrayHider.hide();
 			}
 		});
+		
+		searchBar.evtOpenManual.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				File file = ManualLocator.getManualFile();
+				if (file != null)
+					previewPanel.setHtmlFile(file);
+				else
+					AppUtil.showError("Manual not found!", true, true);
+			}
+		});
 
 		resultPanel.evtSelection.add(new Event.Listener<List<ResultDocument>>() {
 			public void update(List<ResultDocument> eventData) {

@@ -42,6 +42,7 @@ public final class SearchBar {
 	
 	public final Event<String> evtSearch = new Event<String>();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
+	public final Event<Void> evtOpenManual = new Event<Void>();
 	
 	private final Composite comp;
 	private final Combo searchBox;
@@ -82,6 +83,13 @@ public final class SearchBar {
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
 		// TODO i18n
+		
+		tif.image(Img.HELP.get()).toolTip("Open Manual")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						evtOpenManual.fire(null);
+					}
+				}).create();
 
 		tif.image(Img.BROWSER.get()).toolTip("Web Interface")
 				.listener(new SelectionAdapter() {

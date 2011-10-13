@@ -132,9 +132,8 @@ public final class PreviewPanel extends Composite {
 		setError(null, requestCount);
 		
 		createAndShowHtmlPreview();
-		htmlPreview.setHtmlButtonEnabled(false);
 		clearPreviews(true, true, false);
-		htmlPreview.setFile(file);
+		htmlPreview.setFile(file, false);
 	}
 	
 	@NotThreadSafe
@@ -166,9 +165,6 @@ public final class PreviewPanel extends Composite {
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
-		
-		if (htmlPreview != null)
-			htmlPreview.setHtmlButtonEnabled(true);
 	}
 	
 	private void createAndShowHtmlPreview() {
@@ -176,7 +172,8 @@ public final class PreviewPanel extends Composite {
 			htmlPreview = new HtmlPreview(stackComp);
 			htmlPreview.evtHtmlToTextBt.add(new Event.Listener<Void>() {
 				public void update(Void eventData) {
-					assert lastDoc != null;
+					if (lastDoc == null)
+						return;
 					SettingsConf.Bool.PreferHtmlPreview.set(false);
 					setPreviewUnchecked(lastDoc);
 				}
@@ -332,7 +329,7 @@ public final class PreviewPanel extends Composite {
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
 					// TODO websearch: Browser may not be available on the system -> will throw an SWTError
-					htmlPreview.setFile(htmlResource.getFile());
+					htmlPreview.setFile(htmlResource.getFile(), true);
 					lastHtmlResource = htmlResource; // Save a reference for disposal
 				}
 			});
