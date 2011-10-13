@@ -111,6 +111,7 @@ public final class BuildMain {
 		Util.println("Creating portable build...");
 		String releaseDir = U.format("build/%s-%s", appName, version);
 		U.copyDir("dist/img", releaseDir + "/img");
+		U.copyDir("dist/help", releaseDir + "/help");
 		
 		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
 		U.copyFlatten("lib", releaseDir + "/lib", "**/*.jar", excludedLibs);
