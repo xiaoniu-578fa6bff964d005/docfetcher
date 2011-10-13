@@ -32,7 +32,6 @@ import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.FileIconCache;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
@@ -117,13 +116,15 @@ public final class ResultPanel {
 		
 		initContextMenu();
 		
+		// TODO i18n
+		
 		viewer.getControl().addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				evtSelection.fire(viewer.getSelection());
 			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Title", "Subject") { // TODO i18n
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Title", "Subject") {
 			protected String getLabel(ResultDocument element) {
 				return element.getTitle();
 			}
@@ -134,51 +135,45 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Score [%]", SWT.RIGHT) { // TODO i18n
+		viewer.addColumn(new Column<ResultDocument>("Score [%]", SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.valueOf(element.getScore());
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Size", SWT.RIGHT) { // TODO i18n
+		viewer.addColumn(new Column<ResultDocument>("Size", SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.format("%,d KB", element.getSizeInKB());
 			}
 		});
 
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Filename", "Sender") { // TODO i18n
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Filename", "Sender") {
 			protected String getLabel(ResultDocument element) {
 				if (element.isEmail())
 					return element.getSender();
 				return element.getFilename();
 			}
-			protected Image getImage(ResultDocument element) {
-				return getEmailIconOrNull(element);
-			}
 		});
 
-		viewer.addColumn(new Column<ResultDocument>("Type") { // TODO i18n
+		viewer.addColumn(new Column<ResultDocument>("Type") {
 			protected String getLabel(ResultDocument element) {
 				return element.getType();
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Path") { // TODO i18n
+		viewer.addColumn(new Column<ResultDocument>("Path") {
 			protected String getLabel(ResultDocument element) {
 				return element.getPath().getPath();
 			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Authors", "Sender") { // TODO i18n
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Authors", "Sender") {
 			protected String getLabel(ResultDocument element) {
 				return element.getAuthors();
 			}
-			protected Image getImage(ResultDocument element) {
-				return getEmailIconOrNull(element);
-			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Last Modified", "Send Date") { // TODO i18n
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Last Modified", "Send Date") {
 			protected String getLabel(ResultDocument element) {
 				Date date;
 				if (element.isEmail())
@@ -186,9 +181,6 @@ public final class ResultPanel {
 				else
 					date = element.getLastModified();
 				return dateFormat.format(date);
-			}
-			protected Image getImage(ResultDocument element) {
-				return getEmailIconOrNull(element);
 			}
 		});
 		
@@ -320,12 +312,6 @@ public final class ResultPanel {
 			if (! (column instanceof VariableHeaderColumn)) continue;
 			headerMode.setLabel((VariableHeaderColumn<?>) column);
 		}
-	}
-	
-	@Nullable
-	private Image getEmailIconOrNull(@NotNull ResultDocument element) {
-		if (actualHeaderMode != HeaderMode.FILES_AND_EMAILS) return null;
-		return element.isEmail() ? Img.EMAIL.get() : null;
 	}
 	
 	// Should not be called with emails

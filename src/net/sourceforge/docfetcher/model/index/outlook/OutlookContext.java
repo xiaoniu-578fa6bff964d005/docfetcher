@@ -101,7 +101,6 @@ final class OutlookContext {
 		luceneDoc.add(Fields.DATE.create(String.valueOf(date)));
 		luceneDoc.add(Fields.SIZE.create(size));
 		luceneDoc.add(Fields.PARSER.create(Fields.EMAIL_PARSER));
-		// TODO now: Store a more informative path to the email for display on the result panel
 		// TODO pre-release: Fill in more fields as necessary
 		
 		StringBuilder contents = new StringBuilder();
