@@ -70,6 +70,10 @@ final class TextPreview extends ToolBarForm {
 		htmlBt.setEnabled(enabled);
 	}
 	
+	public void setUseMonoFont(boolean useMonoFont) {
+		toolBarWithTextViewer.setUseMonoFont(useMonoFont);
+	}
+
 	public void setText(@NotNull HighlightedString string) {
 		toolBarWithTextViewer.setText(string);
 	}

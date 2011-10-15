@@ -29,10 +29,13 @@ import com.google.common.io.ByteStreams;
 /**
  * @author Tran Nam Quang
  */
-final class TextParser extends StreamParser {
+public final class TextParser extends StreamParser {
 	
 	@Nullable private UniversalDetector charsetDetector;
 	private final Collection<String> types = Collections.singleton("text/plain");
+	
+	TextParser() {
+	}
 
 	protected ParseResult parse(InputStream in,
 								IndexingReporter reporter,

@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
-import net.sourceforge.docfetcher.enums.SettingsConf.Font;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -25,6 +24,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
+import net.sourceforge.docfetcher.util.gui.SystemFont;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
 
 import org.eclipse.swt.SWT;
@@ -77,8 +77,13 @@ final class EmailPreview extends Composite {
 	@NotNull private StyledText dateField;
 	@NotNull private StyledText[] allFields;
 	
+	private final SystemFont systemBoldFont;
+	private final SystemFont systemNormalFont;
+	
 	public EmailPreview(@NotNull Composite parent) {
 		super(parent, SWT.NONE);
+		systemBoldFont = new SystemFont(this, -1, SWT.BOLD);
+		systemNormalFont = new SystemFont(this, -1, SWT.NORMAL);
 		setLayout(new FillLayout());
 
 		CTabFolder tabFolder = TabFolderFactory.create(this, false, false, true);
@@ -107,6 +112,7 @@ final class EmailPreview extends Composite {
 		
 		toolBarWithTextViewer.createTextViewer(comp).setLayoutData(
 			new GridData(SWT.FILL, SWT.FILL, true, true));
+		toolBarWithTextViewer.setUseMonoFont(false);
 		
 		return comp;
 	}
@@ -153,7 +159,7 @@ final class EmailPreview extends Composite {
 									@NotNull String text) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(text);
-		label.setFont(Font.SystemBold.get());
+		systemBoldFont.applyTo(label);
 		return label;
 	}
 	
@@ -164,6 +170,9 @@ final class EmailPreview extends Composite {
 		st.setForeground(Col.WIDGET_FOREGROUND.get());
 		Util.registerSelectAllKey(st);
 		UtilGui.clearSelectionOnFocusLost(st);
+		
+		// Without this, the font won't change on SWT.Settings events
+		systemNormalFont.applyTo(st);
 		return st;
 	}
 

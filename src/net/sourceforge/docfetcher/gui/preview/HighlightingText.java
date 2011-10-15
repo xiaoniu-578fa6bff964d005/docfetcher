@@ -16,8 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.Range;
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.Col;
@@ -25,6 +27,7 @@ import net.sourceforge.docfetcher.util.gui.Col;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,10 +40,13 @@ final class HighlightingText {
 	private final StyleRange highlightStyle = new StyleRange(0, 0, null, Col.YELLOW.get());
 	private final List<int[]> rangesList = new ArrayList<int[]>();
 	private int occCount;
+	private Font normalFont;
+	private Font monoFont;
 	
 	public HighlightingText(@NotNull Composite parent) {
 		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
 		textViewer = new StyledText(parent, style);
+		Util.disposeWith(textViewer, normalFont, monoFont);
 	}
 	
 	@NotNull
@@ -56,6 +62,25 @@ final class HighlightingText {
 	
 	public int getOccCount() {
 		return occCount;
+	}
+	
+	public void setUseMonoFont(boolean useMonoFont) {
+		if (useMonoFont) {
+			if (monoFont == null) {
+				monoFont = Util.IS_WINDOWS
+				? FontDescription.PreviewMonoWindows.get()
+				: FontDescription.PreviewMonoLinux.get();
+			}
+			textViewer.setFont(monoFont);
+		}
+		else {
+			if (normalFont == null) {
+				normalFont = Util.IS_WINDOWS
+				? FontDescription.PreviewWindows.get()
+				: FontDescription.PreviewLinux.get();
+			}
+			textViewer.setFont(normalFont);
+		}
 	}
 	
 	public void setText(@NotNull HighlightedString string) {

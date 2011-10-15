@@ -267,10 +267,12 @@ public final class PreviewPanel extends Composite {
 	// Returns true on success
 	@ThreadSafe
 	private boolean setTextSafely(	@NotNull final HighlightedString string,
+	                              	final boolean isPlainTextFile,
 									final long requestCount,
 									final boolean append) {
 		return runSafely(requestCount, textPreview, new Runnable() {
 			public void run() {
+				textPreview.setUseMonoFont(isPlainTextFile);
 				if (append)
 					textPreview.appendText(string);
 				else
@@ -373,7 +375,7 @@ public final class PreviewPanel extends Composite {
 						try {
 							Item item = queue.take();
 							if (item.string != null)
-								if (!setTextSafely(item.string, startCount, true))
+								if (!setTextSafely(item.string, false, startCount, true))
 									isStopped = true;
 							overlayHider.hide(); // Hide overlay after first page
 							if (item.isLastItem)
@@ -411,7 +413,7 @@ public final class PreviewPanel extends Composite {
 		protected void doRun(Hider overlayHider) throws ParseException,
 				FileNotFoundException {
 			HighlightedString string = doc.getHighlightedText();
-			setTextSafely(string, startCount, false);
+			setTextSafely(string, doc.isPlainTextFile(), startCount, false);
 			// TODO now: catch OutOfMemoryErrors
 		}
 	}

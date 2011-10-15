@@ -147,6 +147,10 @@ class HighlightingToolBarWithTextViewer {
 			counter.setText(textViewer.getOccCount() + "");
 	}
 	
+	public void setUseMonoFont(boolean useMonoFont) {
+		textViewer.setUseMonoFont(useMonoFont);
+	}
+	
 	public final void setText(@NotNull HighlightedString string) {
 		textViewer.setText(string);
 		int occCount = string.getRangeCount();

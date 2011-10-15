@@ -34,6 +34,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -44,7 +45,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.io.Resources;
 import com.google.common.primitives.Ints;
 
@@ -423,29 +423,23 @@ public final class SettingsConf {
 	}
 
 	@Description("# Font entries, consisting of font name, height and style.")
-	public static enum Font implements Storable {
-		// TODO now: update system fonts on SWT.Settings event
-
-		/** A bold version of the system font; will be set during runtime. */
-		SystemBold ("Times", 12, SWT.BOLD),
-
-		/** A smaller version of the system font; will be set during runtime. */
-		SystemSmall ("Times", 8, SWT.NORMAL),
+	public static enum FontDescription implements Storable {
+		PreviewWindows ("Verdana", 10, SWT.NORMAL),
+		PreviewLinux ("Sans", 10, SWT.NORMAL),
+		PreviewMonoWindows ("Courier New", 10, SWT.NORMAL),
+		PreviewMonoLinux ("Monospace", 10, SWT.NORMAL),
 		;
 
-		private static Display display;
 		private static Pattern fontPattern = Pattern.compile(
 				"(.*)," + // Font name with whitespace
 				"\\s*(\\d+)\\s*," + // Font height with whitespace
 				"\\s*(\\d+)\\s*" // Font style with whitespace
 		);
 
-		public FontData defaultValue;
 		private FontData value;
-		private org.eclipse.swt.graphics.Font font;
 
-		Font(String name, int height, int style) {
-			value = defaultValue = new FontData(name, height, style);
+		FontDescription(String name, int height, int style) {
+			value = new FontData(name, height, style);
 		}
 		public void load(String str) {
 			Matcher matcher = fontPattern.matcher(str);
@@ -458,44 +452,16 @@ public final class SettingsConf {
 		}
 		public String valueToString() {
 			// The SWT API discourages accessing the FontData fields
-			return Joiner.on(", ").join(
+			return Util.join(", ",
 					value.getName(),
 					value.getHeight(),
 					value.getStyle()
 			);
 		}
-
-		/**
-		 * Returns the <tt>Font</tt> object corresponding to this enumeration
-		 * constant. It is disposed of automatically after the display is
-		 * disposed. This method must be called from the GUI thread.
-		 */
-		public org.eclipse.swt.graphics.Font get() {
-			if (display == null) {
-				display = Display.getDefault();
-				display.disposeExec(new Runnable() {
-					public void run() {
-						for (Font font : values())
-							if (font.font != null)
-								font.font.dispose();
-					}
-				});
-				FontData fontData = display.getSystemFont().getFontData()[0];
-				String name = fontData.getName();
-				SystemBold.value.setName(name);
-				SystemBold.defaultValue.setName(name);
-				SystemSmall.value.setName(name);
-				SystemSmall.defaultValue.setName(name);
-				int height = fontData.getHeight();
-				SystemBold.value.setHeight(height);
-				SystemBold.defaultValue.setHeight(height);
-				int smallHeight = Math.max(7, height - 5);
-				SystemSmall.value.setHeight(smallHeight);
-				SystemSmall.defaultValue.setHeight(smallHeight);
-			}
-			if (font == null)
-				font = new org.eclipse.swt.graphics.Font(display, value);
-			return font;
+		// Should only be called from within the SWT thread
+		@NotNull
+		public Font get() {
+			return new Font(Display.getDefault(), value);
 		}
 	}
 

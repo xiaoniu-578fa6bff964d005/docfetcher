@@ -29,6 +29,7 @@ import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.parse.PdfParser;
+import net.sourceforge.docfetcher.model.parse.TextParser;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
@@ -172,7 +173,7 @@ public final class ResultDocument {
 	public String getAuthors() {
 		String[] authors = luceneDoc.getValues(Fields.AUTHOR.key());
 		if (authors.length > 0)
-			return Util.join(", ", authors);
+			return Util.join(", ", (Object[]) authors);
 		String sender = luceneDoc.get(Fields.SENDER.key());
 		return sender == null ? "" : sender;
 	}
@@ -201,6 +202,10 @@ public final class ResultDocument {
 	
 	public boolean isPdfFile() {
 		return wasParsedBy(PdfParser.class);
+	}
+	
+	public boolean isPlainTextFile() {
+		return wasParsedBy(TextParser.class);
 	}
 	
 	private boolean wasParsedBy(Class<? extends Parser> parserClass) {
