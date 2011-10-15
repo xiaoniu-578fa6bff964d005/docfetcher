@@ -310,7 +310,7 @@ public final class FileFactory {
 	private static String getRelativePath(	@NotNull File src,
 											@NotNull File dst) {
 		String path = UtilModel.getRelativePath(src, dst);
-		assert UtilModel.noTrailingSlash(path);
+		assert noTrailingSlash(path);
 		return path;
 	}
 	
@@ -337,7 +337,7 @@ public final class FileFactory {
 			throws ArchiveEncryptedException, DiskSpaceException,
 			FileNotFoundException, IOException {
 		// TODO now: can we check if the archive or the target archive entry is encrypted?
-		assert UtilModel.noTrailingSlash(entryPath);
+		assert noTrailingSlash(entryPath);
 		
 		IInArchive archive = new Handler();
 		SevenZipInputStream istream = new SevenZipInputStream(archiveResource.getFile());
@@ -350,7 +350,7 @@ public final class FileFactory {
 				if (entry.isDirectory()) continue;
 				final String currentPath = entry.getName();
 				assert ! currentPath.contains("\\");
-				assert UtilModel.noTrailingSlash(currentPath);
+				assert noTrailingSlash(currentPath);
 
 				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
@@ -446,7 +446,7 @@ public final class FileFactory {
 						continue;
 					String currentPath = fh.isUnicode() ? fh.getFileNameW() : fh.getFileNameString();
 					currentPath = currentPath.replace('\\', '/');
-					assert UtilModel.noTrailingSlash(currentPath);
+					assert noTrailingSlash(currentPath);
 					
 					if (entryPath.equals(currentPath) ||
 							(entryPath.startsWith(currentPath + "/")
@@ -470,7 +470,7 @@ public final class FileFactory {
 				
 				String currentPath = fh.isUnicode() ? fh.getFileNameW() : fh.getFileNameString();
 				currentPath = currentPath.replace('\\', '/');
-				assert UtilModel.noTrailingSlash(currentPath);
+				assert noTrailingSlash(currentPath);
 				
 				// TODO now: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
@@ -559,7 +559,7 @@ public final class FileFactory {
 				                           	FileFolder folder) {
 					if (! folder.isArchive()) return;
 					String currentPath = archive.getArchiveEntryPath(folder);
-					assert UtilModel.noTrailingSlash(currentPath);
+					assert noTrailingSlash(currentPath);
 					if (! entryPath.startsWith(currentPath + "/"))
 						return; // Partial match required
 					matchingNode[0] = folder;
@@ -569,7 +569,7 @@ public final class FileFactory {
 				protected void visitDocument(	FileFolder parent,
 				                             	FileDocument fileDocument) {
 					String currentPath = archive.getArchiveEntryPath(fileDocument);
-					assert UtilModel.noTrailingSlash(currentPath);
+					assert noTrailingSlash(currentPath);
 					if (! currentPath.equals(entryPath))
 						return; // Exact match required
 					matchingNode[0] = fileDocument;
@@ -619,6 +619,14 @@ public final class FileFactory {
 			Closeables.closeQuietly(archive);
 			archiveResource.dispose();
 		}
+	}
+
+	private static boolean noTrailingSlash(@NotNull String path) {
+		int length = path.length();
+		if (length == 0)
+			return true;
+		char lastChar = path.charAt(length - 1);
+		return lastChar != '/' && lastChar != '\\';
 	}
 	
 }
