@@ -177,7 +177,7 @@ final class EmailPreview extends Composite {
 	}
 
 	public void setEmail(@NotNull MailResource mailResource) {
-		// TODO now: Make email addresses clickable -> use HighlightedString to encode links?
+		// TODO websearch: Make email addresses clickable -> use HighlightedString to encode links?
 		// TODO now: If loading info from the document repository failed, try to load it from the Lucene index
 		
 		fromField.setText(mailResource.getSender());

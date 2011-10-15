@@ -490,8 +490,7 @@ public final class Application {
 
 		TwoFormExpander expander = new TwoFormExpander(comp) {
 			protected Control createFirstContents(Composite parent) {
-				// TODO now: Load parser states from file
-				// TODO now: Save parser states to file?
+				// TODO websearch: Load parser states from file, save parser states to file?
 				List<Parser> parsers = ParseService.getParsers();
 				ListMap<Parser, Boolean> map = ListMap.create(parsers.size());
 				for (Parser parser : parsers)

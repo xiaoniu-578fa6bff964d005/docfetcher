@@ -1230,7 +1230,6 @@ public final class Util {
 		);
 	}
 
-	// TODO now: Debug method; show AspectJ warnings whenever it is used
 	@SuppressAjWarnings
 	public static void println(@NotNull Object... objects) {
 		StringBuilder sb = new StringBuilder();

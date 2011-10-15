@@ -63,6 +63,13 @@ abstract class AttachmentVisitor {
 				FileOutputStream out = new FileOutputStream(tempFile);
 
 				/*
+				 * TODO post-release-1.1: Instead of writing to a temporary
+				 * file, we could directly give the input stream to the parse
+				 * service. (But temporary files would still be necessary for
+				 * archives.)
+				 */
+
+				/*
 				 * Copy bytes from input stream to output stream
 				 * 
 				 * 8176 is the block size used internally and should give the

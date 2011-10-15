@@ -53,20 +53,6 @@ import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 public final class ParseService {
 
 	/*
-	 * TODO now: Extraction registry must handle archive entries as inputs
-	 * transparently, including disk space check when extracting the file ->
-	 * document this
-	 * 
-	 * TODO now: Implement support for filename-only search: Requires a
-	 * FilenameParser which is used in case of failure of another parser, or
-	 * when the filetype is unkown.
-	 * 
-	 * TODO now: Some parsers also accept InputStream rather than File (e.g. HTML
-	 * parser and Text parser), so unpacking from a PST or an archive may not
-	 * always be necessary.
-	 */
-	
-	/*
 	 * Construction of this object seems relatively expensive, so we'll keep a
 	 * single instance of it.
 	 */
@@ -94,6 +80,7 @@ public final class ParseService {
 	// Accepts HTML files, but does not handle HTML pairing
 	// When parsing a temporary file and mime type detection is off, the temporary file
 	// must have the correct file extension.
+	// Accepts TrueZIP files
 	@NotNull
 	public static ParseResult parse(@NotNull IndexingConfig config,
 	                                @NotNull String filename,

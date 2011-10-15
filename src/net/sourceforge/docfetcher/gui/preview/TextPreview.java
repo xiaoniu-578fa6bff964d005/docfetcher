@@ -57,7 +57,6 @@ final class TextPreview extends ToolBarForm {
 	
 	@NotNull
 	protected Control createContents(@NotNull Composite parent) {
-		// TODO now: put text viewer into a container with margins
 		return toolBarWithTextViewer.createTextViewer(parent);
 	}
 	

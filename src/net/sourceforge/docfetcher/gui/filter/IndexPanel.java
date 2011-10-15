@@ -414,7 +414,7 @@ public final class IndexPanel {
 				Display display = tree.getDisplay();
 				Point pos = display.getCursorLocation();
 				pos = display.map(null, tree, pos);
-				// TODO now: test on Windows that the model node is always found
+				// TODO now: windows: test on Windows that the model node is always found
 				clickedNode[0] = viewer.getElement(pos);
 				if (clickedNode[0] != null)
 					Folder.evtFolderRemoved.add(menuHider);
@@ -543,8 +543,8 @@ public final class IndexPanel {
 
 		File pstFile = getOutlookPSTFile();
 		if (pstFile != null) {
-			// TODO now: On Windows, if the path is very long, the message dialog's width is too large
-			// TODO now: Don't open the file chooser if the user clicks OK on this message dialog
+			// TODO now: windows: If the path is very long, the message dialog's width is too large
+			// TODO now: windows: Don't open the file chooser if the user clicks OK on this message dialog
 			String msg = "PST file found: " + pstFile + ". Index this file?";
 			if (AppUtil.showConfirmation(msg, false)) // TODO i18n
 				lastPath = pstFile.getPath();
