@@ -107,12 +107,9 @@ public final class IndexPanel {
 		});
 		
 		final Comparator<ViewNode> viewNodeComparator = new Comparator<ViewNode>() {
-			private final AlphanumComparator alphanumComp = new AlphanumComparator(true);
-			
 			public int compare(ViewNode o1, ViewNode o2) {
-				String name1 = o1.getDisplayName();
-				String name2 = o2.getDisplayName();
-				return alphanumComp.compare(name1, name2);
+				return AlphanumComparator.ignoreCaseInstance.compare(
+					o1.getDisplayName(), o2.getDisplayName());
 			}
 		};
 

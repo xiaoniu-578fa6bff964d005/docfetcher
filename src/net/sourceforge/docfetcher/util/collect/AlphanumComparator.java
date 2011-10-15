@@ -36,9 +36,11 @@ import java.util.Comparator;
  */
 public final class AlphanumComparator implements Comparator<String>
 {
+	public static final AlphanumComparator ignoreCaseInstance = new AlphanumComparator(true);
+	
 	private final boolean ignoreCase;
 	
-	public AlphanumComparator(boolean ignoreCase) {
+	private AlphanumComparator(boolean ignoreCase) {
 		this.ignoreCase = ignoreCase;
 	}
 	

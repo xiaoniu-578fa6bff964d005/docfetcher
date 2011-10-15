@@ -42,6 +42,7 @@ import net.sourceforge.docfetcher.util.annotations.NotThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -318,8 +319,8 @@ public final class Searcher {
 			// Sort results by title
 			Arrays.sort(results, new Comparator<ResultDocument>() {
 				public int compare(ResultDocument o1, ResultDocument o2) {
-					// TODO now: use alphanum comparator
-					return o1.getTitle().compareTo(o2.getTitle());
+					return AlphanumComparator.ignoreCaseInstance.compare(
+						o1.getTitle(), o2.getTitle());
 				}
 			});
 			

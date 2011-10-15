@@ -234,7 +234,7 @@ final class FileExtensionChooser {
 	 */
 	@NotNull
 	private static Set<String> listExtensions(@NotNull File rootDir) {
-		Set<String> exts = new TreeSet<String>(new AlphanumComparator(true));
+		Set<String> exts = new TreeSet<String>(AlphanumComparator.ignoreCaseInstance);
 		listExtensions(exts, rootDir);
 		return exts;
 	}

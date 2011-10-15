@@ -84,7 +84,6 @@ public final class ResultPanel {
 	}
 	
 	private static final DateFormat dateFormat = new SimpleDateFormat();
-	private static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 	
 	public final Event<List<ResultDocument>> evtSelection = new Event<List<ResultDocument>> ();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
@@ -218,7 +217,7 @@ public final class ResultPanel {
 	}
 	
 	private static int compareAlphanum(@NotNull String s1, @NotNull String s2) {
-		return alphanumComparator.compare(s1, s2);
+		return AlphanumComparator.ignoreCaseInstance.compare(s1, s2);
 	}
 
 	private void initContextMenu() {

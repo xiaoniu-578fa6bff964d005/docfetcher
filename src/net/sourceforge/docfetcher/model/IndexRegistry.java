@@ -43,6 +43,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.concurrent.BlockingWrapper;
 import net.sourceforge.docfetcher.util.concurrent.DelayedExecutor;
 
@@ -498,8 +499,8 @@ public final class IndexRegistry {
 		private static final IndexComparator instance = new IndexComparator();
 
 		public int compare(LuceneIndex o1, LuceneIndex o2) {
-			// TODO now: use alphanum comparator
-			return o1.getDisplayName().compareTo(o2.getDisplayName());
+			return AlphanumComparator.ignoreCaseInstance.compare(
+				o1.getDisplayName(), o2.getDisplayName());
 		}
 	}
 	
