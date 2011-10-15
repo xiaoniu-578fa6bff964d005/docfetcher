@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
@@ -306,7 +307,6 @@ public final class PreviewPanel extends Composite {
 
 		protected void doRun(Hider overlayHider) throws ParseException,
 				FileNotFoundException {
-			// TODO now: catch OutOfMemoryErrors
 			final MailResource mailResource = doc.getMailResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
@@ -326,7 +326,6 @@ public final class PreviewPanel extends Composite {
 
 		protected void doRun(Hider overlayHider) throws ParseException,
 				FileNotFoundException {
-			// TODO now: catch OutOfMemoryErrors
 			final FileResource htmlResource = doc.getFileResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
@@ -400,8 +399,6 @@ public final class PreviewPanel extends Composite {
 			});
 			
 			queue.put(new Item(null, true));
-			
-			// TODO now: catch OutOfMemoryErrors
 		}
 	}
 	
@@ -414,7 +411,6 @@ public final class PreviewPanel extends Composite {
 				FileNotFoundException {
 			HighlightedString string = doc.getHighlightedText();
 			setTextSafely(string, doc.isPlainTextFile(), startCount, false);
-			// TODO now: catch OutOfMemoryErrors
 		}
 	}
 	
@@ -440,6 +436,14 @@ public final class PreviewPanel extends Composite {
 			}
 			catch (FileNotFoundException e) {
 				setError("Error: " + e.getMessage(), startCount); // TODO i18n
+			}
+			catch (OutOfMemoryError e) {
+				Util.runSwtSafe(PreviewPanel.this, new Runnable() {
+					public void run() {
+						// Note: getShell() must be called in the SWT thread
+						UtilGui.showOutOfMemoryMessage(getShell());
+					}
+				});
 			}
 			finally {
 				hider.hide();
