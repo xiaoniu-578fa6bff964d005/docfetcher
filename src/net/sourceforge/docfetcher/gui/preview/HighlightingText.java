@@ -46,6 +46,8 @@ final class HighlightingText {
 	public HighlightingText(@NotNull Composite parent) {
 		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
 		textViewer = new StyledText(parent, style);
+		int m = 10;
+		textViewer.setMargins(m, m, m, m);
 		Util.disposeWith(textViewer, normalFont, monoFont);
 	}
 	
