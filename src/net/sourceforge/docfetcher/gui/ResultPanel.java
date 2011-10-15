@@ -32,6 +32,7 @@ import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.FileIconCache;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
@@ -83,6 +84,7 @@ public final class ResultPanel {
 	}
 	
 	private static final DateFormat dateFormat = new SimpleDateFormat();
+	private static final AlphanumComparator alphanumComparator = new AlphanumComparator(true);
 	
 	public final Event<List<ResultDocument>> evtSelection = new Event<List<ResultDocument>> ();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
@@ -137,7 +139,7 @@ public final class ResultPanel {
 				return iconCache.getIcon(element.getFilename(), Img.FILE.get());
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return e1.getTitle().compareToIgnoreCase(e2.getTitle());
+				return compareAlphanum(e1.getTitle(), e2.getTitle());
 			}
 		});
 		
@@ -166,7 +168,7 @@ public final class ResultPanel {
 				return element.getFilename();
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return getLabel(e1).compareToIgnoreCase(getLabel(e2));
+				return compareAlphanum(getLabel(e1), getLabel(e2));
 			}
 		});
 
@@ -175,7 +177,7 @@ public final class ResultPanel {
 				return element.getType();
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return e1.getType().compareToIgnoreCase(e2.getType());
+				return compareAlphanum(e1.getType(), e2.getType());
 			}
 		});
 		
@@ -184,7 +186,7 @@ public final class ResultPanel {
 				return element.getPath().getPath();
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return getLabel(e1).compareToIgnoreCase(getLabel(e2));
+				return compareAlphanum(getLabel(e1), getLabel(e2));
 			}
 		});
 		
@@ -193,7 +195,7 @@ public final class ResultPanel {
 				return element.getAuthors();
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return e1.getAuthors().compareToIgnoreCase(e2.getAuthors());
+				return compareAlphanum(e1.getAuthors(), e2.getAuthors());
 			}
 		});
 		
@@ -213,6 +215,10 @@ public final class ResultPanel {
 		
 		SettingsConf.ColumnWidths.ResultPanel.bind(table);
 		SettingsConf.ColumnOrder.ResultPanelColumnOrder.bind(table);
+	}
+	
+	private static int compareAlphanum(@NotNull String s1, @NotNull String s2) {
+		return alphanumComparator.compare(s1, s2);
 	}
 
 	private void initContextMenu() {

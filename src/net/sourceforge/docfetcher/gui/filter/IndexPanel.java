@@ -43,6 +43,7 @@ import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.InputLoop;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
@@ -106,10 +107,12 @@ public final class IndexPanel {
 		});
 		
 		final Comparator<ViewNode> viewNodeComparator = new Comparator<ViewNode>() {
+			private final AlphanumComparator alphanumComp = new AlphanumComparator(true);
+			
 			public int compare(ViewNode o1, ViewNode o2) {
 				String name1 = o1.getDisplayName();
 				String name2 = o2.getDisplayName();
-				return name1.compareTo(name2); // TODO now: use alphanum comparator
+				return alphanumComp.compare(name1, name2);
 			}
 		};
 

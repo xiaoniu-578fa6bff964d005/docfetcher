@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
@@ -233,7 +234,7 @@ final class FileExtensionChooser {
 	 */
 	@NotNull
 	private static Set<String> listExtensions(@NotNull File rootDir) {
-		Set<String> exts = new TreeSet<String> ();
+		Set<String> exts = new TreeSet<String>(new AlphanumComparator(true));
 		listExtensions(exts, rootDir);
 		return exts;
 	}
