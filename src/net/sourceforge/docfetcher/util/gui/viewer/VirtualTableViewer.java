@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.util.gui.viewer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.docfetcher.util.Event;
@@ -23,6 +24,8 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -41,6 +44,7 @@ public abstract class VirtualTableViewer<E> {
 		private String label;
 		private final int orientation;
 		private final Event<String> evtLabelChanged = new Event<String> ();
+		private int lastSortDirection = 1;
 		
 		public Column(@NotNull String label) {
 			this(label, SWT.LEFT);
@@ -61,11 +65,14 @@ public abstract class VirtualTableViewer<E> {
 		@Nullable protected Image getImage(E element) { return null; }
 		@Nullable protected Color getForeground(E element) { return null; }
 		@Nullable protected Color getBackground(E element) { return null; }
+		protected int compare(@NotNull E e1, @NotNull E e2) { return 0; }
 	}
 	
 	private final Table table;
 	private final List<Column<E>> columns = new ArrayList<Column<E>>();
 	private List<E> elements;
+	private boolean sortingEnabled = false;
+	@Nullable private Column<E> lastSortColumn = null;
 	
 	public VirtualTableViewer(@NotNull Composite parent, int style) {
 		table = new Table(parent, style | SWT.VIRTUAL);
@@ -93,7 +100,7 @@ public abstract class VirtualTableViewer<E> {
 		return table;
 	}
 	
-	public final void addColumn(@NotNull Column<E> column) {
+	public final void addColumn(@NotNull final Column<E> column) {
 		Util.checkNotNull(column);
 		columns.add(column);
 		
@@ -106,6 +113,24 @@ public abstract class VirtualTableViewer<E> {
 				tableColumn.setText(eventData);
 			}
 		});
+		
+		tableColumn.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (!sortingEnabled)
+					return;
+				final int direction = lastSortColumn != column
+					? 1
+					: column.lastSortDirection * -1;
+				Collections.sort(elements, new Comparator<E>() {
+					public int compare(E e1, E e2) {
+						return column.compare(e1, e2) * direction;
+					};
+				});
+				table.clearAll();
+				lastSortColumn = column;
+				column.lastSortDirection = direction;
+			}
+		});
 	}
 	
 	@Immutable
@@ -114,12 +139,14 @@ public abstract class VirtualTableViewer<E> {
 		return Collections.unmodifiableList(columns);
 	}
 	
+	// does not take sorting into account
 	public final void setRoot(@NotNull Object rootElement) {
 		Util.checkNotNull(rootElement);
 		Util.checkThat(!columns.isEmpty());
 		elements = Util.checkNotNull(getElements(rootElement));
 		table.clearAll();
 		table.setItemCount(elements.size());
+		lastSortColumn = null;
 	}
 	
 	@MutableCopy
@@ -137,6 +164,13 @@ public abstract class VirtualTableViewer<E> {
 		ScrollBar verticalBar = table.getVerticalBar();
 		if (verticalBar != null)
 			verticalBar.setSelection(0);
+	}
+	
+	// when sorting is enabled, override the compare method on all sortable columns
+	public void setSortingEnabled(boolean sortingEnabled) {
+		this.sortingEnabled = sortingEnabled;
+		if (!sortingEnabled)
+			lastSortColumn = null;
 	}
 	
 	@NotNull

@@ -47,12 +47,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
+import com.google.common.primitives.Longs;
+
 /**
  * @author Tran Nam Quang
  */
 public final class ResultPanel {
 	
-	// TODO now: SWT bug: setting an image, then setting the image to null leaves an indent
 	// TODO now: show an additional icon if an email has attachments
 	// TODO post-release-1.1: show some helpful overlay message if a search yielded no results
 	
@@ -103,7 +104,8 @@ public final class ResultPanel {
 		};
 		
 		// Open result document on double-click
-		viewer.getControl().addMouseListener(new MouseAdapter() {
+		Table table = viewer.getControl();
+		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				List<ResultDocument> selection = viewer.getSelection();
 				if (selection.isEmpty())
@@ -114,11 +116,12 @@ public final class ResultPanel {
 			}
 		});
 		
+		viewer.setSortingEnabled(true);
 		initContextMenu();
 		
 		// TODO i18n
 		
-		viewer.getControl().addSelectionListener(new SelectionAdapter() {
+		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				evtSelection.fire(viewer.getSelection());
 			}
@@ -133,17 +136,26 @@ public final class ResultPanel {
 					return Img.EMAIL.get();
 				return iconCache.getIcon(element.getFilename(), Img.FILE.get());
 			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return e1.getTitle().compareToIgnoreCase(e2.getTitle());
+			}
 		});
 		
 		viewer.addColumn(new Column<ResultDocument>("Score [%]", SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.valueOf(element.getScore());
 			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return -1 * Float.compare(e1.getScore(), e2.getScore());
+			}
 		});
 		
 		viewer.addColumn(new Column<ResultDocument>("Size", SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.format("%,d KB", element.getSizeInKB());
+			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return -1 * Longs.compare(e1.getSizeInKB(), e2.getSizeInKB());
 			}
 		});
 
@@ -153,11 +165,17 @@ public final class ResultPanel {
 					return element.getSender();
 				return element.getFilename();
 			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return getLabel(e1).compareToIgnoreCase(getLabel(e2));
+			}
 		});
 
 		viewer.addColumn(new Column<ResultDocument>("Type") {
 			protected String getLabel(ResultDocument element) {
 				return element.getType();
+			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return e1.getType().compareToIgnoreCase(e2.getType());
 			}
 		});
 		
@@ -165,35 +183,36 @@ public final class ResultPanel {
 			protected String getLabel(ResultDocument element) {
 				return element.getPath().getPath();
 			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return getLabel(e1).compareToIgnoreCase(getLabel(e2));
+			}
 		});
 		
 		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Authors", "Sender") {
 			protected String getLabel(ResultDocument element) {
 				return element.getAuthors();
 			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return e1.getAuthors().compareToIgnoreCase(e2.getAuthors());
+			}
 		});
 		
 		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Last Modified", "Send Date") {
 			protected String getLabel(ResultDocument element) {
-				Date date;
+				return dateFormat.format(getDate(element));
+			}
+			protected int compare(ResultDocument e1, ResultDocument e2) {
+				return getDate(e1).compareTo(getDate(e2));
+			}
+			private Date getDate(ResultDocument element) {
 				if (element.isEmail())
-					date = element.getDate();
-				else
-					date = element.getLastModified();
-				return dateFormat.format(date);
+					return element.getDate();
+				return element.getLastModified();
 			}
 		});
 		
-		SettingsConf.ColumnWidths.ResultPanel.bind(viewer.getControl());
-
-		/*
-		 * TODO now: Adjust result column headers:
-		 * - Title/Subject
-		 * - Filename/Sender
-		 * - Last-Modified/Sent Date
-		 * 
-		 * make column headers movable and clickable
-		 */
+		SettingsConf.ColumnWidths.ResultPanel.bind(table);
+		SettingsConf.ColumnOrder.ResultPanelColumnOrder.bind(table);
 	}
 
 	private void initContextMenu() {

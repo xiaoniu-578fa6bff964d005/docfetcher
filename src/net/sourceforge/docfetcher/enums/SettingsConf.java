@@ -31,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
@@ -302,14 +303,14 @@ public final class SettingsConf {
 		 */
 		public void bind(@NotNull final Table table) {
 			final TableColumn[] columns = table.getColumns();
-			int colLength = columns.length;
-			Util.checkThat(colLength > 0);
-			if (colLength != value.length) {
-				Util.checkThat(colLength == defaultValue.length);
+			int columnCount = columns.length;
+			Util.checkThat(columnCount > 0);
+			if (columnCount != value.length) {
+				Util.checkThat(columnCount == defaultValue.length);
 				value = defaultValue;
 			}
 			
-			for (int i = 0; i < colLength; i++) {
+			for (int i = 0; i < columnCount; i++) {
 				final TableColumn col = columns[i];
 				final int index = i;
 				col.setWidth(value[i]);
@@ -343,6 +344,46 @@ public final class SettingsConf {
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
+		}
+	}
+	
+	@Description("# Column orderings.")
+	public static enum ColumnOrder implements Storable {
+		ResultPanelColumnOrder (),
+		;
+
+		public final int[] defaultValue;
+		private int[] value;
+
+		ColumnOrder(int... defaultValue) {
+			value = this.defaultValue = defaultValue;
+		}
+		public void load(String str) {
+			value = Util.toIntArray(str, value);
+		}
+		public String valueToString() {
+			return Ints.join(", ", value);
+		}
+		
+		public void bind(@NotNull final Table table) {
+			final TableColumn[] columns = table.getColumns();
+			int columnCount = columns.length;
+			Util.checkThat(columnCount > 0);
+			if (columnCount != value.length)
+				value = defaultValue;
+			
+			ControlListener columnListener = new ControlAdapter() {
+				public void controlMoved(ControlEvent e) {
+					value = table.getColumnOrder();
+				}
+			};
+			for (TableColumn column : columns) {
+				column.setMoveable(true);
+				column.addControlListener(columnListener);
+			}
+			
+			if (table.getColumnCount() == value.length)
+				table.setColumnOrder(value);
 		}
 	}
 
