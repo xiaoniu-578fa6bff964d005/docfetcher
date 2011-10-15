@@ -21,7 +21,7 @@ import java.util.Date;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.gui.StackTraceWindow;
+import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;

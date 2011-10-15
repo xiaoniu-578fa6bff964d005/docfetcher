@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.gui;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.Col;
+import net.sourceforge.docfetcher.util.gui.dialog.InfoDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -24,6 +25,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Tran Nam Quang
@@ -71,6 +73,16 @@ public final class UtilGui {
 									boolean grabExcessVerticalSpace) {
 		control.setLayoutData(new GridData(
 			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
+	}
+	
+	public static void showOutOfMemoryMessage(@NotNull Shell parent) {
+		// TODO pre-release: Insert link to manual page
+		InfoDialog dialog = new InfoDialog(parent);
+		dialog.setTitle("Out Of Memory");
+		dialog.setImage(SWT.ICON_ERROR);
+		dialog.setText("DocFetcher has run out of memory. " +
+				"Please see the relevant <a href=\"www.google.com\">manual page</a> for further instructions.");
+		dialog.open();
 	}
 	
 }

@@ -45,8 +45,8 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
-import net.sourceforge.docfetcher.util.gui.InputLoop;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
+import net.sourceforge.docfetcher.util.gui.dialog.InputLoop;
 import net.sourceforge.docfetcher.util.gui.viewer.SimpleTreeViewer;
 
 import org.eclipse.swt.SWT;

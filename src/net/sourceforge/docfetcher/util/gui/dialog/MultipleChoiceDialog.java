@@ -9,14 +9,13 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.util.gui;
+package net.sourceforge.docfetcher.util.gui.dialog;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -27,6 +26,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -67,11 +67,12 @@ public final class MultipleChoiceDialog<A> {
 
 	private final Shell shell;
 	private final Label icon;
-	private final StyledText label;
+	private final Link label;
 	
 	private final GridLayout gridLayout;
 	private final GridData gridData;
 	
+	@Nullable private Button firstButton;
 	@Nullable private A answer;
 
 	public MultipleChoiceDialog(@NotNull Shell parent) {
@@ -89,13 +90,18 @@ public final class MultipleChoiceDialog<A> {
 		icon.setImage(shell.getDisplay().getSystemImage(SWT.ICON_QUESTION));
 		icon.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		
-		label = new StyledText(labelComp, SWT.WRAP | SWT.READ_ONLY);
-		label.setEnabled(false);
+		label = new Link(labelComp, SWT.NONE);
 		label.setBackground(icon.getBackground());
 		label.setForeground(icon.getForeground()); // Not necessary
 		GridData labelData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		labelData.widthHint = 250;
 		label.setLayoutData(labelData);
+		
+		label.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Util.launch(e.text);
+			}
+		});
 	}
 	
 	public void setTitle(@NotNull String title) {
@@ -112,6 +118,7 @@ public final class MultipleChoiceDialog<A> {
 		icon.setImage(shell.getDisplay().getSystemImage(swtImage));
 	}
 	
+	// Supports hyperlinks
 	public void setText(@NotNull String text) {
 		Util.checkNotNull(text);
 		label.setText(text);
@@ -131,12 +138,17 @@ public final class MultipleChoiceDialog<A> {
 		});
 		gridLayout.numColumns += 1;
 		gridData.horizontalSpan += 1;
+		
+		if (firstButton == null)
+			firstButton = bt;
+		
 		return answer;
 	}
 
 	@Nullable
 	public A open() {
 		Util.setCenteredBounds(shell);
+		firstButton.setFocus(); // Avoid focusing hyperlinks if there are any
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch())

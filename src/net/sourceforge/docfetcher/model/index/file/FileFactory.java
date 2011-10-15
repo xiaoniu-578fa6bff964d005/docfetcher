@@ -336,7 +336,7 @@ public final class FileFactory {
 												@NotNull String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
 			FileNotFoundException, IOException {
-		// TODO now: can we check if the archive or the target archive entry is encrypted?
+		// TODO now: windows: can we check if the archive or the target archive entry is encrypted?
 		assert noTrailingSlash(entryPath);
 		
 		IInArchive archive = new Handler();
@@ -472,7 +472,7 @@ public final class FileFactory {
 				currentPath = currentPath.replace('\\', '/');
 				assert noTrailingSlash(currentPath);
 				
-				// TODO now: throw disk space exception
+				// TODO post-release-1.1: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
 					Path cacheKey = originalArchivePath.createSubPath(currentPath);
 					File unpackedFile = unpackRarEntry(config, archive, fh, entryPath);

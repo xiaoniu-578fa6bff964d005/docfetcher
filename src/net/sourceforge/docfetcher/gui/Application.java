@@ -50,9 +50,9 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
-import net.sourceforge.docfetcher.util.gui.MultipleChoiceDialog;
 import net.sourceforge.docfetcher.util.gui.StatusManager;
 import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
+import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;

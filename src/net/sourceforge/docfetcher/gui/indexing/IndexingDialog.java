@@ -41,9 +41,9 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.DropDownMenuManager;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
-import net.sourceforge.docfetcher.util.gui.MultipleChoiceDialog;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
+import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;

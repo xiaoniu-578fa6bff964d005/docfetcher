@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.util.gui;
+package net.sourceforge.docfetcher.util.gui.dialog;
 
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
