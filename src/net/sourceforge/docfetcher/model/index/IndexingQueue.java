@@ -113,30 +113,29 @@ public final class IndexingQueue {
 		
 		thread = new Thread(IndexingQueue.class.getName()) {
 			public void run() {
-				while (true) {
-					try {
-						threadLoop();
-					}
-					catch (InterruptedException e) {
-						// Program shutdown; get out of the loop
-						break;
-					}
-				}
+				while (threadLoop());
 			}
 		};
 		thread.start();
 	}
 	
-	private void threadLoop() throws InterruptedException {
+	// returns whether the loop should continue
+	private boolean threadLoop() {
 		// Wait for next task
 		Task task;
 		writeLock.lock();
 		try {
 			task = getReadyTask();
-			while (task == null) {
+			while (task == null && !shutdown) {
 				readyTaskAvailable.await();
 				task = getReadyTask();
 			}
+			if (shutdown)
+				return false;
+		}
+		catch (InterruptedException e) {
+			// Do not interrupt this thread, call Condition.signal*() instead.
+			throw new IllegalStateException();
 		}
 		finally {
 			writeLock.unlock();
@@ -228,6 +227,8 @@ public final class IndexingQueue {
 				deletion.setApprovedByQueue();
 			}
 		}
+		
+		return true;
 	}
 
 	@NotThreadSafe
@@ -649,6 +650,13 @@ public final class IndexingQueue {
 			if (!removeAll(handler, removedTasks))
 				return false;
 			shutdown = true;
+			
+			/*
+			 * Wake up and terminate worker thread if it was waiting. Do *not*
+			 * call thread.interrupt here, otherwise we'll get an exception when
+			 * trying to close the current Lucene index, if there is one.
+			 */
+			readyTaskAvailable.signal();
 		}
 		finally {
 			writeLock.unlock();
@@ -656,9 +664,6 @@ public final class IndexingQueue {
 		
 		for (Task task : removedTasks)
 			evtRemoved.fire(task);
-
-		// Wake up and terminate worker thread if it was waiting
-		thread.interrupt();
 
 		return true;
 	}

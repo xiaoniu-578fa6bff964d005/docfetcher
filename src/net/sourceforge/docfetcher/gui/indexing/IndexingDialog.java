@@ -19,7 +19,6 @@ import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
-import net.sourceforge.docfetcher.gui.indexing.KeepDiscardDialog.Answer;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -42,6 +41,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.DropDownMenuManager;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
+import net.sourceforge.docfetcher.util.gui.MultipleChoiceDialog;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
@@ -318,17 +318,15 @@ public final class IndexingDialog implements Dialog {
 	
 	@Nullable
 	private CancelAction confirmCancel() {
-		KeepDiscardDialog dialog = new KeepDiscardDialog(shell);
-		Answer answer = dialog.open();
-		switch (answer) {
-		case KEEP:
-			return CancelAction.KEEP;
-		case DISCARD:
-			return CancelAction.DISCARD;
-		case CONTINUE:
-			return null;
-		}
-		throw new IllegalStateException();
+		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
+		dialog.setTitle("Abort Indexing?");
+		dialog.setText("You are about to abort an indexing process. Do you want to keep the"
+			+ " index created so far? Keeping it allows you to continue indexing later by running an index update.");
+		
+		dialog.addButton("&Keep", CancelAction.KEEP);
+		dialog.addButton("&Discard", CancelAction.DISCARD);
+		dialog.addButton("Don't &Abort", null);
+		return dialog.open();
 	}
 
 	@NotNull

@@ -46,9 +46,11 @@ import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
+import net.sourceforge.docfetcher.util.gui.MultipleChoiceDialog;
 import net.sourceforge.docfetcher.util.gui.StatusManager;
 import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
 
@@ -243,10 +245,7 @@ public final class Application {
 			public void shellClosed(final ShellEvent e) {
 				e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
 					public CancelAction cancel() {
-						// TODO now: Ask for confirmation:
-						// Discard, Keep, Don't Exit
-						// -> Refactor KeepDiscardDialog into generic 3-button confirmation dialog
-						return null;
+						return confirmExit();
 					}
 				});
 				
@@ -271,6 +270,20 @@ public final class Application {
 						}
 					}.start();
 				}
+			}
+			
+			@Nullable
+			private CancelAction confirmExit() {
+				MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
+				dialog.setTitle("Abort Indexing?");
+				dialog.setText("An indexing process is still running and must be cancelled before terminating the program." +
+						" Do you want to keep the index created so far? " +
+						"Keeping it allows you to continue indexing later by running an index update.");
+				
+				dialog.addButton("&Keep", CancelAction.KEEP);
+				dialog.addButton("&Discard", CancelAction.DISCARD);
+				dialog.addButton("Don't &Exit", null);
+				return dialog.open();
 			}
 		});
 
