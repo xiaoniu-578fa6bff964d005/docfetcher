@@ -145,6 +145,7 @@ public final class IndexRegistry {
 	}
 	
 	// Will block until the searcher is available (i.e. after load(...) has finished)
+	// do not call this from the GUI thread, otherwise the application might hang
 	// May return null if the calling thread was interrupted
 	@Nullable
 	@ThreadSafe
