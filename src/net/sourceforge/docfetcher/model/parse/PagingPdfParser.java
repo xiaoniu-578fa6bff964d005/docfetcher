@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public abstract class PagingPdfParser {
 		this.file = Util.checkNotNull(file);
 	}
 	
-	public final void run() throws ParseException {
+	public final void run() throws ParseException, CheckedOutOfMemoryError {
 		PDDocument doc = null;
 		try {
 			doc = PDDocument.load(file);
@@ -46,6 +47,9 @@ public abstract class PagingPdfParser {
 		}
 		catch (Exception e) {
 			throw new ParseException(e);
+		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
 		}
 		finally {
 			PdfParser.close(doc);

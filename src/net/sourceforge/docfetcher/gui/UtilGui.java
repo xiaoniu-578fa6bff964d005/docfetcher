@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.Col;
@@ -25,7 +27,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Tran Nam Quang
@@ -75,14 +76,22 @@ public final class UtilGui {
 			SWT.FILL, SWT.FILL, true, grabExcessVerticalSpace));
 	}
 	
-	public static void showOutOfMemoryMessage(@NotNull Shell parent) {
+	public static void showOutOfMemoryMessage(	@NotNull final Control control,
+												@NotNull CheckedOutOfMemoryError e) {
+		Util.printErr(e.getOutOfMemoryError());
+		
 		// TODO pre-release: Insert link to manual page
-		InfoDialog dialog = new InfoDialog(parent);
-		dialog.setTitle("Out Of Memory");
-		dialog.setImage(SWT.ICON_ERROR);
-		dialog.setText("DocFetcher has run out of memory. " +
-				"Please see the relevant <a href=\"www.google.com\">manual page</a> for further instructions.");
-		dialog.open();
+		Util.runSwtSafe(control, new Runnable() {
+			public void run() {
+				// Note: getShell() must be called in the SWT thread
+				InfoDialog dialog = new InfoDialog(control.getShell());
+				dialog.setTitle("Out Of Memory");
+				dialog.setImage(SWT.ICON_ERROR);
+				dialog.setText("DocFetcher has run out of memory. " +
+						"Please see the relevant <a href=\"www.google.com\">manual page</a> for further instructions.");
+				dialog.open();
+			}
+		});
 	}
 	
 }

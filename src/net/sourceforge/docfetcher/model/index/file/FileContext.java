@@ -30,6 +30,7 @@ import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -164,8 +165,8 @@ class FileContext {
 		catch (ParseException e) {
 			fail(ErrorType.PARSING, doc, e);
 		}
-		catch (OutOfMemoryError e) {
-			fail(ErrorType.OUT_OF_MEMORY, doc, e);
+		catch (CheckedOutOfMemoryError e) {
+			fail(ErrorType.OUT_OF_MEMORY, doc, e.getCause());
 		}
 		catch (StackOverflowError e) {
 			fail(ErrorType.STACK_OVERFLOW, doc, e);

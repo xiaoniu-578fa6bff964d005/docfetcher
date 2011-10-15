@@ -22,6 +22,7 @@ import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -118,7 +119,7 @@ final class OutlookContext {
 			
 			protected void handleAttachment(String filename,
 											File tempFile)
-					throws ParseException {
+					throws ParseException, CheckedOutOfMemoryError {
 				// TODO now: Don't try to parse all files -> call ParseService.canParse
 				// TODO post-release-1.1: Maybe recurse into archive attachments
 				Path path = doc.getPath().createSubPath(filename);
@@ -130,7 +131,7 @@ final class OutlookContext {
 				luceneDoc.add(Fields.createContent(metadata));
 			}
 			protected void handleException(	String filename,
-											Exception e) {
+											Throwable t) {
 				Path path = doc.getPath().createSubPath(filename);
 				TreeNode attachNode = new AttachNode(path);
 
@@ -138,7 +139,7 @@ final class OutlookContext {
 				if (errors == null)
 					errors = new ArrayList<IndexingError>(5);
 				IndexingError error = new IndexingError(
-					ErrorType.ATTACHMENT, attachNode, e);
+					ErrorType.ATTACHMENT, attachNode, t);
 				errors.add(error);
 				reporter.fail(error);
 			}

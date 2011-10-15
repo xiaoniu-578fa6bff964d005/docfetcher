@@ -31,6 +31,7 @@ import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.model.search.SearchException;
 import net.sourceforge.docfetcher.model.search.Searcher;
 import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -220,6 +221,9 @@ public final class SearchQueue {
 				
 				// Don't return yet, we might have to update the filters
 				results = null;
+			}
+			catch (CheckedOutOfMemoryError e) {
+				UtilGui.showOutOfMemoryMessage(searchBar.getControl(), e);
 			}
 		}
 		

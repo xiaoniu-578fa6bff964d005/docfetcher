@@ -106,7 +106,7 @@ final class ErrorTable {
 				launchSelection(selection);
 			}
 			public boolean isDefaultItem() {
-				// TODO now: Does this work on Windows?
+				// TODO now: windows: Does this work on Windows?
 				return true;
 			}
 		});

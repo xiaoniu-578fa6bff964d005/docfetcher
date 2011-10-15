@@ -33,6 +33,7 @@ import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
@@ -91,7 +92,6 @@ public final class ParseService {
 	}
 	
 	// Accepts HTML files, but does not handle HTML pairing
-	// may throw OutOfMemoryErrors
 	// When parsing a temporary file and mime type detection is off, the temporary file
 	// must have the correct file extension.
 	@NotNull
@@ -101,7 +101,7 @@ public final class ParseService {
 	                                @NotNull File file,
 	                                @NotNull IndexingReporter reporter,
 	                                @NotNull Cancelable cancelable)
-			throws ParseException {
+			throws ParseException, CheckedOutOfMemoryError {
 		// Search for appropriate parser by mimetype
 		for (PatternAction patternAction : config.getPatternActions()) {
 			if (patternAction.getAction() != MatchAction.DETECT_MIME)
@@ -147,62 +147,68 @@ public final class ParseService {
 										@NotNull Parser parser,
 										@NotNull File file,
 										@NotNull IndexingReporter reporter,
-										@NotNull Cancelable cancelable) throws ParseException {
-		ParseResult result = null;
-		if (ProgramConf.Bool.DryRun.get()) {
-			result = new ParseResult("");
-		}
-		else if (parser instanceof StreamParser) {
-			InputStream in = null;
-			try {
-				if (isZipEntry(file))
-					in = new TFileInputStream(file);
-				else
-					in = new FileInputStream(file);
-				StreamParser streamParser = (StreamParser) parser;
-				result = streamParser.parse(in, reporter, cancelable);
+										@NotNull Cancelable cancelable)
+			throws ParseException, CheckedOutOfMemoryError {
+		try {
+			ParseResult result = null;
+			if (ProgramConf.Bool.DryRun.get()) {
+				result = new ParseResult("");
 			}
-			catch (FileNotFoundException e) {
-				throw new ParseException(e);
-			}
-			finally {
-				Closeables.closeQuietly(in);
-			}
-		}
-		else if (parser instanceof OOoParser) {
-			// The OOo parser can handle both regular files and TrueZIP files
-			OOoParser oooParser = (OOoParser) parser;
-			result = oooParser.parse(file, reporter, cancelable);
-		}
-		else if (parser instanceof FileParser) {
-			FileParser fileParser = (FileParser) parser;
-			if (isZipEntry(file)) {
-				// Unpack zip entry to temporary file
-				TFile tzFile = (TFile) file;
-				File tempFile = null;
+			else if (parser instanceof StreamParser) {
+				InputStream in = null;
 				try {
-					tempFile = config.createDerivedTempFile(tzFile.getName());
-					tzFile.cp(tempFile);
-					result = fileParser.parse(tempFile, reporter, cancelable);
+					if (isZipEntry(file))
+						in = new TFileInputStream(file);
+					else
+						in = new FileInputStream(file);
+					StreamParser streamParser = (StreamParser) parser;
+					result = streamParser.parse(in, reporter, cancelable);
 				}
-				catch (IndexingException e) {
-					throw new ParseException(e.getIOException());
-				}
-				catch (IOException e) {
+				catch (FileNotFoundException e) {
 					throw new ParseException(e);
 				}
 				finally {
-					if (tempFile != null)
-						tempFile.delete();
+					Closeables.closeQuietly(in);
+				}
+			}
+			else if (parser instanceof OOoParser) {
+				// The OOo parser can handle both regular files and TrueZIP files
+				OOoParser oooParser = (OOoParser) parser;
+				result = oooParser.parse(file, reporter, cancelable);
+			}
+			else if (parser instanceof FileParser) {
+				FileParser fileParser = (FileParser) parser;
+				if (isZipEntry(file)) {
+					// Unpack zip entry to temporary file
+					TFile tzFile = (TFile) file;
+					File tempFile = null;
+					try {
+						tempFile = config.createDerivedTempFile(tzFile.getName());
+						tzFile.cp(tempFile);
+						result = fileParser.parse(tempFile, reporter, cancelable);
+					}
+					catch (IndexingException e) {
+						throw new ParseException(e.getIOException());
+					}
+					catch (IOException e) {
+						throw new ParseException(e);
+					}
+					finally {
+						if (tempFile != null)
+							tempFile.delete();
+					}
+				} else {
+					result = fileParser.parse(file, reporter, cancelable);
 				}
 			} else {
-				result = fileParser.parse(file, reporter, cancelable);
+				throw new IllegalStateException();
 			}
-		} else {
-			throw new IllegalStateException();
+			String parserName = parser.getClass().getSimpleName();
+			return result.setParserName(parserName);
 		}
-		String parserName = parser.getClass().getSimpleName();
-		return result.setParserName(parserName);
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
+		}
 	}
 	
 	private static boolean isZipEntry(@NotNull File file) {
@@ -215,7 +221,7 @@ public final class ParseService {
 	public static String renderText(@NotNull IndexingConfig config,
 	                                @NotNull File file,
 									@NotNull String parserName)
-			throws ParseException {
+			throws ParseException, CheckedOutOfMemoryError {
 		Util.checkThat(! (file instanceof TFile));
 		if (parserName.equals(FILENAME_PARSER)) {
 			assert config.isIndexFilenames();
@@ -225,21 +231,26 @@ public final class ParseService {
 		for (Parser parser : parsers) {
 			if (!parser.getClass().getSimpleName().equals(parserName))
 				continue;
-			if (parser instanceof StreamParser) {
-				InputStream in = null;
-				try {
-					in = new FileInputStream(file);
-					return ((StreamParser) parser).renderText(in, cancelable);
+			try {
+				if (parser instanceof StreamParser) {
+					InputStream in = null;
+					try {
+						in = new FileInputStream(file);
+						return ((StreamParser) parser).renderText(in, cancelable);
+					}
+					catch (FileNotFoundException e) {
+						throw new ParseException(e);
+					}
+					finally {
+						Closeables.closeQuietly(in);
+					}
 				}
-				catch (FileNotFoundException e) {
-					throw new ParseException(e);
-				}
-				finally {
-					Closeables.closeQuietly(in);
+				else if (parser instanceof FileParser) {
+					return ((FileParser) parser).renderText(file, cancelable);
 				}
 			}
-			else if (parser instanceof FileParser) {
-				return ((FileParser) parser).renderText(file, cancelable);
+			catch (OutOfMemoryError e) {
+				throw new CheckedOutOfMemoryError(e);
 			}
 		}
 		throw new IllegalArgumentException(); // TODO now: make this a checked exception?

@@ -18,6 +18,7 @@ import java.util.List;
 
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ import org.junit.Test;
 public final class PagingPdfParserTest {
 	
 	@Test
-	public void testParse() throws ParseException {
+	public void testParse() throws ParseException, CheckedOutOfMemoryError {
 		final List<String> pages = new ArrayList<String> (3);
 		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
 			protected void handlePage(String pageText) {
@@ -41,7 +42,8 @@ public final class PagingPdfParserTest {
 	}
 	
 	@Test
-	public void testParseAndStop() throws ParseException {
+	public void testParseAndStop() throws ParseException,
+			CheckedOutOfMemoryError {
 		final List<String> pages = new ArrayList<String> (2);
 		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
 			protected void handlePage(String pageText) {

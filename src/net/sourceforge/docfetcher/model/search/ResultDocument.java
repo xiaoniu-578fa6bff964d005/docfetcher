@@ -30,6 +30,7 @@ import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.parse.PdfParser;
 import net.sourceforge.docfetcher.model.parse.TextParser;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
@@ -216,7 +217,8 @@ public final class ResultDocument {
 	// Should be run in a thread
 	// thrown parse exception has localized error message
 	@NotNull
-	private String getText() throws ParseException, FileNotFoundException {
+	private String getText() throws ParseException, FileNotFoundException,
+			CheckedOutOfMemoryError {
 		onlyFiles();
 		String parserName = luceneDoc.get(Fields.PARSER.key());
 		FileResource fileResource = null;
@@ -235,13 +237,14 @@ public final class ResultDocument {
 	// thrown parse exception has localized error message
 	@NotNull
 	public HighlightedString getHighlightedText() throws ParseException,
-			FileNotFoundException {
+			FileNotFoundException, CheckedOutOfMemoryError {
 		return HighlightService.highlight(query, isPhraseQuery, getText());
 	}
 	
 	// should be run in a thread
 	public void readPdfPages(@NotNull final PdfPageHandler pageHandler)
-			throws ParseException, FileNotFoundException {
+			throws ParseException, FileNotFoundException,
+			CheckedOutOfMemoryError {
 		// TODO i18n of error messages
 		onlyFiles();
 		Util.checkNotNull(pageHandler);
@@ -250,13 +253,22 @@ public final class ResultDocument {
 			fileResource = getFileResource();
 			new PagingPdfParser(fileResource.getFile()) {
 				protected void handlePage(String pageText) {
-					HighlightedString string = HighlightService.highlight(
-							query, isPhraseQuery, pageText
-					);
+					HighlightedString string;
+					try {
+						string = HighlightService.highlight(
+								query, isPhraseQuery, pageText
+						);
+					}
+					catch (CheckedOutOfMemoryError e) {
+						throw e.getOutOfMemoryError();
+					}
 					pageHandler.handlePage(string);
 					if (pageHandler.isStopped()) stop();
 				}
 			}.run();
+		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
 		}
 		finally {
 			if (fileResource != null)
@@ -291,7 +303,7 @@ public final class ResultDocument {
 	 */
 	@NotNull
 	public MailResource getMailResource() throws ParseException,
-			FileNotFoundException {
+			FileNotFoundException, CheckedOutOfMemoryError {
 		onlyEmails();
 		return mailFactory.createMail(config, query, isPhraseQuery, getPath());
 	}

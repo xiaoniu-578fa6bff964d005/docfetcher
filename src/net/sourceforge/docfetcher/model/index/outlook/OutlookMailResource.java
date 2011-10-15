@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightService;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -50,7 +51,8 @@ public final class OutlookMailResource extends MailResource {
 						boolean isPhraseQuery,
 						@NotNull final HotColdFileCache unpackCache,
 						@NotNull final Path emailId,
-						@NotNull PSTMessage email) throws ParseException {
+						@NotNull PSTMessage email) throws ParseException,
+			CheckedOutOfMemoryError {
 		Util.checkNotNull(config, unpackCache, email);
 		
 		subject = email.getSubject();
@@ -62,14 +64,14 @@ public final class OutlookMailResource extends MailResource {
 		
 		new AttachmentVisitor(config, email, false) {
 			// TODO now: tell attachment visitor to skip a file if it was found in the cache
-			protected void handleAttachment(String filename,
-											File tempFile) throws Exception {
+			protected void handleAttachment(String filename, File tempFile)
+					throws ParseException {
 				Path cacheKey = emailId.createSubPath(filename);
 				FileResource fileResource = unpackCache.putIfAbsent(cacheKey, tempFile);
 				attachments.add(new Attachment(filename, fileResource));
 			}
 			protected void handleException(	String filename,
-											Exception e) {
+											Throwable e) {
 				// TODO now: if parsing of this file failed, show an error for the
 				// file on the preview panel
 			}

@@ -34,6 +34,7 @@ import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.parse.Parser;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
@@ -228,7 +229,7 @@ public final class Searcher {
 	@NotNull
 	@ThreadSafe
 	public List<ResultDocument> search(@NotNull String queryString)
-			throws SearchException {
+			throws SearchException, CheckedOutOfMemoryError {
 		/*
 		 * Note: For the desktop interface, we'll always search in all available
 		 * indexes, even those which are unchecked on the filter panel. This
@@ -258,8 +259,7 @@ public final class Searcher {
 		try {
 			checkIndexesExist();
 			
-			// Perform search
-			// TODO now: calling search can throw an OutOfMemoryError -> catch it
+			// Perform search; might throw OutOfMemoryError
 			ScoreDoc[] scoreDocs = luceneSearcher.search(query, MAX_RESULTS).scoreDocs;
 
 			// Create result documents
@@ -278,6 +278,9 @@ public final class Searcher {
 		catch (IOException e) {
 			throw new SearchException(e.getMessage()); // TODO i18n
 		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
+		}
 		finally {
 			readLock.unlock();
 		}
@@ -287,7 +290,7 @@ public final class Searcher {
 	@NotNull
 	@ThreadSafe
 	public List<ResultDocument> list(@NotNull Set<String> uids)
-			throws SearchException {
+			throws SearchException, CheckedOutOfMemoryError {
 		// Construct a filter that only matches documents with the given UIDs
 		TermsFilter uidFilter = new TermsFilter();
 		String fieldName = Fields.UID.key();
@@ -300,8 +303,7 @@ public final class Searcher {
 		try {
 			checkIndexesExist();
 			
-			// Perform search
-			// TODO now: calling search can throw an OutOfMemoryError -> catch it
+			// Perform search; might throw OutOfMemoryError
 			ScoreDoc[] scoreDocs = luceneSearcher.search(query, uidFilter, MAX_RESULTS).scoreDocs;
 			
 			// Create result documents
@@ -329,6 +331,9 @@ public final class Searcher {
 		catch (IOException e) {
 			throw new SearchException(e.getMessage()); // TODO i18n
 		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
+		}
 		finally {
 			readLock.unlock();
 		}
@@ -342,7 +347,7 @@ public final class Searcher {
 	@NotNull
 	@ThreadSafe
 	public ResultPage search(@NotNull WebQuery webQuery)
-			throws IOException, SearchException {
+			throws IOException, SearchException, CheckedOutOfMemoryError {
 		Util.checkNotNull(webQuery);
 		
 		if (ioException != null)
@@ -395,7 +400,7 @@ public final class Searcher {
 		try {
 			checkIndexesExist();
 			
-			// Perform search
+			// Perform search; might throw OutOfMemoryError
 			int maxResults = (webQuery.pageIndex + 1) * PAGE_SIZE;
 			TopDocs topDocs = luceneSearcher.search(query, filter, maxResults);
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
@@ -429,6 +434,9 @@ public final class Searcher {
 			
 			return new ResultPage(
 				Arrays.asList(results), newPageIndex, pageCount, hitCount);
+		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
 		}
 		finally {
 			readLock.unlock();

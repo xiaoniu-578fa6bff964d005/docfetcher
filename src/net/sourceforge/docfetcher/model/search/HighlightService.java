@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -54,7 +55,8 @@ public final class HighlightService {
 	@NotNull
 	public static HighlightedString highlight(	@NotNull Query query,
 												boolean isPhraseQuery,
-												@NotNull String text) {
+												@NotNull String text)
+			throws CheckedOutOfMemoryError {
 		List<Range> ranges;
 		if (isPhraseQuery)
 			ranges = highlightPhrases(query, text);
@@ -67,7 +69,8 @@ public final class HighlightService {
 	@NotNull
 	@SuppressWarnings("unchecked")
 	private static List<Range> highlightPhrases(@NotNull Query query,
-												@NotNull String text) {
+												@NotNull String text)
+			throws CheckedOutOfMemoryError {
 		// FastVectorHighlighter only supports TermQuery, PhraseQuery and BooleanQuery
 		FastVectorHighlighter highlighter = new FastVectorHighlighter(true, true, null, null);
 		FieldQuery fieldQuery = highlighter.getFieldQuery(query);
@@ -84,9 +87,10 @@ public final class HighlightService {
 			Closeables.closeQuietly(writer); // flush unwritten documents into index
 			IndexReader indexReader = IndexReader.open(directory);
 			
+			// This might throw an OutOfMemoryError
 			FieldTermStack fieldTermStack = new FieldTermStack(
-					indexReader, 0, Fields.CONTENT.key(), fieldQuery
-			);
+				indexReader, 0, Fields.CONTENT.key(), fieldQuery);
+			
 			FieldPhraseList fieldPhraseList = new FieldPhraseList(fieldTermStack, fieldQuery);
 			
 			// Hack: We'll use reflection to access a private field
@@ -101,7 +105,11 @@ public final class HighlightService {
 				ranges.add(new Range(start, end - start));
 			}
 			return ranges;
-		} catch (Exception e) {
+		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
+		}
+		catch (Exception e) {
 			return new ArrayList<Range> (0);
 		}
 	}
@@ -109,7 +117,8 @@ public final class HighlightService {
 	@MutableCopy
 	@NotNull
 	private static List<Range> highlight(	@NotNull Query query,
-											@NotNull String text) {
+											@NotNull String text)
+			throws CheckedOutOfMemoryError {
 		final List<Range> ranges = new ArrayList<Range> ();
 		/*
 		 * A formatter is supposed to return formatted text, but since we're
@@ -136,10 +145,14 @@ public final class HighlightService {
 		try {
 			/*
 			 * This has a return value, but we ignore it since we only want the
-			 * offsets.
+			 * offsets. Might throw an OutOfMemoryError.
 			 */
 			highlighter.getBestFragment(IndexRegistry.analyzer, key, text);
-		} catch (Exception e) {
+		}
+		catch (OutOfMemoryError e) {
+			throw new CheckedOutOfMemoryError(e);
+		}
+		catch (Exception e) {
 			Util.printErr(e);
 		}
 		return ranges;

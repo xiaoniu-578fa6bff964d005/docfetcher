@@ -17,6 +17,8 @@ import java.io.InputStream;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.parse.ParseException;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -80,13 +82,20 @@ abstract class AttachmentVisitor {
 				Closeables.closeQuietly(in);
 
 				handleAttachment(filename, tempFile);
-			} catch (Exception e) {
+			}
+			catch (CheckedOutOfMemoryError e) {
+				if (filename == null)
+					filename = "???";
+				handleException(filename, e.getCause());
+			}
+			catch (Exception e) {
 				if (filename == null)
 					filename = "???";
 				if (e instanceof IndexingException)
 					e = ((IndexingException) e).getIOException();
 				handleException(filename, e);
-			} finally {
+			}
+			finally {
 				if (deleteTempFiles && tempFile != null)
 					tempFile.delete();
 			}
@@ -96,10 +105,10 @@ abstract class AttachmentVisitor {
 	
 	protected abstract void handleAttachment(	@NotNull String filename,
 												@NotNull File tempFile)
-			throws Exception;
+			throws ParseException, CheckedOutOfMemoryError;
 	
 	protected abstract void handleException(@NotNull String filename,
-											@NotNull Exception e);
+											@NotNull Throwable e);
 	
 	protected void runFinally() {}
 

@@ -20,6 +20,7 @@ import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.Path.PathParts;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.ParseException;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -47,10 +48,11 @@ public final class OutlookMailFactory {
 	// Path argument should be path to PST file + path to folder + descriptor node ID
 	@NotNull
 	public MailResource createMail(	@NotNull IndexingConfig config,
-	                               	@NotNull Query query,
-	                               	boolean isPhraseQuery,
+									@NotNull Query query,
+									boolean isPhraseQuery,
 									@NotNull Path emailPath)
-			throws ParseException, FileNotFoundException {
+			throws ParseException, FileNotFoundException,
+			CheckedOutOfMemoryError {
 		PathParts leftMiddle_right = emailPath.splitAtLastSeparator();
 		try {
 			PathParts left_middle = leftMiddle_right.getLeft().splitAtExistingFile();

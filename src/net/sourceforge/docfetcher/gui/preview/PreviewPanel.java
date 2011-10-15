@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.model.search.ResultDocument.PdfPageHandler;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -306,7 +307,7 @@ public final class PreviewPanel extends Composite {
 		}
 
 		protected void doRun(Hider overlayHider) throws ParseException,
-				FileNotFoundException {
+				FileNotFoundException, CheckedOutOfMemoryError {
 			final MailResource mailResource = doc.getMailResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
@@ -347,7 +348,7 @@ public final class PreviewPanel extends Composite {
 		}
 
 		protected void doRun(final Hider overlayHider) throws ParseException,
-				FileNotFoundException {
+				FileNotFoundException, CheckedOutOfMemoryError {
 			class Item {
 				@Nullable private final HighlightedString string;
 				private boolean isLastItem;
@@ -408,7 +409,7 @@ public final class PreviewPanel extends Composite {
 		}
 
 		protected void doRun(Hider overlayHider) throws ParseException,
-				FileNotFoundException {
+				FileNotFoundException, CheckedOutOfMemoryError {
 			HighlightedString string = doc.getHighlightedText();
 			setTextSafely(string, doc.isPlainTextFile(), startCount, false);
 		}
@@ -437,13 +438,8 @@ public final class PreviewPanel extends Composite {
 			catch (FileNotFoundException e) {
 				setError("Error: " + e.getMessage(), startCount); // TODO i18n
 			}
-			catch (OutOfMemoryError e) {
-				Util.runSwtSafe(PreviewPanel.this, new Runnable() {
-					public void run() {
-						// Note: getShell() must be called in the SWT thread
-						UtilGui.showOutOfMemoryMessage(getShell());
-					}
-				});
+			catch (CheckedOutOfMemoryError e) {
+				UtilGui.showOutOfMemoryMessage(PreviewPanel.this, e);
 			}
 			finally {
 				hider.hide();
@@ -451,7 +447,8 @@ public final class PreviewPanel extends Composite {
 		}
 		
 		protected abstract void doRun(@NotNull Hider overlayHider)
-				throws ParseException, FileNotFoundException;
+				throws ParseException, FileNotFoundException,
+				CheckedOutOfMemoryError;
 	}
 	
 }
