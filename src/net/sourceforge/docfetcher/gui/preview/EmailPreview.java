@@ -17,15 +17,16 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf.Font;
-import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.MailResource;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.TabFolderFactory;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -51,7 +52,8 @@ final class EmailPreview extends Composite {
 		Util.setCenteredBounds(shell, 400, 300);
 
 		// Load images
-		LazyImageCache lazyImageCache = new LazyImageCache(display, SystemConf.Str.ImgDir.get());
+		AppUtil.Const.autoInit();
+		LazyImageCache lazyImageCache = new LazyImageCache(display, AppUtil.getImageDir());
 		Img.initialize(lazyImageCache);
 		
 		new EmailPreview(shell);

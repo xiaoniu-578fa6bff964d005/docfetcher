@@ -11,7 +11,6 @@
 
 package net.sourceforge.docfetcher.gui.preview;
 
-import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
@@ -50,7 +49,9 @@ public final class WelcomePanel extends Composite {
 		shell.setText("Welcome");
 		Util.setCenteredBounds(shell, 600, 600);
 
-		new WelcomePanel(shell).evtLinkClicked.add(new Event.Listener<Void>() {
+		String imagePath = AppUtil.getImageDir() + "/squirrel.png";
+		WelcomePanel welcomePanel = new WelcomePanel(shell, imagePath);
+		welcomePanel.evtLinkClicked.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				AppUtil.showInfo("Link to manual was clicked.");
 			}
@@ -69,7 +70,7 @@ public final class WelcomePanel extends Composite {
 	private final Image image;
 	private final Font font;
 	
-	public WelcomePanel(@NotNull Composite parent) {
+	public WelcomePanel(@NotNull Composite parent, String imagePath) {
 		super(parent, SWT.NONE);
 		setLayout(Util.createGridLayout(1, false, 0, 0));
 		
@@ -80,8 +81,7 @@ public final class WelcomePanel extends Composite {
 		centerComp.setLayout(Util.createGridLayout(2, false, 0, 0));
 		
 		// Load resources
-		String imgDir = SystemConf.Str.ImgDir.get();
-		image = new Image(getDisplay(), imgDir + "/squirrel.png");
+		image = new Image(getDisplay(), imagePath);
 		font = new Font(getDisplay(), "Verdana", 10, SWT.NORMAL);
 		
 		// Dispose resources

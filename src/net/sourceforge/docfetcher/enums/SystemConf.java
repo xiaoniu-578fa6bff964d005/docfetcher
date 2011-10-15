@@ -78,10 +78,6 @@ public final class SystemConf {
 		ProgramName ("Unspecified"),
 		ProgramVersion ("Unspecified"),
 		BuildDate ("Unspecified"),
-		
-		ProgramConfFilename ("program.conf"),
-		SettingsConfFilename ("settings.conf"),
-		ImgDir ("img"),
 		;
 
 		private String value;

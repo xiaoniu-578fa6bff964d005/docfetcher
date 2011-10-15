@@ -126,21 +126,19 @@ public final class Application {
 
 		if (!AppUtil.checkSingleInstance()) return;
 
-		// TODO now: load settings after starting the index registry thread ->
-		// values for index registry constructor can be set later
-		
-		// Load program configuration and preferences; load index registry
+		// Load program configuration and preferences
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
-		Display display = new Display();
-		loadIndexRegistry(display);
 		
-		shell = new Shell(display);
+		// Load index registry; create display and shell
+		Display display = new Display();
 		AppUtil.setDisplay(display);
+		loadIndexRegistry(display);
+		shell = new Shell(display);
 
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
-			display, SystemConf.Str.ImgDir.get());
+			display, AppUtil.getImageDir());
 		Img.initialize(lazyImageCache);
 		lazyImageCache.reportMissingFiles(
 			shell, Img.class, "Missing image files:");
@@ -309,7 +307,7 @@ public final class Application {
 	private static void loadIndexRegistry(@NotNull final Display display) {
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
-			indexParentDir = new File("bin", "indexes");
+			indexParentDir = new File("bin/indexes");
 		else if (SystemConf.Bool.IsPortable.get())
 			indexParentDir = new File("indexes");
 		else
@@ -372,12 +370,21 @@ public final class Application {
 	}
 
 	private static void loadProgramConf() {
-		String programConfFilename = SystemConf.Str.ProgramConfFilename.get();
-		File appDataDir = AppUtil.getAppDataDir();
-		File programConfFile = new File(appDataDir, programConfFilename);
+		AppUtil.checkConstInitialized();
+		AppUtil.ensureNoDisplay();
+		
+		File confFile;
+		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
+			confFile = new File("dist/program.conf");
+		}
+		else {
+			File appDataDir = AppUtil.getAppDataDir();
+			confFile = new File(appDataDir, "conf/program.conf");
+		}
+		
 		try {
 			List<Loadable> notLoaded = ConfLoader.load(
-				programConfFile, ProgramConf.class, false);
+				confFile, ProgramConf.class, false);
 			if (!notLoaded.isEmpty()) {
 				List<String> entryNames = new ArrayList<String>(
 					notLoaded.size());
@@ -386,23 +393,23 @@ public final class Application {
 				String msg = String.format(
 					"The following entries in '%s' "
 							+ "are missing or have invalid values:\n",
-					programConfFilename);
+					confFile.getName());
 				msg += Joiner.on("\n").join(entryNames);
 				AppUtil.showErrorOnStart(msg, false);
 			}
 		}
 		catch (FileNotFoundException e) {
 			// Restore conf file if missing
-			String absPath = Util.getSystemAbsPath(programConfFile);
+			String absPath = Util.getSystemAbsPath(confFile);
 			String msg = String.format("Configuration file is missing:\n%s.\n"
 					+ "File will be restored.", absPath);
 			AppUtil.showErrorOnStart(msg, false);
-			InputStream in = Main.class.getResourceAsStream(programConfFilename);
+			InputStream in = Main.class.getResourceAsStream(confFile.getName());
 			try {
 				ConfLoader.load(in, ProgramConf.class);
-				URL url = Resources.getResource(Main.class, programConfFilename);
+				URL url = Resources.getResource(Main.class, confFile.getName());
 				Files.copy(
-					Resources.newInputStreamSupplier(url), programConfFile);
+					Resources.newInputStreamSupplier(url), confFile);
 			}
 			catch (Exception e1) {
 				AppUtil.showStackTraceInOwnDisplay(e1);
@@ -417,16 +424,25 @@ public final class Application {
 	}
 
 	private static File loadSettingsConf() {
-		File appDataDir = AppUtil.getAppDataDir();
-		String settingsConfName = SystemConf.Str.SettingsConfFilename.get();
-		File settingsConfFile = new File(appDataDir, settingsConfName);
+		AppUtil.checkConstInitialized();
+		AppUtil.ensureNoDisplay();
+		
+		File confFile;
+		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
+			confFile = new File("bin/settings.conf");
+		}
+		else {
+			File appDataDir = AppUtil.getAppDataDir();
+			confFile = new File(appDataDir, "conf/settings.conf");
+		}
+		
 		try {
-			ConfLoader.load(settingsConfFile, SettingsConf.class, true);
+			ConfLoader.load(confFile, SettingsConf.class, true);
 		}
 		catch (IOException e) {
 			AppUtil.showStackTraceInOwnDisplay(e);
 		}
-		return settingsConfFile;
+		return confFile;
 	}
 
 	private static Control createLeftPanel(Composite parent) {

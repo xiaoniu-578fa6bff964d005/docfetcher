@@ -142,7 +142,7 @@ public final class BuildMain {
 			"${main_class}", Main.class.getName());
 		
 		U.copyTextFile(
-			"dist/program.conf", releaseDir + "/program.conf", LineSep.WINDOWS);
+			"dist/program.conf", releaseDir + "/conf/program.conf", LineSep.WINDOWS);
 		
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");

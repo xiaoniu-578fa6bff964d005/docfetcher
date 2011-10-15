@@ -165,7 +165,7 @@ public final class AppUtil {
 		});
 	}
 	
-	private static void checkConstInitialized() {
+	public static void checkConstInitialized() {
 		if (! initialized) {
 			for (Const value : Const.values()) {
 				if (value.value == null)
@@ -175,7 +175,7 @@ public final class AppUtil {
 		}
 	}
 	
-	private static void ensureNoDisplay() {
+	public static void ensureNoDisplay() {
 		if (display != null)
 			throw new IllegalStateException("Display has already been initialized.");
 	}
@@ -514,6 +514,7 @@ public final class AppUtil {
 		File appDataDir = null;
 		if (Const.IS_DEVELOPMENT_VERSION.asBoolean()) {
 			// The development flag has higher priority than the portable flag
+			// TODO post-release-1.1: Remove this part of the if-clause
 			appDataDir = new File("bin");
 		}
 		else if (Const.IS_PORTABLE.asBoolean()) {
@@ -553,6 +554,14 @@ public final class AppUtil {
 	public static boolean isPortable() {
 		checkConstInitialized();
 		return Const.IS_PORTABLE.asBoolean();
+	}
+	
+	@NotNull
+	public static String getImageDir() {
+		checkConstInitialized();
+		if (Const.IS_DEVELOPMENT_VERSION.asBoolean())
+			return "dist/img";
+		return "img";
 	}
 
 }
