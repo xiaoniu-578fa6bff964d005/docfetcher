@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -153,7 +154,7 @@ public final class TestParseFromZip {
 	private static abstract class ZipAndRun {
 		public ZipAndRun(TestFiles testFile) throws Exception {
 			TFile src = new TFile(testFile.getPath());
-			File dir = Files.createTempDir();
+			File dir = Util.createTempDir();
 			TFile archive = new TFile(dir, "archive.zip");
 			archive.mkdir();
 			TFile dst = new TFile(archive, src.getName());

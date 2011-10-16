@@ -39,7 +39,6 @@ import SevenZip.Archive.SevenZip.Handler;
 
 import com.google.common.base.Predicate;
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 import com.google.common.io.NullOutputStream;
 
 import de.innosystec.unrar.Archive;
@@ -244,7 +243,7 @@ public final class FileFactory {
 						 */
 						TFile tzHtmlFile = (TFile) htmlFile;
 						TFile tzHtmlDir = (TFile) htmlDir;
-						File tempDir = Files.createTempDir();
+						File tempDir = Util.createTempDir();
 						File newHtmlFile = new File(tempDir, tzHtmlFile.getName());
 						File newHtmlDir = new File(tempDir, tzHtmlDir.getName());
 						tzHtmlFile.cp(newHtmlFile);
@@ -462,7 +461,7 @@ public final class FileFactory {
 			FileHeader fh = null;
 			NullOutputStream nullOut = isSolid ? new NullOutputStream() : null;
 			
-			for (int i = 0;; i++) {
+			while (true) {
 				fh = archive.nextFileHeader();
 				if (fh == null) break; // Last entry reached
 				if (fh.isEncrypted() || fh.isDirectory())
@@ -605,7 +604,7 @@ public final class FileFactory {
 				else { // HTML file with HTML folder
 					List<FileDocument> docsDeep = htmlFolder.getDocumentsDeep();
 					docsDeep.add(htmlDoc);
-					File tempDir = Files.createTempDir();
+					File tempDir = Util.createTempDir();
 					archive.unpack(docsDeep, tempDir);
 					File htmlFile = archive.getFile(htmlDoc);
 					return unpackCache.putIfAbsent(cacheKey, htmlFile, tempDir);

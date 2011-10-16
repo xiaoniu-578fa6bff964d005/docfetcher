@@ -88,7 +88,7 @@ public final class FileIndexTest {
 	 */
 	@Test
 	public void testHtmlPairUpdate() throws Exception {
-		File tempDir = Files.createTempDir();
+		File tempDir = Util.createTempDir();
 		File htmlFile = new File(tempDir, "test.html");
 		Files.copy(TestFiles.html.get(), htmlFile);
 		File htmlDir = new File(tempDir, "test_files");
@@ -147,7 +147,7 @@ public final class FileIndexTest {
 		Collections.sort(files);
 		
 		File originalFile = files.get(0);
-		File tempDir = Files.createTempDir();
+		File tempDir = Util.createTempDir();
 		File target = new File(tempDir, "target.7z");
 		
 		int[] expectedCounts = { 1, 1, 1, 1, 1, 0 };
@@ -194,7 +194,7 @@ public final class FileIndexTest {
 	 */
 	@Test
 	public void testIndexUpdateAfterFolderRenaming() throws Exception {
-		File tempDir = Files.createTempDir();
+		File tempDir = Util.createTempDir();
 		
 		// Set up subfolder
 		File subDir1 = new File(tempDir, "Test1");
@@ -221,7 +221,7 @@ public final class FileIndexTest {
 	 */
 	@Test
 	public void testIndexUpdateAfterFileRenaming() throws Exception {
-		File tempDir = Files.createTempDir();
+		File tempDir = Util.createTempDir();
 		
 		File textFile = new File(tempDir, "test.txt");
 		Files.write("Hello World", textFile, Charsets.UTF_8);
@@ -244,7 +244,7 @@ public final class FileIndexTest {
 	 */
 	@Test
 	public void testIndexUpdateAfterRenamingIn7z() throws Exception {
-		File tempDir = Files.createTempDir();
+		File tempDir = Util.createTempDir();
 		
 		ListMap<String, String> files = ListMap.create();
 		files.add("file1.7z", "file2.7z");

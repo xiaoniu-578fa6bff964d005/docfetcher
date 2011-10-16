@@ -62,7 +62,7 @@ public final class SolidArchiveTreeTest {
 				}.runSilently();
 				
 				assertEquals(1, unpackList.size());
-				File tempDir = Files.createTempDir();
+				File tempDir = Util.createTempDir();
 				archive.unpack(unpackList, tempDir);
 				File unpackedFile = archive.getFile(unpackList.get(0));
 				assertTrue(unpackedFile.isFile());

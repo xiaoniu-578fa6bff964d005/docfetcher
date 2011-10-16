@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 
+import com.google.common.io.Files;
+
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.LoopTimer;
 import net.sourceforge.docfetcher.util.Util;
@@ -65,6 +67,10 @@ privileged aspect CodeConventions {
 	declare warning: call(* File.getAbsolutePath())
 	&& !withincode(@SuppressAjWarnings * *(..)):
 		"Use Util.getAbsPath*(...) instead.";
+	
+	declare warning: call(* Files.createTempDir())
+	&& !withincode(@SuppressAjWarnings * *(..)):
+		"Use Util.createTempDir() instead.";
 	
 	declare warning: call(* Closeable+.close(..))
 	&& !withincode(* Closeable+.close(..)):

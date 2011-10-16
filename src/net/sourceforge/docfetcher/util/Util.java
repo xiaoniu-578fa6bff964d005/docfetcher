@@ -72,6 +72,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.WString;
@@ -1182,6 +1183,20 @@ public final class Util {
 		Util.checkNotNull(fileOrDir);
 		return launch(getSystemAbsPath(fileOrDir));
 	}
+	
+	@NotNull
+	@SuppressAjWarnings
+	public static File createTempDir() throws IOException {
+		File dir = Files.createTempDir();
+		
+		/*
+		 * On Mac OS X, Files.createTempDir() will return a symlink, which will
+		 * lead to various problems, e.g. Files.deleteRecursively(File) failing
+		 * to delete the temporary directory. The workaround is to return a
+		 * canonical file on Mac OS X.
+		 */
+		return IS_MAC_OS_X ? dir.getCanonicalFile() : dir;
+	}
 
 	/**
 	 * Equivalent to {@link #createTempFile(String, String, File)
@@ -1218,10 +1233,10 @@ public final class Util {
 		/*
 		 * On Mac OS X, File.createTempFile() will give us a symlink to a file,
 		 * which is not what we want, because our file walker will silently
-		 * ignore symlinks. The workaround is to return a canonical file in this
-		 * case.
+		 * ignore symlinks. The workaround is to return a canonical file on Mac
+		 * OS X.
 		 */
-		if (Util.IS_MAC_OS_X && Util.isSymLink(file))
+		if (Util.IS_MAC_OS_X)
 			file = file.getCanonicalFile();
 		
 		file.deleteOnExit();
