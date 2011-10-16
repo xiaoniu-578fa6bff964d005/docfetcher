@@ -467,8 +467,10 @@ public final class SettingsConf {
 	public static enum FontDescription implements Storable {
 		PreviewWindows ("Verdana", 10, SWT.NORMAL),
 		PreviewLinux ("Sans", 10, SWT.NORMAL),
+		PreviewMacOsX ("Helvetica", 12, SWT.NORMAL),
 		PreviewMonoWindows ("Courier New", 10, SWT.NORMAL),
 		PreviewMonoLinux ("Monospace", 10, SWT.NORMAL),
+		PreviewMonoMacOsX ("Monaco", 10, SWT.NORMAL),
 		;
 
 		private static Pattern fontPattern = Pattern.compile(

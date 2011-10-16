@@ -69,17 +69,23 @@ final class HighlightingText {
 	public void setUseMonoFont(boolean useMonoFont) {
 		if (useMonoFont) {
 			if (monoFont == null) {
-				monoFont = Util.IS_WINDOWS
-				? FontDescription.PreviewMonoWindows.get()
-				: FontDescription.PreviewMonoLinux.get();
+				if (Util.IS_WINDOWS)
+					monoFont = FontDescription.PreviewMonoWindows.get();
+				else if (Util.IS_LINUX)
+					monoFont = FontDescription.PreviewMonoLinux.get();
+				else if (Util.IS_MAC_OS_X)
+					monoFont = FontDescription.PreviewMonoMacOsX.get();
 			}
 			textViewer.setFont(monoFont);
 		}
 		else {
 			if (normalFont == null) {
-				normalFont = Util.IS_WINDOWS
-				? FontDescription.PreviewWindows.get()
-				: FontDescription.PreviewLinux.get();
+				if (Util.IS_WINDOWS)
+					normalFont = FontDescription.PreviewWindows.get();
+				else if (Util.IS_LINUX)
+					normalFont = FontDescription.PreviewLinux.get();
+				else if (Util.IS_MAC_OS_X)
+					normalFont = FontDescription.PreviewMacOsX.get();
 			}
 			textViewer.setFont(normalFont);
 		}
