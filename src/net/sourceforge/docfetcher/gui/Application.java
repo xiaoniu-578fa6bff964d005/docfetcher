@@ -48,6 +48,7 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap;
+import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.StatusManager;
@@ -167,6 +168,7 @@ public final class Application {
 		else
 			shell.setText(ProgramConf.Str.AppName.get());
 		
+		initCocoaMenu(display);
 		initSystemTrayHider();
 
 		ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
@@ -606,6 +608,26 @@ public final class Application {
 		systemTrayHider.evtShutdown.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				shell.close();
+			}
+		});
+	}
+
+	private static void initCocoaMenu(@NotNull Display display) {
+		if (!Util.IS_MAC_OS_X)
+			return;
+		
+		CocoaUIEnhancer cocoaUIEnhancer = new CocoaUIEnhancer(ProgramConf.Str.AppName.get());
+		cocoaUIEnhancer.hookApplicationMenu(display, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+//				shell.close(); // Not necessary
+			}
+		}, new Runnable() {
+			public void run() {
+				// TODO post-release-1.1: Show an about dialog? Or maybe open a manual page?
+			}
+		}, new Runnable() {
+			public void run() {
+				// TODO now: Open preferences dialog
 			}
 		});
 	}
