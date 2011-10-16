@@ -18,7 +18,6 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.MemoryList;
-import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
 import org.eclipse.swt.SWT;
@@ -28,7 +27,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -106,21 +105,30 @@ public final class SearchBar {
 					}
 				}).create();
 		
+		comp.setLayout(Util.createGridLayout(3, false, 0, 0));
+		
 		final int searchBoxMaxWidth = ProgramConf.Int.SearchBoxMaxWidth.get();
-		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.margin(0).top().bottom().right().applyTo(toolBar);
-		fdf.unright().left(searchBox).applyTo(searchBt);
-		fdf.left().width(searchBoxMaxWidth).applyTo(searchBox);
+		final GridData searchBoxGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		searchBoxGridData.widthHint = searchBoxMaxWidth;
+		searchBox.setLayoutData(searchBoxGridData);
+		
+		searchBt.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+		toolBar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
 		
 		// Make the search box smaller when there's not enough space left
 		comp.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				int spaceLeft = comp.getSize().x;
-				spaceLeft -= toolBar.getSize().x;
-				spaceLeft -= searchBt.getSize().x;
-				spaceLeft -= comp.getBorderWidth() * 2;
-				FormData formData = (FormData) searchBox.getLayoutData();
-				formData.width = Util.clamp(spaceLeft, 0, searchBoxMaxWidth);
+				spaceLeft -= toolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+				spaceLeft -= searchBt.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+				
+				/*
+				 * The minimum value for this is platform dependent. 10 pixel
+				 * should be large enough for all platforms.
+				 */
+				spaceLeft -= 10;
+				
+				searchBoxGridData.widthHint = Util.clamp(spaceLeft, 0, searchBoxMaxWidth);
 				comp.layout();
 			}
 		});

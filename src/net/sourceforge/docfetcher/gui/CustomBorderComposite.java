@@ -31,7 +31,6 @@ public class CustomBorderComposite extends Composite {
 		super(parent, Util.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
 		if (Util.IS_WINDOWS)
 			UtilGui.paintBorder(this);
-		setLayout(Util.createFormLayout(Util.IS_WINDOWS ? 2 : 0));
 	}
 
 }
