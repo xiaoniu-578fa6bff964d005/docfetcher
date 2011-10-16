@@ -144,8 +144,8 @@ public abstract class VirtualTableViewer<E> {
 		Util.checkNotNull(rootElement);
 		Util.checkThat(!columns.isEmpty());
 		elements = Util.checkNotNull(getElements(rootElement));
+		table.setItemCount(elements.size()); // Must be called *before* calling clearAll()
 		table.clearAll();
-		table.setItemCount(elements.size());
 		lastSortColumn = null;
 	}
 	
