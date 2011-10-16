@@ -122,18 +122,25 @@ public final class BuildMain {
 			"%s/lib/%s", releaseDir, tmpMainJar.getName());
 		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
 		
-		String linuxLauncher = U.format("%s/%s.sh", releaseDir, appName);
+		String linuxLauncher = U.format("%s/%s-Linux.sh", releaseDir, appName);
 		U.copyTextFile(
-			"dist/launcher.sh", linuxLauncher, LineSep.UNIX,
+			"dist/launcher-linux.sh", linuxLauncher, LineSep.UNIX,
 			"${main_class}", Main.class.getName()
 		);
 		
-		if (Util.IS_LINUX) {
+		String macOsXLauncher = U.format("%s/%s-MacOSX.command", releaseDir, appName);
+		U.copyTextFile(
+			"dist/launcher-macosx.sh", macOsXLauncher, LineSep.UNIX,
+			"${main_class}", Main.class.getName()
+		);
+		
+		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
 			U.exec("chmod +x %s", Util.getAbsPath(linuxLauncher));
+			U.exec("chmod +x %s", Util.getAbsPath(macOsXLauncher));
 		}
 		else {
 			Util.printErr("Warning: Cannot make the" +
-					"Linux launcher script executable.");
+					" launcher shell script executable.");
 		}
 		
 		String batLauncher = U.format("%s/%s.bat", releaseDir, appName);
