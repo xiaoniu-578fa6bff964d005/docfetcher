@@ -393,9 +393,9 @@ public final class Util {
 											@NotNull String labelText) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(labelText);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		Text text = new Text(parent, SWT.BORDER | SWT.SINGLE);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
 	}
 	

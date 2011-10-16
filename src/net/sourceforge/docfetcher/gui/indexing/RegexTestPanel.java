@@ -25,14 +25,13 @@ import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -79,11 +78,10 @@ final class RegexTestPanel extends Composite {
 			}
 		});
 		
-		setLayout(new FormLayout());
-		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.bottom().right().applyTo(fileChooserBt);
-		fdf.margin(0).left(0, 5).right(fileChooserBt).applyTo(fileBox);
-		fdf.reset().left().right().top().bottom(fileBox).applyTo(label);
+		setLayout(Util.createGridLayout(2, false, 0, 0));
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 2, 1));
+		fileBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		fileChooserBt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 	}
 	
 	public void setPatternActions(@NotNull List<PatternAction> patternActions) {
