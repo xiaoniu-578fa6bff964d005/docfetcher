@@ -116,7 +116,7 @@ public final class BuildMain {
 		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
 		U.copyFlatten("lib", releaseDir + "/lib", "**/*.jar", excludedLibs);
 		U.copyFlatten("lib", releaseDir + "/lib/swt", "**/swt*.jar", null);
-		U.copyFlatten("lib", releaseDir + "/lib", "**/*.so, **/*.dll", null);
+		U.copyFlatten("lib", releaseDir + "/lib", "**/*.so, **/*.dll, **/*.dylib", null);
 		
 		String dstMainJar = U.format(
 			"%s/lib/%s", releaseDir, tmpMainJar.getName());
