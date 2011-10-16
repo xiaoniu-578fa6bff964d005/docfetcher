@@ -1214,6 +1214,16 @@ public final class Util {
 		if (prefixLength < 3)
 			prefix += Strings.repeat("_", 3 - prefixLength);
 		File file = File.createTempFile(prefix, suffix, directory);
+		
+		/*
+		 * On Mac OS X, File.createTempFile() will give us a symlink to a file,
+		 * which is not what we want, because our file walker will silently
+		 * ignore symlinks. The workaround is to return a canonical file in this
+		 * case.
+		 */
+		if (Util.IS_MAC_OS_X && Util.isSymLink(file))
+			file = file.getCanonicalFile();
+		
 		file.deleteOnExit();
 		return file;
 	}
