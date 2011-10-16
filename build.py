@@ -6,8 +6,11 @@ program in the package 'net.sourceforge.docfetcher.build'. This script merely
 compiles and launches the Java builder.
 '''
 
-import os, shutil
+import os, shutil, platform
 from os.path import exists, join, isfile, isdir
+
+is_windows = 'windows' in platform.system().lower()
+classpath_sep = ';' if is_windows else ':'
 
 print 'Cleaning build directory...'
 if not exists('build'):
@@ -54,7 +57,7 @@ for root, dirs, files in os.walk('build/tmp/src-builder'):
 execute([
 	'javac',
 	'-sourcepath build/tmp/src-builder',
-	'-classpath \"%s\"' % ':'.join(jars),
+	'-classpath \"%s\"' % classpath_sep.join(jars),
 	'-nowarn',
 	' '.join(compile_paths)
 ])
@@ -75,6 +78,6 @@ print '-' * 40
 jars.append(jar_path)
 execute([
 	'java',
-	'-classpath \"%s\"' % ':'.join(jars),
+	'-classpath \"%s\"' % classpath_sep.join(jars),
 	main_class
 ])
