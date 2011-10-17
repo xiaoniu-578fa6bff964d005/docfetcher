@@ -71,6 +71,7 @@ final class PatternTable extends Composite {
 		display.dispose();
 	}
 	
+	private final LuceneIndex index;
 	@NotNull private SimpleTableViewer<PatternAction> tableViewer;
 	private final RegexTestPanel regexTestPanel;
 	private boolean storeRelativePaths;
@@ -79,6 +80,7 @@ final class PatternTable extends Composite {
 						@NotNull LuceneIndex index) {
 		// TODO i18n
 		super(parent, SWT.NONE);
+		this.index = index;
 		setLayout(Util.createGridLayout(2, false, 0, 5));
 		
 		Table table = createTable();
@@ -94,6 +96,8 @@ final class PatternTable extends Composite {
 		
 		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 2));
 		regexTestPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		restoreDefaults();
 	}
 	
 	@NotNull
@@ -196,7 +200,7 @@ final class PatternTable extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				tableViewer.add(new PatternAction());
 				tableViewer.showElement(tableViewer.getItemCount() - 1);
-				regexTestPanel.setPatternActions(tableViewer.getSelection());
+				updateRegexTestPanel();
 			}
 		});
 		
@@ -206,7 +210,7 @@ final class PatternTable extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				for (PatternAction patternAction : tableViewer.getSelection())
 					tableViewer.remove(patternAction);
-				regexTestPanel.setPatternActions(tableViewer.getSelection());
+				updateRegexTestPanel();
 			}
 		});
 		
@@ -244,8 +248,11 @@ final class PatternTable extends Composite {
 		return tableViewer.getElements();
 	}
 	
-	public void removeAll() {
+	public void restoreDefaults() {
 		tableViewer.removeAll();
+		for (PatternAction patternAction : index.getConfig().getPatternActions())
+			tableViewer.add(patternAction);
+		updateRegexTestPanel();
 	}
 	
 }

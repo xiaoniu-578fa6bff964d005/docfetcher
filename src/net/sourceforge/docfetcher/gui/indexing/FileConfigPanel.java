@@ -203,7 +203,7 @@ final class FileConfigPanel extends ConfigPanel {
 		
 		extGroupWrapper.setTextExtensions(config.getTextExtensions());
 		extGroupWrapper.setZipExtensions(config.getZipExtensions());
-		patternTable.removeAll();
+		patternTable.restoreDefaults();
 		
 		htmlPairingBt.setSelection(config.isHtmlPairing());
 		detectExecArchivesBt.setSelection(config.isDetectExecutableArchives());

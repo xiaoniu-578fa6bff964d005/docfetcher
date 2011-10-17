@@ -45,13 +45,18 @@ public final class PatternAction implements Serializable {
 		}
 	}
 	
-	@NotNull private String regex = "regex";
+	@NotNull private String regex;
 	@Nullable private transient Pattern pattern;
 	
 	@NotNull private MatchTarget target = MatchTarget.FILENAME;
 	@NotNull private MatchAction action = MatchAction.EXCLUDE;
 	
 	public PatternAction() {
+		this("regex");
+	}
+	
+	public PatternAction(@NotNull String regex) {
+		this.regex = regex;
 	}
 	
 	// might throw PatternSyntaxException

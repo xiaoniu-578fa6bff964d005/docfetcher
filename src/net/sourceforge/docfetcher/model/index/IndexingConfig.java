@@ -51,6 +51,9 @@ public class IndexingConfig implements Serializable {
 	
 	public static final List<String> defaultZipExtensions = Arrays.asList("zip", "jar");
 	public static final List<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	private static final List<PatternAction> defaultPatternActions = Arrays.asList(
+		new PatternAction(".*\\.class"),
+		new PatternAction(".*\\.pyc"));
 	
 	public static final List<String> hiddenZipExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
@@ -61,7 +64,7 @@ public class IndexingConfig implements Serializable {
 	
 	@NotNull private List<String> zipExtensions = defaultZipExtensions;
 	@NotNull private List<String> textExtensions = defaultTextExtensions;
-	@NotNull private List<PatternAction> patternActions = Collections.emptyList();
+	@NotNull private List<PatternAction> patternActions = defaultPatternActions;
 	
 	private boolean htmlPairing = true;
 	private boolean detectExecutableArchives = false;
