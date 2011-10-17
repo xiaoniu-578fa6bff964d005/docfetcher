@@ -449,6 +449,7 @@ public final class AppUtil {
 				"java.runtime.name",
 				"java.runtime.version",
 				"java.version",
+				"sun.arch.data.model",
 				"os.arch",
 				"os.name",
 				"os.version",
