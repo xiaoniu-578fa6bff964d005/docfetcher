@@ -32,7 +32,7 @@ public final class TabFolderFactory {
 	
 	private TabFolderFactory() {}
 	
-	public static CTabFolder create(Composite parent,
+	public static CTabFolder create(@NotNull Composite parent,
 									boolean close,
 									boolean curvyTabs,
 									boolean coloredTabs) {
@@ -44,12 +44,13 @@ public final class TabFolderFactory {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setSimple(false);
 			if (coloredTabs) {
-				updateColors(tabFolder);
+				final TextAreaColorsImpl textAreaColors = new TextAreaColorsImpl(tabFolder);
+				textAreaColors.setColors();
 				
 				// Adapt colors to OS theme changes
 				tabFolder.getDisplay().addListener(SWT.Settings, new Listener() {
 					public void handleEvent(Event event) {
-						updateColors(tabFolder);
+						textAreaColors.setColors();
 					}
 				});
 			}
@@ -68,51 +69,58 @@ public final class TabFolderFactory {
 		return tabFolder;
 	}
 
-	private static void updateColors(@NotNull CTabFolder tabFolder) {
-		Color colBack = Col.TITLE_BACKGROUND.get();
-		Color colFront = Col.TITLE_FOREGROUND.get();
-		if (!colFront.equals(colBack)) {
-			tabFolder.setSelectionBackground(colBack);
-			tabFolder.setSelectionForeground(colFront);
+	private static class TextAreaColorsImpl extends TextAreaColors {
+		private final CTabFolder tabFolder;
+		
+		public TextAreaColorsImpl(@NotNull CTabFolder tabFolder) {
+			super(tabFolder);
+			this.tabFolder = tabFolder;
+		}
+		protected Color getBackground() {
+			return Col.TITLE_BACKGROUND.get();
+		}
+		public void setColors() {
+			tabFolder.setSelectionBackground(getBackground());
+			tabFolder.setSelectionForeground(getForeground());
 		}
 	}
 	
 	private static class CustomRenderer extends CTabFolderRenderer {
-		private CTabFolder tabFolder;
-		private boolean coloredTabs;
-		public CustomRenderer(CTabFolder tabFolder, boolean coloredTabs) {
+		private final CTabFolder tabFolder;
+		private final boolean coloredTabs;
+		private final TextAreaColorsImpl textAreaColors;
+		
+		public CustomRenderer(@NotNull CTabFolder tabFolder, boolean coloredTabs) {
 			super(tabFolder);
 			this.tabFolder = tabFolder;
 			this.coloredTabs = coloredTabs;
+			textAreaColors = new TextAreaColorsImpl(tabFolder);
 		}
 		protected void draw(int part, int state, Rectangle bounds, GC gc) {
 			// Tab states
 			boolean isHot = Util.contains(state, SWT.HOT);
 			boolean isSelected = Util.contains(state, SWT.SELECTED);
-			boolean doUseColoredTabs = coloredTabs;
-			if (coloredTabs && Col.TITLE_FOREGROUND.get().equals(Col.TITLE_BACKGROUND.get()))
-				doUseColoredTabs = false; // colored tabs sometimes make the text indiscernible
 			
 			// Color definitions
-			Col borderCol = doUseColoredTabs
-				? Col.TITLE_BACKGROUND
-				: Col.WIDGET_NORMAL_SHADOW;
-			Col backCol = null;
+			Color borderCol = coloredTabs
+				? textAreaColors.getBackground()
+				: Col.WIDGET_NORMAL_SHADOW.get();
+			Color backCol = null;
 			if (isHot || isSelected)
-				backCol = doUseColoredTabs
-					? Col.TITLE_BACKGROUND
-					: Col.WIDGET_HIGHLIGHT_SHADOW;
+				backCol = coloredTabs
+					? textAreaColors.getBackground()
+					: Col.WIDGET_HIGHLIGHT_SHADOW.get();
 			else
-				backCol = Col.WIDGET_BACKGROUND;
-			Col shadowCol = Col.WIDGET_DARK_SHADOW;
-			Col textCol = doUseColoredTabs && (isSelected || isHot)
-				? Col.TITLE_FOREGROUND
-				: Col.WIDGET_FOREGROUND;
+				backCol = Col.WIDGET_BACKGROUND.get();
+			Color shadowCol = Col.WIDGET_DARK_SHADOW.get();
+			Color textCol = coloredTabs && (isSelected || isHot)
+				? textAreaColors.getForeground()
+				: Col.WIDGET_FOREGROUND.get();
 			
 			// Draw separating line between tabs and body
 			if (Util.contains(part, CTabFolderRenderer.PART_HEADER)) {
 				int tabHeight = tabFolder.getTabHeight();
-				gc.setForeground(borderCol.get());
+				gc.setForeground(borderCol);
 				/*
 				 * The drawn line must be shifted down by 1 pixel, otherwise it
 				 * will overlap with the tabfolder menu.
@@ -153,16 +161,16 @@ public final class TabFolderFactory {
 			
 			// Draw tab shadow
 			if (isHot) {
-				gc.setForeground(shadowCol.get());
+				gc.setForeground(shadowCol);
 				gc.drawRectangle(rect);
 			}
 			
 			// Draw tab background
-			gc.setBackground(backCol.get());
+			gc.setBackground(backCol);
 			gc.fillRectangle(rectShifted);
 
 			// Draw tab border
-			gc.setForeground(borderCol.get());
+			gc.setForeground(borderCol);
 			if (isHot) {
 				gc.drawRectangle(rectShifted);
 			}
@@ -193,7 +201,7 @@ public final class TabFolderFactory {
 			// Draw tab text
 			String text = item.getText();
 			Point textExt = gc.textExtent(text);
-			gc.setForeground(textCol.get());
+			gc.setForeground(textCol);
 			gc.drawString(text,
 					bounds.x + imgEndOffset + margin + hotShift,
 					bounds.y + (bounds.height - textExt.y) / 2 + hotShift + vShift,
