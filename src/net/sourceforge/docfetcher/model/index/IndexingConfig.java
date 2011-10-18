@@ -49,8 +49,8 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 @SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
 	
-	public static final List<String> defaultZipExtensions = Arrays.asList("zip", "jar");
-	public static final List<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
+	private static final List<String> defaultZipExtensions = Arrays.asList("zip", "jar");
+	private static final List<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
 	private static final List<PatternAction> defaultPatternActions = Arrays.asList(
 		new PatternAction(".*\\.class"),
 		new PatternAction(".*\\.pyc"));
