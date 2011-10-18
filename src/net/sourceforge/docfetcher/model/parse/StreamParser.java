@@ -13,8 +13,6 @@ package net.sourceforge.docfetcher.model.parse;
 
 import java.io.InputStream;
 
-import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
@@ -27,16 +25,14 @@ abstract class StreamParser extends Parser {
 	// immediately if possible and return the partially extracted text.
 	@NotNull
 	protected abstract ParseResult parse(	@NotNull InputStream in,
-	                                     	@NotNull IndexingReporter reporter,
-											@NotNull Cancelable cancelable)
+	                                     	@NotNull ParseContext context)
 			throws ParseException;
 	
 	@NotNull
 	protected String renderText(@NotNull InputStream in,
-								@NotNull Cancelable cancelable)
+								@NotNull ParseContext context)
 			throws ParseException {
-		ParseResult parseResult = parse(in, IndexingReporter.nullReporter, cancelable);
-		return parseResult.getContent().toString();
+		return parse(in, context).getContent().toString();
 	}
 
 }

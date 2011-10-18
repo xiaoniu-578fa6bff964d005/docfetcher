@@ -15,16 +15,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
+import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.parse.HtmlParser;
 import net.sourceforge.docfetcher.model.parse.PagingPdfParser;
+import net.sourceforge.docfetcher.model.parse.ParseContext;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
@@ -225,7 +228,11 @@ public final class ResultDocument {
 		try {
 			fileResource = getFileResource();
 			File file = fileResource.getFile();
-			return ParseService.renderText(config, file, parserName);
+			ParseContext context = new ParseContext(
+				getFilename(), getPath(), IndexingReporter.nullReporter,
+				Cancelable.nullCancelable);
+			return ParseService.renderText(
+				config, file, parserName, context);
 		}
 		finally {
 			if (fileResource != null)

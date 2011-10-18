@@ -21,8 +21,6 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
-import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -41,9 +39,9 @@ public final class HtmlParser extends StreamParser {
 	HtmlParser() {
 	}
 	
+	@Override
 	public ParseResult parse(	InputStream in,
-								IndexingReporter reporter,
-								Cancelable cancelable) throws ParseException {
+	                         	ParseContext context) throws ParseException {
 		Source source;
 		try {
 			source = new Source(in);
@@ -93,7 +91,7 @@ public final class HtmlParser extends StreamParser {
 	}
 	
 	@Override
-	protected String renderText(InputStream in, Cancelable cancelable)
+	protected String renderText(InputStream in, ParseContext context)
 			throws ParseException {
 		try {
 			Source source = new Source(in);

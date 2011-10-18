@@ -17,8 +17,6 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -38,9 +36,9 @@ public final class PdfParser extends StreamParser {
 	PdfParser() {
 	}
 	
+	@Override
 	protected ParseResult parse(@NotNull InputStream in,
-	                            @NotNull final IndexingReporter reporter,
-								@NotNull final Cancelable cancelable)
+	                            @NotNull final ParseContext context)
 			throws ParseException {
 		PDDocument pdfDoc = null;
 		try {
@@ -63,10 +61,10 @@ public final class PdfParser extends StreamParser {
 			 */
 			PDFTextStripper stripper = new PDFTextStripper() {
 				protected void startPage(PDPage page) throws IOException {
-					reporter.subInfo(getCurrentPageNo(), pageCount);
+					context.getReporter().subInfo(getCurrentPageNo(), pageCount);
 				}
 				protected void endPage(PDPage page) throws IOException {
-					if (cancelable.isCanceled())
+					if (context.getCancelable().isCanceled())
 						setEndPage(0);
 				}
 			};

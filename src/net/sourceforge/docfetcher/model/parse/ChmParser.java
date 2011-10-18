@@ -14,9 +14,6 @@ package net.sourceforge.docfetcher.model.parse;
 import java.io.File;
 import java.util.Collection;
 
-import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
-
 /**
  * @author Tran Nam Quang
  */
@@ -24,9 +21,9 @@ final class ChmParser extends FileParser {
 
 	// TODO websearch: parser
 	
+	@Override
 	protected ParseResult parse(File file,
-								IndexingReporter reporter,
-								Cancelable cancelable) throws ParseException {
+								ParseContext context) throws ParseException {
 		return null;
 	}
 

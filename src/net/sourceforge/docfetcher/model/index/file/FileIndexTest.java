@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.model.NullCancelable;
+import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
@@ -49,10 +49,10 @@ public final class FileIndexTest {
 		File file = TestFiles.archive_zip_rar_7z.get();
 		FileIndex index = new FileIndex(null, file);
 		CountingReporter reporter = new CountingReporter();
-		index.update(reporter, NullCancelable.getInstance());
+		index.update(reporter, Cancelable.nullCancelable);
 		assertEquals(reporter.counter, 1);
 		index.clear();
-		index.update(reporter, NullCancelable.getInstance());
+		index.update(reporter, Cancelable.nullCancelable);
 		assertEquals(reporter.counter, 2);
 	}
 	
@@ -69,7 +69,7 @@ public final class FileIndexTest {
 		for (File file : files) {
 			FileIndex index = new FileIndex(null, file);
 			index.getConfig().setDetectExecutableArchives(true);
-			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 			Directory luceneDir = index.getLuceneDir();
 
 			/*
@@ -105,9 +105,9 @@ public final class FileIndexTest {
 		final CountingReporter reporter = new CountingReporter();
 		
 		// Index update should not detect any changes when nothing was modified
-		index.update(reporter, NullCancelable.getInstance());
+		index.update(reporter, Cancelable.nullCancelable);
 		assertEquals(1, reporter.counter);
-		index.update(reporter, NullCancelable.getInstance());
+		index.update(reporter, Cancelable.nullCancelable);
 		assertEquals(1, reporter.counter);
 		
 		// Index update must detect changes when files have been modified
@@ -124,7 +124,7 @@ public final class FileIndexTest {
 			int expectedCount = entry.getValue().intValue();
 			file.setLastModified(System.currentTimeMillis() + (i + 1) * 1000);
 			
-			index.update(reporter, NullCancelable.getInstance());
+			index.update(reporter, Cancelable.nullCancelable);
 			
 			String msg = String.format("On '%s'.", file.getName());
 			assertEquals(msg, expectedCount, reporter.counter);
@@ -134,7 +134,7 @@ public final class FileIndexTest {
 		// Index update must detect change when HTML folder is deleted
 		Files.deleteRecursively(htmlDir);
 		reporter.counter = 0;
-		index.update(reporter, NullCancelable.getInstance());
+		index.update(reporter, Cancelable.nullCancelable);
 		assertEquals(1, reporter.counter);
 		
 		Files.deleteRecursively(tempDir);
@@ -164,12 +164,12 @@ public final class FileIndexTest {
 				
 				Files.copy(file1, target);
 				target.setLastModified(System.currentTimeMillis() - 1000);
-				index.update(new IndexingReporter(), NullCancelable.getInstance());
+				index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 				
 				Files.copy(file2, target);
 				CountingReporter reporter2 = new CountingReporter();
 				
-				index.update(reporter2, NullCancelable.getInstance());
+				index.update(reporter2, Cancelable.nullCancelable);
 				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
 				
 				Files.deleteDirectoryContents(tempDir);
@@ -204,13 +204,13 @@ public final class FileIndexTest {
 		
 		// Create index
 		FileIndex index = new FileIndex(null, tempDir);
-		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		// Rename subfolder, then update index
 		File subDir2 = new File(tempDir, "Test2");
 		subDir1.renameTo(subDir2);
-		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		Files.deleteRecursively(tempDir);
@@ -227,12 +227,12 @@ public final class FileIndexTest {
 		Files.write("Hello World", textFile, Charsets.UTF_8);
 		
 		FileIndex index = new FileIndex(null, tempDir);
-		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		textFile.renameTo(new File(tempDir, "test2.txt"));
 		
-		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		Files.deleteRecursively(tempDir);
@@ -259,11 +259,11 @@ public final class FileIndexTest {
 			Files.copy(oldFile, target);
 			
 			FileIndex index = new FileIndex(null, tempDir);
-			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 			
 			Files.copy(newFile, target);
-			index.update(new IndexingReporter(), NullCancelable.getInstance());
+			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		}
 		
@@ -279,11 +279,11 @@ public final class FileIndexTest {
 		File dir = TestFiles.index_update_html_in_html.get();
 		FileIndex index = new FileIndex(null, dir);
 		
-		index.update(new IndexingReporter(), NullCancelable.getInstance());
+		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
 		UtilModel.assertDocCount(index.getLuceneDir(), 2);
 		
 		CountingReporter countingReporter = new CountingReporter();
-		index.update(countingReporter, NullCancelable.getInstance());
+		index.update(countingReporter, Cancelable.nullCancelable);
 		assertEquals(0, countingReporter.counter);
 	}
 	

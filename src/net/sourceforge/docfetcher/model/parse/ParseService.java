@@ -25,12 +25,9 @@ import java.util.List;
 import java.util.Locale;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
-import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.NullCancelable;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
-import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
@@ -66,7 +63,8 @@ public final class ParseService {
 		// TextParser must have high priority since its file extensions can be customized
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
-		new PdfParser()
+		new PdfParser(),
+		new AbiWordParser()
 	};
 
 	private ParseService() {}
@@ -83,16 +81,15 @@ public final class ParseService {
 	// Accepts TrueZIP files
 	@NotNull
 	public static ParseResult parse(@NotNull IndexingConfig config,
-	                                @NotNull String filename,
-	                                @NotNull Path filepath,
 	                                @NotNull File file,
-	                                @NotNull IndexingReporter reporter,
-	                                @NotNull Cancelable cancelable)
+	                                @NotNull ParseContext context)
 			throws ParseException, CheckedOutOfMemoryError {
 		// Search for appropriate parser by mimetype
 		for (PatternAction patternAction : config.getPatternActions()) {
 			if (patternAction.getAction() != MatchAction.DETECT_MIME)
 				continue;
+			String filename = context.getFilename();
+			Path filepath = context.getFilepath();
 			if (!patternAction.matches(filename, filepath, true))
 				continue;
 			try {
@@ -101,7 +98,7 @@ public final class ParseService {
 					if (Collections.disjoint(mimeTypes, parser.getTypes()))
 						continue;
 					try {
-						return doParse(config, parser, file, reporter, cancelable);
+						return doParse(config, parser, file, context);
 					}
 					catch (ParseException e) {
 						// Try next parser
@@ -116,7 +113,7 @@ public final class ParseService {
 		// Search for appropriate parser by filename
 		Parser parser = findParser(config, file.getName());
 		if (parser != null)
-			return doParse(config, parser, file, reporter, cancelable);
+			return doParse(config, parser, file, context);
 		
 		/*
 		 * Fall back to filename parser if allowed. The filename will be added
@@ -133,8 +130,7 @@ public final class ParseService {
 	private static ParseResult doParse(	@NotNull IndexingConfig config,
 										@NotNull Parser parser,
 										@NotNull File file,
-										@NotNull IndexingReporter reporter,
-										@NotNull Cancelable cancelable)
+										@NotNull ParseContext context)
 			throws ParseException, CheckedOutOfMemoryError {
 		try {
 			ParseResult result = null;
@@ -149,7 +145,7 @@ public final class ParseService {
 					else
 						in = new FileInputStream(file);
 					StreamParser streamParser = (StreamParser) parser;
-					result = streamParser.parse(in, reporter, cancelable);
+					result = streamParser.parse(in, context);
 				}
 				catch (FileNotFoundException e) {
 					throw new ParseException(e);
@@ -161,7 +157,7 @@ public final class ParseService {
 			else if (parser instanceof OOoParser) {
 				// The OOo parser can handle both regular files and TrueZIP files
 				OOoParser oooParser = (OOoParser) parser;
-				result = oooParser.parse(file, reporter, cancelable);
+				result = oooParser.parse(file, context);
 			}
 			else if (parser instanceof FileParser) {
 				FileParser fileParser = (FileParser) parser;
@@ -172,7 +168,7 @@ public final class ParseService {
 					try {
 						tempFile = config.createDerivedTempFile(tzFile.getName());
 						tzFile.cp(tempFile);
-						result = fileParser.parse(tempFile, reporter, cancelable);
+						result = fileParser.parse(tempFile, context);
 					}
 					catch (IndexingException e) {
 						throw new ParseException(e.getIOException());
@@ -185,7 +181,7 @@ public final class ParseService {
 							tempFile.delete();
 					}
 				} else {
-					result = fileParser.parse(file, reporter, cancelable);
+					result = fileParser.parse(file, context);
 				}
 			} else {
 				throw new IllegalStateException();
@@ -207,14 +203,15 @@ public final class ParseService {
 	@NotNull
 	public static String renderText(@NotNull IndexingConfig config,
 	                                @NotNull File file,
-									@NotNull String parserName)
+									@NotNull String parserName,
+									@NotNull ParseContext context)
 			throws ParseException, CheckedOutOfMemoryError {
 		Util.checkThat(! (file instanceof TFile));
 		if (parserName.equals(FILENAME_PARSER)) {
 			assert config.isIndexFilenames();
 			return "";
 		}
-		NullCancelable cancelable = NullCancelable.getInstance();
+		
 		for (Parser parser : parsers) {
 			if (!parser.getClass().getSimpleName().equals(parserName))
 				continue;
@@ -223,7 +220,7 @@ public final class ParseService {
 					InputStream in = null;
 					try {
 						in = new FileInputStream(file);
-						return ((StreamParser) parser).renderText(in, cancelable);
+						return ((StreamParser) parser).renderText(in, context);
 					}
 					catch (FileNotFoundException e) {
 						throw new ParseException(e);
@@ -233,7 +230,7 @@ public final class ParseService {
 					}
 				}
 				else if (parser instanceof FileParser) {
-					return ((FileParser) parser).renderText(file, cancelable);
+					return ((FileParser) parser).renderText(file, context);
 				}
 			}
 			catch (OutOfMemoryError e) {

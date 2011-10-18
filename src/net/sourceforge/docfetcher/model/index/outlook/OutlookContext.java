@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.MutableInt;
+import net.sourceforge.docfetcher.model.parse.ParseContext;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -123,8 +124,10 @@ final class OutlookContext {
 				// TODO now: Don't try to parse all files -> call ParseService.canParse
 				// TODO post-release-1.1: Maybe recurse into archive attachments
 				Path path = doc.getPath().createSubPath(filename);
+				ParseContext parseContext = new ParseContext(
+					filename, path, reporter, cancelable);
 				ParseResult parseResult = ParseService.parse(
-					config, filename, path, tempFile, reporter, cancelable);
+					config, tempFile, parseContext);
 				luceneDoc.add(Fields.createContent(parseResult.getContent()));
 				StringBuilder metadata = parseResult.getMetadata();
 				metadata.append(filename);
