@@ -1026,7 +1026,7 @@ public final class Util {
 	}
 	
 	@NotNull
-	public static <T> List<T> createEmptyList(@NotNull Collection<T>... cols) {
+	public static <T> List<T> createEmptyList(@NotNull Collection<?>... cols) {
 		int size = 0;
 		for (int i = 0; i < cols.length; i++)
 			size += cols[i].size();

@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +29,10 @@ import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.model.parse.OOoParser.OOoCalcParser;
+import net.sourceforge.docfetcher.model.parse.OOoParser.OOoDrawParser;
+import net.sourceforge.docfetcher.model.parse.OOoParser.OOoImpressParser;
+import net.sourceforge.docfetcher.model.parse.OOoParser.OOoWriterParser;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
@@ -37,6 +40,7 @@ import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Closeables;
 
 import de.schlichtherle.truezip.file.TFile;
@@ -64,7 +68,11 @@ public final class ParseService {
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
 		new PdfParser(),
-		new AbiWordParser()
+		new AbiWordParser(),
+		new OOoWriterParser(),
+		new OOoCalcParser(),
+		new OOoDrawParser(),
+		new OOoImpressParser()
 	};
 
 	private ParseService() {}
@@ -154,11 +162,6 @@ public final class ParseService {
 					Closeables.closeQuietly(in);
 				}
 			}
-			else if (parser instanceof OOoParser) {
-				// The OOo parser can handle both regular files and TrueZIP files
-				OOoParser oooParser = (OOoParser) parser;
-				result = oooParser.parse(file, context);
-			}
 			else if (parser instanceof FileParser) {
 				FileParser fileParser = (FileParser) parser;
 				if (isZipEntry(file)) {
@@ -180,10 +183,12 @@ public final class ParseService {
 						if (tempFile != null)
 							tempFile.delete();
 					}
-				} else {
+				}
+				else {
 					result = fileParser.parse(file, context);
 				}
-			} else {
+			}
+			else {
 				throw new IllegalStateException();
 			}
 			String parserName = parser.getClass().getSimpleName();
@@ -237,7 +242,7 @@ public final class ParseService {
 				throw new CheckedOutOfMemoryError(e);
 			}
 		}
-		throw new IllegalArgumentException(); // TODO now: make this a checked exception?
+		throw new IllegalArgumentException();
 	}
 	
 	@Nullable
@@ -284,16 +289,24 @@ public final class ParseService {
 	// accepts TrueZIP files
 	@MutableCopy
 	@NotNull
-	private static List<String> getPossibleMimeTypes(@NotNull File file)
+	@VisibleForTesting
+	static List<String> getPossibleMimeTypes(@NotNull File file)
 			throws IOException {
 		InputStream in = null;
 		try {
 			in = new TFileInputStream(file);
 			in = new BufferedInputStream(in); // must support mark and reset
+			
 			Collection<?> mimeTypes = mimeDetector.getMimeTypes(in);
-			List<String> result = new ArrayList<String> (mimeTypes.size());
+			Collection<String> textTypes = textParser.getTypes();
+			List<String> result = Util.createEmptyList(mimeTypes, textTypes);
+			
 			for (Object mimeType : mimeTypes)
 				result.add(mimeType.toString().toLowerCase(Locale.ENGLISH));
+			
+			if (TextDetector.isText(in))
+				result.addAll(textTypes);
+			
 			return result;
 		}
 		finally {

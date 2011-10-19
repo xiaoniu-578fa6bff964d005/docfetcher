@@ -44,6 +44,13 @@ public enum TestFiles {
 	index_update_html_in_7z ("index-update-html-in-7z"),
 	index_update_rename_in_7z ("index-update-rename-in-7z"),
 	index_update_html_in_html ("index-update-html-in-html"),
+	
+	lorem_ipsum_abw ("lorem-ipsum/lorem-ipsum.abw"),
+	lorem_ipsum_abw_gz ("lorem-ipsum/lorem-ipsum.abw.gz"),
+	lorem_ipsum_html ("lorem-ipsum/lorem-ipsum.html"),
+	lorem_ipsum_odt ("lorem-ipsum/lorem-ipsum.odt"),
+	lorem_ipsum_pdf ("lorem-ipsum/lorem-ipsum.pdf"),
+	lorem_ipsum_txt ("lorem-ipsum/lorem-ipsum.txt"),
 	;
 	
 	private final String path;

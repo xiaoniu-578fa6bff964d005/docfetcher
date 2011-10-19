@@ -11,14 +11,20 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
+import net.sourceforge.docfetcher.util.annotations.NotNull;
+
 /**
  * @author Tran Nam Quang
  */
 @SuppressWarnings("serial")
 public final class ParseException extends Exception {
 	
-	public ParseException(Throwable cause) {
+	public ParseException(@NotNull Throwable cause) {
 		super(cause);
+	}
+	
+	public ParseException(@NotNull String message) {
+		super(message);
 	}
 	
 }

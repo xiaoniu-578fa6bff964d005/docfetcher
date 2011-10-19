@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -35,6 +34,9 @@ final class AbiWordParser extends StreamParser {
 	
 	private static final Collection<String> extensions = Arrays.asList(
 		"abw", "abw.gz", "zabw");
+	private static final Collection<String> types = Arrays.asList(
+		MediaType.text("xml"),
+		MediaType.application("x-gzip"));
 
 	@Override
 	protected ParseResult parse(InputStream in,
@@ -111,11 +113,7 @@ final class AbiWordParser extends StreamParser {
 	}
 
 	protected Collection<String> getTypes() {
-		/*
-		 * AbiWord documents don't seem to have an official mimetype, so just
-		 * return an empty list to disable mimetype detection.
-		 */
-		return Collections.emptyList();
+		return types;
 	}
 
 	public String getTypeLabel() {
