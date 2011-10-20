@@ -27,7 +27,6 @@ import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.MutableInt;
 import net.sourceforge.docfetcher.model.index.PatternAction;
-import net.sourceforge.docfetcher.model.parse.ParseContext;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -136,10 +135,8 @@ class FileContext {
 		info(InfoType.EXTRACTING, doc);
 		try {
 			// Text extraction; may throw OutOfMemoryErrors
-			ParseContext parseContext = new ParseContext(
-				doc.getName(), doc.getPath(), reporter, cancelable);
 			ParseResult parseResult = ParseService.parse(
-				config, file, parseContext);
+				config, file, doc.getName(), doc.getPath(), reporter, cancelable);
 			
 			/*
 			 * If we detect a cancel request at this point, the request probably

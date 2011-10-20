@@ -12,30 +12,28 @@
 package net.sourceforge.docfetcher.model.parse;
 
 import net.sourceforge.docfetcher.model.Cancelable;
-import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 /**
  * @author Tran Nam Quang
  */
-@VisibleForPackageGroup
-public final class ParseContext {
+final class ParseContext {
 	
 	private final String filename;
-	private final Path filepath;
 	private final IndexingReporter reporter;
 	private final Cancelable cancelable;
 
+	public ParseContext(@NotNull String filename) {
+		this(filename, IndexingReporter.nullReporter, Cancelable.nullCancelable);
+	}
+	
 	public ParseContext(@NotNull String filename,
-	                    @NotNull Path filepath,
 	                    @NotNull IndexingReporter reporter,
 						@NotNull Cancelable cancelable) {
-		Util.checkNotNull(filename, filepath, reporter, cancelable);
+		Util.checkNotNull(filename, reporter, cancelable);
 		this.filename = filename;
-		this.filepath = filepath;
 		this.reporter = reporter;
 		this.cancelable = cancelable;
 	}
@@ -43,11 +41,6 @@ public final class ParseContext {
 	@NotNull
 	public String getFilename() {
 		return filename;
-	}
-	
-	@NotNull
-	public Path getFilepath() {
-		return filepath;
 	}
 
 	@NotNull

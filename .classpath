@@ -31,14 +31,6 @@
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
-	<classpathentry kind="lib" path="lib/poi/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/poi/geronimo-stax-api_1.0_spec-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-3.6-20091214.jar" sourcepath="lib/poi/poi-3.6-20091214-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-contrib-3.6-20091214.jar" sourcepath="lib/poi/poi-3.6-20091214-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.6-20091214.jar" sourcepath="lib/poi/poi-3.6-20091214-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.6-20091214.jar" sourcepath="lib/poi/poi-3.6-20091214-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.6-20091214.jar" sourcepath="lib/poi/poi-3.6-20091214-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-misc-3.0.3.jar" sourcepath="lib/lucene/lucene-misc-3.0.3-src.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.0.3.jar" sourcepath="lib/lucene/lucene-queries-3.0.3-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
@@ -54,5 +46,13 @@
 	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.3.3.jar" sourcepath="lib/truezip/truezip-file-7.3.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.3.3.jar" sourcepath="lib/truezip/truezip-kernel-7.3.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.3.3.jar" sourcepath="lib/truezip/truezip-swing-7.3.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/poi/ooxml-lib/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/poi/ooxml-lib/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

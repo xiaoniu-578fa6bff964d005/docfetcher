@@ -29,8 +29,9 @@ abstract class FileParser extends Parser {
 	
 	@NotNull
 	protected String renderText(@NotNull File file,
-								@NotNull ParseContext context)
+								@NotNull String filename)
 			throws ParseException {
+		ParseContext context = new ParseContext(filename);
 		return parse(file, context).getContent().toString();
 	}
 

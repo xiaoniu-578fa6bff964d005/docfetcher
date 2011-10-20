@@ -91,7 +91,7 @@ public final class HtmlParser extends StreamParser {
 	}
 	
 	@Override
-	protected String renderText(InputStream in, ParseContext context)
+	protected String renderText(InputStream in, String filename)
 			throws ParseException {
 		try {
 			Source source = new Source(in);

@@ -47,10 +47,15 @@ public enum TestFiles {
 	
 	lorem_ipsum_abw ("lorem-ipsum/lorem-ipsum.abw"),
 	lorem_ipsum_abw_gz ("lorem-ipsum/lorem-ipsum.abw.gz"),
+	lorem_ipsum_doc_97 ("lorem-ipsum/lorem-ipsum(word-97).doc"),
 	lorem_ipsum_html ("lorem-ipsum/lorem-ipsum.html"),
 	lorem_ipsum_odt ("lorem-ipsum/lorem-ipsum.odt"),
 	lorem_ipsum_pdf ("lorem-ipsum/lorem-ipsum.pdf"),
+	lorem_ipsum_ppt_97 ("lorem-ipsum/lorem-ipsum(powerpoint-97).ppt"),
 	lorem_ipsum_txt ("lorem-ipsum/lorem-ipsum.txt"),
+	lorem_ipsum_xls_5_0 ("lorem-ipsum/lorem-ipsum(excel-5.0).xls"),
+	lorem_ipsum_xls_95 ("lorem-ipsum/lorem-ipsum(excel-95).xls"),
+	lorem_ipsum_xls_97 ("lorem-ipsum/lorem-ipsum(excel-97).xls"),
 	;
 	
 	private final String path;

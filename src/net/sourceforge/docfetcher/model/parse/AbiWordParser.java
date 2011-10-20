@@ -61,9 +61,9 @@ final class AbiWordParser extends StreamParser {
 	}
 	
 	@Override
-	protected String renderText(InputStream in, ParseContext context)
+	protected String renderText(InputStream in, String filename)
 			throws ParseException {
-		Source source = getSource(in, context.getFilename());
+		Source source = getSource(in, filename);
 		
 		// Find all top level elements, excluding the metadata element
 		List<Element> topLevelNonMetaElements = new ArrayList<Element>();

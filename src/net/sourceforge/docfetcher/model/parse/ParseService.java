@@ -24,11 +24,16 @@ import java.util.List;
 import java.util.Locale;
 
 import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
+import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSVisioParser;
+import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
 import net.sourceforge.docfetcher.model.parse.OOoParser.OOoCalcParser;
 import net.sourceforge.docfetcher.model.parse.OOoParser.OOoDrawParser;
 import net.sourceforge.docfetcher.model.parse.OOoParser.OOoImpressParser;
@@ -67,12 +72,19 @@ public final class ParseService {
 		// TextParser must have high priority since its file extensions can be customized
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
+		
 		new PdfParser(),
 		new AbiWordParser(),
+		
 		new OOoWriterParser(),
 		new OOoCalcParser(),
 		new OOoDrawParser(),
-		new OOoImpressParser()
+		new OOoImpressParser(),
+		
+		new MSWordParser(),
+		new MSExcelParser(),
+		new MSPowerPointParser(),
+		new MSVisioParser()
 	};
 
 	private ParseService() {}
@@ -90,14 +102,17 @@ public final class ParseService {
 	@NotNull
 	public static ParseResult parse(@NotNull IndexingConfig config,
 	                                @NotNull File file,
-	                                @NotNull ParseContext context)
+	                                @NotNull String filename,
+	                                @NotNull Path filepath,
+	                                @NotNull IndexingReporter reporter,
+	                                @NotNull Cancelable cancelable)
 			throws ParseException, CheckedOutOfMemoryError {
+		ParseContext context = new ParseContext(filename, reporter, cancelable);
+		
 		// Search for appropriate parser by mimetype
 		for (PatternAction patternAction : config.getPatternActions()) {
 			if (patternAction.getAction() != MatchAction.DETECT_MIME)
 				continue;
-			String filename = context.getFilename();
-			Path filepath = context.getFilepath();
 			if (!patternAction.matches(filename, filepath, true))
 				continue;
 			try {
@@ -208,8 +223,8 @@ public final class ParseService {
 	@NotNull
 	public static String renderText(@NotNull IndexingConfig config,
 	                                @NotNull File file,
-									@NotNull String parserName,
-									@NotNull ParseContext context)
+	                                @NotNull String filename,
+									@NotNull String parserName)
 			throws ParseException, CheckedOutOfMemoryError {
 		Util.checkThat(! (file instanceof TFile));
 		if (parserName.equals(FILENAME_PARSER)) {
@@ -225,7 +240,7 @@ public final class ParseService {
 					InputStream in = null;
 					try {
 						in = new FileInputStream(file);
-						return ((StreamParser) parser).renderText(in, context);
+						return ((StreamParser) parser).renderText(in, filename);
 					}
 					catch (FileNotFoundException e) {
 						throw new ParseException(e);
@@ -235,7 +250,7 @@ public final class ParseService {
 					}
 				}
 				else if (parser instanceof FileParser) {
-					return ((FileParser) parser).renderText(file, context);
+					return ((FileParser) parser).renderText(file, filename);
 				}
 			}
 			catch (OutOfMemoryError e) {

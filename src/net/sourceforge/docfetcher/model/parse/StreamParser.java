@@ -30,8 +30,9 @@ abstract class StreamParser extends Parser {
 	
 	@NotNull
 	protected String renderText(@NotNull InputStream in,
-								@NotNull ParseContext context)
+	                            @NotNull String filename)
 			throws ParseException {
+		ParseContext context = new ParseContext(filename);
 		return parse(in, context).getContent().toString();
 	}
 

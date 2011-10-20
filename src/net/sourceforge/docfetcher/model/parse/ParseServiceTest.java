@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
+import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
 import net.sourceforge.docfetcher.model.parse.OOoParser.OOoWriterParser;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
@@ -34,9 +36,14 @@ public final class ParseServiceTest {
 		ListMap<File, Parser> fileToParserMap = ListMap.<File, Parser>create()
 		.add(TestFiles.lorem_ipsum_abw.get(), new AbiWordParser())
 		.add(TestFiles.lorem_ipsum_abw_gz.get(), new AbiWordParser())
+		.add(TestFiles.lorem_ipsum_doc_97.get(), new MSWordParser())
+		.add(TestFiles.lorem_ipsum_xls_5_0.get(), new MSExcelParser())
+		.add(TestFiles.lorem_ipsum_xls_95.get(), new MSExcelParser())
+		.add(TestFiles.lorem_ipsum_xls_97.get(), new MSExcelParser())
 		.add(TestFiles.lorem_ipsum_html.get(), new HtmlParser())
 		.add(TestFiles.lorem_ipsum_odt.get(), new OOoWriterParser())
 		.add(TestFiles.lorem_ipsum_pdf.get(), new PdfParser())
+		.add(TestFiles.lorem_ipsum_ppt_97.get(), new MSPowerPointParser())
 		.add(TestFiles.lorem_ipsum_txt.get(), new TextParser());
 		
 		for (Entry<File, Parser> entry : fileToParserMap) {
