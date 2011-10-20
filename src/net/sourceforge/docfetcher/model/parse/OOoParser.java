@@ -67,7 +67,7 @@ abstract class OOoParser extends FileParser {
 		}
 	}
 	
-	private static final Collection<String> types = Collections.singletonList(
+	private static final Collection<String> types = Collections.singleton(
 		MediaType.application("zip"));
 	
 	private final String typeLabel;

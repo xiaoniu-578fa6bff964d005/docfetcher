@@ -31,6 +31,9 @@ import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.model.index.PatternAction;
 import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSExcel2007Parser;
+import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSPowerPoint2007Parser;
+import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSWord2007Parser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSVisioParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
@@ -84,7 +87,11 @@ public final class ParseService {
 		new MSWordParser(),
 		new MSExcelParser(),
 		new MSPowerPointParser(),
-		new MSVisioParser()
+		new MSVisioParser(),
+		
+		new MSWord2007Parser(),
+		new MSExcel2007Parser(),
+		new MSPowerPoint2007Parser()
 	};
 
 	private ParseService() {}
