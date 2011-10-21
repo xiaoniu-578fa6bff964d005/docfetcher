@@ -41,8 +41,9 @@ public final class ParseServiceTest {
 		.add(TestFiles.lorem_ipsum_html.get(), new HtmlParser())
 		.add(TestFiles.lorem_ipsum_odt.get(), new OOoWriterParser())
 		.add(TestFiles.lorem_ipsum_pdf.get(), new PdfParser())
+		.add(TestFiles.lorem_ipsum_rtf.get(), new RtfParser())
 		.add(TestFiles.lorem_ipsum_txt.get(), new TextParser())
-		
+
 		.add(TestFiles.lorem_ipsum_doc_97.get(), new MSWordParser())
 		.add(TestFiles.lorem_ipsum_xls_5_0.get(), new MSExcelParser())
 		.add(TestFiles.lorem_ipsum_xls_95.get(), new MSExcelParser())

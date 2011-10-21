@@ -51,6 +51,7 @@ public enum TestFiles {
 	lorem_ipsum_html ("lorem-ipsum/lorem-ipsum.html"),
 	lorem_ipsum_odt ("lorem-ipsum/lorem-ipsum.odt"),
 	lorem_ipsum_pdf ("lorem-ipsum/lorem-ipsum.pdf"),
+	lorem_ipsum_rtf ("lorem-ipsum/lorem-ipsum.rtf"),
 	lorem_ipsum_txt ("lorem-ipsum/lorem-ipsum.txt"),
 	
 	lorem_ipsum_doc_97 ("lorem-ipsum/lorem-ipsum(word-97).doc"),

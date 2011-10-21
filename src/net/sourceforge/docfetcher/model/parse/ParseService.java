@@ -76,8 +76,9 @@ public final class ParseService {
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
 		
-		new PdfParser(),
 		new AbiWordParser(),
+		new PdfParser(),
+		new RtfParser(),
 		
 		new OOoWriterParser(),
 		new OOoCalcParser(),
