@@ -8,6 +8,11 @@ import java.net.URLClassLoader;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
+/**
+ * Helper class for dynamically adding jars to the classpath.
+ * 
+ * @author Tran Nam Quang
+ */
 public final class ClassPathHack {
 
 	private static final Class<?>[] parameters = new Class[] { URL.class };

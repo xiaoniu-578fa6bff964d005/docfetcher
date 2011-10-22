@@ -1,0 +1,16 @@
+DocFetcher makes use of the RTF parser from Apache Tika 1.0. The following is a complete list of all the classes that were imported from Tika to satisfy the RTF parser dependencies:
+
+1) All classes in the package org.apache.tika.parser.rtf.
+
+2) All classes in the following packages:
+  * org.apache.tika.exception
+  * org.apache.tika.io
+  * org.apache.tika.metadata
+  * org.apache.tika.sax
+
+3) The following classes:
+  * org.apache.tika.mime.MediaType
+  * org.apache.tika.parser.AbstractParser
+  * org.apache.tika.parser.ParseContext
+  * org.apache.tika.parser.Parser
+  * org.apache.tika.utils.CharsetUtils

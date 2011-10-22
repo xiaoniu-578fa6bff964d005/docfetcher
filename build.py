@@ -22,14 +22,11 @@ for filename in os.listdir('build'):
 	elif isdir(path):
 		shutil.rmtree(path)
 
-package = 'net.sourceforge.docfetcher'
-package_path = package.replace('.', '/')
-
 print 'Copying sources to build directory...'
 shutil.copytree(
-	join('src', package_path),
-	join('build/tmp/src-builder', package_path),
-	ignore = shutil.ignore_patterns('.svn', '.cvs')
+	'src',
+	'build/tmp/src-builder',
+	ignore = shutil.ignore_patterns('.svn', '.cvs', '.git')
 )
 
 def execute(cmd_parts):
@@ -41,6 +38,9 @@ for root, dirs, files in os.walk('lib'):
 	for filename in files:
 		if not filename.endswith('.jar'): continue
 		jars.append(join(root, filename))
+
+package = 'net.sourceforge.docfetcher'
+package_path = package.replace('.', '/')
 
 print 'Compiling sources...'
 compile_paths = [

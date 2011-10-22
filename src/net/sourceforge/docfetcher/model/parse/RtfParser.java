@@ -11,41 +11,62 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.rtf.RTFEditorKit;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.rtf.TextExtractor;
+import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.XHTMLContentHandler;
 
 /**
  * @author Tran Nam Quang
  */
 final class RtfParser extends StreamParser {
 	
-	// TODO post-release-1.1: Use RTF parser from Tika
-	
 	private static final Collection<String> extensions = Collections.singleton("rtf");
 	private static final Collection<String> types = Collections.singleton(MediaType.text("rtf"));
 
 	protected ParseResult parse(InputStream in, ParseContext context)
 			throws ParseException {
-		return new ParseResult(renderText(in, context.getFilename()));
+		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
+		Metadata metadata = new Metadata();
+		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
+		TextExtractor extractor = new TextExtractor(handler, metadata);
+		try {
+			extractor.extract(in);
+			
+			/*
+			 * See TextExtractor#processControlWord() for a list of the
+			 * available metadata.
+			 */
+			return new ParseResult(bodyHandler.toString())
+				.addAuthor(metadata.get(Metadata.AUTHOR))
+				.setTitle(metadata.get(Metadata.TITLE))
+				.addMiscMetadata(metadata.get(Metadata.SUBJECT))
+				.addMiscMetadata(metadata.get(Metadata.KEYWORDS))
+				.addMiscMetadata(metadata.get(Metadata.CATEGORY))
+				.addMiscMetadata(metadata.get(Metadata.COMMENT))
+				.addMiscMetadata(metadata.get(Metadata.COMPANY))
+				.addMiscMetadata(metadata.get(Metadata.MANAGER));
+		}
+		catch (Exception e) {
+			throw new ParseException(e);
+		}
 	}
 	
 	protected String renderText(InputStream in, String filename)
 			throws ParseException {
+		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
+		Metadata metadata = new Metadata();
+		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
+		TextExtractor extractor = new TextExtractor(handler, metadata);
 		try {
-			DefaultStyledDocument doc = new DefaultStyledDocument();
-			new RTFEditorKit().read(in, doc, 0);
-			return doc.getText(0, doc.getLength());
+			extractor.extract(in);
+			return bodyHandler.toString();
 		}
-		catch (BadLocationException e) {
-			throw new ParseException(e);
-		}
-		catch (IOException e) {
+		catch (Exception e) {
 			throw new ParseException(e);
 		}
 	}

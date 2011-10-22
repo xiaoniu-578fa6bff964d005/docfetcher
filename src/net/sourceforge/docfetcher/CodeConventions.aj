@@ -45,7 +45,8 @@ privileged aspect CodeConventions {
 	declare warning: call(LoopTimer+.new(..)):
 		"Don't forget to remove the LoopTimer after usage.";
 	
-	declare warning: execution(!@SuppressAjWarnings boolean get*(..)):
+	declare warning: execution(!@SuppressAjWarnings boolean get*(..))
+	&& within(net.sourceforge.docfetcher..*): // Ignore external sources
 		"Boolean getter methods should start with 'is'.";
 	
 	declare warning: (call(* File.list(..)) || call(* File.listFiles(..)))
@@ -61,7 +62,8 @@ privileged aspect CodeConventions {
 		"Use Util.launch(..) instead, it will also work on KDE.";
 	
 	declare warning: call(* File.createTempFile(..))
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& within(net.sourceforge.docfetcher..*): // Ignore external sources
 		"Use Util.createTempFile(..) instead.";
 	
 	declare warning: call(* File.getAbsolutePath())
@@ -73,7 +75,8 @@ privileged aspect CodeConventions {
 		"Use Util.createTempDir() instead.";
 	
 	declare warning: call(* Closeable+.close(..))
-	&& !withincode(* Closeable+.close(..)):
+	&& !withincode(* Closeable+.close(..))
+	&& within(net.sourceforge.docfetcher..*): // Ignore external sources
 		"Resources should be closed with " +
 		"com.google.common.io.Closeables.closeQuietly(Closeable) " +
 		"inside a finally block.";
