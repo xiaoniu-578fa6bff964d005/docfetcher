@@ -71,7 +71,7 @@ public final class ParseService {
 	private static final TextParser textParser;
 	private static final HtmlParser htmlParser;
 	
-	private static final Parser[] parsers = {
+	private static final Parser[] parsers0 = {
 		// TextParser must have high priority since its file extensions can be customized
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
@@ -94,13 +94,23 @@ public final class ParseService {
 		new MSExcel2007Parser(),
 		new MSPowerPoint2007Parser()
 	};
+	
+	private static final List<Parser> parsers;
+	
+	static {
+		if (!Util.IS_MAC_OS_X)
+			parsers = Collections.unmodifiableList(Util.createListReversed(
+				Collections.singleton(new ChmParser()), parsers0));
+		else
+			parsers = Arrays.asList(parsers0);
+	}
 
 	private ParseService() {}
 	
 	@Immutable
 	@NotNull
 	public static List<Parser> getParsers() {
-		return Arrays.asList(parsers);
+		return parsers;
 	}
 	
 	// Accepts HTML files, but does not handle HTML pairing
@@ -265,7 +275,13 @@ public final class ParseService {
 				throw new CheckedOutOfMemoryError(e);
 			}
 		}
-		throw new IllegalArgumentException();
+		/*
+		 * This could happen when somebody indexes a CHM file on Windows/Linux,
+		 * then moves DocFetcher to Mac OS X and tries to view the indexed CHM
+		 * file in the preview panel.
+		 */
+		throw new ParseException("Can't find a suitable parser.");
+//		throw new IllegalArgumentException();
 	}
 	
 	@Nullable

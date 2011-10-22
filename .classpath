@@ -54,5 +54,10 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
+	<classpathentry kind="lib" path="lib/chm4j/chm4j.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/chm4j"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

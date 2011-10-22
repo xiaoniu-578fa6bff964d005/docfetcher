@@ -997,7 +997,7 @@ public final class Util {
 	 */
 	@MutableCopy
 	@NotNull
-	public static <T> List<T> createList(	@NotNull Collection<T> col,
+	public static <T> List<T> createList(	@NotNull Collection<? extends T> col,
 											@NotNull T... elements) {
 		Util.checkNotNull(col, elements);
 		List<T> newList = new ArrayList<T>(col.size() + elements.length);
@@ -1015,7 +1015,7 @@ public final class Util {
 	 */
 	@MutableCopy
 	@NotNull
-	public static <T> List<T> createListReversed(	@NotNull Collection<T> col,
+	public static <T> List<T> createListReversed(	@NotNull Collection<? extends T> col,
 													@NotNull T... elements) {
 		Util.checkNotNull(col, elements);
 		List<T> newList = new ArrayList<T>(col.size() + elements.length);
