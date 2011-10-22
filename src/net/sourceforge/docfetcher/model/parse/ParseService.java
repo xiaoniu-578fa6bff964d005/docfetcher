@@ -79,6 +79,7 @@ public final class ParseService {
 		new AbiWordParser(),
 		new PdfParser(),
 		new RtfParser(),
+		new SvgParser(),
 		
 		new OOoWriterParser(),
 		new OOoCalcParser(),
