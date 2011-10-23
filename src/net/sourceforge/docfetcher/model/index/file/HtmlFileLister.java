@@ -63,7 +63,9 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		for (File fileOrDir : Util.listFiles(parentDir)) {
 			if (isStopped()) return;
 			try {
-				if (Util.isSymLink(fileOrDir) || skip(fileOrDir))
+				if (Util.isSymLink(fileOrDir))
+					continue;
+				if (skip(fileOrDir))
 					continue;
 			}
 			catch (AssertionError e) {

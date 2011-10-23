@@ -647,10 +647,22 @@ public final class Util {
 	@SuppressAjWarnings
 	public static boolean isSymLink(@NotNull File file) {
 		try {
-			String absPath = file.getAbsolutePath();
-			String canPath = file.getCanonicalPath();
-			return ! absPath.equals(canPath);
-		} catch (IOException e) {
+			/*
+			 * Earlier versions simply compared the absolute and canonical path
+			 * of the given file. This did not work for files with 8.3
+			 * filenames, which were incorrectly identified as symlinks.
+			 */
+			File canon;
+			if (file.getParent() == null) {
+				canon = file;
+			}
+			else {
+				File canonDir = file.getParentFile().getCanonicalFile();
+				canon = new File(canonDir, file.getName());
+			}
+			return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+		}
+		catch (IOException e) {
 			return false;
 		}
 	}
@@ -679,10 +691,14 @@ public final class Util {
 	 * represents an archive entry, this method always returns false.
 	 */
 	public static boolean isJunctionOrSymlink(@NotNull File file) {
-		if (! IS_WINDOWS) return false;
+		if (! IS_WINDOWS)
+			return false;
 		try {
-			return file.exists() && (0x400 & getWin32FileAttributes(file)) != 0;
-		} catch (IOException e) {
+			// Wrap in java.io.File to shield against TFile instances
+			return new File(file.getPath()).exists()
+					&& (0x400 & getWin32FileAttributes(file)) != 0;
+		}
+		catch (IOException e) {
 			return false;
 		}
 	}
@@ -1201,12 +1217,20 @@ public final class Util {
 		File dir = Files.createTempDir();
 		
 		/*
-		 * On Mac OS X, Files.createTempDir() will return a symlink, which will
-		 * lead to various problems, e.g. Files.deleteRecursively(File) failing
-		 * to delete the temporary directory. The workaround is to return a
-		 * canonical file on Mac OS X.
+		 * On Windows and Mac OS X, returning a canonical file avoids certain
+		 * symlink-related issues:
+		 * 
+		 * On Windows 7, Files.createTempDir() might return a directory that
+		 * contains 8.3 filenames, for which the absolute and canonical paths
+		 * differ, so that the directory will be incorrectly treated as a
+		 * symlink. On Mac OS X, Files.createTempDir() will return an actual
+		 * symlink.
+		 * 
+		 * In both cases, returning a file that is or appears to be a symlink
+		 * will lead to various problems, e.g. Files.deleteRecursively(File)
+		 * failing to delete the temporary directory.
 		 */
-		return IS_MAC_OS_X ? dir.getCanonicalFile() : dir;
+		return IS_WINDOWS || IS_MAC_OS_X ? dir.getCanonicalFile() : dir;
 	}
 
 	/**

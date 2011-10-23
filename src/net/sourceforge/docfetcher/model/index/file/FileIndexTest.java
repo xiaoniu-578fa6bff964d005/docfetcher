@@ -50,10 +50,10 @@ public final class FileIndexTest {
 		FileIndex index = new FileIndex(null, file);
 		CountingReporter reporter = new CountingReporter();
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(reporter.counter, 1);
+		assertEquals(1, reporter.counter);
 		index.clear();
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(reporter.counter, 2);
+		assertEquals(2, reporter.counter);
 	}
 	
 	@Test

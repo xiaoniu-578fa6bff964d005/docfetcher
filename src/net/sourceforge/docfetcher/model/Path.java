@@ -88,7 +88,7 @@ public final class Path implements Serializable {
 	}
 	
 	public boolean contains(@NotNull Path subPath) {
-		return subPath.getCanonicalPath().startsWith(getCanonicalPath() + "/");
+		return subPath.getCanonicalPath().startsWith(getCanonicalPath() + Util.FS);
 	}
 	
 	@NotNull

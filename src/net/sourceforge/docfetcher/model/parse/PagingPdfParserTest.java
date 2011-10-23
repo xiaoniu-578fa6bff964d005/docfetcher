@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
+import net.sourceforge.docfetcher.util.Util;
 
 import org.junit.Test;
 
@@ -36,9 +37,9 @@ public final class PagingPdfParserTest {
 			}
 		}.run();
 		assertEquals(3, pages.size());
-		assertEquals("page 1\n", pages.get(0));
-		assertEquals("page 2\n", pages.get(1));
-		assertEquals("page 3\n", pages.get(2));
+		assertEquals("page 1" + Util.LS, pages.get(0));
+		assertEquals("page 2" + Util.LS, pages.get(1));
+		assertEquals("page 3" + Util.LS, pages.get(2));
 	}
 	
 	@Test
@@ -52,8 +53,8 @@ public final class PagingPdfParserTest {
 			}
 		}.run();
 		assertEquals(2, pages.size());
-		assertEquals("page 1\n", pages.get(0));
-		assertEquals("page 2\n", pages.get(1));
+		assertEquals("page 1" + Util.LS, pages.get(0));
+		assertEquals("page 2" + Util.LS, pages.get(1));
 	}
 
 }

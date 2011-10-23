@@ -146,7 +146,9 @@ public final class TestParseFromZip {
 					.addAuthor(pdInfo.getAuthor())
 					.addMiscMetadata(pdInfo.getSubject())
 					.addMiscMetadata(pdInfo.getKeywords());
-				assertEquals("page 1\npage 2\npage 3", result.getContent().toString().trim());
+				String expectedContents = Util.join(Util.LS, "page 1", "page 2", "page 3");
+				String actualContents = result.getContent().toString().trim();
+				assertEquals(expectedContents, actualContents);
 			}
 		};
 	}
@@ -162,6 +164,12 @@ public final class TestParseFromZip {
 			InputStream in = new TFileInputStream(dst);
 			handleInputStream(in);
 			Closeables.closeQuietly(in);
+			
+			/*
+			 * On Windows 7, the archive must be unmounted before the directory
+			 * can be deleted.
+			 */
+			TFile.umount(archive);
 			Files.deleteRecursively(dir);
 		}
 		protected abstract void handleInputStream(InputStream in) throws Exception;
