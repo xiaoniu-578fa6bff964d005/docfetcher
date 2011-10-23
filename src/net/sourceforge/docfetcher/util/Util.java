@@ -390,11 +390,22 @@ public final class Util {
 	
 	@NotNull
 	public static Text createLabeledGridText(	@NotNull Composite parent,
-											@NotNull String labelText) {
+												@NotNull String labelText) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(labelText);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		Text text = new Text(parent, SWT.BORDER | SWT.SINGLE);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		return text;
+	}
+	
+	@NotNull
+	public static StyledText createLabeledGridStyledText(	@NotNull Composite parent,
+															@NotNull String labelText) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(labelText);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		StyledText text = new StyledText(parent, SWT.BORDER | SWT.SINGLE);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
 	}

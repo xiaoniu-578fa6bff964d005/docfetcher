@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.Range;
 import net.sourceforge.docfetcher.util.Util;
@@ -68,25 +68,13 @@ final class HighlightingText {
 	
 	public void setUseMonoFont(boolean useMonoFont) {
 		if (useMonoFont) {
-			if (monoFont == null) {
-				if (Util.IS_WINDOWS)
-					monoFont = FontDescription.PreviewMonoWindows.get();
-				else if (Util.IS_LINUX)
-					monoFont = FontDescription.PreviewMonoLinux.get();
-				else if (Util.IS_MAC_OS_X)
-					monoFont = FontDescription.PreviewMonoMacOsX.get();
-			}
+			if (monoFont == null)
+				monoFont = UtilGui.getPreviewFontMono().get();
 			textViewer.setFont(monoFont);
 		}
 		else {
-			if (normalFont == null) {
-				if (Util.IS_WINDOWS)
-					normalFont = FontDescription.PreviewWindows.get();
-				else if (Util.IS_LINUX)
-					normalFont = FontDescription.PreviewLinux.get();
-				else if (Util.IS_MAC_OS_X)
-					normalFont = FontDescription.PreviewMacOsX.get();
-			}
+			if (normalFont == null)
+				normalFont = UtilGui.getPreviewFontNormal().get();
 			textViewer.setFont(normalFont);
 		}
 	}

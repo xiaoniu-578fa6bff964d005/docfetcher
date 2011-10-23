@@ -89,6 +89,14 @@ public final class SearchBar {
 						evtOpenManual.fire(null);
 					}
 				}).create();
+		
+		tif.image(Img.PREFERENCES.get()).toolTip("Preferences")
+				.listener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						PrefDialog prefDialog = new PrefDialog(comp.getShell());
+						prefDialog.open();
+					}
+				}).create();
 
 		tif.image(Img.BROWSER.get()).toolTip("Web Interface")
 				.listener(new SelectionAdapter() {

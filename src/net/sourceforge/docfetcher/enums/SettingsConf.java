@@ -34,11 +34,9 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -72,11 +70,15 @@ public final class SettingsConf {
 
 	@Description("# Boolean entries. Allowed values: true, false")
 	public static enum Bool implements Storable {
-		MainShellMaximized (false),
+		ShowManualOnStartup (true),
 		UseOrOperator (true),
+		HideOnOpen (false),
+		ClearSearchHistoryOnExit (false),
+		ResetLocationFilterOnExit (true),
+		
+		MainShellMaximized (false),
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
-		HideOnOpen (true),
 		ShowRelativePathsMessage (true),
 		;
 
@@ -172,6 +174,7 @@ public final class SettingsConf {
 
 	@Description("# Comma-separated lists of integers.")
 	public static enum IntArray implements Storable {
+		PreviewHighlighting (255, 255, 0),
 		;
 
 		public final Event<int[]> evtChanged = new Event<int[]> ();
@@ -240,6 +243,7 @@ public final class SettingsConf {
 		MainWindow (-1, -1, 640, 480),
 		IndexingDialog (-1, -1, 450, 500),
 		FileExtensionChooser (-1, -1, 300, 450),
+		PreferencesDialog (-1, -1, 500, 400),
 		;
 
 		public final int[] defaultValue;
@@ -502,55 +506,15 @@ public final class SettingsConf {
 			);
 		}
 		// Should only be called from within the SWT thread
+		// Caller is responsible for disposing the returned font
 		@NotNull
 		public Font get() {
 			return new Font(Display.getDefault(), value);
 		}
-	}
-
-	@Description("# Color entries, consisting of red, green and blue values.")
-	public enum Col implements Storable {
-		;
-
-		private static Display display;
-
-		public RGB defaultValue;
-		private RGB value;
-		private Color color;
-
-		Col(int red, int green, int blue) {
-			value = defaultValue = new RGB(red, green, blue);
-		}
-		Col(float hue, float saturation, float brightness) {
-			value = defaultValue= new RGB(hue, saturation, brightness);
-		}
-		public void load(String str) {
-			int[] values = Util.toIntArray(str, new int[] {value.red, value.green, value.blue});
-			value = new RGB(values[0], values[1], values[2]);
-		}
-		public String valueToString() {
-			return Ints.join(", ", value.red, value.green, value.blue);
-		}
-
-		/**
-		 * Returns the <tt>Color</tt> object corresponding to this enumeration
-		 * constant. It is disposed of automatically after the display is
-		 * disposed. This method must be called from the GUI thread.
-		 */
-		public Color get() {
-			if (display == null) {
-				display = Display.getDefault();
-				display.disposeExec(new Runnable() {
-					public void run() {
-						for (Col col : values())
-							if (col.color != null)
-								col.color.dispose();
-					}
-				});
-			}
-			if (color == null)
-				color = new Color(display, value);
-			return color;
+		@NotNull
+		public FontData createFontData() {
+			return new FontData(
+				value.getName(), value.getHeight(), value.getStyle());
 		}
 	}
 

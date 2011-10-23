@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -92,6 +94,28 @@ public final class UtilGui {
 				dialog.open();
 			}
 		});
+	}
+	
+	@NotNull
+	public static FontDescription getPreviewFontNormal() {
+		if (Util.IS_WINDOWS)
+			return SettingsConf.FontDescription.PreviewWindows;
+		if (Util.IS_LINUX)
+			return SettingsConf.FontDescription.PreviewLinux;
+		if (Util.IS_MAC_OS_X)
+			return SettingsConf.FontDescription.PreviewMacOsX;
+		throw new IllegalStateException();
+	}
+	
+	@NotNull
+	public static FontDescription getPreviewFontMono() {
+		if (Util.IS_WINDOWS)
+			return SettingsConf.FontDescription.PreviewMonoWindows;
+		if (Util.IS_LINUX)
+			return SettingsConf.FontDescription.PreviewMonoLinux;
+		if (Util.IS_MAC_OS_X)
+			return SettingsConf.FontDescription.PreviewMonoMacOsX;
+		throw new IllegalStateException();
 	}
 	
 }

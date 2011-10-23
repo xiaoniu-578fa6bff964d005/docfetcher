@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -98,10 +97,7 @@ final class FileExtensionChooser {
 		StyledText loadingMsg = new StyledText(textContainer, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		loadingMsg.setBackground(Col.LIST_BACKGROUND.get()); // don't use WHITE, it won't work with dark themes
 		loadingMsg.setText("loading");
-		if (Util.IS_WINDOWS)
-			loadingMsg.setFont(FontDescription.PreviewWindows.get());
-		else
-			loadingMsg.setFont(FontDescription.PreviewLinux.get());
+		loadingMsg.setFont(UtilGui.getPreviewFontNormal().get());
 		loadingMsg.getCaret().setVisible(false);
 		stackLayout.topControl = textContainer;
 		
