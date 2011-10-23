@@ -27,7 +27,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +40,9 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public final class SearchBar {
 	
+	private static final int MARGIN = 1;
+	private static final int SPACING = 2;
+	
 	public final Event<String> evtSearch = new Event<String>();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	public final Event<Void> evtOpenManual = new Event<Void>();
@@ -46,10 +50,15 @@ public final class SearchBar {
 	private final Composite comp;
 	private final Combo searchBox;
 	private final Button searchBt;
+	private final ToolBar toolBar;
 	private final MemoryList<String> searchHistory;
 	
 	public SearchBar(@NotNull Composite parent) {
-		comp = new CustomBorderComposite(parent);
+		comp = new CustomBorderComposite(parent) {
+			public Point computeSize(int wHint, int hHint, boolean changed) {
+				return SearchBar.this.computeSize(wHint, hHint);
+			}
+		};
 		searchBox = new Combo(comp, SWT.BORDER);
 		searchBox.setVisibleItemCount(ProgramConf.Int.SearchHistorySize.get());
 		Util.selectAllOnFocus(searchBox);
@@ -77,8 +86,7 @@ public final class SearchBar {
 			}
 		});
 		
-		// Create toolbar
-		final ToolBar toolBar = new ToolBar(comp, SWT.FLAT);
+		toolBar = new ToolBar(comp, SWT.FLAT);
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
 		// TODO i18n
@@ -113,33 +121,71 @@ public final class SearchBar {
 					}
 				}).create();
 		
-		comp.setLayout(Util.createGridLayout(3, false, 0, 0));
-		
-		final int searchBoxMaxWidth = ProgramConf.Int.SearchBoxMaxWidth.get();
-		final GridData searchBoxGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		searchBoxGridData.widthHint = searchBoxMaxWidth;
-		searchBox.setLayoutData(searchBoxGridData);
-		
-		searchBt.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		toolBar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
-		
 		// Make the search box smaller when there's not enough space left
 		comp.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				int spaceLeft = comp.getSize().x;
-				spaceLeft -= toolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-				spaceLeft -= searchBt.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+				Point searchBoxSize = computeSize(searchBox);
+				Point searchBtSize = computeSize(searchBt);
+				Point toolBarSize = computeSize(toolBar);
 				
-				/*
-				 * The minimum value for this is platform dependent. 10 pixel
-				 * should be large enough for all platforms.
-				 */
-				spaceLeft -= 10;
+				Rectangle clientArea = comp.getClientArea();
+				int caWidth = clientArea.width;
+				int caHeight = clientArea.height;
 				
-				searchBoxGridData.widthHint = Util.clamp(spaceLeft, 0, searchBoxMaxWidth);
-				comp.layout();
+				int spaceLeft = caWidth;
+				spaceLeft -= toolBarSize.x;
+				spaceLeft -= searchBtSize.x;
+				spaceLeft -= 5; // spacing between search button and toolbar
+				
+				int searchBoxMaxWidth = ProgramConf.Int.SearchBoxMaxWidth.get();
+				int searchBoxWidth = Util.clamp(spaceLeft, 0, searchBoxMaxWidth);
+				setBounds(searchBox, MARGIN, searchBoxWidth, caHeight, searchBoxSize.y);
+				
+				int searchBtX = MARGIN + searchBox.getSize().x + SPACING;
+				setBounds(searchBt, searchBtX, searchBtSize.x, caHeight, searchBtSize.y);
+				
+				int toolBarX = caWidth - MARGIN - toolBarSize.x;
+				setBounds(toolBar, toolBarX, toolBarSize.x, caHeight, toolBarSize.y);
 			}
 		});
+	}
+	
+	private void setBounds(	@NotNull Control control,
+							int x,
+							int width,
+							int compHeight,
+							int controlHeight) {
+		int y = Math.max(0, (compHeight - controlHeight) / 2); 
+		control.setLocation(x, y);
+		control.setSize(width, Math.min(compHeight, controlHeight));
+	}
+	
+	@NotNull
+	private Point computeSize(int wHint, int hHint) {
+		Point searchBoxSize = computeSize(searchBox);
+		Point searchBtSize = computeSize(searchBt);
+		Point toolBarSize = computeSize(toolBar);
+		
+		int width = 0;
+		width += searchBoxSize.x;
+		width += searchBtSize.x;
+		width += toolBarSize.x;
+		width += MARGIN * 2 + SPACING * 2;
+		
+		int height = Math.max(searchBoxSize.y, searchBtSize.y);
+		height = Math.max(height, toolBarSize.y);
+		height += MARGIN * 2;
+		
+		if (wHint != SWT.DEFAULT)
+			width = wHint;
+		if (hHint != SWT.DEFAULT)
+			height = hHint;
+		return new Point(width, height);
+	}
+	
+	@NotNull
+	private Point computeSize(@NotNull Control control) {
+		return control.computeSize(SWT.DEFAULT, SWT.DEFAULT, false);
 	}
 	
 	public void addToSearchHistory(@NotNull String query) {
