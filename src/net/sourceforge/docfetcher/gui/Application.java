@@ -56,6 +56,8 @@ import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -625,10 +627,12 @@ public final class Application {
 		}, new Runnable() {
 			public void run() {
 				// TODO post-release-1.1: Show an about dialog? Or maybe open a manual page?
+				AppUtil.showInfo("Dummy Message");
 			}
 		}, new Runnable() {
 			public void run() {
-				// TODO now: Open preferences dialog
+				PrefDialog prefDialog = new PrefDialog(shell);
+				prefDialog.open();
 			}
 		});
 	}

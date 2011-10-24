@@ -173,7 +173,12 @@ final class PrefDialog {
 	@NotNull
 	private static void setNonEditable(	@NotNull StyledText st,
 										boolean hideSelection) {
-		st.setAlignment(SWT.CENTER);
+		/*
+		 * Bug in SWT 3.7: On Mac OS X, setting a center alignment causes the
+		 * text to disappear.
+		 */
+		if (!Util.IS_MAC_OS_X)
+			st.setAlignment(SWT.CENTER);
 		st.setEditable(false);
 		st.setCaret(null);
 		st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
