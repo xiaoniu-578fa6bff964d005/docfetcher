@@ -149,7 +149,8 @@ public final class Application {
 		// Set shell icons, must be done *after* loading the images
 		shell.setImages(new Image[] {
 			Img.DOCFETCHER_16.get(), Img.DOCFETCHER_32.get(),
-			Img.DOCFETCHER_48.get(), });
+			Img.DOCFETCHER_48.get(), Img.DOCFETCHER_64.get(),
+			Img.DOCFETCHER_128.get()});
 
 		// Set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
