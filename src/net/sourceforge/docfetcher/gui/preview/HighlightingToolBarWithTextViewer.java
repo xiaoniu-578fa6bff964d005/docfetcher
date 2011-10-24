@@ -49,7 +49,8 @@ class HighlightingToolBarWithTextViewer {
 	
 	public HighlightingToolBarWithTextViewer(@NotNull Composite toolBarParent) {
 		toolBarComp = new CustomBorderComposite(toolBarParent);
-		toolBarComp.setLayout(Util.createGridLayout(2, false, 0, 0));
+		int margin = Util.IS_WINDOWS ? 2 : 0;
+		toolBarComp.setLayout(Util.createGridLayout(2, false, margin, 0));
 		
 		// TODO i18n for counter and buttons
 		

@@ -58,7 +58,8 @@ final class HtmlPreview extends ToolBarForm {
 	@NotNull
 	protected Control createToolBar(@NotNull Composite parent) {
 		CustomBorderComposite comp = new CustomBorderComposite(parent);
-		comp.setLayout(Util.createGridLayout(3, false, 0, 0));
+		int margin = Util.IS_WINDOWS ? 2 : 0;
+		comp.setLayout(Util.createGridLayout(3, false, margin, 0));
 		
 		ToolBar leftToolBar = new ToolBar(comp, SWT.FLAT);
 		leftToolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));

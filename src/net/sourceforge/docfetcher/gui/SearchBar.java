@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public final class SearchBar {
 	
-	private static final int MARGIN = 1;
-	private static final int SPACING = 2;
+	private static final int MARGIN = Util.IS_WINDOWS ? 1 : 0;
+	private static final int SPACING = 1;
 	
 	public final Event<String> evtSearch = new Event<String>();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
