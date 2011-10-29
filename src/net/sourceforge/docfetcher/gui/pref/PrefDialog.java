@@ -21,8 +21,6 @@ import net.sourceforge.docfetcher.util.gui.ConfigComposite;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormLayout;
@@ -41,6 +39,8 @@ public final class PrefDialog {
 	
 	private final Shell shell;
 	@NotNull private Button okBt;
+	private final PrefOption[] checkOptions;
+	private final PrefOption[] fieldOptions;
 	
 	public PrefDialog(@NotNull Shell parent) {
 		Util.checkNotNull(parent);
@@ -50,22 +50,7 @@ public final class PrefDialog {
 		shell.setImage(Img.PREFERENCES.get());
 		SettingsConf.ShellBounds.PreferencesDialog.bind(shell);
 		
-		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
-			protected Control createContents(Composite parent) {
-				return PrefDialog.this.createContents(parent);
-			}
-			protected Control createButtonArea(Composite parent) {
-				return PrefDialog.this.createButtonArea(parent);
-			}
-		};
-	}
-	
-	@NotNull
-	private Control createContents(@NotNull Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
-		comp.setLayout(Util.createGridLayout(2, false, 0, 5));
-		
-		PrefOption[] checkOptions = new PrefOption[] {
+		checkOptions = new PrefOption[] {
 			new CheckOption(
 				"Show manual on startup",
 				SettingsConf.Bool.ShowManualOnStartup),
@@ -88,7 +73,7 @@ public final class PrefDialog {
 //				SettingsConf.Bool.ResetLocationFilterOnExit),
 		};
 		
-		PrefOption[] fieldOptions = new PrefOption[] {
+		fieldOptions = new PrefOption[] {
 			new ColorOption(
 				"Highlight color:",
 				SettingsConf.IntArray.PreviewHighlighting),
@@ -103,6 +88,21 @@ public final class PrefDialog {
 			
 			new HotKeyOption("Global hotkey:")
 		};
+		
+		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
+			protected Control createContents(Composite parent) {
+				return PrefDialog.this.createContents(parent);
+			}
+			protected Control createButtonArea(Composite parent) {
+				return PrefDialog.this.createButtonArea(parent);
+			}
+		};
+	}
+	
+	@NotNull
+	private Control createContents(@NotNull Composite parent) {
+		Composite comp = new Composite(parent, SWT.NONE);
+		comp.setLayout(Util.createGridLayout(2, false, 0, 5));
 		
 		for (PrefOption checkOption : checkOptions)
 			checkOption.createControls(comp);
@@ -132,19 +132,26 @@ public final class PrefDialog {
 		
 		Button resetBt = Util.createPushButton(comp, "restore_defaults", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				for (PrefOption checkOption : checkOptions)
+					checkOption.restoreDefault();
+				for (PrefOption fieldOption : fieldOptions)
+					fieldOption.restoreDefault();
 			}
 		});
 		
 		okBt = Util.createPushButton(comp, "&OK", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				for (PrefOption checkOption : checkOptions)
+					checkOption.save();
+				for (PrefOption fieldOption : fieldOptions)
+					fieldOption.save();
+				shell.close();
 			}
 		});
 		
 		Button cancelBt = Util.createPushButton(comp, "&Cancel", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
+				shell.close();
 			}
 		});
 		
@@ -169,49 +176,13 @@ public final class PrefDialog {
 	
 	@NotNull
 	static StyledLabel createLabeledStyledLabel(@NotNull Composite parent,
-														@NotNull String labelText) {
+												@NotNull String labelText) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(labelText);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		StyledLabel text = new StyledLabel(parent, SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
-	}
-
-	private static final class CheckOption extends PrefOption {
-		private final SettingsConf.Bool enumOption;
-		
-		public CheckOption(	@NotNull String labelText,
-							@NotNull SettingsConf.Bool enumOption) {
-			super(labelText);
-			this.enumOption = enumOption;
-		}
-		public void createControls(@NotNull Composite parent) {
-			Button bt = Util.createCheckButton(parent, labelText);
-			bt.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 2, 1));
-			bt.setSelection(enumOption.get());
-		}
-	}
-	
-	private static final class HotKeyOption extends PrefOption {
-		public HotKeyOption(@NotNull String labelText) {
-			super(labelText);
-		}
-		public void createControls(@NotNull Composite parent) {
-			final StyledLabel st = createLabeledStyledLabel(parent, labelText);
-			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-			
-			int[] hotkey = SettingsConf.IntArray.HotkeyToFront.get();
-			st.setText(HotkeyDialog.toString(hotkey));
-			
-			st.addMouseListener(new MouseAdapter() {
-				public void mouseDown(MouseEvent e) {
-					HotkeyDialog dialog = new HotkeyDialog(st.getShell());
-					int[] hotkey = dialog.open();
-					st.setText(HotkeyDialog.toString(hotkey));
-				}
-			});
-		}
 	}
 
 	static abstract class PrefOption {
@@ -223,6 +194,8 @@ public final class PrefDialog {
 		// Subclassers must set grid datas on the created controls, assuming
 		// a two-column grid layout
 		protected abstract void createControls(@NotNull Composite parent);
+		protected abstract void restoreDefault();
+		protected abstract void save();
 	}
 
 }

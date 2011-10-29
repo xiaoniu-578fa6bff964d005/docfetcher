@@ -65,9 +65,7 @@ final class ColorOption extends PrefOption {
 				RGB rgb = dialog.open();
 				if (rgb == null)
 					return;
-				Color oldColor = color;
 				setColor(rgb.red, rgb.green, rgb.blue);
-				oldColor.dispose();
 			}
 		});
 		
@@ -78,11 +76,23 @@ final class ColorOption extends PrefOption {
 		});
 	}
 	
+	protected void restoreDefault() {
+		setColor(enumOption.defaultValue);
+	}
+	
+	protected void save() {
+		RGB rgb = color.getRGB();
+		enumOption.set(rgb.red, rgb.green, rgb.blue);
+	}
+	
 	private void setColor(@NotNull int... rgb) {
+		Color oldColor = color;
 		color = new Color(st.getDisplay(), rgb[0], rgb[1], rgb[2]);
 		st.setBackground(color);
 		st.setSelectionBackground(color);
 		st.setSelectionForeground(st.getForeground());
+		if (oldColor != null)
+			oldColor.dispose();
 	}
 	
 }

@@ -57,9 +57,9 @@ final class FontOption extends PrefOption {
 		st.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				FontDialog dialog = new FontDialog(st.getShell());
-				FontData[] oldFontData = font.getFontData();
-				oldFontData[0].setHeight(fontHeight);
-				dialog.setFontList(new FontData[] {oldFontData[0]});
+				FontData oldFontData = font.getFontData()[0];
+				oldFontData.setHeight(fontHeight);
+				dialog.setFontList(new FontData[] {oldFontData});
 				FontData newFontData = dialog.open();
 				if (newFontData == null)
 					return;
@@ -68,6 +68,16 @@ final class FontOption extends PrefOption {
 				oldFont.dispose();
 			}
 		});
+	}
+	
+	protected void restoreDefault() {
+		setFont(fontDescription.createDefaultFontData());
+	}
+	
+	protected void save() {
+		FontData fontData = font.getFontData()[0];
+		fontData.setHeight(fontHeight);
+		fontDescription.set(fontData);
 	}
 	
 	private void setFont(@NotNull FontData fontData) {

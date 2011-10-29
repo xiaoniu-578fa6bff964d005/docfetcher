@@ -485,10 +485,11 @@ public final class SettingsConf {
 				"\\s*(\\d+)\\s*" // Font style with whitespace
 		);
 
+		public final FontData defaultValue;
 		private FontData value;
 
 		FontDescription(String name, int height, int style) {
-			value = new FontData(name, height, style);
+			value = defaultValue = new FontData(name, height, style);
 		}
 		public void load(String str) {
 			Matcher matcher = fontPattern.matcher(str);
@@ -513,10 +514,20 @@ public final class SettingsConf {
 		public Font get() {
 			return new Font(Display.getDefault(), value);
 		}
+		public void set(@NotNull FontData fontData) {
+			Util.checkNotNull(fontData);
+			value = fontData;
+		}
 		@NotNull
 		public FontData createFontData() {
 			return new FontData(
 				value.getName(), value.getHeight(), value.getStyle());
+		}
+		@NotNull
+		public FontData createDefaultFontData() {
+			return new FontData(
+				defaultValue.getName(), defaultValue.getHeight(),
+				defaultValue.getStyle());
 		}
 	}
 
