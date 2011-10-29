@@ -9,43 +9,33 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.gui;
+package net.sourceforge.docfetcher.gui.pref;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.gui.ConfigComposite;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Tran Nam Quang
  */
-final class PrefDialog {
+@VisibleForPackageGroup
+public final class PrefDialog {
 	
 	private final Shell shell;
 	@NotNull private Button okBt;
@@ -109,7 +99,7 @@ final class PrefDialog {
 				"Preview font (fixed width):",
 				UtilGui.getPreviewFontMono()),
 			
-			new TextFieldOption("Global hotkey:")
+			new HotKeyOption("Global hotkey:")
 		};
 		
 		for (PrefOption checkOption : checkOptions)
@@ -176,7 +166,7 @@ final class PrefDialog {
 	}
 	
 	@NotNull
-	private static StyledLabel createLabeledStyledLabel(@NotNull Composite parent,
+	static StyledLabel createLabeledStyledLabel(@NotNull Composite parent,
 														@NotNull String labelText) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(labelText);
@@ -201,106 +191,8 @@ final class PrefDialog {
 		}
 	}
 	
-	private static final class FontOption extends PrefOption {
-		private final FontDescription fontDescription;
-		@NotNull private StyledLabel st;
-		@NotNull private Font font;
-		private int fontHeight;
-		
-		public FontOption(	@NotNull String labelText,
-							@NotNull SettingsConf.FontDescription fontDescription) {
-			super(labelText);
-			this.fontDescription = fontDescription;
-		}
-		protected void createControls(Composite parent) {
-			st = createLabeledStyledLabel(parent, labelText);
-			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-			setFont(fontDescription.createFontData());
-			
-			st.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent e) {
-					font.dispose();
-				}
-			});
-			
-			st.addMouseListener(new MouseAdapter() {
-				public void mouseDown(MouseEvent e) {
-					FontDialog dialog = new FontDialog(st.getShell());
-					FontData[] oldFontData = font.getFontData();
-					oldFontData[0].setHeight(fontHeight);
-					dialog.setFontList(new FontData[] {oldFontData[0]});
-					FontData newFontData = dialog.open();
-					if (newFontData == null)
-						return;
-					Font oldFont = font;
-					setFont(newFontData);
-					oldFont.dispose();
-				}
-			});
-		}
-		private void setFont(@NotNull FontData fontData) {
-			fontHeight = fontData.getHeight();
-			Display display = st.getDisplay();
-			Font systemFont = display.getSystemFont();
-			fontData.setHeight(systemFont.getFontData()[0].getHeight());
-			st.setFont(font = new Font(display, fontData));
-			st.setText(fontData.getName() + " " + fontHeight);
-		}
-	}
-	
-	private static final class ColorOption extends PrefOption {
-		@NotNull private SettingsConf.IntArray enumOption;
-		@NotNull private StyledText st;
-		@NotNull private Color color;
-		
-		public ColorOption(@NotNull String labelText, @NotNull SettingsConf.IntArray enumOption) {
-			super(labelText);
-			this.enumOption = enumOption;
-		}
-		protected void createControls(Composite parent) {
-			Label label = new Label(parent, SWT.NONE);
-			label.setText(labelText);
-			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			
-			int style = SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY;
-			st = new StyledText(parent, style);
-			st.setCaret(null);
-			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-			
-			GridData stGridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
-			stGridData.widthHint = 50;
-			st.setLayoutData(stGridData);
-			setColor(enumOption.get());
-			
-			st.addMouseListener(new MouseAdapter() {
-				public void mouseDown(MouseEvent e) {
-					ColorDialog dialog = new ColorDialog(st.getShell());
-					dialog.setRGB(color.getRGB());
-					RGB rgb = dialog.open();
-					if (rgb == null)
-						return;
-					Color oldColor = color;
-					setColor(rgb.red, rgb.green, rgb.blue);
-					oldColor.dispose();
-				}
-			});
-			
-			st.addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent e) {
-					color.dispose();
-				}
-			});
-		}
-		private void setColor(@NotNull int... rgb) {
-			color = new Color(st.getDisplay(), rgb[0], rgb[1], rgb[2]);
-			st.setBackground(color);
-			st.setSelectionBackground(color);
-			st.setSelectionForeground(st.getForeground());
-		}
-	}
-
-	private static final class TextFieldOption extends PrefOption {
-		public TextFieldOption(@NotNull String labelText) {
+	private static final class HotKeyOption extends PrefOption {
+		public HotKeyOption(@NotNull String labelText) {
 			super(labelText);
 		}
 		public void createControls(@NotNull Composite parent) {
@@ -310,10 +202,10 @@ final class PrefDialog {
 		}
 	}
 
-	private static abstract class PrefOption {
+	static abstract class PrefOption {
 		protected final String labelText;
 
-		private PrefOption(@NotNull String labelText) {
+		public PrefOption(@NotNull String labelText) {
 			this.labelText = labelText;
 		}
 		// Subclassers must set grid datas on the created controls, assuming

@@ -31,6 +31,7 @@ import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.gui.filter.ToolBarForm;
 import net.sourceforge.docfetcher.gui.filter.TwoFormExpander;
+import net.sourceforge.docfetcher.gui.pref.PrefDialog;
 import net.sourceforge.docfetcher.gui.preview.PreviewPanel;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.FolderWatcher;
