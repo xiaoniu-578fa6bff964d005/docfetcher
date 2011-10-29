@@ -49,6 +49,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -440,6 +441,20 @@ public final class Util {
 			bt.setToolTipText(toolTip);
 		bt.addSelectionListener(listener);
 		return bt;
+	}
+	
+	/**
+	 * Returns a suitable text foreground color for the given background color.
+	 * The returned color is either black or white, depending on the perceived
+	 * luminance of the given background color.
+	 */
+	@NotNull
+	public static Color getTextForeground(@NotNull Color background) {
+		int r = background.getRed();
+		int g = background.getGreen();
+		int b = background.getBlue();
+		double a = 1 - (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+		return a < 0.5 ? Col.BLACK.get() : Col.WHITE.get();
 	}
 
 	/**

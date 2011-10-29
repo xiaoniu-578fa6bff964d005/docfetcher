@@ -44,13 +44,12 @@ public final class TabFolderFactory {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setSimple(false);
 			if (coloredTabs) {
-				final TextAreaColorsImpl textAreaColors = new TextAreaColorsImpl(tabFolder);
-				textAreaColors.setColors();
+				setTabColors(tabFolder);
 				
 				// Adapt colors to OS theme changes
 				tabFolder.getDisplay().addListener(SWT.Settings, new Listener() {
 					public void handleEvent(Event event) {
-						textAreaColors.setColors();
+						setTabColors(tabFolder);
 					}
 				});
 			}
@@ -68,33 +67,22 @@ public final class TabFolderFactory {
 		
 		return tabFolder;
 	}
-
-	private static class TextAreaColorsImpl extends TextAreaColors {
-		private final CTabFolder tabFolder;
-		
-		public TextAreaColorsImpl(@NotNull CTabFolder tabFolder) {
-			super(tabFolder);
-			this.tabFolder = tabFolder;
-		}
-		protected Color getBackground() {
-			return Col.TITLE_BACKGROUND.get();
-		}
-		public void setColors() {
-			tabFolder.setSelectionBackground(getBackground());
-			tabFolder.setSelectionForeground(getForeground());
-		}
+	
+	private static void setTabColors(@NotNull CTabFolder tabFolder) {
+		Color background = Col.TITLE_BACKGROUND.get();
+		Color foreground = Util.getTextForeground(background);
+		tabFolder.setSelectionBackground(background);
+		tabFolder.setSelectionForeground(foreground);
 	}
 	
 	private static class CustomRenderer extends CTabFolderRenderer {
 		private final CTabFolder tabFolder;
 		private final boolean coloredTabs;
-		private final TextAreaColorsImpl textAreaColors;
 		
 		public CustomRenderer(@NotNull CTabFolder tabFolder, boolean coloredTabs) {
 			super(tabFolder);
 			this.tabFolder = tabFolder;
 			this.coloredTabs = coloredTabs;
-			textAreaColors = new TextAreaColorsImpl(tabFolder);
 		}
 		protected void draw(int part, int state, Rectangle bounds, GC gc) {
 			// Tab states
@@ -103,18 +91,18 @@ public final class TabFolderFactory {
 			
 			// Color definitions
 			Color borderCol = coloredTabs
-				? textAreaColors.getBackground()
+				? Col.TITLE_BACKGROUND.get()
 				: Col.WIDGET_NORMAL_SHADOW.get();
 			Color backCol = null;
 			if (isHot || isSelected)
 				backCol = coloredTabs
-					? textAreaColors.getBackground()
+					? Col.TITLE_BACKGROUND.get()
 					: Col.WIDGET_HIGHLIGHT_SHADOW.get();
 			else
 				backCol = Col.WIDGET_BACKGROUND.get();
 			Color shadowCol = Col.WIDGET_DARK_SHADOW.get();
 			Color textCol = coloredTabs && (isSelected || isHot)
-				? textAreaColors.getForeground()
+				? Util.getTextForeground(Col.TITLE_BACKGROUND.get())
 				: Col.WIDGET_FOREGROUND.get();
 			
 			// Draw separating line between tabs and body
