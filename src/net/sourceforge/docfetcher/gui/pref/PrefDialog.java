@@ -21,6 +21,8 @@ import net.sourceforge.docfetcher.util.gui.ConfigComposite;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormLayout;
@@ -196,9 +198,19 @@ public final class PrefDialog {
 			super(labelText);
 		}
 		public void createControls(@NotNull Composite parent) {
-			StyledLabel st = createLabeledStyledLabel(parent, labelText);
+			final StyledLabel st = createLabeledStyledLabel(parent, labelText);
 			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-			st.setText("Ctrl + F8");
+			
+			int[] hotkey = SettingsConf.IntArray.HotkeyToFront.get();
+			st.setText(HotkeyDialog.toString(hotkey));
+			
+			st.addMouseListener(new MouseAdapter() {
+				public void mouseDown(MouseEvent e) {
+					HotkeyDialog dialog = new HotkeyDialog(st.getShell());
+					int[] hotkey = dialog.open();
+					st.setText(HotkeyDialog.toString(hotkey));
+				}
+			});
 		}
 	}
 

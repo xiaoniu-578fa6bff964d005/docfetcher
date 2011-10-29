@@ -44,6 +44,7 @@ public enum Img implements FilenameProvider {
 	
 	HELP ("help.gif"),
 	PREFERENCES ("preferences.gif"),
+	LETTERS ("letters.gif"),
 	INDEXING ("indexing.gif"),
 	MINIMIZE ("minimize.gif"),
 	MAXIMIZE ("maximize.gif"),
