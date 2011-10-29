@@ -56,8 +56,6 @@ import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;

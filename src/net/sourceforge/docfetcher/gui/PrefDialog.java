@@ -23,6 +23,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -34,6 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
@@ -171,21 +174,14 @@ final class PrefDialog {
 	}
 	
 	@NotNull
-	private static void setNonEditable(	@NotNull StyledText st,
-										boolean hideSelection) {
-		/*
-		 * Bug in SWT 3.7: On Mac OS X, setting a center alignment causes the
-		 * text to disappear.
-		 */
-		if (!Util.IS_MAC_OS_X)
-			st.setAlignment(SWT.CENTER);
-		st.setEditable(false);
-		st.setCaret(null);
-		st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-		if (hideSelection) {
-			st.setSelectionBackground(st.getBackground());
-			st.setSelectionForeground(st.getForeground());
-		}
+	public static StyledLabel createLabeledStyledLabel(	@NotNull Composite parent,
+														@NotNull String labelText) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(labelText);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		StyledLabel text = new StyledLabel(parent, SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		return text;
 	}
 
 	private static final class CheckOption extends PrefOption {
@@ -205,7 +201,9 @@ final class PrefDialog {
 	
 	private static final class FontOption extends PrefOption {
 		private final FontDescription fontDescription;
+		@NotNull private StyledLabel st;
 		@NotNull private Font font;
+		private int fontHeight;
 		
 		public FontOption(	@NotNull String labelText,
 							@NotNull SettingsConf.FontDescription fontDescription) {
@@ -213,21 +211,38 @@ final class PrefDialog {
 			this.fontDescription = fontDescription;
 		}
 		protected void createControls(Composite parent) {
-			StyledText st = Util.createLabeledGridStyledText(parent, labelText);
-			setNonEditable(st, true);
-			
-			Display display = parent.getDisplay();
-			FontData fontData = fontDescription.createFontData();
-			Font systemFont = display.getSystemFont();
-			fontData.setHeight(systemFont.getFontData()[0].getHeight());
-			st.setFont(font = new Font(display, fontData));
-			st.setText(fontData.getName() + " " + fontData.getHeight());
+			st = createLabeledStyledLabel(parent, labelText);
+			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+			setFont(fontDescription.createFontData());
 			
 			st.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent e) {
 					font.dispose();
 				}
 			});
+			
+			st.addMouseListener(new MouseAdapter() {
+				public void mouseDown(MouseEvent e) {
+					FontDialog dialog = new FontDialog(st.getShell());
+					FontData[] oldFontData = font.getFontData();
+					oldFontData[0].setHeight(fontHeight);
+					dialog.setFontList(new FontData[] {oldFontData[0]});
+					FontData newFontData = dialog.open();
+					if (newFontData == null)
+						return;
+					Font oldFont = font;
+					setFont(newFontData);
+					oldFont.dispose();
+				}
+			});
+		}
+		private void setFont(@NotNull FontData fontData) {
+			fontHeight = fontData.getHeight();
+			Display display = st.getDisplay();
+			Font systemFont = display.getSystemFont();
+			fontData.setHeight(systemFont.getFontData()[0].getHeight());
+			st.setFont(font = new Font(display, fontData));
+			st.setText(fontData.getName() + " " + fontHeight);
 		}
 	}
 	
@@ -245,7 +260,9 @@ final class PrefDialog {
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 			
 			StyledText st = new StyledText(parent, SWT.SINGLE | SWT.BORDER);
-			setNonEditable(st, false);
+			st.setEditable(false);
+			st.setCaret(null);
+			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
 			
 			GridData stGridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
 			stGridData.widthHint = 50;
@@ -270,9 +287,8 @@ final class PrefDialog {
 			super(labelText);
 		}
 		public void createControls(@NotNull Composite parent) {
-			StyledText st = Util.createLabeledGridStyledText(parent, labelText);
-			setNonEditable(st, true);
-			
+			StyledLabel st = createLabeledStyledLabel(parent, labelText);
+			st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
 			st.setText("Ctrl + F8");
 		}
 	}
