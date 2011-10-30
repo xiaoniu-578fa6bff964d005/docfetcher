@@ -11,6 +11,9 @@
 
 package net.sourceforge.docfetcher.gui.pref;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
@@ -39,8 +42,8 @@ public final class PrefDialog {
 	
 	private final Shell shell;
 	@NotNull private Button okBt;
-	private final PrefOption[] checkOptions;
-	private final PrefOption[] fieldOptions;
+	private final List<PrefOption> checkOptions;
+	private final List<PrefOption> fieldOptions;
 	
 	public PrefDialog(@NotNull Shell parent) {
 		Util.checkNotNull(parent);
@@ -50,7 +53,7 @@ public final class PrefDialog {
 		shell.setImage(Img.PREFERENCES.get());
 		SettingsConf.ShellBounds.PreferencesDialog.bind(shell);
 		
-		checkOptions = new PrefOption[] {
+		checkOptions = Arrays.<PrefOption> asList(
 			new CheckOption(
 				"Show manual on startup",
 				SettingsConf.Bool.ShowManualOnStartup),
@@ -65,15 +68,15 @@ public final class PrefDialog {
 
 			new CheckOption(
 				"Clear search history on exit",
-				SettingsConf.Bool.ClearSearchHistoryOnExit),
+				SettingsConf.Bool.ClearSearchHistoryOnExit)
 
 			// TODO post-release-1.1: Implement this; requires saving and restoring the tree expansion state
 //			new CheckOption(
 //				"Reset location filter on exit",
 //				SettingsConf.Bool.ResetLocationFilterOnExit),
-		};
+		);
 		
-		fieldOptions = new PrefOption[] {
+		fieldOptions = Util.createList(
 			new ColorOption(
 				"Highlight color:",
 				SettingsConf.IntArray.PreviewHighlighting),
@@ -84,10 +87,10 @@ public final class PrefDialog {
 			
 			new FontOption(
 				"Preview font (fixed width):",
-				UtilGui.getPreviewFontMono()),
-			
-			new HotkeyOption("Global hotkey:")
-		};
+				UtilGui.getPreviewFontMono())
+		);
+		if (!Util.IS_MAC_OS_X)
+			fieldOptions.add(new HotkeyOption("Global hotkey:"));
 		
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {

@@ -1031,6 +1031,16 @@ public final class Util {
 		return list.get(size - 1);
 	}
 	
+	@MutableCopy
+	@NotNull
+	public static <T> List<T> createList(@NotNull T... elements) {
+		Util.checkNotNull(elements);
+		List<T> newList = new ArrayList<T>(elements.length);
+		for (T element : elements)
+			newList.add(element);
+		return newList;
+	}
+	
 	/**
 	 * Creates a new list from the given collection and elements. The given
 	 * collection is added first to the returned list.

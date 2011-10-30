@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.build.U.LineSep;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 
@@ -43,29 +44,16 @@ public final class BuildMain {
 	private static final String appName = "DocFetcher";
 	private static final String version = "1.1";
 	
+	private static final String packageId = Main.class.getPackage().getName();
+	private static final String packagePath = packageId.replace(".", "/");
+	private static final String mainPath = "build/tmp/src/" + packagePath;
+	
+	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
+	private static final String buildDate = dateFormat.format(new Date());
+	
 	public static void main(String[] args) throws Exception {
-		String packageId = Main.class.getPackage().getName();
-		String packagePath = packageId.replace(".", "/");
-		
-		DateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
-		String buildDate = format.format(new Date());
-		
 		Util.println("Copying sources to build directory...");
 		U.copyDir("src", "build/tmp/src");
-		
-		String mainPath = "build/tmp/src/" + packagePath;
-		U.copyTextFile(
-			"dist/system-template.conf",
-			mainPath + "/system.conf",
-			LineSep.WINDOWS,
-			"${app_name}", appName,
-			"${app_version}", version,
-			"${build_date}", buildDate,
-			"${is_portable}", Boolean.TRUE.toString());
-		U.copyTextFile(
-			"dist/program.conf",
-			mainPath + "/program.conf",
-			LineSep.WINDOWS);
 		
 		// Licenses
 		String licensePatterns = U.readPatterns("lib/license_patterns.txt");
@@ -88,23 +76,53 @@ public final class BuildMain {
 		javac.setFork(true); // Won't find javac executable without this
 		javac.execute();
 		
-		Util.println("Creating Jar file...");
-		Jar jar = new Jar();
-		jar.setProject(new Project());
+		createPortableBuild(recreateJarFile(true, LineSep.WINDOWS));
+		createMacOsXBuild(recreateJarFile(false, LineSep.UNIX));
+		runTests();
+	}
+	
+	private static File recreateJarFile(boolean isPortable, LineSep lineSep) throws Exception {
+		String prefix = (isPortable ? "" : "non-");
+		Util.println(U.format("Creating %sportable Jar file...", prefix));
+		
+		File systemConfDest = new File(mainPath + "/system.conf");
+		systemConfDest.delete();
+		
+		File programConfDest = new File(mainPath + "/program.conf");
+		programConfDest.delete();
+		
 		File mainJarFile = new File(String.format(
 			"build/tmp/%s_%s_%s.jar", packageId, version, buildDate));
+		mainJarFile.delete();
+		
+		U.copyTextFile(
+			"dist/system-template.conf",
+			systemConfDest.getPath(),
+			lineSep,
+			"${app_name}", appName,
+			"${app_version}", version,
+			"${build_date}", buildDate,
+			"${is_portable}", String.valueOf(isPortable));
+		
+		U.copyTextFile(
+			"dist/program.conf",
+			programConfDest.getPath(),
+			lineSep);
+		
+		Jar jar = new Jar();
+		jar.setProject(new Project());
 		jar.setDestFile(mainJarFile);
 		jar.setBasedir(new File("build/tmp/src"));
+		
 		Manifest manifest = new Manifest();
 		Attribute attr = new Attribute();
 		attr.setName("Main-Class");
 		attr.setValue(Main.class.getName());
 		manifest.addConfiguredAttribute(attr);
 		jar.addConfiguredManifest(manifest);
-		jar.execute();
 		
-		createPortableBuild(mainJarFile);
-		runTests();
+		jar.execute();
+		return mainJarFile;
 	}
 
 	private static void createPortableBuild(File tmpMainJar) throws Exception {
@@ -128,11 +146,19 @@ public final class BuildMain {
 			"${main_class}", Main.class.getName()
 		);
 		
-		String macOsXLauncher = U.format("%s/%s-MacOSX.command", releaseDir, appName);
+		// Create DocFetcher.app launcher for Mac OS X
+		String macOsXLauncher = U.format("%s/%s.app/Contents/MacOS/%s", releaseDir, appName, appName);
 		U.copyTextFile(
-			"dist/launcher-macosx.sh", macOsXLauncher, LineSep.UNIX,
+			"dist/launcher-macosx-portable.sh",
+			macOsXLauncher,
+			LineSep.UNIX,
+			"${app_name}", appName,
 			"${main_class}", Main.class.getName()
 		);
+		U.copyBinaryFile(
+			"dist/DocFetcher.icns",
+			U.format("%s/%s.app/Contents/Resources/%s.icns", releaseDir, appName, appName));
+		deployInfoPlist(new File(U.format("%s/%s.app/Contents", releaseDir, appName)));
 		
 		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
 			U.exec("chmod +x %s", Util.getAbsPath(linuxLauncher));
@@ -156,6 +182,67 @@ public final class BuildMain {
 		
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");
+	}
+	
+	private static void deployInfoPlist(File dstDir) throws Exception {
+		U.copyTextFile(
+			"dist/Info.plist",
+			new File(dstDir, "Info.plist").getPath(),
+			LineSep.UNIX,
+			"${app_name}", appName,
+			"${app_version}", version,
+			"${build_date}", buildDate,
+			"${package_id}", packageId);
+	}
+	
+	private static void createMacOsXBuild(File tmpMainJar) throws Exception {
+		Util.println("Creating Mac OS X build (without disk image packaging)...");
+		String appDir = U.format("build/%s.app", appName);
+		String contentsDir = appDir + "/Contents";
+		String resourcesDir = contentsDir + "/Resources";
+		
+		U.copyDir("dist/img", resourcesDir + "/img");
+		U.copyDir("dist/help", resourcesDir + "/help");
+		U.copyBinaryFile(
+			"dist/DocFetcher.icns",
+			U.format("%s/%s.icns", resourcesDir, appName));
+		deployInfoPlist(new File(contentsDir));
+		
+		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
+		U.copyFlatten("lib", resourcesDir + "/lib", "**/*.jar", excludedLibs);
+		U.copyFlatten("lib", resourcesDir + "/lib/swt", "**/swt*mac*.jar", null);
+		U.copyFlatten("lib", resourcesDir + "/lib", "**/*.dylib", null);
+		
+		String dstMainJar = U.format(
+			"%s/lib/%s", resourcesDir, tmpMainJar.getName());
+		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
+		
+		String launcher = U.format("%s/MacOS/%s", contentsDir, appName);
+		U.copyTextFile(
+			"dist/launcher-macosx-app.sh", launcher, LineSep.UNIX,
+			"${app_name}", appName,
+			"${main_class}", Main.class.getName()
+		);
+		
+		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
+			U.exec("chmod +x %s", Util.getAbsPath(launcher));
+		}
+		else {
+			Util.printErr("Warning: Cannot make the" +
+					" launcher shell script executable.");
+		}
+		
+		U.copyBinaryFile("build/tmp/licenses.zip", resourcesDir
+				+ "/misc/licenses.zip");
+		
+		if (Util.IS_MAC_OS_X) {
+			String dmgPath = U.format("build/%s-%s.dmg", appName, version);
+			U.exec("hdiutil create -srcfolder %s %s", appDir, dmgPath);
+			U.exec("hdiutil internet-enable yes " + dmgPath);
+		}
+		else {
+			Util.printErr("Warning: Could not create a disk image for Mac OS X.");
+		}
 	}
 	
 	private static void runTests() {

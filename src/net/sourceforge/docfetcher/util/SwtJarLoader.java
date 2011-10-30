@@ -30,7 +30,19 @@ public final class SwtJarLoader {
 	public static void loadSwtJar() throws IOException {
 		String osNamePart = getOsNamePart();
 		String osArchPart = getOsArchPart();
-        for (File file : new File("lib/swt").listFiles()) {
+		
+		/*
+		 * Determine the directory containing the SWT jars. For all versions
+		 * except the non-portable Mac OS X version, this is simply 'lib/swt'.
+		 */
+		File swtDir = new File("lib/swt");
+		if (osNamePart.contains("mac") && !swtDir.exists()) {
+			File altSwtDir = new File("../Resources/lib/swt");
+			assert altSwtDir.exists();
+			swtDir = altSwtDir;
+		}
+		
+        for (File file : swtDir.listFiles()) {
         	String filename = file.getName();
 			if (filename.contains(osNamePart)
 					&& filename.endsWith(osArchPart + ".jar")) {

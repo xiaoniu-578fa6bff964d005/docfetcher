@@ -132,10 +132,10 @@ final class U {
 		zip.setDestFile(new File(dstPath));
 		zip.execute();
 	}
+	
+	public enum LineSep {
+		UNIX,
+		WINDOWS,
+	}
 
-}
-
-enum LineSep {
-	UNIX,
-	WINDOWS,
 }

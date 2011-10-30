@@ -134,12 +134,20 @@ public final class Application {
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
 		
+		// Determine shell title
+		String shellTitle;
+		if (SystemConf.Bool.IsDevelopmentVersion.get())
+			shellTitle = SystemConf.Str.ProgramName.get();
+		else
+			shellTitle = ProgramConf.Str.AppName.get();
+		
 		// Load index registry; create display and shell
+		Display.setAppName(shellTitle); // must be called *before* the display is created
 		Display display = new Display();
 		AppUtil.setDisplay(display);
 		loadIndexRegistry(display);
 		shell = new Shell(display);
-
+		
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
 			display, AppUtil.getImageDir());
@@ -163,12 +171,7 @@ public final class Application {
 		SettingsConf.ShellBounds.MainWindow.bind(shell);
 		SettingsConf.Bool.MainShellMaximized.bindMaximized(shell);
 		shell.setLayout(new FormLayout());
-		
-		// Set shell title
-		if (SystemConf.Bool.IsDevelopmentVersion.get())
-			shell.setText(SystemConf.Str.ProgramName.get());
-		else
-			shell.setText(ProgramConf.Str.AppName.get());
+		shell.setText(shellTitle);
 		
 		initCocoaMenu(display);
 		initSystemTrayHider();
@@ -416,15 +419,16 @@ public final class Application {
 			}
 		}
 		catch (FileNotFoundException e) {
-			// Restore conf file if missing
-			String absPath = Util.getSystemAbsPath(confFile);
-			String msg = String.format("Configuration file is missing:\n%s.\n"
-					+ "File will be restored.", absPath);
-			AppUtil.showErrorOnStart(msg, false);
+			/*
+			 * Restore conf file if missing. In case of the non-portable
+			 * version, the conf file will be missing the first time the program
+			 * is started.
+			 */
 			InputStream in = Main.class.getResourceAsStream(confFile.getName());
 			try {
 				ConfLoader.load(in, ProgramConf.class);
 				URL url = Resources.getResource(Main.class, confFile.getName());
+				Util.getParentFile(confFile).mkdirs();
 				Files.copy(
 					Resources.newInputStreamSupplier(url), confFile);
 			}

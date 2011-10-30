@@ -313,9 +313,8 @@ public final class AppUtil {
 		
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		int style = SWT.OK;
-		style |= isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING;
-		MessageBox msgBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+		int style = SWT.OK | (isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING);
+		MessageBox msgBox = new MessageBox(shell, style);
 		msgBox.setText(Msg.system_error.value);
 		msgBox.setMessage(message);
 		msgBox.open();
@@ -538,12 +537,12 @@ public final class AppUtil {
 				throw new IllegalStateException("Cannot find application data folder.");
 			appDataDir = new File(winAppData, programName);
 		}
-		else if (Util.IS_LINUX) {
-			// /home/<UserName>/.<LowerCaseProgramName>
+		else if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
+			// Linux: /home/<UserName>/.<LowerCaseProgramName>
+			// Mac OS X: /Users/<UserName>/.<LowerCaseProgramName>
 			appDataDir = new File(Util.USER_HOME_PATH, "." + programName.toLowerCase());
 		}
 		else {
-			// TODO mac: implement this on the Mac
 			throw new IllegalStateException();
 		}
 		
@@ -562,6 +561,8 @@ public final class AppUtil {
 		checkConstInitialized();
 		if (Const.IS_DEVELOPMENT_VERSION.asBoolean())
 			return "dist/img";
+		if (Util.IS_MAC_OS_X && !Const.IS_PORTABLE.asBoolean())
+			return "../Resources/img";
 		return "img";
 	}
 
