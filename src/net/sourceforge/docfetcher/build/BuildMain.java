@@ -143,6 +143,9 @@ public final class BuildMain {
 					" launcher shell script executable.");
 		}
 		
+		String exeLauncher = U.format("%s/%s.exe", releaseDir, appName);
+		U.copyBinaryFile("dist/DocFetcher.exe", exeLauncher);
+		
 		String batLauncher = U.format("%s/%s.bat", releaseDir, appName);
 		U.copyTextFile(
 			"dist/launcher-portable.bat", batLauncher, LineSep.WINDOWS,

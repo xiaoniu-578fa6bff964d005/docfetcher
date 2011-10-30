@@ -1,0 +1,23 @@
+These are the settings used for creating a Windows launcher with Launch4J.
+
+Basic
+==============================
+Jar runtime path: lib\
+Don't wrap the jar, launch only: checked
+Icon: (Path to ico file)
+Change dir: .
+Stay alive after launching a GUI application: checked
+	(Uninstaller won't work without this!)
+Java download URL: http://java.com
+
+Classpath
+==============================
+Custom classpath: checked
+Main class: net.sourceforge.docfetcher.Main
+Classpath: lib\*.jar
+
+JRE
+==============================
+Min JRE version: 1.6.0
+Max heap size: 256 MB
+JVM options: -Djava.library.path="lib"
