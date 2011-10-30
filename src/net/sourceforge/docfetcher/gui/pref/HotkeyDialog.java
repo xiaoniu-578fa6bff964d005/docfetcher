@@ -16,6 +16,7 @@ import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
@@ -53,7 +54,10 @@ final class HotkeyDialog {
 		keyLabel.setText("keybox_msg");
 		hotkeyBox = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
 		hotkeyBox.setText(toString(hotkey));
-		hotkeyBox.setFocus();
+		
+		// On Windows XP, the read-only text field looks like a label without this
+		hotkeyBox.setBackground(Col.LIST_BACKGROUND.get());
+		hotkeyBox.setForeground(Col.LIST_FOREGROUND.get());
 		
 		Label vSpacer = new Label(shell, SWT.NONE);
 		Label sep = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -129,6 +133,7 @@ final class HotkeyDialog {
 		
 		Util.setCenteredBounds(shell);
 		shell.open();
+		hotkeyBox.setFocus();
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch())
 				shell.getDisplay().sleep();

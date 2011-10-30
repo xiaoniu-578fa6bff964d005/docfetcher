@@ -23,12 +23,12 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * @author Tran Nam Quang
  */
-final class HotKeyOption extends PrefOption {
+final class HotkeyOption extends PrefOption {
 	
 	@NotNull private StyledLabel st;
 	@NotNull private int[] hotkey;
 
-	public HotKeyOption(@NotNull String labelText) {
+	public HotkeyOption(@NotNull String labelText) {
 		super(labelText);
 	}
 

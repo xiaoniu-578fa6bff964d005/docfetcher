@@ -86,7 +86,7 @@ public final class PrefDialog {
 				"Preview font (fixed width):",
 				UtilGui.getPreviewFontMono()),
 			
-			new HotKeyOption("Global hotkey:")
+			new HotkeyOption("Global hotkey:")
 		};
 		
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
