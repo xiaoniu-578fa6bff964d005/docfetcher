@@ -11,12 +11,10 @@
 
 package net.sourceforge.docfetcher.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -71,8 +69,6 @@ import org.eclipse.swt.widgets.Widget;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -94,6 +90,9 @@ public final class Util {
 	/** Whether the platform is Linux. */
 	public static final boolean IS_LINUX;
 	
+	/** Whether the platform is Linux KDE. */
+	public static final boolean IS_LINUX_KDE;
+	
 	/** Whether the platform is Mac OS X. */
 	public static final boolean IS_MAC_OS_X;
 	
@@ -113,6 +112,7 @@ public final class Util {
 		String osName = System.getProperty("os.name").toLowerCase();
 		IS_WINDOWS = osName.contains("windows");
 		IS_LINUX = osName.contains("linux");
+		IS_LINUX_KDE = IS_LINUX && System.getenv("KDE_FULL_SESSION") != null;
 		IS_MAC_OS_X = osName.equals("mac os x");
 	}
 
@@ -1206,24 +1206,24 @@ public final class Util {
 	@SuppressAjWarnings
 	public static boolean launch(@NotNull String filename) {
 		Util.checkNotNull(filename);
-		if (Program.launch(filename))
+
+		/*
+		 * On KDE with SWT 3.7, calling Program.launch will throw an
+		 * UnsatisfiedLinkError, so don't do that and only try xdg-open.
+		 */
+		if (!IS_LINUX_KDE && Program.launch(filename))
 			return true;
-		if (! IS_LINUX)
+		
+		if (!IS_LINUX)
 			return false;
+		
 		try {
 			String[] cmd = {"xdg-open", filename};
 			Process process = Runtime.getRuntime().exec(cmd);
-			
-			ByteArrayOutputStream errorOut = new ByteArrayOutputStream();
-			InputStream errorIn = process.getErrorStream();
-			
 			int exitValue = process.waitFor();
-			ByteStreams.copy(errorIn, errorOut);
-			Closeables.closeQuietly(errorIn);
-			Closeables.closeQuietly(errorOut);
-			
-			return exitValue == 0 && errorOut.size() == 0;
-		} catch (Exception e) {
+			return exitValue == 0;
+		}
+		catch (Exception e) {
 			return false;
 		}
 	}
