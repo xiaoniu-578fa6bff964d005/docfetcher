@@ -26,6 +26,8 @@ import org.apache.poi.hdgf.extractor.VisioTextExtractor;
 import org.apache.poi.hpsf.PropertySetFactory;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.hwpf.OldWordFileFormatException;
+import org.apache.poi.hwpf.extractor.Word6Extractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.poifs.eventfilesystem.POIFSReader;
 import org.apache.poi.poifs.eventfilesystem.POIFSReaderEvent;
@@ -45,7 +47,12 @@ abstract class MSOfficeParser extends FileParser {
 		}
 		protected String extractText(InputStream in)
 				throws IOException {
-			return new WordExtractor(in).getText();
+			try {
+				return new WordExtractor(in).getText();
+			}
+			catch (OldWordFileFormatException e) {
+				return new Word6Extractor(in).getText();
+			}
 		}
 	}
 	
