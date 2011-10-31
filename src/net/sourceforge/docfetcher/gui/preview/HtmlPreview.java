@@ -51,6 +51,7 @@ final class HtmlPreview extends ToolBarForm {
 	@NotNull private ToolItem htmlBt;
 	@NotNull private Browser browser;
 	
+	// This will throw an SWTError if no embedded browser is available
 	public HtmlPreview(@NotNull Composite parent) {
 		super(parent);
 	}
@@ -143,7 +144,8 @@ final class HtmlPreview extends ToolBarForm {
 	
 	@NotNull
 	protected Control createContents(@NotNull Composite parent) {
-		// TODO websearch: Add program.conf entry to allow using Mozilla (SWT.MOZILLA) or WebKit browser
+		// TODO post-release-1.1: Add program.conf entry to allow using Mozilla (SWT.MOZILLA) or WebKit browser
+		// This will throw an SWTError if no embedded browser is available
 		browser = new Browser(parent, SWT.BORDER);
 		
 		browser.addLocationListener(new LocationAdapter() {

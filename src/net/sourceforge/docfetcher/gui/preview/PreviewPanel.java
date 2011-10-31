@@ -33,6 +33,7 @@ import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.concurrent.MergingBlockingQueue;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -68,6 +69,7 @@ public final class PreviewPanel extends Composite {
 	@Nullable private ResultDocument lastDoc;
 	@Nullable private MailResource lastMailResource;
 	@Nullable private FileResource lastHtmlResource;
+	private boolean browserCreationFailed = false;
 	
 	// Thread interrupt signal
 	private long requestCount = 0;
@@ -124,7 +126,7 @@ public final class PreviewPanel extends Composite {
 	}
 	
 	@ThreadSafe
-	public void setHtmlFile(@NotNull File file) {
+	public boolean setHtmlFile(@NotNull File file) {
 		Util.checkNotNull(file);
 		Util.assertSwtThread();
 		
@@ -133,9 +135,11 @@ public final class PreviewPanel extends Composite {
 		requestCount++;
 		setError(null, requestCount);
 		
-		createAndShowHtmlPreview();
+		if (!createAndShowHtmlPreview())
+			return false;
 		clearPreviews(true, true, false);
 		htmlPreview.setFile(file, false);
+		return true;
 	}
 	
 	@NotThreadSafe
@@ -151,27 +155,35 @@ public final class PreviewPanel extends Composite {
 			clearPreviews(true, false, true);
 			new EmailThread(doc, requestCount).start();
 		}
-		else if (doc.isHtmlFile() && SettingsConf.Bool.PreferHtmlPreview.get()) {
-			createAndShowHtmlPreview();
-			clearPreviews(true, true, false);
-			new HtmlThread(doc, requestCount).start();
-		}
 		else if (doc.isPdfFile()) {
 			moveToTop(textPreview);
 			clearPreviews(true, true, true);
 			new PdfThread(doc, requestCount).start();
 		}
+		else if (doc.isHtmlFile()
+				&& SettingsConf.Bool.PreferHtmlPreview.get()
+				&& createAndShowHtmlPreview()) {
+			clearPreviews(true, true, false);
+			new HtmlThread(doc, requestCount).start();
+		}
 		else {
-			textPreview.setHtmlButtonEnabled(doc.isHtmlFile());
+			boolean htmlEnabled = doc.isHtmlFile() && !browserCreationFailed;
+			textPreview.setHtmlButtonEnabled(htmlEnabled);
 			moveToTop(textPreview);
 			clearPreviews(false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
 	}
 	
-	private void createAndShowHtmlPreview() {
+	private boolean createAndShowHtmlPreview() {
 		if (htmlPreview == null) {
-			htmlPreview = new HtmlPreview(stackComp);
+			try {
+				htmlPreview = new HtmlPreview(stackComp);
+			}
+			catch (SWTError e) {
+				browserCreationFailed = true;
+				return false;
+			}
 			htmlPreview.evtHtmlToTextBt.add(new Event.Listener<Void>() {
 				public void update(Void eventData) {
 					if (lastDoc == null)
@@ -182,6 +194,7 @@ public final class PreviewPanel extends Composite {
 			});
 		}
 		moveToTop(htmlPreview);
+		return true;
 	}
 	
 	// Returns the currently displayed result document, if there is one
