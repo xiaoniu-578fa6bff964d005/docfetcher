@@ -158,6 +158,7 @@ public final class IndexingQueue {
 			luceneIndex.clear();
 		}
 		IndexingResult result = task.update(); // Long-running process
+		boolean hasErrors = luceneIndex.hasErrorsDeep();
 
 		boolean doDelete = false;
 		boolean fireRemoved = false;
@@ -195,7 +196,7 @@ public final class IndexingQueue {
 				if (result == IndexingResult.SUCCESS_CHANGED)
 					indexRegistry.save(luceneIndex);
 				boolean keep = task.is(CancelAction.KEEP);
-				if (keep || shutdown || !luceneIndex.hasErrorsDeep())
+				if (keep || shutdown || !hasErrors)
 					fireRemoved = tasks.remove(task);
 			}
 			task.set(TaskState.FINISHED);
@@ -206,6 +207,8 @@ public final class IndexingQueue {
 		
 		if (fireRemoved)
 			evtRemoved.fire(task);
+		
+		task.evtFinished.fire(hasErrors);
 		
 		// Delete index; this can be done without holding the lock
 		if (doDelete) {

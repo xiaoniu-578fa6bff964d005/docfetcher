@@ -16,6 +16,7 @@ import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
 import net.sourceforge.docfetcher.model.TreeIndex.IndexingResult;
 import net.sourceforge.docfetcher.model.index.DelegatingReporter.ExistingMessagesHandler;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -49,6 +50,10 @@ public final class Task {
 	public enum TaskState {
 		NOT_READY, READY, INDEXING, FINISHED
 	}
+	
+	// Event data: True if there were errors
+	// Fired without lock, possibly from non-GUI thread
+	public final Event<Boolean> evtFinished = new Event<Boolean>();
 
 	private final IndexingQueue queue;
 	private final LuceneIndex index;

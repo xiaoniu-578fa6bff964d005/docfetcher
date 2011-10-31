@@ -435,6 +435,18 @@ public final class IndexingDialog implements Dialog {
 			}
 		});
 		
+		task.evtFinished.add(new Event.Listener<Boolean>() {
+			public void update(Boolean eventData) {
+				if (eventData) {
+					Util.runAsyncExec(tabItem, new Runnable() {
+						public void run() {
+							tabItem.setImage(Img.WARNING_BIG.get());
+						}
+					});
+				}
+			}
+		});
+		
 		/*
 		 * For unknown reasons, without this line the progress table won't
 		 * scroll to the bottom until the next message comes in.

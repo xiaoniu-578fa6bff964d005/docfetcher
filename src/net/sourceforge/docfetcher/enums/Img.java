@@ -51,6 +51,8 @@ public enum Img implements FilenameProvider {
 	HIDE ("hide.gif"),
 	RESTORE ("restore.png"),
 	INDEXING_DIALOG ("indexing_dialog.gif"),
+	WARNING ("warning.gif"),
+	WARNING_BIG ("warning_big.gif"),
 	ARROW_LEFT ("arrow_left.gif"),
 	ARROW_RIGHT ("arrow_right.gif"),
 	ARROW_UP ("arrow_up.gif"),
