@@ -30,19 +30,19 @@ abstract class MSOffice2007Parser extends FileParser {
 	
 	public static final class MSWord2007Parser extends MSOffice2007Parser {
 		public MSWord2007Parser() {
-			super("MS Word 2007", "docx", "docm"); // TODO i18n filetype_docx
+			super("MS Word 2007", "docx", "docm", "dotx"); // TODO i18n filetype_docx
 		}
 	}
 	
 	public static final class MSExcel2007Parser extends MSOffice2007Parser {
 		public MSExcel2007Parser() {
-			super("MS Excel 2007", "xlsx", "xlsm"); // TODO i18n filetype_xlsx
+			super("MS Excel 2007", "xlsx", "xlsm", "xltx"); // TODO i18n filetype_xlsx
 		}
 	}
 	
 	public static final class MSPowerPoint2007Parser extends MSOffice2007Parser {
 		public MSPowerPoint2007Parser() {
-			super("MS PowerPoint 2007", "pptx", "pptm"); // TODO i18n filetype_pptx
+			super("MS PowerPoint 2007", "pptx", "pptm", "ppsx"); // TODO i18n filetype_pptx
 		}
 	}
 	

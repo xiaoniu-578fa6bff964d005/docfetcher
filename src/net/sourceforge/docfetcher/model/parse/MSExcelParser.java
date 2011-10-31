@@ -33,7 +33,7 @@ import com.google.common.io.Closeables;
 final class MSExcelParser extends MSOfficeParser {
 	
 	public MSExcelParser() {
-		super("MS Excel", "xls"); // TODO i18n filetype_xls
+		super("MS Excel", "xls", "xlt"); // TODO i18n filetype_xls
 	}
 
 	@Override

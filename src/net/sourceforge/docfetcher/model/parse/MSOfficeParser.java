@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -39,7 +40,8 @@ abstract class MSOfficeParser extends FileParser {
 	
 	public static final class MSWordParser extends MSOfficeParser {
 		public MSWordParser() {
-			super("MS Word", "doc"); // TODO i18n filetype_doc
+			// TODO post-release-1.1: 'dot' extension might interfere with GraphViz dot format
+			super("MS Word", "doc", "dot"); // TODO i18n filetype_doc
 		}
 		protected String extractText(InputStream in)
 				throws IOException {
@@ -49,7 +51,7 @@ abstract class MSOfficeParser extends FileParser {
 	
 	public static final class MSPowerPointParser extends MSOfficeParser {
 		public MSPowerPointParser() {
-			super("MS PowerPoint", "ppt"); // TODO i18n filetype_ppt
+			super("MS PowerPoint", "ppt", "pps"); // TODO i18n filetype_ppt
 		}
 		protected String extractText(InputStream in)
 				throws IOException {
@@ -78,9 +80,9 @@ abstract class MSOfficeParser extends FileParser {
 	private final Collection<String> extensions;
 	
 	MSOfficeParser(	@NotNull String typeLabel,
-					@NotNull String extension) {
+					@NotNull String... extensions) {
 		this.typeLabel = typeLabel;
-		extensions = Collections.singleton(extension);
+		this.extensions = Arrays.asList(extensions);
 	}
 
 	protected final ParseResult parse(File file, ParseContext context)
