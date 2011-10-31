@@ -106,7 +106,8 @@ final class PatternTable extends Composite {
 		 * Note: The table has SWT.SINGLE style because moving more than one
 		 * element up or down at once is currently not supported.
 		 */
-		tableViewer = new SimpleTableViewer<PatternAction>(this, SWT.BORDER | SWT.SINGLE);
+		int style = SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION;
+		tableViewer = new SimpleTableViewer<PatternAction>(this, style);
 		tableViewer.enableEditSupport();
 		
 		tableViewer.addColumn(new Column<PatternAction>("Pattern (regex)") {

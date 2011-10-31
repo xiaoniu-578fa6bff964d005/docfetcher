@@ -220,6 +220,7 @@ public final class SimpleTableViewer<E> {
 	}
 	
 	// Implementors should override Column.getEditSupport() for each editable column
+	// On Windows, table must be created with style SWT.FULL_SELECTION to allow editing of columns beyond the first one
 	public void enableEditSupport() {
 		if (editSupport != null)
 			return;
