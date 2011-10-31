@@ -81,4 +81,6 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	
 	public boolean isWatchFolders();
 	
+	public boolean hasErrorsDeep();
+	
 }

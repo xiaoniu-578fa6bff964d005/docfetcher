@@ -195,4 +195,8 @@ public abstract class TreeIndex <
 		return config.isWatchFolders();
 	}
 	
+	public final boolean hasErrorsDeep() {
+		return rootFolder.hasErrorsDeep();
+	}
+	
 }

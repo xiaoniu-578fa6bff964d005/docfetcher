@@ -481,4 +481,18 @@ public abstract class Folder
 		return null;
 	}
 	
+	public synchronized final boolean hasErrorsDeep() {
+		if (hasErrors())
+			return true;
+		if (documents != null)
+			for (D document : documents.values())
+				if (document.hasErrors())
+					return true;
+		if (subFolders != null)
+			for (F subFolder : subFolders.values())
+				if (subFolder.hasErrorsDeep())
+					return true;
+		return false;
+	}
+	
 }

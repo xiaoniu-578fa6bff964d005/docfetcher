@@ -195,8 +195,7 @@ public final class IndexingQueue {
 				if (result == IndexingResult.SUCCESS_CHANGED)
 					indexRegistry.save(luceneIndex);
 				boolean keep = task.is(CancelAction.KEEP);
-				boolean noErrors = true; // TODO now: take collected errors into account
-				if (keep || noErrors || shutdown)
+				if (keep || shutdown || !luceneIndex.hasErrorsDeep())
 					fireRemoved = tasks.remove(task);
 			}
 			task.set(TaskState.FINISHED);
