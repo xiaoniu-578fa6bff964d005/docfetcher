@@ -182,6 +182,9 @@ public final class SettingsConf {
 	public static enum IntArray implements Storable {
 		PreviewHighlighting (255, 255, 0),
 		HotkeyToFront (SWT.CTRL, SWT.F8),
+		
+		RightSashHorizontal (1, 1),
+		RightSashVertical (1, 1),
 		;
 
 		public final Event<int[]> evtChanged = new Event<int[]> ();

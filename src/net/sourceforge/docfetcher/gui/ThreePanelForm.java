@@ -38,21 +38,25 @@ import org.eclipse.swt.widgets.Control;
  */
 public abstract class ThreePanelForm extends FixedSashForm {
 	
-	// TODO now: Vertical and horizontal layout have separate sash weights
+	public final Event<Boolean> evtSecondSubControlShown = new Event<Boolean>();
+	public final Event<Boolean> evtSubOrientationChanging = new Event<Boolean>();
+	public final Event<Boolean> evtSubOrientationChanged = new Event<Boolean>();
 	
-	private SashForm sash;
-	private Composite secondControl;
-	private Composite firstSubControlWrapper;
-	private ThinArrowButton leftBt;
-	private ThinArrowButton bottomBt;
-	private ThinArrowButton outerRightBt;
-	private ThinArrowButton innerRightBt;
+	@NotNull private SashForm sash;
+	@NotNull private Composite secondControl;
+	@NotNull private Control firstSubControl;
+	@NotNull private Control secondSubControl;
+	@NotNull private Composite firstSubControlWrapper;
+	@NotNull private ThinArrowButton leftBt;
+	@NotNull private ThinArrowButton bottomBt;
+	@NotNull private ThinArrowButton outerRightBt;
+	@NotNull private ThinArrowButton innerRightBt;
 	
 	/**
 	 * Creates an instance with the given parent and the given initial width for
 	 * the left panel.
 	 */
-	public ThreePanelForm(Composite parent, int startOffset) {
+	public ThreePanelForm(@NotNull Composite parent, int startOffset) {
 		super(parent, SWT.LEFT, startOffset);
 	}
 	
@@ -84,8 +88,8 @@ public abstract class ThreePanelForm extends FixedSashForm {
 		firstSubControlWrapper = new Composite(sash, SWT.NONE);
 		firstSubControlWrapper.setLayout(Util.createGridLayout(2, false, 0, 0));
 
-		createFirstSubControl(firstSubControlWrapper)
-		.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		firstSubControl = createFirstSubControl(firstSubControlWrapper);
+		firstSubControl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		innerRightBt = new ThinArrowButton(firstSubControlWrapper, SWT.RIGHT);
 		innerRightBt.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2));
@@ -93,7 +97,7 @@ public abstract class ThreePanelForm extends FixedSashForm {
 		bottomBt = new ThinArrowButton(firstSubControlWrapper, SWT.UP);
 		bottomBt.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
 
-		createSecondSubControl(sash);
+		secondSubControl = createSecondSubControl(sash);
 		
 		leftBt.addMouseListener(new MouseAdapter() {
 			public void mouseUp(MouseEvent e) {
@@ -189,6 +193,7 @@ public abstract class ThreePanelForm extends FixedSashForm {
 		else
 			sash.setMaximizedControl(firstSubControlWrapper);
 		updateRightButtons();
+		evtSecondSubControlShown.fire(isVisible);
 	}
 	
 	/**
@@ -203,8 +208,29 @@ public abstract class ThreePanelForm extends FixedSashForm {
 	 * Sets the orientation of the sash separating the two subcontrols.
 	 */
 	public final void setVertical(boolean isVertical) {
+		evtSubOrientationChanging.fire(isVertical);
 		sash.setOrientation(isVertical ? SWT.VERTICAL : SWT.HORIZONTAL);
 		updateRightButtons();
+		evtSubOrientationChanged.fire(isVertical);
+	}
+	
+	@NotNull
+	public final int[] getSubSashWeights() {
+		return sash.getWeights();
+	}
+	
+	public final void setSubSashWeights(@NotNull int[] weights) {
+		sash.setWeights(weights);
+	}
+	
+	@NotNull
+	public final Control getFirstSubControl() {
+		return firstSubControl;
+	}
+	
+	@NotNull
+	public final Control getSecondSubControl() {
+		return secondSubControl;
 	}
 
 }

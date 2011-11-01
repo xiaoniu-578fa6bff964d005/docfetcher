@@ -59,6 +59,7 @@ import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -572,38 +573,101 @@ public final class Application {
 	@NotNull
 	private static ThreePanelForm initThreePanelForm() {
 		int filterPanelWidth = SettingsConf.Int.FilterPanelWidth.get();
-		ThreePanelForm threePanelForm = new ThreePanelForm(shell, filterPanelWidth) {
+		final ThreePanelForm threePanelForm = new ThreePanelForm(shell, filterPanelWidth) {
 			protected Control createFirstControl(Composite parent) {
-				final Control leftControl = createLeftPanel(parent);
-				leftControl.addControlListener(new ControlAdapter() {
-					public void controlResized(ControlEvent e) {
-						if (leftControl.isVisible()) {
-							int width = leftControl.getSize().x;
-							SettingsConf.Int.FilterPanelWidth.set(width);
-						}
-					}
-				});
-				return leftControl;
+				return createLeftPanel(parent);
 			}
-
 			protected Control createFirstSubControl(Composite parent) {
 				return createRightTopPanel(parent);
 			}
-
 			protected Control createSecondSubControl(Composite parent) {
 				return previewPanel = new PreviewPanel(parent);
 			}
 		};
+
 		threePanelForm.setSashWidth(sashWidth);
 		threePanelForm.setSubSashWidth(sashWidth);
 		
+		// Restore visibility of filter panel and preview panel
 		threePanelForm.setFirstControlVisible(SettingsConf.Bool.ShowFilterPanel.get());
+		threePanelForm.setSecondSubControlVisible(SettingsConf.Bool.ShowPreviewPanel.get());
+		
+		// Restore orientation and weights of right sash
+		boolean isVertical = SettingsConf.Bool.ShowPreviewPanelAtBottom.get();
+		threePanelForm.setVertical(isVertical);
+		threePanelForm.setSubSashWeights(getRightSashWeights(isVertical));
+		
+		// Store visibility of filter panel
 		threePanelForm.evtFirstControlShown.add(new Event.Listener<Boolean>() {
 			public void update(Boolean eventData) {
 				SettingsConf.Bool.ShowFilterPanel.set(eventData);
 			}
 		});
+		
+		// Store width of filter panel
+		final Control leftControl = threePanelForm.getFirstControl();
+		leftControl.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				if (leftControl.isVisible()) {
+					int width = leftControl.getSize().x;
+					SettingsConf.Int.FilterPanelWidth.set(width);
+				}
+			}
+		});
+		
+		final boolean[] ignoreControlResize = { false };
+		
+		// Store weights of right sash
+		Control topRightControl = threePanelForm.getFirstSubControl();
+		ControlListener rightControlListener = new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				if (!previewPanel.isVisible() || ignoreControlResize[0])
+					return;
+				int[] weights = threePanelForm.getSubSashWeights();
+				if (threePanelForm.isVertical())
+					SettingsConf.IntArray.RightSashVertical.set(weights);
+				else
+					SettingsConf.IntArray.RightSashHorizontal.set(weights);
+			}
+		};
+		topRightControl.addControlListener(rightControlListener);
+		previewPanel.addControlListener(rightControlListener);
+		
+		// Store visibility of preview panel
+		threePanelForm.evtSecondSubControlShown.add(new Event.Listener<Boolean>() {
+			public void update(Boolean eventData) {
+				SettingsConf.Bool.ShowPreviewPanel.set(eventData);
+			}
+		});
+		
+		/*
+		 * Temporarily deactivate storing the sash weights during sash
+		 * orientation changes. Without this, we'd set the same sash weights for
+		 * both orientations.
+		 */
+		threePanelForm.evtSubOrientationChanging.add(new Event.Listener<Boolean>() {
+			public void update(Boolean isVertical) {
+				ignoreControlResize[0] = true;
+			}
+		});
+		
+		// Store orientation of right sash; update weights
+		threePanelForm.evtSubOrientationChanged.add(new Event.Listener<Boolean>() {
+			public void update(Boolean isVertical) {
+				SettingsConf.Bool.ShowPreviewPanelAtBottom.set(isVertical);
+				threePanelForm.setSubSashWeights(getRightSashWeights(isVertical));
+				ignoreControlResize[0] = false;
+			}
+		});
+		
 		return threePanelForm;
+	}
+	
+	@NotNull
+	private static int[] getRightSashWeights(boolean isVertical) {
+		return isVertical
+			? SettingsConf.IntArray.RightSashVertical.get()
+			: SettingsConf.IntArray.RightSashHorizontal.get();
 	}
 	
 	@NotNull
