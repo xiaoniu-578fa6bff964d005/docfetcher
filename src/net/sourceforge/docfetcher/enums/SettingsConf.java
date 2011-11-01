@@ -420,33 +420,31 @@ public final class SettingsConf {
 		 * synchronized across all bound sash forms.
 		 */
 		public void bind(@NotNull final SashForm sash) {
-			int[] weights = sash.getWeights();
-			assert weights.length > 0;
-			if (weights.length != value.length) {
-				assert weights.length == defaultValue.length;
+			Control[] children = sash.getChildren();
+			assert children.length > 0;
+			if (children.length != value.length) {
+				assert children.length == defaultValue.length;
 				value = defaultValue;
 			}
-			for (int i = 0; i < weights.length; i++) {
-				final int index = i;
-				weights[i] = value[i];
-				for (Control control : sash.getChildren())
-					control.addControlListener(new ControlAdapter() {
-						public void controlResized(ControlEvent e) {
-							value[index] = sash.getWeights()[index];
-							
-							/*
-							 * The event must be fired with asyncExec, otherwise
-							 * we'll get some nasty visual artifacts.
-							 */
-							Util.runAsyncExec(sash, new Runnable() {
-								public void run() {
-									evtChanged.fire(sash);
-								}
-							});
-						}
-					});
+			sash.setWeights(value);
+			
+			for (Control control : children) {
+				control.addControlListener(new ControlAdapter() {
+					public void controlResized(ControlEvent e) {
+						value = sash.getWeights();
+						
+						/*
+						 * The event must be fired with asyncExec, otherwise
+						 * we'll get some nasty visual artifacts.
+						 */
+						Util.runAsyncExec(sash, new Runnable() {
+							public void run() {
+								evtChanged.fire(sash);
+							}
+						});
+					}
+				});
 			}
-			sash.setWeights(weights);
 			
 			// Update sash weights if they have been changed in other sash forms
 			final Event.Listener<SashForm> changeListener = new Event.Listener<SashForm>() {
