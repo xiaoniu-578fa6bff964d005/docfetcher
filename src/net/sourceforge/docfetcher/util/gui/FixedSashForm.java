@@ -80,37 +80,7 @@ public abstract class FixedSashForm extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				if (! isSmooth && e.detail == SWT.DRAG)
 					return;
-				FixedSashForm parent = FixedSashForm.this;
-				Rectangle parentRect = parent.getClientArea();
-				Rectangle sashRect = sash.getBounds();
-				FormData sashData = (FormData) sash.getLayoutData();
-				
-				int newOffset = isHorizontal ? e.x : e.y;
-				int lower = parent.limit;
-				int upper = -1;
-				if (isHorizontal)
-					upper = parentRect.width - sashRect.width - lower;
-				else
-					upper = parentRect.height - sashRect.height - lower;
-				newOffset = Math.max(Math.min(newOffset, upper), lower);
-				
-				int oldOffset = isHorizontal ? sashRect.x : sashRect.y;
-				if (newOffset == oldOffset) return;
-				
-				if (isHorizontal) {
-					if (isFirstFixed)
-						sashData.left = new FormAttachment(0, newOffset);
-					else
-						sashData.right = new FormAttachment(100,
-								- parentRect.width + sashRect.width + newOffset);
-				} else {
-					if (isFirstFixed)
-						sashData.top = new FormAttachment(0, newOffset);
-					else
-						sashData.bottom = new FormAttachment(100,
-								- parentRect.height + sashRect.height + newOffset);
-				}
-				parent.layout();
+				setFixedDimension(isHorizontal ? e.x : e.y);
 			}
 		});
 
@@ -140,14 +110,14 @@ public abstract class FixedSashForm extends Composite {
 	/**
 	 * Returns the width of the sash.
 	 */
-	public int getSashWidth() {
+	public final int getSashWidth() {
 		return ((FormData) sash.getLayoutData()).width;
 	}
 	
 	/**
 	 * Sets the width of the sash.
 	 */
-	public void setSashWidth(int width) {
+	public final void setSashWidth(int width) {
 		((FormData) sash.getLayoutData()).width = width;
 		layout(false);
 	}
@@ -155,21 +125,21 @@ public abstract class FixedSashForm extends Composite {
 	/**
 	 * Returns the minimum for the fixed dimension of the first control.
 	 */
-	public int getLimit() {
+	public final int getLimit() {
 		return limit;
 	}
 
 	/**
 	 * Sets the minimum for the fixed dimension of the first control.
 	 */
-	public void setLimit(int limit) {
+	public final void setLimit(int limit) {
 		this.limit = limit;
 	}
 	
 	/**
 	 * Returns whether the first control is visible.
 	 */
-	public boolean isFirstControlVisible() {
+	public final boolean isFirstControlVisible() {
 		return isFirstVisible;
 	}
 	
@@ -177,7 +147,7 @@ public abstract class FixedSashForm extends Composite {
 	 * Sets the visibility of the first control. If it's invisible, the second
 	 * control will fill the entire sash form.
 	 */
-	public void setFirstControlVisible(boolean isVisible) {
+	public final void setFirstControlVisible(boolean isVisible) {
 		if (this.isFirstVisible == isVisible) return;
 		this.isFirstVisible = isVisible;
 		firstControl.setVisible(isVisible);
@@ -196,23 +166,56 @@ public abstract class FixedSashForm extends Composite {
 	/**
 	 * Returns the fixed dimension of the first control.
 	 */
-	public int getFixedDimension() {
+	public final int getFixedDimension() {
 		Control fixedControl = isFirstFixed ? firstControl : secondControl;
 		Point size = fixedControl.getSize();
 		return isHorizontal ? size.x : size.y;
 	}
 	
+	public final void setFixedDimension(int newOffset) {
+		FixedSashForm parent = FixedSashForm.this;
+		Rectangle parentRect = parent.getClientArea();
+		Rectangle sashRect = sash.getBounds();
+		FormData sashData = (FormData) sash.getLayoutData();
+		
+		int lower = parent.limit;
+		int upper = -1;
+		if (isHorizontal)
+			upper = parentRect.width - sashRect.width - lower;
+		else
+			upper = parentRect.height - sashRect.height - lower;
+		newOffset = Math.max(Math.min(newOffset, upper), lower);
+		
+		int oldOffset = isHorizontal ? sashRect.x : sashRect.y;
+		if (newOffset == oldOffset) return;
+		
+		if (isHorizontal) {
+			if (isFirstFixed)
+				sashData.left = new FormAttachment(0, newOffset);
+			else
+				sashData.right = new FormAttachment(100,
+						- parentRect.width + sashRect.width + newOffset);
+		} else {
+			if (isFirstFixed)
+				sashData.top = new FormAttachment(0, newOffset);
+			else
+				sashData.bottom = new FormAttachment(100,
+						- parentRect.height + sashRect.height + newOffset);
+		}
+		parent.layout();
+	}
+	
 	/**
 	 * Returns whether 'smooth' dragging for the sash is enabled.
 	 */
-	public boolean isSmooth() {
+	public final boolean isSmooth() {
 		return isSmooth;
 	}
 	
 	/**
 	 * Enables or disables 'smooth' dragging for the sash.
 	 */
-	public void setSmooth(boolean isSmooth) {
+	public final void setSmooth(boolean isSmooth) {
 		this.isSmooth = isSmooth;
 	}
 
@@ -229,14 +232,14 @@ public abstract class FixedSashForm extends Composite {
 	/**
 	 * Returns the first control.
 	 */
-	public Control getFirstControl() {
+	public final Control getFirstControl() {
 		return firstControl;
 	}
 
 	/**
 	 * Returns the second control.
 	 */
-	public Control getSecondControl() {
+	public final Control getSecondControl() {
 		return secondControl;
 	}
 

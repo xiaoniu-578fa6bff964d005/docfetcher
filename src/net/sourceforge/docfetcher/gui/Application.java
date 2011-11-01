@@ -57,6 +57,8 @@ import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -175,76 +177,16 @@ public final class Application {
 		
 		initCocoaMenu(display);
 		initSystemTrayHider();
-
-		final ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
-			protected Control createFirstControl(Composite parent) {
-				return createLeftPanel(parent);
-			}
-
-			protected Control createFirstSubControl(Composite parent) {
-				return createRightTopPanel(parent);
-			}
-
-			protected Control createSecondSubControl(Composite parent) {
-				return previewPanel = new PreviewPanel(parent);
-			}
-		};
-		threePanelForm.setSashWidth(sashWidth);
-		threePanelForm.setSubSashWidth(sashWidth);
-		
-		threePanelForm.setFirstControlVisible(SettingsConf.Bool.ShowFilterPanel.get());
-		threePanelForm.evtFirstControlShown.add(new Event.Listener<Boolean>() {
-			public void update(Boolean eventData) {
-				SettingsConf.Bool.ShowFilterPanel.set(eventData);
-			}
-		});
+		ThreePanelForm threePanelForm = initThreePanelForm();
+		StatusBar statusBar = initStatusBar();
 		
 		new SearchQueue(
 			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);
-
-		final StatusBar statusBar = new StatusBar(shell) {
-			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
-				indexingStatus = new StatusBarPart(statusBar, true);
-				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
-				indexingStatus.setVisible(false);
-				
-				indexPanel.evtIndexingDialogOpened.add(new Event.Listener<Void>() {
-					public void update(Void eventData) {
-						indexingStatus.setVisible(false);
-					}
-				});
-				
-				indexingStatus.evtClicked.add(new Event.Listener<Void>() {
-					public void update(Void eventData) {
-						indexPanel.openIndexingDialog();
-					}
-				});
-				
-				StatusBarPart webInterfaceStatus = new StatusBarPart(statusBar, true);
-				webInterfaceStatus.setContents(Img.INDEXING.get(), "Web Interface");
-
-				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
-				parts.add(indexingStatus);
-				parts.add(webInterfaceStatus);
-				return parts;
-			}
-		};
-		statusBar.getLeftPart().setContents(Img.INDEXING.get(), "Status Bar");
 
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.bottom().left().right().applyTo(statusBar);
 		fdf.top().bottom(statusBar).applyTo(threePanelForm);
 
-		new StatusManager(display, new StatusWidgetProvider() {
-			public String getStatus() {
-				return statusBar.getLeftPart().getText();
-			}
-
-			public void setStatus(String text) {
-				statusBar.getLeftPart().setContents(null, text);
-			}
-		});
-		
 		// Move focus to search text field
 		searchBar.setFocus();
 		
@@ -264,7 +206,7 @@ public final class Application {
 		if (showManualHint) {
 			// TODO now: Show hint in status bar
 		}
-
+		
 		// Global keyboard shortcuts
 		display.addFilter(SWT.KeyUp, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
@@ -274,50 +216,10 @@ public final class Application {
 		
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(final ShellEvent e) {
-				e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
-					public CancelAction cancel() {
-						return confirmExit();
-					}
-				});
-				
-				if (e.doit) {
-					/*
-					 * Note: The getSearcher() call below will block until the
-					 * searcher is available. If we run this inside the GUI
-					 * thread, we won't let go of the GUI lock, causing the
-					 * program to deadlock when the user tries to close the
-					 * program before all indexes have been loaded.
-					 */
-					new Thread() {
-						public void run() {
-							/*
-							 * The folder watcher will be null if the program is
-							 * shut down while loading the indexes
-							 */
-							if (folderWatcher != null)
-								folderWatcher.shutdown();
-							
-							indexRegistry.getSearcher().shutdown();
-						}
-					}.start();
-				}
-			}
-			
-			@Nullable
-			private CancelAction confirmExit() {
-				MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
-				dialog.setTitle("Abort Indexing?");
-				dialog.setText("An indexing process is still running and must be cancelled before terminating the program." +
-						" Do you want to keep the index created so far? " +
-						"Keeping it allows you to continue indexing later by running an index update.");
-				
-				dialog.addButton("&Keep", CancelAction.KEEP);
-				dialog.addButton("&Discard", CancelAction.DISCARD);
-				dialog.addButton("Don't &Exit", null);
-				return dialog.open();
+				handleShellClosed(e);
 			}
 		});
-
+		
 		// TODO pre-release: mark classes in gui package as final / package-visible when
 		// possible -> move GUI classes above into gui package
 
@@ -665,6 +567,130 @@ public final class Application {
 				prefDialog.open();
 			}
 		});
+	}
+	
+	@NotNull
+	private static ThreePanelForm initThreePanelForm() {
+		int filterPanelWidth = SettingsConf.Int.FilterPanelWidth.get();
+		ThreePanelForm threePanelForm = new ThreePanelForm(shell, filterPanelWidth) {
+			protected Control createFirstControl(Composite parent) {
+				final Control leftControl = createLeftPanel(parent);
+				leftControl.addControlListener(new ControlAdapter() {
+					public void controlResized(ControlEvent e) {
+						if (leftControl.isVisible()) {
+							int width = leftControl.getSize().x;
+							SettingsConf.Int.FilterPanelWidth.set(width);
+						}
+					}
+				});
+				return leftControl;
+			}
+
+			protected Control createFirstSubControl(Composite parent) {
+				return createRightTopPanel(parent);
+			}
+
+			protected Control createSecondSubControl(Composite parent) {
+				return previewPanel = new PreviewPanel(parent);
+			}
+		};
+		threePanelForm.setSashWidth(sashWidth);
+		threePanelForm.setSubSashWidth(sashWidth);
+		
+		threePanelForm.setFirstControlVisible(SettingsConf.Bool.ShowFilterPanel.get());
+		threePanelForm.evtFirstControlShown.add(new Event.Listener<Boolean>() {
+			public void update(Boolean eventData) {
+				SettingsConf.Bool.ShowFilterPanel.set(eventData);
+			}
+		});
+		return threePanelForm;
+	}
+	
+	@NotNull
+	private static StatusBar initStatusBar() {
+		final StatusBar statusBar = new StatusBar(shell) {
+			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
+				indexingStatus = new StatusBarPart(statusBar, true);
+				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
+				indexingStatus.setVisible(false);
+				
+				indexPanel.evtIndexingDialogOpened.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						indexingStatus.setVisible(false);
+					}
+				});
+				
+				indexingStatus.evtClicked.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						indexPanel.openIndexingDialog();
+					}
+				});
+				
+				StatusBarPart webInterfaceStatus = new StatusBarPart(statusBar, true);
+				webInterfaceStatus.setContents(Img.INDEXING.get(), "Web Interface");
+
+				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
+				parts.add(indexingStatus);
+				parts.add(webInterfaceStatus);
+				return parts;
+			}
+		};
+		statusBar.getLeftPart().setContents(Img.INDEXING.get(), "Status Bar");
+		
+		new StatusManager(shell.getDisplay(), new StatusWidgetProvider() {
+			public String getStatus() {
+				return statusBar.getLeftPart().getText();
+			}
+
+			public void setStatus(String text) {
+				statusBar.getLeftPart().setContents(null, text);
+			}
+		});
+		
+		return statusBar;
+	}
+	
+	private static void handleShellClosed(@NotNull ShellEvent e) {
+		e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
+			public CancelAction cancel() {
+				return confirmExit();
+			}
+		});
+		if (!e.doit)
+			return;
+		/*
+		 * Note: The getSearcher() call below will block until the
+		 * searcher is available. If we run this inside the GUI
+		 * thread, we won't let go of the GUI lock, causing the
+		 * program to deadlock when the user tries to close the
+		 * program before all indexes have been loaded.
+		 */
+		new Thread() {
+			public void run() {
+				/*
+				 * The folder watcher will be null if the program is
+				 * shut down while loading the indexes
+				 */
+				if (folderWatcher != null)
+					folderWatcher.shutdown();
+				
+				indexRegistry.getSearcher().shutdown();
+			}
+		}.start();
+	}
+	
+	@Nullable
+	private static CancelAction confirmExit() {
+		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
+		dialog.setTitle("Abort Indexing?");
+		dialog.setText("An indexing process is still running and must be cancelled before terminating the program." +
+				" Do you want to keep the index created so far? " +
+				"Keeping it allows you to continue indexing later by running an index update.");
+		
+		dialog.addButton("&Keep", CancelAction.KEEP);
+		dialog.addButton("&Discard", CancelAction.DISCARD);
+		dialog.addButton("Don't &Exit", null);
+		return dialog.open();
 	}
 
 }
