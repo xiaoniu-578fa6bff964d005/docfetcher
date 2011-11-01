@@ -15,8 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Collections;
-
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.mozilla.universalchardet.UniversalDetector;
@@ -30,7 +28,7 @@ import com.google.common.io.ByteStreams;
 public final class TextParser extends StreamParser {
 	
 	@Nullable private UniversalDetector charsetDetector;
-	private final Collection<String> types = Collections.singleton("text/plain");
+	private final Collection<String> types = MediaType.Col.text("plain");
 	
 	TextParser() {
 	}

@@ -1033,9 +1033,10 @@ public final class Util {
 	
 	@MutableCopy
 	@NotNull
-	public static <T> List<T> createList(@NotNull T... elements) {
+	public static <T> List<T> createList(	int extraCapacity,
+											@NotNull T... elements) {
 		Util.checkNotNull(elements);
-		List<T> newList = new ArrayList<T>(elements.length);
+		List<T> newList = new ArrayList<T>(elements.length + extraCapacity);
 		for (T element : elements)
 			newList.add(element);
 		return newList;

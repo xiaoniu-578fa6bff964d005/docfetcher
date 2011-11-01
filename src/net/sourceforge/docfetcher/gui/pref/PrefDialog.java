@@ -76,7 +76,7 @@ public final class PrefDialog {
 //				SettingsConf.Bool.ResetLocationFilterOnExit),
 		);
 		
-		fieldOptions = Util.createList(
+		fieldOptions = Util.createList(1,
 			new ColorOption(
 				"Highlight color:",
 				SettingsConf.IntArray.PreviewHighlighting),

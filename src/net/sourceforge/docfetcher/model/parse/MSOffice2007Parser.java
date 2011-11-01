@@ -14,8 +14,6 @@ package net.sourceforge.docfetcher.model.parse;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.extractor.ExtractorFactory;
@@ -46,8 +44,7 @@ abstract class MSOffice2007Parser extends FileParser {
 		}
 	}
 	
-	private final Collection<String> types = Collections.singleton(
-		MediaType.application("zip"));
+	private final Collection<String> types = MediaType.Col.application("zip");
 	
 	private final String typeLabel;
 	private final Collection<String> extensions;

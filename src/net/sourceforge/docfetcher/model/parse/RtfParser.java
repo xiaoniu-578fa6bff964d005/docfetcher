@@ -26,7 +26,7 @@ import org.apache.tika.sax.XHTMLContentHandler;
 final class RtfParser extends StreamParser {
 	
 	private static final Collection<String> extensions = Collections.singleton("rtf");
-	private static final Collection<String> types = Collections.singleton(MediaType.text("rtf"));
+	private static final Collection<String> types = MediaType.Col.text("rtf");
 
 	protected ParseResult parse(InputStream in, ParseContext context)
 			throws ParseException {

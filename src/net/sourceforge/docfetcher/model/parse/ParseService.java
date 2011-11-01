@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -37,10 +36,10 @@ import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSWord2007Parse
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSVisioParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
-import net.sourceforge.docfetcher.model.parse.OOoParser.OOoCalcParser;
-import net.sourceforge.docfetcher.model.parse.OOoParser.OOoDrawParser;
-import net.sourceforge.docfetcher.model.parse.OOoParser.OOoImpressParser;
-import net.sourceforge.docfetcher.model.parse.OOoParser.OOoWriterParser;
+import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeCalcParser;
+import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeDrawParser;
+import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeImpressParser;
+import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeWriterParser;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
@@ -71,7 +70,7 @@ public final class ParseService {
 	private static final TextParser textParser;
 	private static final HtmlParser htmlParser;
 	
-	private static final Parser[] parsers0 = {
+	private static final List<Parser> parsers = Util.createList(1,
 		// TextParser must have high priority since its file extensions can be customized
 		textParser = new TextParser(),
 		htmlParser = new HtmlParser(),
@@ -81,10 +80,10 @@ public final class ParseService {
 		new RtfParser(),
 		new SvgParser(),
 		
-		new OOoWriterParser(),
-		new OOoCalcParser(),
-		new OOoDrawParser(),
-		new OOoImpressParser(),
+		new OpenOfficeWriterParser(),
+		new OpenOfficeCalcParser(),
+		new OpenOfficeDrawParser(),
+		new OpenOfficeImpressParser(),
 		
 		new MSWordParser(),
 		new MSExcelParser(),
@@ -94,16 +93,11 @@ public final class ParseService {
 		new MSWord2007Parser(),
 		new MSExcel2007Parser(),
 		new MSPowerPoint2007Parser()
-	};
-	
-	private static final List<Parser> parsers;
+	);
 	
 	static {
 		if (!Util.IS_MAC_OS_X)
-			parsers = Collections.unmodifiableList(Util.createListReversed(
-				Collections.singleton(new ChmParser()), parsers0));
-		else
-			parsers = Arrays.asList(parsers0);
+			parsers.add(new ChmParser());
 	}
 
 	private ParseService() {}

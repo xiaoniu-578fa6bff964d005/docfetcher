@@ -21,7 +21,7 @@ import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSWord2007Parser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
-import net.sourceforge.docfetcher.model.parse.OOoParser.OOoWriterParser;
+import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeWriterParser;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
@@ -39,7 +39,7 @@ public final class ParseServiceTest {
 		.add(TestFiles.lorem_ipsum_abw_gz.get(), new AbiWordParser())
 		.add(TestFiles.lorem_ipsum_docx.get(), new MSWord2007Parser())
 		.add(TestFiles.lorem_ipsum_html.get(), new HtmlParser())
-		.add(TestFiles.lorem_ipsum_odt.get(), new OOoWriterParser())
+		.add(TestFiles.lorem_ipsum_odt.get(), new OpenOfficeWriterParser())
 		.add(TestFiles.lorem_ipsum_pdf.get(), new PdfParser())
 		.add(TestFiles.lorem_ipsum_rtf.get(), new RtfParser())
 		.add(TestFiles.lorem_ipsum_svg.get(), new SvgParser())

@@ -26,7 +26,7 @@ import net.htmlparser.jericho.Source;
 final class SvgParser extends StreamParser {
 	
 	private static final Collection<String> extensions = Collections.singleton("svg");
-	private static final Collection<String> types = Collections.singleton(MediaType.text("xml"));
+	private static final Collection<String> types = MediaType.Col.text("xml");
 
 	@Override
 	protected ParseResult parse(InputStream in, ParseContext context)

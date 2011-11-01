@@ -31,7 +31,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public final class PdfParser extends StreamParser {
 	
 	private static final Collection<String> extensions = Collections.singleton("pdf");
-	private static final Collection<String> types = Collections.singleton(MediaType.application("pdf"));
+	private static final Collection<String> types = MediaType.Col.application("pdf");
 	
 	PdfParser() {
 	}

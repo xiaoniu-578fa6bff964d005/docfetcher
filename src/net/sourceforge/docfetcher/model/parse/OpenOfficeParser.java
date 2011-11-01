@@ -20,7 +20,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -41,39 +40,38 @@ import com.google.common.io.Closeables;
 /**
  * @author Tran Nam Quang
  */
-abstract class OOoParser extends FileParser {
+abstract class OpenOfficeParser extends FileParser {
 	
-	public static final class OOoWriterParser extends OOoParser {
-		public OOoWriterParser() {
+	public static final class OpenOfficeWriterParser extends OpenOfficeParser {
+		public OpenOfficeWriterParser() {
 			super("OpenOffice.org Writer", "odt", "ott"); // TODO i18n filetype_odt
 		}
 	}
 	
-	public static final class OOoCalcParser extends OOoParser {
-		public OOoCalcParser() {
+	public static final class OpenOfficeCalcParser extends OpenOfficeParser {
+		public OpenOfficeCalcParser() {
 			super("OpenOffice.org Calc", "ods", "ots"); // TODO i18n filetype_ods
 		}
 	}
 	
-	public static final class OOoDrawParser extends OOoParser {
-		public OOoDrawParser() {
+	public static final class OpenOfficeDrawParser extends OpenOfficeParser {
+		public OpenOfficeDrawParser() {
 			super("OpenOffice.org Draw", "odg", "otg"); // TODO i18n filetype_odg
 		}
 	}
 	
-	public static final class OOoImpressParser extends OOoParser {
-		public OOoImpressParser() {
+	public static final class OpenOfficeImpressParser extends OpenOfficeParser {
+		public OpenOfficeImpressParser() {
 			super("OpenOffice.org Impress", "odp", "otp"); // TODO i18n filetype_odp
 		}
 	}
 	
-	private static final Collection<String> types = Collections.singleton(
-		MediaType.application("zip"));
+	private static final Collection<String> types = MediaType.Col.application("zip");
 	
 	private final String typeLabel;
 	private final Collection<String> extensions;
 	
-	private OOoParser(@NotNull String typeLabel, @NotNull String... extensions) {
+	private OpenOfficeParser(@NotNull String typeLabel, @NotNull String... extensions) {
 		this.typeLabel = typeLabel;
 		this.extensions = Arrays.asList(extensions);
 	}

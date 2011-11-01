@@ -11,9 +11,12 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
@@ -22,6 +25,20 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 final class MediaType {
 	
 	private MediaType() {
+	}
+	
+	public static final class Col {
+		@ImmutableCopy
+		@NotNull
+		public static Collection<String> text(@NotNull String subType) {
+			return Collections.singleton(MediaType.text(subType));
+		}
+		
+		@ImmutableCopy
+		@NotNull
+		public static Collection<String> application(@NotNull String subType) {
+			return Collections.singleton(MediaType.application(subType));
+		}
 	}
 	
 	@NotNull

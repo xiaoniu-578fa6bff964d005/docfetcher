@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -80,8 +78,7 @@ abstract class MSOfficeParser extends FileParser {
 	 * The mime magic detector seems to identify all MS Office files as
 	 * 'application/msword', even when they're not MS Word files.
 	 */
-	private static final Collection<String> types = Collections
-			.singleton(MediaType.application("msword"));
+	private static final Collection<String> types = MediaType.Col.application("msword");
 	
 	private final String typeLabel;
 	private final Collection<String> extensions;
