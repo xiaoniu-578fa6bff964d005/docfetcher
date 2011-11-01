@@ -723,6 +723,11 @@ public final class Application {
 		});
 		if (!e.doit)
 			return;
+		
+		// Clear search history
+		if (SettingsConf.Bool.ClearSearchHistoryOnExit.get())
+			SettingsConf.StrList.SearchHistory.set();
+		
 		/*
 		 * Note: The getSearcher() call below will block until the
 		 * searcher is available. If we run this inside the GUI
