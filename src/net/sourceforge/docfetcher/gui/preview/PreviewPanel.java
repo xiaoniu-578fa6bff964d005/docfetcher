@@ -129,14 +129,15 @@ public final class PreviewPanel extends Composite {
 	public boolean setHtmlFile(@NotNull File file) {
 		Util.checkNotNull(file);
 		Util.assertSwtThread();
+
+		if (!createAndShowHtmlPreview())
+			return false;
 		
 		lastDoc = null;
 		disposeLastResources();
 		requestCount++;
 		setError(null, requestCount);
 		
-		if (!createAndShowHtmlPreview())
-			return false;
 		clearPreviews(true, true, false);
 		htmlPreview.setFile(file, false);
 		return true;
@@ -176,6 +177,8 @@ public final class PreviewPanel extends Composite {
 	}
 	
 	private boolean createAndShowHtmlPreview() {
+		if (browserCreationFailed)
+			return false;
 		if (htmlPreview == null) {
 			try {
 				htmlPreview = new HtmlPreview(stackComp);

@@ -546,14 +546,7 @@ public final class Application {
 		
 		searchBar.evtOpenManual.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
-				File file = ManualLocator.getManualFile();
-				if (file != null) {
-					if (!previewPanel.setHtmlFile(file))
-						Util.launch(file);
-				}
-				else {
-					AppUtil.showError("Manual not found!", true, true);
-				}
+				showManual();
 			}
 		});
 
@@ -572,6 +565,17 @@ public final class Application {
 		});
 
 		return comp;
+	}
+	
+	private static void showManual() {
+		File file = ManualLocator.getManualFile();
+		if (file != null) {
+			if (!previewPanel.setHtmlFile(file))
+				Util.launch(file);
+		}
+		else {
+			AppUtil.showError("Manual not found!", true, true);
+		}
 	}
 	
 	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
