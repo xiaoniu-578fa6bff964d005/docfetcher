@@ -82,8 +82,8 @@ public final class BuildMain {
 	}
 	
 	private static File recreateJarFile(boolean isPortable, LineSep lineSep) throws Exception {
-		String prefix = (isPortable ? "" : "non-");
-		Util.println(U.format("Creating %sportable Jar file...", prefix));
+		String prefix = isPortable ? "" : "non-";
+		Util.println(U.format("Creating %sportable jar file...", prefix));
 		
 		File systemConfDest = new File(mainPath + "/system.conf");
 		systemConfDest.delete();
@@ -165,7 +165,7 @@ public final class BuildMain {
 			U.exec("chmod +x %s", Util.getAbsPath(macOsXLauncher));
 		}
 		else {
-			Util.printErr("Warning: Cannot make the" +
+			Util.printErr("** Warning: Cannot make the" +
 					" launcher shell script executable.");
 		}
 		
@@ -230,7 +230,7 @@ public final class BuildMain {
 			U.exec("chmod +x %s", Util.getAbsPath(launcher));
 		}
 		else {
-			Util.printErr("Warning: Cannot make the" +
+			Util.printErr("** Warning: Cannot make the" +
 					" launcher shell script executable.");
 		}
 		
