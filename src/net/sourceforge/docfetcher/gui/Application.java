@@ -92,6 +92,7 @@ public final class Application {
 	private static IndexPanel indexPanel;
 
 	private static Shell shell;
+	private static ThreePanelForm threePanelForm;
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
@@ -178,7 +179,7 @@ public final class Application {
 		
 		initCocoaMenu(display);
 		initSystemTrayHider();
-		ThreePanelForm threePanelForm = initThreePanelForm();
+		initThreePanelForm();
 		StatusBar statusBar = initStatusBar();
 		
 		new SearchQueue(
@@ -475,7 +476,9 @@ public final class Application {
 			public void update(Void eventData) {
 				File file = ManualLocator.getManualFile();
 				if (file != null) {
-					if (!previewPanel.setHtmlFile(file))
+					if (previewPanel.setHtmlFile(file))
+						threePanelForm.setSecondSubControlVisible(true);
+					else
 						Util.launch(file);
 				}
 				else {
@@ -571,9 +574,9 @@ public final class Application {
 	}
 	
 	@NotNull
-	private static ThreePanelForm initThreePanelForm() {
+	private static void initThreePanelForm() {
 		int filterPanelWidth = SettingsConf.Int.FilterPanelWidth.get();
-		final ThreePanelForm threePanelForm = new ThreePanelForm(shell, filterPanelWidth) {
+		threePanelForm = new ThreePanelForm(shell, filterPanelWidth) {
 			protected Control createFirstControl(Composite parent) {
 				return createLeftPanel(parent);
 			}
@@ -659,8 +662,6 @@ public final class Application {
 				ignoreControlResize[0] = false;
 			}
 		});
-		
-		return threePanelForm;
 	}
 	
 	@NotNull
