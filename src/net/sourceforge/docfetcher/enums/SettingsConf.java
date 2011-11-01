@@ -78,6 +78,8 @@ public final class SettingsConf {
 		HotkeyEnabled (true),
 		
 		ShowFilterPanel (true),
+		ShowPreviewPanel (true),
+		ShowPreviewPanelAtBottom (true),
 		
 		MainShellMaximized (false),
 		PreferHtmlPreview (true),

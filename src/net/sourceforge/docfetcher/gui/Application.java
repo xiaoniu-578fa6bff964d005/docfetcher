@@ -247,6 +247,23 @@ public final class Application {
 		
 		// Move focus to search text field
 		searchBar.setFocus();
+		
+		// Try to show the manual in the embedded browser
+		boolean showManualHint = true;
+		if (SettingsConf.Bool.ShowManualOnStartup.get()
+				&& SettingsConf.Bool.ShowPreviewPanel.get()) {
+			File file = ManualLocator.getManualFile();
+			if (file == null) {
+				showManualHint = false;
+				AppUtil.showError("Manual not found!", true, true);
+			}
+			else if (previewPanel.setHtmlFile(file)) {
+				showManualHint = false;
+			}
+		}
+		if (showManualHint) {
+			// TODO now: Show hint in status bar
+		}
 
 		// Global keyboard shortcuts
 		display.addFilter(SWT.KeyUp, new Listener() {
@@ -553,7 +570,14 @@ public final class Application {
 		
 		searchBar.evtOpenManual.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
-				showManual();
+				File file = ManualLocator.getManualFile();
+				if (file != null) {
+					if (!previewPanel.setHtmlFile(file))
+						Util.launch(file);
+				}
+				else {
+					AppUtil.showError("Manual not found!", true, true);
+				}
 			}
 		});
 
@@ -572,17 +596,6 @@ public final class Application {
 		});
 
 		return comp;
-	}
-	
-	private static void showManual() {
-		File file = ManualLocator.getManualFile();
-		if (file != null) {
-			if (!previewPanel.setHtmlFile(file))
-				Util.launch(file);
-		}
-		else {
-			AppUtil.showError("Manual not found!", true, true);
-		}
 	}
 	
 	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
