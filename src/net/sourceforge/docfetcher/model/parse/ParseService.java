@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Set;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Path;
@@ -48,7 +49,9 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import com.google.common.io.Closeables;
+import com.google.common.primitives.Ints;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
@@ -107,6 +110,79 @@ public final class ParseService {
 	public static List<Parser> getParsers() {
 		return parsers;
 	}
+
+	/**
+	 * Returns a list containing all parsers that support the mime type and/or
+	 * file extension of the given file.
+	 * <p>
+	 * The list is sorted by the degree of matching: If a parser supports
+	 * <em>both</em> the mime type <em>and</em> the file extension of the given
+	 * file, it appears in the returned list before other parsers that support
+	 * either only the mime type or only the file extension.
+	 */
+	@MutableCopy
+	@NotNull
+	@VisibleForTesting
+	static List<Parser> getSortedMatchingParsers(	@NotNull IndexingConfig config,
+													@NotNull File file,
+													@NotNull String filename)
+			throws IOException {
+		class Match {
+			final Parser parser;
+			boolean mimeMatch = false;
+			boolean extMatch = false;
+			
+			public Match(@NotNull Parser parser) {
+				this.parser = parser;
+			}
+			public int getMatchCount() {
+				return (mimeMatch ? 1 : 0) + (extMatch ? 1 : 0);
+			}
+		}
+		
+		Set<Match> matches = Sets.newTreeSet(new Comparator<Match>() {
+			public int compare(Match m1, Match m2) {
+				// Element with higher match count comes first
+				int cmp = -1 * Ints.compare(m1.getMatchCount(), m2.getMatchCount());
+				if (cmp != 0)
+					return cmp;
+				
+				// Element with mime match comes before element with file
+				// extension match
+				if (m1.mimeMatch && !m2.mimeMatch)
+					return -1;
+				if (!m1.mimeMatch && m2.mimeMatch)
+					return 1;
+				
+				// Compare parser names
+				String name1 = m1.parser.getClass().getSimpleName();
+				String name2 = m2.parser.getClass().getSimpleName();
+				return name1.compareTo(name2);
+			}
+		});
+		
+		List<String> mimeTypes = getPossibleMimeTypes(file);
+		String ext = Util.getExtension(filename);
+		
+		for (Parser parser : parsers) {
+			Match match = new Match(parser);
+			if (!Collections.disjoint(mimeTypes, parser.getTypes()))
+				match.mimeMatch = true;
+			for (String candidateExt : getExtensions(config, parser)) {
+				if (candidateExt.toLowerCase().equals(ext)) {
+					match.extMatch = true;
+					break;
+				}
+			}
+			if (match.mimeMatch || match.extMatch)
+				matches.add(match);
+		}
+		
+		List<Parser> parsers = Util.createEmptyList(matches);
+		for (Match match : matches)
+			parsers.add(match.parser);
+		return parsers;
+	}
 	
 	// Accepts HTML files, but does not handle HTML pairing
 	// When parsing a temporary file and mime type detection is off, the temporary file
@@ -129,10 +205,9 @@ public final class ParseService {
 			if (!patternAction.matches(filename, filepath, true))
 				continue;
 			try {
-				List<String> mimeTypes = getPossibleMimeTypes(file);
-				for (Parser parser : parsers) {
-					if (Collections.disjoint(mimeTypes, parser.getTypes()))
-						continue;
+				List<Parser> matchingParsers = getSortedMatchingParsers(
+					config, file, filename);
+				for (Parser parser : matchingParsers) {
 					try {
 						return doParse(config, parser, file, context);
 					}
@@ -147,7 +222,7 @@ public final class ParseService {
 		}
 		
 		// Search for appropriate parser by filename
-		Parser parser = findParser(config, file.getName());
+		Parser parser = findParserByName(config, file.getName());
 		if (parser != null)
 			return doParse(config, parser, file, context);
 		
@@ -280,27 +355,31 @@ public final class ParseService {
 	}
 	
 	@Nullable
-	private static Parser findParser(	@NotNull IndexingConfig config,
-										@NotNull String filename) {
+	private static Parser findParserByName(	@NotNull IndexingConfig config,
+											@NotNull String filename) {
 		String ext = Util.getExtension(filename);
-		for (Parser parser : parsers) {
-			Collection<String> exts;
-			if (parser == textParser)
-				exts = config.getTextExtensions();
-			else if (parser == htmlParser)
-				exts = config.getHtmlExtensions();
-			else
-				exts = parser.getExtensions();
-			for (String candidateExt : exts)
+		for (Parser parser : parsers)
+			for (String candidateExt : getExtensions(config, parser))
 				if (candidateExt.toLowerCase().equals(ext))
 					return parser;
-		}
 		return null;
+	}
+
+	@Immutable
+	@NotNull
+	private static Collection<String> getExtensions(@NotNull IndexingConfig config,
+													@NotNull Parser parser) {
+		if (parser == textParser)
+			return config.getTextExtensions();
+		else if (parser == htmlParser)
+			return config.getHtmlExtensions();
+		return parser.getExtensions();
 	}
 	
 	public static boolean canParseByName(	@NotNull IndexingConfig config,
 											@NotNull String filename) {
-		return config.isIndexFilenames() || findParser(config, filename) != null;
+		return config.isIndexFilenames()
+				|| findParserByName(config, filename) != null;
 	}
 	
 	public static boolean isBuiltInExtension(	@NotNull IndexingConfig config,

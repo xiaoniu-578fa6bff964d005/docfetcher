@@ -16,12 +16,15 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.parse.MSOffice2007Parser.MSWord2007Parser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSPowerPointParser;
 import net.sourceforge.docfetcher.model.parse.MSOfficeParser.MSWordParser;
 import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeWriterParser;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
@@ -57,6 +60,59 @@ public final class ParseServiceTest {
 			Collection<String> actualTypes = ParseService.getPossibleMimeTypes(entry.getKey());
 			assertTrue(!Collections.disjoint(expectedTypes, actualTypes));
 		}
+	}
+	
+	/**
+	 * Tests that the best parser is chosen when multiple parsers support the
+	 * mime type of a particular file.
+	 */
+	@Test
+	public void testMimeTypeOverlap() throws Exception {
+		IndexingConfig config = new IndexingConfig();
+		
+		File odtFile = TestFiles.lorem_ipsum_odt.get();
+		List<Parser> odtParsers = ParseService.getSortedMatchingParsers(
+			config, odtFile, odtFile.getName());
+		assertTrue(equalClasses(odtParsers,
+			OpenOfficeParser.OpenOfficeWriterParser.class,
+			MSOffice2007Parser.MSExcel2007Parser.class,
+			MSOffice2007Parser.MSPowerPoint2007Parser.class,
+			MSOffice2007Parser.MSWord2007Parser.class,
+			OpenOfficeParser.OpenOfficeCalcParser.class,
+			OpenOfficeParser.OpenOfficeDrawParser.class,
+			OpenOfficeParser.OpenOfficeImpressParser.class
+		));
+		
+		File docxFile = TestFiles.lorem_ipsum_docx.get();
+		List<Parser> docxParsers = ParseService.getSortedMatchingParsers(
+			config, docxFile, docxFile.getName());
+		assertTrue(equalClasses(docxParsers,
+			MSOffice2007Parser.MSWord2007Parser.class,
+			MSOffice2007Parser.MSExcel2007Parser.class,
+			MSOffice2007Parser.MSPowerPoint2007Parser.class,
+			OpenOfficeParser.OpenOfficeCalcParser.class,
+			OpenOfficeParser.OpenOfficeDrawParser.class,
+			OpenOfficeParser.OpenOfficeImpressParser.class,
+			OpenOfficeParser.OpenOfficeWriterParser.class
+		));
+	}
+
+	/**
+	 * Returns true if the elements in the given collection have the classes
+	 * specified in the given array of classes.
+	 */
+	@NotNull
+	private boolean equalClasses(	@NotNull Collection<?> col,
+									@NotNull Class<?>... classes) {
+		if (col.size() != classes.length)
+			return false;
+		int i = 0;
+		for (Object element : col) {
+			if (!element.getClass().equals(classes[i]))
+				return false;
+			i++;
+		}
+		return true;
 	}
 	
 	// TODO test: What happens when a parser (e.g. AbiWordParser) is fed with the wrong filetype, e.g. binary files?
