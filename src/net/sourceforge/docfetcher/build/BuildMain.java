@@ -196,7 +196,9 @@ public final class BuildMain {
 	}
 	
 	private static void createMacOsXBuild(File tmpMainJar) throws Exception {
-		Util.println("Creating Mac OS X build (without disk image packaging)...");
+		String suffix = Util.IS_MAC_OS_X ? "" : " (without disk image packaging)";
+		Util.println(U.format("Creating Mac OS X build%s...", suffix));
+		
 		String appDir = U.format("build/%s.app", appName);
 		String contentsDir = appDir + "/Contents";
 		String resourcesDir = contentsDir + "/Resources";
@@ -239,9 +241,6 @@ public final class BuildMain {
 			String dmgPath = U.format("build/%s-%s.dmg", appName, version);
 			U.exec("hdiutil create -srcfolder %s %s", appDir, dmgPath);
 			U.exec("hdiutil internet-enable yes " + dmgPath);
-		}
-		else {
-			Util.printErr("Warning: Could not create a disk image for Mac OS X.");
 		}
 	}
 	
