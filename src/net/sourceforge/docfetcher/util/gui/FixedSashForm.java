@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.util.gui;
 
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 
 import org.eclipse.swt.SWT;
@@ -44,6 +45,8 @@ import org.eclipse.swt.widgets.Sash;
  * @author Tran Nam Quang
  */
 public abstract class FixedSashForm extends Composite {
+	
+	public final Event<Boolean> evtFirstControlShown = new Event<Boolean>();
 
 	private int limit = 50;
 	private Sash sash;
@@ -187,6 +190,7 @@ public abstract class FixedSashForm extends Composite {
 			setLayout(stackLayout);
 		}
 		layout();
+		evtFirstControlShown.fire(isVisible);
 	}
 	
 	/**

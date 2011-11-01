@@ -176,7 +176,7 @@ public final class Application {
 		initCocoaMenu(display);
 		initSystemTrayHider();
 
-		ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
+		final ThreePanelForm threePanelForm = new ThreePanelForm(shell, 250) {
 			protected Control createFirstControl(Composite parent) {
 				return createLeftPanel(parent);
 			}
@@ -191,6 +191,13 @@ public final class Application {
 		};
 		threePanelForm.setSashWidth(sashWidth);
 		threePanelForm.setSubSashWidth(sashWidth);
+		
+		threePanelForm.setFirstControlVisible(SettingsConf.Bool.ShowFilterPanel.get());
+		threePanelForm.evtFirstControlShown.add(new Event.Listener<Boolean>() {
+			public void update(Boolean eventData) {
+				SettingsConf.Bool.ShowFilterPanel.set(eventData);
+			}
+		});
 		
 		new SearchQueue(
 			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);

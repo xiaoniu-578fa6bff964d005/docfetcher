@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.FixedSashForm;
@@ -98,7 +99,16 @@ public abstract class ThreePanelForm extends FixedSashForm {
 			public void mouseUp(MouseEvent e) {
 				boolean isVisible = ! isFirstControlVisible();
 				setFirstControlVisible(isVisible);
-				leftBt.setOrientation(isVisible ? SWT.LEFT : SWT.RIGHT);
+			}
+		});
+		
+		/*
+		 * Update the orientation of the left button when it's clicked or when
+		 * the left panel is shown or hidden programmatically.
+		 */
+		evtFirstControlShown.add(new Event.Listener<Boolean>() {
+			public void update(Boolean eventData) {
+				leftBt.setOrientation(eventData ? SWT.LEFT : SWT.RIGHT);
 			}
 		});
 		

@@ -77,6 +77,8 @@ public final class SettingsConf {
 		ResetLocationFilterOnExit (true),
 		HotkeyEnabled (true),
 		
+		ShowFilterPanel (true),
+		
 		MainShellMaximized (false),
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
