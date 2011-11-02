@@ -38,6 +38,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -97,9 +98,12 @@ final class FileExtensionChooser {
 		StyledText loadingMsg = new StyledText(textContainer, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		loadingMsg.setBackground(Col.LIST_BACKGROUND.get()); // don't use WHITE, it won't work with dark themes
 		loadingMsg.setText("loading");
-		loadingMsg.setFont(UtilGui.getPreviewFontNormal().get());
 		loadingMsg.getCaret().setVisible(false);
 		stackLayout.topControl = textContainer;
+		
+		Font font = UtilGui.getPreviewFontNormal().createFont();
+		loadingMsg.setFont(font);
+		Util.disposeWith(loadingMsg, font);
 		
 		okBt = new Button(shell, SWT.PUSH);
 		okBt.setText("ok");

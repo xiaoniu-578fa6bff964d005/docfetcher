@@ -490,6 +490,8 @@ public final class SettingsConf {
 				"\\s*(\\d+)\\s*," + // Font height with whitespace
 				"\\s*(\\d+)\\s*" // Font style with whitespace
 		);
+		
+		public final Event<Void> evtChanged = new Event<Void>();
 
 		public final FontData defaultValue;
 		private FontData value;
@@ -517,12 +519,13 @@ public final class SettingsConf {
 		// Should only be called from within the SWT thread
 		// Caller is responsible for disposing the returned font
 		@NotNull
-		public Font get() {
+		public Font createFont() {
 			return new Font(Display.getDefault(), value);
 		}
 		public void set(@NotNull FontData fontData) {
 			Util.checkNotNull(fontData);
 			value = fontData;
+			evtChanged.fire(null);
 		}
 		@NotNull
 		public FontData createFontData() {

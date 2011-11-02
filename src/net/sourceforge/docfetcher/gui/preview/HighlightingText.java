@@ -65,6 +65,32 @@ final class HighlightingText {
 			}
 		});
 		
+		// Update normal font when preferences entry changes
+		UtilGui.getPreviewFontNormal().evtChanged.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				if (normalFont == null)
+					return;
+				Font oldFont = normalFont;
+				normalFont = UtilGui.getPreviewFontNormal().createFont();
+				if (textViewer.getFont() == oldFont)
+					textViewer.setFont(normalFont);
+				oldFont.dispose();
+			}
+		});
+		
+		// Update monospace font when preferences entry changes
+		UtilGui.getPreviewFontMono().evtChanged.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				if (monoFont == null)
+					return;
+				Font oldFont = monoFont;
+				monoFont = UtilGui.getPreviewFontMono().createFont();
+				if (textViewer.getFont() == oldFont)
+					textViewer.setFont(monoFont);
+				oldFont.dispose();
+			}
+		});
+		
 		// Dispose of fonts and highlight color
 		textViewer.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -101,12 +127,12 @@ final class HighlightingText {
 	public void setUseMonoFont(boolean useMonoFont) {
 		if (useMonoFont) {
 			if (monoFont == null)
-				monoFont = UtilGui.getPreviewFontMono().get();
+				monoFont = UtilGui.getPreviewFontMono().createFont();
 			textViewer.setFont(monoFont);
 		}
 		else {
 			if (normalFont == null)
-				normalFont = UtilGui.getPreviewFontNormal().get();
+				normalFont = UtilGui.getPreviewFontNormal().createFont();
 			textViewer.setFont(normalFont);
 		}
 	}
