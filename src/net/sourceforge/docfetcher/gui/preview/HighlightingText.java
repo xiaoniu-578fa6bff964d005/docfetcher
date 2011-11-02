@@ -19,16 +19,19 @@ import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.Range;
-import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.gui.Col;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -37,7 +40,9 @@ import org.eclipse.swt.widgets.Composite;
 final class HighlightingText {
 	
 	@NotNull private StyledText textViewer;
-	private final StyleRange highlightStyle = new StyleRange(0, 0, null, Col.YELLOW.get());
+	@NotNull private StyleRange highlightStyle;
+	@NotNull private Color highlightColor;
+	
 	private final List<int[]> rangesList = new ArrayList<int[]>();
 	private int occCount;
 	private Font normalFont;
@@ -48,7 +53,34 @@ final class HighlightingText {
 		textViewer = new StyledText(parent, style);
 		int m = 10;
 		textViewer.setMargins(m, m, m, m);
-		Util.disposeWith(textViewer, normalFont, monoFont);
+		setHighlightColorAndStyle();
+		
+		// Update highlight color when preferences entry changes
+		SettingsConf.IntArray.PreviewHighlighting.evtChanged.add(new Event.Listener<int[]>() {
+			public void update(int[] eventData) {
+				Color oldColor = highlightColor;
+				setHighlightColorAndStyle();
+				updateHighlighting();
+				oldColor.dispose();
+			}
+		});
+		
+		// Dispose of fonts and highlight color
+		textViewer.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				Resource[] resources = new Resource[] {
+					normalFont, monoFont, highlightColor };
+				for (Resource resource : resources)
+					if (resource != null)
+						resource.dispose();
+			}
+		});
+	}
+	
+	private void setHighlightColorAndStyle() {
+		int[] rgb = SettingsConf.IntArray.PreviewHighlighting.get();
+		highlightColor = new Color(textViewer.getDisplay(), rgb[0], rgb[1], rgb[2]);
+		highlightStyle = new StyleRange(0, 0, null, highlightColor);
 	}
 	
 	@NotNull

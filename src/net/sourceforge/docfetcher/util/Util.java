@@ -36,8 +36,6 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
@@ -51,7 +49,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
@@ -1501,17 +1498,4 @@ public final class Util {
 		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
 	}
 	
-	// Any of the given resources may be null
-	public static void disposeWith(	@NotNull Widget widget,
-									@NotNull final Resource... resources) {
-		Util.checkNotNull(widget, resources);
-		widget.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				for (Resource resource : resources)
-					if (resource != null)
-						resource.dispose();
-			}
-		});
-	}
-
 }
