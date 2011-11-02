@@ -52,8 +52,6 @@ import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
-import net.sourceforge.docfetcher.util.gui.StatusManager;
-import net.sourceforge.docfetcher.util.gui.StatusManager.StatusWidgetProvider;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
@@ -206,7 +204,8 @@ public final class Application {
 			}
 		}
 		if (showManualHint) {
-			// TODO now: Show hint in status bar
+			String msg = "Msg.press_help_button.format(Key.Help.toString())";
+			statusBar.getLeftPart().setContents(Img.HELP.get(), msg);
 		}
 		
 		// Global keyboard shortcuts
@@ -673,7 +672,7 @@ public final class Application {
 	
 	@NotNull
 	private static StatusBar initStatusBar() {
-		final StatusBar statusBar = new StatusBar(shell) {
+		return new StatusBar(shell) {
 			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
 				indexingStatus = new StatusBarPart(statusBar, true);
 				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
@@ -700,19 +699,6 @@ public final class Application {
 				return parts;
 			}
 		};
-		statusBar.getLeftPart().setContents(Img.INDEXING.get(), "Status Bar");
-		
-		new StatusManager(shell.getDisplay(), new StatusWidgetProvider() {
-			public String getStatus() {
-				return statusBar.getLeftPart().getText();
-			}
-
-			public void setStatus(String text) {
-				statusBar.getLeftPart().setContents(null, text);
-			}
-		});
-		
-		return statusBar;
 	}
 	
 	private static void handleShellClosed(@NotNull ShellEvent e) {

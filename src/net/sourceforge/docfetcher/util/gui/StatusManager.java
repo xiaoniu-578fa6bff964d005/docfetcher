@@ -15,8 +15,12 @@ import net.sourceforge.docfetcher.util.Util;
 
 import org.eclipse.swt.widgets.Display;
 
-
-public class StatusManager {
+/**
+ * @author Tran Nam Quang
+ */
+public final class StatusManager {
+	
+	// TODO post-release-1.1: Concurrency is broken here
 	
 	public static interface StatusWidgetProvider {
 		public String getStatus();
