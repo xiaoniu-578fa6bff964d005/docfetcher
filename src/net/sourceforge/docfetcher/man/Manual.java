@@ -23,8 +23,8 @@ import net.sourceforge.docfetcher.build.BuildMain;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
-import net.sourceforge.docfetcher.util.collect.ListMap;
 
+import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 
 import com.google.common.base.Charsets;
@@ -38,9 +38,6 @@ public final class Manual {
 	private static final String packagePath = Manual.class.getPackage().getName().replace('.', '/');
 	private static final String manDir = String.format("src/%s", packagePath);
 	
-	private static final ListMap<String, String> backLinkMap = ListMap.<String, String> create()
-		.add("Portable_Repositories", "Advanced_Usage");
-
 	public static void main(String[] args) throws Exception {
 		Util.checkThat(args.length > 0);
 		String langId = args[0];
@@ -50,7 +47,7 @@ public final class Manual {
 		File dstDir = new File("dist/help/" + dstDirName);
 		Files.deleteDirectoryContents(dstDir);
 		
-		PegDownProcessor processor = new PegDownProcessor();
+		PegDownProcessor processor = new PegDownProcessor(Extensions.TABLES);
 		File propsFile = new File(srcDir, "/page.properties");
 		PageProperties props = new PageProperties(propsFile);
 		convert(processor, props, srcDir, dstDir, true);
@@ -134,25 +131,21 @@ public final class Manual {
 			template = UtilGlobal.replace(path, template, key, pair.value);
 		}
 		
-		Pair[] optPairs = new Pair[] { props.portableDocRepos };
-		for (Pair pair : optPairs) {
-			String key = "${" + pair.key + "}";
-			try {
-				template = UtilGlobal.replace(path, template, key, pair.value);
-			}
-			catch (Exception e) {
+		String key = null;
+		SubPageData matchingData = null;
+		for (SubPageData data : props.subPageData) {
+			key = "${" + data.key + "}";
+			if (!template.contains(key))
 				continue;
-			}
+			matchingData = data;
+			break;
 		}
-		
-		String basename = Util.splitFilename(file)[0];
-		String linkPart = backLinkMap.getValue(basename);
-		String link = "../DocFetcher_Manual.html#" + linkPart;
+		Util.checkNotNull(key, matchingData);
+		template = UtilGlobal.replace(path, template, key, matchingData.title);
+		String link = "../DocFetcher_Manual.html#" + matchingData.backLink;
 		template = UtilGlobal.replace(path, template, "${back_link}", link);
 		
-		return UtilGlobal.replace(path, template,
-			"${contents}", htmlBody
-		);
+		return UtilGlobal.replace(path, template, "${contents}", htmlBody);
 	}
 	
 	private static final class Pair {
@@ -165,6 +158,20 @@ public final class Manual {
 		}
 	}
 	
+	private static final class SubPageData {
+		public final String key;
+		public final String title;
+		public final String backLink;
+		
+		public SubPageData(	@NotNull String key,
+							@NotNull String title,
+							@NotNull String backLink) {
+			this.key = key;
+			this.title = title;
+			this.backLink = backLink;
+		}
+	}
+	
 	private static final class PageProperties {
 		private final File propsFile;
 		private final Properties props = new Properties();
@@ -173,18 +180,21 @@ public final class Manual {
 		public final Pair docfetcherManual;
 		public final Pair mainFooter;
 		public final Pair backToMainPage;
-		public final Pair portableDocRepos;
+		public final SubPageData[] subPageData;
 
 		public PageProperties(@NotNull File propsFile) throws IOException {
 			this.propsFile = propsFile;
 			String propsFileContents = Files.toString(propsFile, Charsets.UTF_8);
 			props.load(new StringReader(propsFileContents));
 			
-			author = get("author");
-			docfetcherManual = get("docfetcher_manual");
-			mainFooter = get("main_footer");
-			backToMainPage = get("back_to_main_page");
-			portableDocRepos = get("portable_doc_repos");
+			author = getPair("author");
+			docfetcherManual = getPair("docfetcher_manual");
+			mainFooter = getPair("main_footer");
+			backToMainPage = getPair("back_to_main_page");
+			
+			subPageData = new SubPageData[] {
+				getSubPageData("portable_doc_repos", "Advanced_Usage"),
+				getSubPageData("query_syntax", "Advanced_Usage") };
 			
 			String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 			mainFooter.value = mainFooter.value.replace("${year}", year);
@@ -192,14 +202,26 @@ public final class Manual {
 		}
 		
 		@NotNull
-		private Pair get(@NotNull String key) throws IOException {
+		private Pair getPair(@NotNull String key) throws IOException {
+			return new Pair(key, getValue(key));
+		}
+		
+		@NotNull
+		private SubPageData getSubPageData(	@NotNull String key,
+											@NotNull String backLink)
+				throws IOException {
+			return new SubPageData(key, getValue(key), backLink);
+		}
+		
+		@NotNull
+		private String getValue(@NotNull String key) throws IOException {
 			String value = props.getProperty(key);
 			if (value == null) {
 				String msg = "Missing property %s in file %s.";
 				msg = String.format(msg, key, propsFile.getName());
 				throw new IOException(msg);
 			}
-			return new Pair(key, value);
+			return value;
 		}
 	}
 

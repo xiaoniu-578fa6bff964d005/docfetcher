@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>DocFetcher Manual - Portable Document Repositories</title>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+		<meta content="Tran Nam Quang" name="author">
+		<link rel="stylesheet" href="style.css" type="text/css">
+	</head>
+	<body>
+		<div class="header">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Back to main page</a>
+		</div>
+		<div id="main">
+			<h1>Query Syntax</h1><p>This page gives an overview of the available query syntax, going from "basic" to "advanced". The query syntax is provided by Apache Lucene, DocFetcher's underlying search engine, and it's described in a more technical manner on Lucene's <a href="http://lucene.apache.org/java/3_4_0/queryparsersyntax.html">query syntax page</a>.</p><h2>Boolean Operators</h2><p>DocFetcher supports the boolean operators <code>OR</code>, <code>AND</code> and <code>NOT</code>. If words are concatenated <em>without</em> boolean operators, DocFetcher will by default treat them as if they were concatenated with <code>OR</code>. If you don't like that, you can go to the <a href="Preferences.html">preferences</a> and set <code>AND</code> as the default.</p><p>Instead of <code>OR</code>, <code>AND</code> and <code>NOT</code>, you can also use <code>||</code>, <code>&amp;&amp;</code> and <code>&#39;-&#39;</code> (minus symbol), respectively. You can use <em>parentheses</em> to form more complicated boolean expressions. Here are some examples:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Query </th>
+      <th>Resulting documents contain...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>dog OR cat</code> </td>
+      <td>either <code>dog</code>, or <code>cat</code>, or both</td>
+    </tr>
+    <tr>
+      <td><code>dog AND cat</code> </td>
+      <td>both <code>dog</code> and <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>dog cat</code> </td>
+      <td>(by default equivalent to <code>dog OR cat</code>)</td>
+    </tr>
+    <tr>
+      <td><code>dog NOT cat</code> </td>
+      <td><code>dog</code>, but not <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>-dog cat</code> </td>
+      <td><code>cat</code>, but not <code>dog</code></td>
+    </tr>
+    <tr>
+      <td><code>(dog OR cat) AND mouse</code> </td>
+      <td><code>mouse</code>, and either <code>dog</code> or <code>cat</code>, or both</td>
+    </tr>
+  </tbody>
+</table><h2>Searching is case-insensitive</h2><p>DocFetcher does not distinguish between lowercase and uppercase characters, so it doesn't matter if the words you enter are completely lowercase, or completely uppercase, or a mix of both. The only exceptions are the keywords <code>OR</code>, <code>AND</code>, <code>NOT</code> and <code>TO</code>, which must always be entered in uppercase. (For the <code>TO</code> keyword, see the 'range searches' section below.)</p><h2>Phrase Searches and Required Terms</h2><p>To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a <code>&#39;+&#39;</code> in front of it. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Query </th>
+      <th>Resulting documents contain...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>&quot;dog cat mouse&quot;</code> </td>
+      <td>the words <code>dog</code>, <code>cat</code> and <code>mouse</code>, in that particular order</td>
+    </tr>
+    <tr>
+      <td><code>+dog cat</code> </td>
+      <td>definitely <code>dog</code>, and maybe also <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>&quot;dog cat&quot; AND mouse</code> </td>
+      <td>the phrase <code>dog cat</code>, and the word <code>mouse</code></td>
+    </tr>
+    <tr>
+      <td><code>+dog +cat</code> </td>
+      <td>(equivalent to <code>dog AND cat</code>)</td>
+    </tr>
+  </tbody>
+</table><h2>Wildcards</h2><p>Question marks (<code>&#39;?&#39;</code>) and asterisks (<code>&#39;*&#39;</code>) can be used to indicate that some characters are unknown. The question mark stands for exactly one unknown character, while the asterisk stands for zero or more unknown characters.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Query </th>
+      <th>Resulting documents contain...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>luc?</code> </td>
+      <td><code>lucy</code>, <code>luca</code>, ...</td>
+    </tr>
+    <tr>
+      <td><code>luc*</code> </td>
+      <td><code>luc</code>, <code>lucy</code>, <code>luck</code>, <code>lucene</code>, ...</td>
+    </tr>
+    <tr>
+      <td><code>*ene*</code> </td>
+      <td><code>lucene</code>, <code>energy</code>, <code>generator</code>, ...</td>
+    </tr>
+  </tbody>
+</table><p>Note: If wildcards are used as the first character of a word, the search tends to be slower on average. This is due to how the index is structured: It's as if you tried to look up someone's phone number, and you only know that person's first name. So, in the example above, searching for <code>*ene*</code> will probably be slower than the other searches because <code>*ene*</code> starts with a wildcard.</p><h2>Fuzzy Searches</h2><p>Fuzzy searches allow you to search for words <em>similar</em> to a given word. For example, if you search for <code>roam~</code>, DocFetcher will find documents containing words like <code>foam</code> and <code>roams</code>.</p><p>Additionally, you can append a similarity threshold between 0 and 1, like so: <code>roam~0.8</code>. The higher the threshold, the higher the similarity of the returned matches. Leaving out the threshold is the same as using the default value of 0.5.</p><h2>Proximity Searches</h2><p>Proximity searches allow you to find words that are within a specific distance away from each other. To do a proximity search, put a tilde (<code>&#39;~&#39;</code>) at the end of a phrase, followed by a distance value. &mdash; Note that this is syntactically similar to fuzzy searches. For example, to search for documents containing <code>wikipedia</code> and <code>lucene</code> within 10 words of each other, type in: <code>&quot;wikipedia lucene&quot;~10</code></p><h2>Boosting Terms</h2><p>You can influence the relevance sorting of the results by assigning custom weights to words. Example: If you enter <code>dog^4 cat</code> instead of just <code>dog cat</code>, documents containing <code>dog</code> will receive a higher score and therefore move closer to the top of the results.</p><p>Although the boost factor must be positive, it can be less than 1 (e.g. 0.2). If no boost factor is specified, the default value 1 is used.</p><h2>Field Searches</h2><p>By default, DocFetcher will search in all the textual data it is capable of extracting, i.e. the contents, the filenames and the metadata of the documents. However, you can also restrict your searches to the filename and/or certain metadata fields. For example, to search for documents whose titles contain <code>wikipedia</code>, enter: <code>title:wikipedia</code>. This may be combined with phrase search, e.g. <code>title:&quot;dog cat&quot;</code>, or with parentheses, e.g. <code>title:(dog cat)</code>. In fact, if you omit the quotes and parentheses, only <code>dog</code> will be matched against the title, not <code>cat</code>.</p><p>Which fields are available generally depends on the document format, but you can use this as a rule of thumb:</p>
+<ul>
+  <li><em>Files</em>: filename, title, author</li>
+  <li><em>Emails</em>: subject, sender, recipients</li>
+</ul><h2>Range Searches</h2><p>DocFetcher allows searching for words that are lexicographically <em>between</em> two other words. For example, the word <code>beta</code> lies between <code>alpha</code> and <code>gamma</code>. So, if you want to list all documents that contain words between <code>alpha</code> and <code>gamma</code>, type in: <code>[alpha TO gamma]</code>.</p><p>When using the square brackets, the range query is <em>inclusive</em>, i.e. <code>alpha</code> and <code>gamma</code> are included in the results. To do an <em>exclusive</em> range search, use curly brackets instead: <code>{alpha TO gamma}</code></p><p>You may combine range searches and field searches as follows: <code>title:{alpha TO gamma}</code>. This will restrict the range search to the title field.</p>
+		</div>
+		<div class="footer">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Back to main page</a>
+		</div>
+	</body>
+</html>
