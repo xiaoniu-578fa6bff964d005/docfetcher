@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Zip;
 
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -95,24 +96,14 @@ final class U {
 			contents = Util.ensureWindowsLineSep(contents);
 			break;
 		}
-		if (replacements != null) {
-			Util.checkThat(replacements.length % 2 == 0);
-			for (int i = 0; i < replacements.length; i += 2) {
-				String s1 = replacements[i];
-				String s2 = replacements[i + 1];
-				if (!contents.contains(s1)) {
-					String msg = "Text substitution failed: File '%s' does not contain '%s'.";
-					throw new IllegalStateException(format(msg, srcPath, s1));
-				}
-				contents = contents.replace(s1, s2);
-			}
-		}
+		if (replacements != null)
+			contents = UtilGlobal.replace(srcPath, contents, replacements);
 		if (!dstPath.endsWith(".sh") && !contents.startsWith("#!") && contents.contains("${"))
 			Util.printErr(format("Warning: File '%s' contains "
 					+ "suspicious substitution pattern: ${", srcPath));
 		U.write(contents, dstPath);
 	}
-
+	
 	static String read(String path) throws Exception {
 		return Files.toString(new File(path), Charsets.UTF_8);
 	}

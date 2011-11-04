@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher;
 import java.util.Collections;
 import java.util.Iterator;
 
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -50,6 +51,23 @@ public final class UtilGlobal {
 				};
 			}
 		};
+	}
+	
+	@NotNull
+	public static String replace(	@NotNull String srcPath,
+	                             	@NotNull String input,
+									@NotNull String... replacements) {
+		Util.checkThat(replacements.length % 2 == 0);
+		for (int i = 0; i < replacements.length; i += 2) {
+			String s1 = replacements[i];
+			String s2 = replacements[i + 1];
+			if (!input.contains(s1)) {
+				String msg = "Text substitution failed: File '%s' does not contain '%s'.";
+				throw new IllegalStateException(String.format(msg, srcPath, s1));
+			}
+			input = input.replace(s1, s2);
+		}
+		return input;
 	}
 	
 }
