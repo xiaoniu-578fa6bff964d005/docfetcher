@@ -182,7 +182,7 @@ public final class IndexRegistry {
 	private void addIndex(	@NotNull LuceneIndex index,
 							@Nullable Long lastModified) {
 		Util.checkNotNull(index);
-		Util.checkNotNull(index.getIndexDir()); // RAM indexes not allowed
+		Util.checkNotNull(index.getIndexDirPath()); // RAM indexes not allowed
 		writeLock.lock();
 		try {
 			if (indexes.containsKey(index))
@@ -387,7 +387,7 @@ public final class IndexRegistry {
 		try {
 			Map<File, LuceneIndex> indexDirMap = Maps.newHashMap();
 			for (LuceneIndex index : indexes.keySet())
-				indexDirMap.put(index.getIndexDir(), index);
+				indexDirMap.put(index.getIndexDirPath().getCanonicalFile(), index);
 			
 			/*
 			 * The code below is pretty inefficient if many indexes are added,
@@ -403,7 +403,7 @@ public final class IndexRegistry {
 				if (!serFile.isFile())
 					continue;
 				
-				LuceneIndex index = indexDirMap.remove(indexDir);
+				LuceneIndex index = indexDirMap.remove(Util.getAbsFile(indexDir));
 				
 				// New index found
 				if (index == null) {
@@ -438,7 +438,7 @@ public final class IndexRegistry {
 		Util.checkNotNull(index);
 		writeLock.lock();
 		try {
-			File indexDir = index.getIndexDir();
+			File indexDir = index.getIndexDirPath().getCanonicalFile();
 			indexDir.mkdirs();
 			File serFile = new File(indexDir, SER_FILENAME);
 			

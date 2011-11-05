@@ -474,10 +474,10 @@ public final class Searcher {
 		if (indexes.isEmpty())
 			throw new SearchException("Nothing to search in: No indexes have been created yet."); // TODO i18n
 		for (LuceneIndex index : indexes) {
-			File indexDir = index.getIndexDir();
+			File indexDir = index.getIndexDirPath().getCanonicalFile();
 			if (indexDir != null && !indexDir.isDirectory()) {
 				String msg = "folders_not_found"; // TODO i18n
-				msg += "\n" + Util.getSystemAbsPath(indexDir);
+				msg += "\n" + indexDir;
 				throw new SearchException(msg);
 			}
 		}

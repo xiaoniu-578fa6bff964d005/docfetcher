@@ -40,9 +40,15 @@ public abstract class TreeIndex <
 		FAILURE,
 	}
 	
+	/*
+	 * Note: It is important to always serialize Path objects instead of
+	 * java.io.File objects to avoid certain portability issues caused by
+	 * non-normalized file paths.
+	 */
+	
 	private final IndexingConfig config;
 	private final F rootFolder;
-	@Nullable private final File fileIndexDir;
+	@Nullable private final Path fileIndexDirPath;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	
 	// if indexDir is null, all content is written to a RAM index, which
@@ -76,13 +82,13 @@ public abstract class TreeIndex <
 		
 		// Create index directory or RAM directory
 		if (indexParentDir == null) {
-			fileIndexDir = null;
+			fileIndexDirPath = null;
 			ramIndexDir = new RAMDirectory();
 		}
 		else {
 			long id = Util.getTimestamp();
 			String indexDirName = getIndexDirName(rootFile) + "_" + id;
-			fileIndexDir = new File(indexParentDir, indexDirName);
+			fileIndexDirPath = new Path(new File(indexParentDir, indexDirName).getPath());
 		}
 	}
 	
@@ -103,15 +109,15 @@ public abstract class TreeIndex <
 	}
 	
 	@Nullable
-	public final File getIndexDir() {
-		return fileIndexDir;
+	public final Path getIndexDirPath() {
+		return fileIndexDirPath;
 	}
 	
 	@NotNull
 	public final Directory getLuceneDir() throws IOException {
-		if (fileIndexDir != null) {
+		if (fileIndexDirPath != null) {
 			assert ramIndexDir == null;
-			return FSDirectory.open(fileIndexDir);
+			return FSDirectory.open(fileIndexDirPath.getCanonicalFile());
 		}
 		if (ramIndexDir == null) // may be null after deserialization
 			ramIndexDir = new RAMDirectory();
@@ -142,7 +148,8 @@ public abstract class TreeIndex <
 	}
 	
 	private void clear(boolean removeTopLevel) {
-		if (fileIndexDir != null) {
+		if (fileIndexDirPath != null) {
+			File fileIndexDir = fileIndexDirPath.getCanonicalFile();
 			if (fileIndexDir.exists()) {
 				try {
 					if (removeTopLevel)

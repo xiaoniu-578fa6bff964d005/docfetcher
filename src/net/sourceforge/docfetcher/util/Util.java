@@ -590,6 +590,11 @@ public final class Util {
 		return getAbsPath(new File(path));
 	}
 	
+	@NotNull
+	public static File getAbsFile(@NotNull File file) {
+		return new File(getAbsPath(file));
+	}
+	
 	/**
 	 * Equivalent to {@link java.io.File#getAbsolutePath()}.
 	 */

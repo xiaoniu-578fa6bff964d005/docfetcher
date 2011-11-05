@@ -262,10 +262,10 @@ public final class IndexingQueue {
 		Task task = new Task(this, index, action);
 
 		// Check that the given index has the right index directory
-		File taskIndexDir = task.getLuceneIndex().getIndexDir();
+		File taskIndexDir = task.getLuceneIndex().getIndexDirPath().getCanonicalFile();
 		File taskParentIndexDir = Util.getParentFile(taskIndexDir);
 		File indexParentDir = indexRegistry.getIndexParentDir();
-		Util.checkThat(taskParentIndexDir.equals(indexParentDir));
+		Util.checkThat(sameFiles(taskParentIndexDir, indexParentDir));
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
 
@@ -410,6 +410,11 @@ public final class IndexingQueue {
 			evtRemoved.fire(removedTask);
 		
 		return null;
+	}
+	
+	@NotThreadSafe
+	private static boolean sameFiles(@NotNull File f1, @NotNull File f2) {
+		return Util.getAbsPath(f1).equals(Util.getAbsPath(f2));
 	}
 
 	@NotThreadSafe

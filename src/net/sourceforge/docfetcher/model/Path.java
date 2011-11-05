@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.Normalizer;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -69,7 +70,16 @@ public final class Path implements Serializable {
 	
 	@NotNull
 	private static String normalizePath(@NotNull String path) {
-		return Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
+		path = Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
+		return normalizeUnicode(path);
+	}
+	
+	@NotNull
+	private static String normalizeUnicode(@NotNull String str) {
+	    Normalizer.Form form = Normalizer.Form.NFD;
+	    if (!Normalizer.isNormalized(str, form))
+			return Normalizer.normalize(str, form);
+	    return str;
 	}
 	
 	@NotNull

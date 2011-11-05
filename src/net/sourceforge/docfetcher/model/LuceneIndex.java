@@ -39,7 +39,7 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	 * if the Lucene index was created in memory.
 	 */
 	@Nullable
-	public File getIndexDir();
+	public Path getIndexDirPath();
 	
 	/**
 	 * Warning: If the root file corresponds to the current working directory,
