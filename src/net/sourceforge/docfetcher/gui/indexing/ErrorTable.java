@@ -68,7 +68,6 @@ final class ErrorTable {
 		// Some keyboard shortcuts
 		table.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-				// TODO mac: Are these the correct keyboard shortcuts on Mac OS X?
 				if (e.stateMask == SWT.MOD1) {
 					switch (e.keyCode) {
 					case 'a': table.selectAll(); break;

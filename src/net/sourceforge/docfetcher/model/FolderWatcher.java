@@ -224,11 +224,9 @@ public final class FolderWatcher {
 
 				/*
 				 * Tests indicate that Linux can watch individual files, but
-				 * Windows can't. That means on non-Linux platforms we'll
-				 * watch the parent folder instead if our target is a file
+				 * Windows and Mac OS X can't. That means on non-Linux platforms
+				 * we'll watch the parent folder instead if our target is a file
 				 * (for example a PST file).
-				 * 
-				 * TODO mac: check this for Mac OS X
 				 */
 				File fileToWatch = rootFile.isFile() && !Util.IS_LINUX
 					? Util.getParentFile(rootFile)
