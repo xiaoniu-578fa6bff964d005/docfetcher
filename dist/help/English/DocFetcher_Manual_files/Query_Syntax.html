@@ -11,7 +11,7 @@
 			<a href="../DocFetcher_Manual.html#Advanced_Usage">Back to main page</a>
 		</div>
 		<div id="main">
-			<h1>Query Syntax</h1><p>This page gives an overview of the available query syntax, going from "basic" to "advanced". The query syntax is provided by Apache Lucene, DocFetcher's underlying search engine, and it's described in a more technical manner on Lucene's <a href="http://lucene.apache.org/java/3_4_0/queryparsersyntax.html">query syntax page</a>.</p><h2>Boolean Operators</h2><p>DocFetcher supports the boolean operators <code>OR</code>, <code>AND</code> and <code>NOT</code>. If words are concatenated <em>without</em> boolean operators, DocFetcher will by default treat them as if they were concatenated with <code>OR</code>. If you don't like that, you can go to the <a href="Preferences.html">preferences</a> and set <code>AND</code> as the default.</p><p>Instead of <code>OR</code>, <code>AND</code> and <code>NOT</code>, you can also use <code>||</code>, <code>&amp;&amp;</code> and <code>&#39;-&#39;</code> (minus symbol), respectively. You can use <em>parentheses</em> to form more complicated boolean expressions. Here are some examples:</p>
+			<h1>Query Syntax</h1><p>This page gives an overview of the available query syntax, going from "basic" to "advanced". The query syntax is provided by Apache Lucene, DocFetcher's underlying search engine, and it's described in a more technical manner on Lucene's <a href="http://lucene.apache.org/java/3_4_0/queryparsersyntax.html">query syntax page</a>.</p><h2>Boolean Operators</h2><p>DocFetcher supports the boolean operators <code>OR</code>, <code>AND</code> and <code>NOT</code>. If words are concatenated <em>without</em> boolean operators, DocFetcher will by default treat them as if they were concatenated with <code>OR</code>. If you don't like that, you can go to the <a href="Preferences.html">preferences</a> and set <code>AND</code> as the default.</p><p>Instead of <code>OR</code>, <code>AND</code> and <code>NOT</code>, you can also use <code>||</code>, <code>&amp;&amp;</code> and <code>&#39;-&#39;</code> (minus symbol), respectively. You can use <em>parentheses</em> to group certain expressions. Here are some examples:</p>
 <table>
   <thead>
     <tr>
@@ -30,7 +30,7 @@
     </tr>
     <tr>
       <td><code>dog cat</code> </td>
-      <td>(by default equivalent to <code>dog OR cat</code>)</td>
+      <td>(by default equivalent to the query <code>dog OR cat</code>)</td>
     </tr>
     <tr>
       <td><code>dog NOT cat</code> </td>
@@ -45,7 +45,7 @@
       <td><code>mouse</code>, and either <code>dog</code> or <code>cat</code>, or both</td>
     </tr>
   </tbody>
-</table><h2>Searching is case-insensitive</h2><p>DocFetcher does not distinguish between lowercase and uppercase characters, so it doesn't matter if the words you enter are completely lowercase, or completely uppercase, or a mix of both. The only exceptions are the keywords <code>OR</code>, <code>AND</code>, <code>NOT</code> and <code>TO</code>, which must always be entered in uppercase. (For the <code>TO</code> keyword, see the 'range searches' section below.)</p><h2>Phrase Searches and Required Terms</h2><p>To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a <code>&#39;+&#39;</code> in front of it. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:</p>
+</table><h2>Searching is case-insensitive</h2><p>DocFetcher does not distinguish between lowercase and uppercase characters, so it doesn't matter if the words you enter are completely lowercase, or completely uppercase, or a mix of both. The only exceptions are the keywords <code>OR</code>, <code>AND</code>, <code>NOT</code> and <code>TO</code>, which must always be entered in uppercase. (For the <code>TO</code> keyword, see the 'range searches' section below.)</p><h2>Phrase Searches and Required Terms</h2><p>To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a <code>&#39;+&#39;</code> in front of the word. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:</p>
 <table>
   <thead>
     <tr>
@@ -68,7 +68,7 @@
     </tr>
     <tr>
       <td><code>+dog +cat</code> </td>
-      <td>(equivalent to <code>dog AND cat</code>)</td>
+      <td>(equivalent to the query <code>dog AND cat</code>)</td>
     </tr>
   </tbody>
 </table><h2>Wildcards</h2><p>Question marks (<code>&#39;?&#39;</code>) and asterisks (<code>&#39;*&#39;</code>) can be used to indicate that some characters are unknown. The question mark stands for exactly one unknown character, while the asterisk stands for zero or more unknown characters.</p>

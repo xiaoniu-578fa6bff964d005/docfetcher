@@ -6,13 +6,13 @@ Boolean Operators
 -----------------
 DocFetcher supports the boolean operators `OR`, `AND` and `NOT`. If words are concatenated *without* boolean operators, DocFetcher will by default treat them as if they were concatenated with `OR`. If you don't like that, you can go to the [preferences](Preferences.html) and set `AND` as the default.
 
-Instead of `OR`, `AND` and `NOT`, you can also use `||`, `&&` and `'-'` (minus symbol), respectively. You can use *parentheses* to form more complicated boolean expressions. Here are some examples:
+Instead of `OR`, `AND` and `NOT`, you can also use `||`, `&&` and `'-'` (minus symbol), respectively. You can use *parentheses* to group certain expressions. Here are some examples:
 
 Query                    | Resulting documents contain...      
 -------------------------|---------------------------------------------
 `dog OR cat`             | either `dog`, or `cat`, or both
 `dog AND cat`            | both `dog` and `cat`
-`dog cat`                | (by default equivalent to `dog OR cat`)
+`dog cat`                | (by default equivalent to the query `dog OR cat`)
 `dog NOT cat`            | `dog`, but not `cat`
 `-dog cat`               | `cat`, but not `dog`
 `(dog OR cat) AND mouse` | `mouse`, and either `dog` or `cat`, or both
@@ -25,14 +25,14 @@ DocFetcher does not distinguish between lowercase and uppercase characters, so i
 
 Phrase Searches and Required Terms
 ----------------------------------
-To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a `'+'` in front of it. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:
+To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a `'+'` in front of the word. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:
 
 Query                 | Resulting documents contain...      
 ----------------------|-------------------------------------
 `"dog cat mouse"`     | the words `dog`, `cat` and `mouse`, in that particular order
 `+dog cat`            | definitely `dog`, and maybe also `cat`
 `"dog cat" AND mouse` | the phrase `dog cat`, and the word `mouse`
-`+dog +cat`           | (equivalent to `dog AND cat`)
+`+dog +cat`           | (equivalent to the query `dog AND cat`)
 
 
 Wildcards

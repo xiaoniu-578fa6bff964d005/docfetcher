@@ -3,7 +3,7 @@ Introduction
 
 DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository.
 
-**Index-based search**: Since searching in the documents directly would be impractically slow for a larger number of documents, DocFetcher requires that you create *indexes* for the folders you want to search in. These indexes allow DocFetcher to quickly look up files by keyword, similar to how you would use the index in the back of a book. Creating an index might take some time, depending on the number and sizes of the indexed files. However, this needs to be done only once for each folder; afterwards you can search in the folders as many times as you want.
+**Index-based search**: Since searching in the documents directly would be impractically slow for a larger number of documents, DocFetcher requires that you create *indexes* for the folders you want to search in. These indexes allow DocFetcher to quickly look up files by keyword, similar to how you would use the index in the back of a book. Creating an index might take some time, depending on the number and sizes of the indexed files. However, this needs to be done only once for each folder; afterwards you can search in the indexed folders as many times as you want.
 
 **Creating an index**: To create an index, right-click on the `Search Scope` area on the left and select `Create Index From > Folder`. Now choose a folder to be indexed. For starters, this should be a small one with not too many files in it, like, say, 50? After selecting the folder, a configuration window pops up. The default configuration should suffice, so just click on the `Run` button and wait until DocFetcher has finished indexing the documents. (An alternative way of creating an index is to paste a directory from the clipboard into the `Search Scope` area.)
 
@@ -39,21 +39,23 @@ Advanced Usage
 
 **Query syntax**: With DocFetcher, you can do much more than simple word lookup. For example, you can use wildcards to search for words with a common start, like so: `wiki*`. To search for a certain phrase (i.e. a sequence of words in a specific order), surround the phrase with quotation marks: `"the quick brown fox"`. But that's barely the start. For an overview of all the supported contructs, see the [query syntax section](DocFetcher_Manual_files/Query_Syntax.html).
 
-**Portable document repository**: The portable version of DocFetcher allows you create a bundle containing DocFetcher, your documents and the associated indexes. You can then freely move this bundle around, e.g. onto CD-ROMs, USB drives, encrypted volumes or other computers. This is also useful for sharing a single document repository across a local area network or across different operating systems. One important thing to keep in mind here is that the indexes must be created with *relative paths*. [Details](DocFetcher_Manual_files/Portable_Repositories.html).
+**Portable document repository**: The portable version of DocFetcher allows you create a bundle containing DocFetcher, your documents and the associated indexes. You can then freely move this bundle around, e.g. onto CD-ROMs, USB drives, encrypted volumes or other computers. This is also useful for sharing a single document repository across a local area network or across different operating systems in a dual-boot system. One important thing to keep in mind here is that the indexes must be created with *relative paths*. [Details](DocFetcher_Manual_files/Portable_Repositories.html).
 
-**Indexing configuration options**: For a detailed discussion of all those options on the indexing configuration window, click [here](http://todo.com). Perhaps the most interesting ones are:
+**Indexing configuration options**: For a detailed discussion of all those options on the indexing configuration window, click [here](DocFetcher_Manual_files/Indexing_Options.html). You can also reach this page directly from the configuration window by clicking on the `Help` button at the bottom of the window. Perhaps the most interesting configuration options are:
 
-* customizable file extensions for plain text files and zip archives
-* exclusion of certain files from indexing based on regular expressions
-* mime type detection
-* detection of HTML pairs
+* ***Customizable file extensions***: The file extensions for plain text files and zip archives are fully customizable. This is particularly useful for indexing source code files.
+* ***File exclusion***: You can exclude certain files from indexing based on regular expressions.
+* ***Mime type detection***: Without mime type detection, DocFetcher will just look at a file's extension (e.g. `'.doc'`) to determine its file type. With mime type detection, DocFetcher will also peek into the file's contents to see if it can find any better type info. This is slower than just checking the file extension, but it's useful for files that have the wrong file extension.
+* ***HTML pairing***: By default, DocFetcher treats an HTML file and its associated folder (e.g. a file `foo.html` and a folder `foo_files`) as a single document. The main purpose of this is to make all the "clutter" inside the HTML folders disappear from the search results.
+
+**Regular expressions**: Both the file exclusion and the mime type detection rely on so-called *regular expressions*. These are user-defined patterns that DocFetcher will match against filenames or filepaths. For example, to exclude all files starting with the word "journal", you can use this regular expression: `journal.*`. Note that this is slightly different from DocFetcher's query syntax, where you would omit the dot: `journal*`. If you want to know more about regular expressions, read this [brief introduction](DocFetcher_Manual_files/Regular_Expressions.html).
 
 * * *
 
 Caveats and Common Gotchas
 ==========================
 
-**Raising the memory limit**: DocFetcher, like all Java programs, has a fixed limit on how much memory it's allowed to use, known as the *Java heap size*. This memory limit must be set on startup, and DocFetcher currently chooses a default value of 256 MB. If you try to index a very, very large number of files, and/or if some of the indexed files are really huge (which is not uncommon with PDF files), then chances are DocFetcher will hit that memory limit. If this ever happens, you might want to [raise the memory limit](http://todo.com).
+**Raising the memory limit**: DocFetcher, like all Java programs, has a fixed limit on how much memory it's allowed to use, known as the *Java heap size*. This memory limit must be set on startup, and DocFetcher currently chooses a default value of 256 MB. If you try to index a very, very large number of files, and/or if some of the indexed files are really huge (which is not uncommon with PDF files), then chances are DocFetcher will hit that memory limit. If this ever happens, you might want to [raise the memory limit](DocFetcher_Manual_files/Memory_Limit.html).
 
 **Don't index system folders**: In contrast to other desktop search applications, DocFetcher was not designed for indexing system folders such as `C:`or `C:\Windows`. Doing so is discouraged for the following reasons:
 
@@ -63,7 +65,7 @@ Caveats and Common Gotchas
 
 **Unicode support**: DocFetcher has full Unicode support for all document formats except CHM files. In case of plain text files, DocFetcher has to use [certain heuristics](http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html) to guess the correct encoding, since plain text files don't contain any explicit encoding information.
 
-**Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well (but not executable rar archives). DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
+**Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well, but not executable rar archives. DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
 With that said, it should be noted that support for zip and 7z archives is best in terms of robustness and speed. On the other hand, indexing of tar.gz, tar.bz2 and similar formats tends to be less efficient. This is due to the fact that these formats don't have an internal "summary" of the archive contents, which forces DocFetcher to unpack the entire archive rather than only individual archive entries. Bottom line: If you have the choice, compress your files either as zip or 7z archives for maximum compatibility with DocFetcher.
 
 **Folder watch limit (Linux-only)**: On Linux, processes can by default watch at most 8192 folders. You might reach this limit if you index a very deep hierarchy of folders. If that happens, DocFetcher will probably print a warning message like "No space left on device" on the console. You can work around this by raising the watch limit. For example, this command will raise the watch limit to 32000:
@@ -77,4 +79,4 @@ With that said, it should be noted that support for zip and 7z archives is best 
 Further information
 ===================
 
-**The DocFetcher wiki**: For more information, have a look at our [wiki](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page), and the [Advanced Usage](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Advanced_Usage) section in particular.
+**The DocFetcher wiki**: For more information, have a look at our [wiki](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page), and the wiki's [Advanced Usage](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Advanced_Usage) section in particular.
