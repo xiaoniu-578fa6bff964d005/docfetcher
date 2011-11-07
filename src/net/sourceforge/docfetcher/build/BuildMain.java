@@ -140,7 +140,7 @@ public final class BuildMain {
 			"%s/lib/%s", releaseDir, tmpMainJar.getName());
 		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
 		
-		String linuxLauncher = U.format("%s/%s-Linux.sh", releaseDir, appName);
+		String linuxLauncher = U.format("%s/%s.sh", releaseDir, appName);
 		U.copyTextFile(
 			"dist/launcher-linux.sh", linuxLauncher, LineSep.UNIX,
 			"${main_class}", Main.class.getName()
@@ -166,13 +166,19 @@ public final class BuildMain {
 		}
 		else {
 			Util.printErr("** Warning: Cannot make the" +
-					" launcher shell script executable.");
+					" portable launcher shell scripts executable.");
 		}
 		
 		String exeLauncher = U.format("%s/%s.exe", releaseDir, appName);
-		U.copyBinaryFile("dist/DocFetcher.exe", exeLauncher);
+		U.copyBinaryFile("dist/DocFetcher-256.exe", exeLauncher);
 		
-		String batLauncher = U.format("%s/%s.bat", releaseDir, appName);
+		for (int heapSize : new int[] {512, 768, 1024}) {
+			String exeName = U.format("%s-%d.exe", appName, heapSize);
+			exeLauncher = U.format("%s/misc/%s", releaseDir, exeName);
+			U.copyBinaryFile("dist/" + exeName, exeLauncher);
+		}
+		
+		String batLauncher = U.format("%s/misc/%s.bat", releaseDir, appName);
 		U.copyTextFile(
 			"dist/launcher-portable.bat", batLauncher, LineSep.WINDOWS,
 			"${main_class}", Main.class.getName());
@@ -231,7 +237,7 @@ public final class BuildMain {
 		}
 		else {
 			Util.printErr("** Warning: Cannot make the" +
-					" launcher shell script executable.");
+					" Mac OS X launcher shell script executable.");
 		}
 		
 		U.copyBinaryFile("build/tmp/licenses.zip", resourcesDir
