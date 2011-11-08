@@ -22,6 +22,8 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Event.Listener;
 import net.sourceforge.docfetcher.util.Util;
 
+import org.eclipse.swt.SWT;
+
 import com.melloware.jintellitype.JIntellitype;
 
 /**
@@ -150,8 +152,14 @@ public final class HotkeyHandler {
 		}
 
 		public void registerHotkey(int id, int mask, int key) {
-			JIntellitype.getInstance().registerSwingHotKey(id,
-					KeyCodeTranslator.translateSWTModifiers(mask),
+			/*
+			 * Bug in JIntellitype 1.3.7: The method
+			 * JIntellitype.registerSwingHotKey incorrectly translates AWT
+			 * modifiers to JIntellitype modifiers. The fix is to translate
+			 * directly from SWT modifiers to JIntellitype modifiers.
+			 */
+			JIntellitype.getInstance().registerHotKey(id,
+					toIntellitypeModifier(mask),
 					KeyCodeTranslator.translateSWTKey(key));
 		}
 
@@ -161,6 +169,17 @@ public final class HotkeyHandler {
 
 		public void shutdown() {
 			JIntellitype.getInstance().cleanUp();
+		}
+		
+		private int toIntellitypeModifier(int swtModifier) {
+			int mask = 0;
+			if ((swtModifier & SWT.CTRL) != 0)
+				mask |= JIntellitype.MOD_CONTROL;
+			if ((swtModifier & SWT.ALT) != 0)
+				mask |= JIntellitype.MOD_ALT;
+			if ((swtModifier & SWT.SHIFT) != 0)
+				mask |= JIntellitype.MOD_SHIFT;
+			return mask;
 		}
 	}
 
