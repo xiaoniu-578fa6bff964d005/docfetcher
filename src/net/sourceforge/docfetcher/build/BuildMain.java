@@ -76,14 +76,19 @@ public final class BuildMain {
 		javac.setFork(true); // Won't find javac executable without this
 		javac.execute();
 		
-		createPortableBuild(recreateJarFile(true, LineSep.WINDOWS));
-		createMacOsXBuild(recreateJarFile(false, LineSep.UNIX));
+		recreateJarFile("", false, LineSep.WINDOWS); // Needed for NSIS script
+		File portableJar = recreateJarFile("portable_", true, LineSep.WINDOWS);
+		File macOsXJar = recreateJarFile("macosx_", false, LineSep.UNIX);
+		
+		createPortableBuild(portableJar);
+		createMacOsXBuild(macOsXJar);
 		runTests();
 	}
 	
-	private static File recreateJarFile(boolean isPortable, LineSep lineSep) throws Exception {
-		String prefix = isPortable ? "" : "non-";
-		Util.println(U.format("Creating %sportable jar file...", prefix));
+	private static File recreateJarFile(String jarPrefix, boolean isPortable,
+			LineSep lineSep) throws Exception {
+		String msgPrefix = isPortable ? "" : "non-";
+		Util.println(U.format("Creating %sportable jar file...", msgPrefix));
 		
 		File systemConfDest = new File(mainPath + "/system.conf");
 		systemConfDest.delete();
@@ -92,7 +97,7 @@ public final class BuildMain {
 		programConfDest.delete();
 		
 		File mainJarFile = new File(String.format(
-			"build/tmp/%s_%s_%s.jar", packageId, version, buildDate));
+			"build/tmp/%s%s_%s_%s.jar", jarPrefix, packageId, version, buildDate));
 		mainJarFile.delete();
 		
 		U.copyTextFile(
@@ -136,8 +141,8 @@ public final class BuildMain {
 		U.copyFlatten("lib", releaseDir + "/lib/swt", "**/swt*.jar", null);
 		U.copyFlatten("lib", releaseDir + "/lib", "**/*.so, **/*.dll, **/*.dylib", null);
 		
-		String dstMainJar = U.format(
-			"%s/lib/%s", releaseDir, tmpMainJar.getName());
+		String jarName = U.removePrefix(tmpMainJar.getName(), "portable_");
+		String dstMainJar = U.format("%s/lib/%s", releaseDir, jarName);
 		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
 		
 		String linuxLauncher = U.format("%s/%s.sh", releaseDir, appName);
@@ -198,6 +203,11 @@ public final class BuildMain {
 		 * we're the portable version.
 		 */
 		U.write("", releaseDir + "/indexes/.indexes.txt");
+		
+		U.copyTextFile(
+			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
+		U.copyBinaryFile(
+			"dist/ChangeLog.html", releaseDir + "/misc/ChangeLog.html");
 	}
 	
 	private static void deployInfoPlist(File dstDir) throws Exception {
@@ -242,8 +252,8 @@ public final class BuildMain {
 		U.copyFlatten("lib", resourcesDir + "/lib/swt", "**/swt*mac*.jar", null);
 		U.copyFlatten("lib", resourcesDir + "/lib", "**/*.dylib", null);
 		
-		String dstMainJar = U.format(
-			"%s/lib/%s", resourcesDir, tmpMainJar.getName());
+		String jarName = U.removePrefix(tmpMainJar.getName(), "macosx_");
+		String dstMainJar = U.format("%s/lib/%s", resourcesDir, jarName);
 		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
 		
 		String launcher = U.format("%s/MacOS/%s", contentsDir, appName);

@@ -49,6 +49,11 @@ final class U {
 	static String format(String format, Object... args) {
 		return String.format(format, args);
 	}
+	
+	static String removePrefix(String input, String prefix) {
+		Util.checkThat(input.startsWith(prefix));
+		return input.substring(prefix.length());
+	}
 
 	static void exec(String format, Object... args) throws Exception {
 		Runtime.getRuntime().exec(format(format, args)).waitFor();
