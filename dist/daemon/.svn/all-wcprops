@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svnroot/docfetcher/!svn/ver/108/trunk/DocFetcher/resources/daemon
+END
+docfetcher-daemon-win.exe
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/docfetcher/!svn/ver/108/trunk/DocFetcher/resources/daemon/docfetcher-daemon-win.exe
+END
+docfetcher-daemon-linux
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/docfetcher/!svn/ver/104/trunk/DocFetcher/resources/daemon/docfetcher-daemon-linux
+END

@@ -142,14 +142,14 @@ public final class BuildMain {
 		
 		String linuxLauncher = U.format("%s/%s.sh", releaseDir, appName);
 		U.copyTextFile(
-			"dist/launcher-linux.sh", linuxLauncher, LineSep.UNIX,
+			"dist/launchers/launcher-linux.sh", linuxLauncher, LineSep.UNIX,
 			"${main_class}", Main.class.getName()
 		);
 		
 		// Create DocFetcher.app launcher for Mac OS X
 		String macOsXLauncher = U.format("%s/%s.app/Contents/MacOS/%s", releaseDir, appName, appName);
 		U.copyTextFile(
-			"dist/launcher-macosx-portable.sh",
+			"dist/launchers/launcher-macosx-portable.sh",
 			macOsXLauncher,
 			LineSep.UNIX,
 			"${app_name}", appName,
@@ -160,34 +160,44 @@ public final class BuildMain {
 			U.format("%s/%s.app/Contents/Resources/%s.icns", releaseDir, appName, appName));
 		deployInfoPlist(new File(U.format("%s/%s.app/Contents", releaseDir, appName)));
 		
-		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
-			U.exec("chmod +x %s", Util.getAbsPath(linuxLauncher));
-			U.exec("chmod +x %s", Util.getAbsPath(macOsXLauncher));
-		}
-		else {
-			Util.printErr("** Warning: Cannot make the" +
-					" portable launcher shell scripts executable.");
-		}
+		makeExecutable(
+			"Cannot make the portable launcher shell scripts executable.",
+			linuxLauncher, macOsXLauncher);
 		
 		String exeLauncher = U.format("%s/%s.exe", releaseDir, appName);
-		U.copyBinaryFile("dist/DocFetcher-256.exe", exeLauncher);
+		U.copyBinaryFile("dist/launchers/DocFetcher-256.exe", exeLauncher);
 		
 		for (int heapSize : new int[] {512, 768, 1024}) {
 			String exeName = U.format("%s-%d.exe", appName, heapSize);
 			exeLauncher = U.format("%s/misc/%s", releaseDir, exeName);
-			U.copyBinaryFile("dist/" + exeName, exeLauncher);
+			U.copyBinaryFile("dist/launchers/" + exeName, exeLauncher);
 		}
 		
 		String batLauncher = U.format("%s/misc/%s.bat", releaseDir, appName);
 		U.copyTextFile(
-			"dist/launcher-portable.bat", batLauncher, LineSep.WINDOWS,
+			"dist/launchers/launcher.bat", batLauncher, LineSep.WINDOWS,
 			"${main_class}", Main.class.getName());
+		
+		String[] daemonNames = new String[] {
+			"docfetcher-daemon-windows.exe", "docfetcher-daemon-linux" };
+		for (String daemonName : daemonNames) {
+			String dstPath = releaseDir + "/" + daemonName;
+			U.copyBinaryFile("dist/daemon/" + daemonName, dstPath);
+		}
+		makeExecutable("Cannot make the Linux daemon executable.", releaseDir
+				+ "/" + daemonNames[1]);
 		
 		U.copyTextFile(
 			"dist/program.conf", releaseDir + "/conf/program.conf", LineSep.WINDOWS);
 		
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");
+		
+		/*
+		 * Create an empty file 'indexes/.indexes.txt' to let the daemons know
+		 * we're the portable version.
+		 */
+		U.write("", releaseDir + "/indexes/.indexes.txt");
 	}
 	
 	private static void deployInfoPlist(File dstDir) throws Exception {
@@ -199,6 +209,17 @@ public final class BuildMain {
 			"${app_version}", version,
 			"${build_date}", buildDate,
 			"${package_id}", packageId);
+	}
+	
+	private static void makeExecutable(String errorMessage, String... paths)
+			throws Exception {
+		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
+			for (String path : paths)
+				U.exec("chmod +x %s", Util.getAbsPath(path));
+		}
+		else {
+			Util.printErr("** Warning: " + errorMessage);
+		}
 	}
 	
 	private static void createMacOsXBuild(File tmpMainJar) throws Exception {
@@ -227,18 +248,13 @@ public final class BuildMain {
 		
 		String launcher = U.format("%s/MacOS/%s", contentsDir, appName);
 		U.copyTextFile(
-			"dist/launcher-macosx-app.sh", launcher, LineSep.UNIX,
+			"dist/launchers/launcher-macosx-app.sh", launcher, LineSep.UNIX,
 			"${app_name}", appName,
 			"${main_class}", Main.class.getName()
 		);
-		
-		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
-			U.exec("chmod +x %s", Util.getAbsPath(launcher));
-		}
-		else {
-			Util.printErr("** Warning: Cannot make the" +
-					" Mac OS X launcher shell script executable.");
-		}
+		makeExecutable(
+			"Cannot make the Mac OS X launcher shell script executable.",
+			launcher);
 		
 		U.copyBinaryFile("build/tmp/licenses.zip", resourcesDir
 				+ "/misc/licenses.zip");
@@ -246,7 +262,6 @@ public final class BuildMain {
 		if (Util.IS_MAC_OS_X) {
 			String dmgPath = U.format("build/%s-%s.dmg", appName, version);
 			U.exec("hdiutil create -srcfolder %s %s", appDir, dmgPath);
-			U.exec("hdiutil internet-enable yes " + dmgPath);
 		}
 	}
 	

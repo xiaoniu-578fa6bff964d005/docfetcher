@@ -60,6 +60,7 @@ public final class IndexingQueue {
 	
 	// may be called from a different thread
 	public final Event<Void> evtQueueEmpty = new Event<Void>();
+	public final Event<Void> evtWorkerThreadTerminated = new Event<Void>();
 
 	private final Event<Task> evtAdded = new Event<Task>();
 	private final Event<Task> evtRemoved = new Event<Task>();
@@ -114,6 +115,7 @@ public final class IndexingQueue {
 		thread = new Thread(IndexingQueue.class.getName()) {
 			public void run() {
 				while (threadLoop());
+				evtWorkerThreadTerminated.fire(null);
 			}
 		};
 		thread.start();

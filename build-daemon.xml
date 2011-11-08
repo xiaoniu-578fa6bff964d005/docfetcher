@@ -1,0 +1,58 @@
+<project name="docfetcher-daemon" default="compile" basedir=".">
+
+	<!-- Warning: This script uses a patched up version of cpptasks 1.0 beta5 --> 
+	<taskdef resource="cpptasks.tasks">
+		<classpath>
+			<pathelement path="cpptasks.jar"/>
+		</classpath>
+	</taskdef>
+	
+	<target name="init">
+		<condition property="isWindows">
+			<os family="windows"/>
+		</condition>
+		<condition property="isLinux">
+			<os family="unix"/>
+		</condition>
+	</target>
+	
+	<target name="compile-windows" if="isWindows" depends="init">
+		<delete dir="build/daemon-win32"/>
+		<delete file="resources/daemon/docfetcher-daemon-win.exe"/>
+		<mkdir dir="build/daemon-win32//obj"/>
+		<cc
+			name="g++"
+			outtype="executable"
+			subsystem="console"
+			outfile="build/daemon-win32/docfetcher-daemon-win.exe"
+			objdir="build/daemon-win32/obj">
+			<fileset dir="src-daemon/win32/src" includes="*.cpp"/>
+			<fileset dir="src-daemon/win32/src/jnotify_win32" includes="*.cpp"/>
+			<linker name="g++">
+				<linkerarg value="-mwindows"/>
+			</linker>
+		</cc>
+		<copy todir="resources/daemon">
+			<filelist dir="build/daemon-win32" files="docfetcher-daemon-win.exe"/>
+		</copy>
+	</target>
+	
+	<target name="compile-linux" if="isLinux" depends="init">
+		<delete dir="build/daemon-linux"/>
+		<delete file="resources/daemon/docfetcher-daemon-linux"/>
+		<mkdir dir="build/daemon-linux/obj"/>
+		<cc
+			name="g++"
+			outtype="executable"
+			subsystem="console"
+			outfile="build/daemon-linux/docfetcher-daemon-linux"
+			objdir="build/daemon-linux/obj">
+			<fileset dir="src-daemon/linux/src" includes="*.cpp"/>
+		</cc>
+		<copy todir="resources/daemon">
+			<filelist dir="build/daemon-linux" files="docfetcher-daemon-linux"/>
+		</copy>
+	</target>
+	
+	<target name="compile" depends="compile-windows, compile-linux"/>
+</project>

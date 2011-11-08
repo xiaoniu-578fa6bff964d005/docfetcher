@@ -34,8 +34,10 @@ import net.sourceforge.docfetcher.gui.filter.TwoFormExpander;
 import net.sourceforge.docfetcher.gui.pref.PrefDialog;
 import net.sourceforge.docfetcher.gui.preview.PreviewPanel;
 import net.sourceforge.docfetcher.model.Cancelable;
+import net.sourceforge.docfetcher.model.Daemon;
 import net.sourceforge.docfetcher.model.FolderWatcher;
 import net.sourceforge.docfetcher.model.IndexRegistry;
+import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
 import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -252,6 +254,8 @@ public final class Application {
 	}
 
 	private static void loadIndexRegistry(@NotNull final Display display) {
+		Util.assertSwtThread();
+		
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
 			indexParentDir = new File("bin/indexes");
@@ -259,10 +263,36 @@ public final class Application {
 			indexParentDir = new File("indexes");
 		else
 			indexParentDir = AppUtil.getAppDataDir();
+		indexParentDir.mkdirs();
 		
 		// TODO now: make cache capacity customizable
 		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
 		indexRegistry = new IndexRegistry(indexParentDir, 20, reporterCapacity);
+		final Daemon daemon = new Daemon(indexRegistry);
+		IndexingQueue queue = indexRegistry.getQueue();
+		
+		queue.evtWorkerThreadTerminated.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				daemon.writeIndexesToFile();
+			}
+		});
+		
+		/*
+		 * Remove indexing hint from the status bar when the task
+		 * queue has been emptied. This covers those situations
+		 * where the indexing dialog has been minimized to the
+		 * status bar and the last task in the queue has just been
+		 * completed.
+		 */
+		queue.evtQueueEmpty.add(new Event.Listener<Void>() {
+			public void update(Void eventData) {
+				Util.runAsyncExec(indexingStatus.getControl(), new Runnable() {
+					public void run() {
+						indexingStatus.setVisible(false);
+					}
+				});
+			}
+		});
 		
 		new Thread(Application.class.getName() + " (load index registry)") {
 			public void run() {
@@ -289,22 +319,8 @@ public final class Application {
 					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
 					
-					/*
-					 * Remove indexing hint from the status bar when the task
-					 * queue has been emptied. This covers those situations
-					 * where the indexing dialog has been minimized to the
-					 * status bar and the last task in the queue has just been
-					 * completed.
-					 */
-					indexRegistry.getQueue().evtQueueEmpty.add(new Event.Listener<Void>() {
-						public void update(Void eventData) {
-							Util.runAsyncExec(indexingStatus.getControl(), new Runnable() {
-								public void run() {
-									indexingStatus.setVisible(false);
-								}
-							});
-						}
-					});
+					// Must be called *after* the indexes have been loaded
+					daemon.enqueueUpdateTasks();
 				}
 				catch (IOException e) {
 					if (display.isDisposed())
@@ -715,17 +731,16 @@ public final class Application {
 			SettingsConf.StrList.SearchHistory.set();
 		
 		/*
-		 * Note: The getSearcher() call below will block until the
-		 * searcher is available. If we run this inside the GUI
-		 * thread, we won't let go of the GUI lock, causing the
-		 * program to deadlock when the user tries to close the
-		 * program before all indexes have been loaded.
+		 * Note: The getSearcher() call below will block until the searcher is
+		 * available. If we run this inside the GUI thread, we won't let go of
+		 * the GUI lock, causing the program to deadlock when the user tries to
+		 * close the program before all indexes have been loaded.
 		 */
 		new Thread() {
 			public void run() {
 				/*
-				 * The folder watcher will be null if the program is
-				 * shut down while loading the indexes
+				 * The folder watcher will be null if the program is shut down
+				 * while loading the indexes
 				 */
 				if (folderWatcher != null)
 					folderWatcher.shutdown();
