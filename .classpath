@@ -26,6 +26,16 @@
 	<classpathentry kind="lib" path="lib/pegdown/parboiled-core-1.0.2.jar" sourcepath="lib/pegdown/parboiled-core-1.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pegdown/parboiled-java-1.0.2.jar" sourcepath="lib/pegdown/parboiled-java-1.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pegdown/pegdown-1.1.0.jar" sourcepath="lib/pegdown/pegdown-1.1.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jxgrabkey/JXGrabKey-0.3.2.jar" sourcepath="lib/jxgrabkey/JXGrabKey-0.3.2-src.zip">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/jxgrabkey"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/jintellitype/jintellitype-1.3.7.jar" sourcepath="lib/jintellitype/jintellitype-1.3.7-sources.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/jintellitype"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_6_1.jar"/>

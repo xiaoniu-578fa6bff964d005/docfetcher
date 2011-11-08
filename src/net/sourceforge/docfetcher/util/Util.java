@@ -96,6 +96,8 @@ public final class Util {
 	/** Whether the platform is Mac OS X. */
 	public static final boolean IS_MAC_OS_X;
 	
+	public static final boolean IS_64_BIT_JVM;
+	
 	/** The system's temporary directory. Does not contain backward slashes. */
 	public static final File TEMP_DIR = new File(System.getProperty("java.io.tmpdir"));
 	
@@ -114,6 +116,11 @@ public final class Util {
 		IS_LINUX = osName.contains("linux");
 		IS_LINUX_KDE = IS_LINUX && System.getenv("KDE_FULL_SESSION") != null;
 		IS_MAC_OS_X = osName.equals("mac os x");
+		
+		String arch = System.getProperty("sun.arch.data.model");
+		if (arch == null)
+			arch = System.getProperty("os.arch").toLowerCase();
+		IS_64_BIT_JVM = arch.contains("64");
 	}
 
 	/** Line separator character ('\r\n' on Windows, '\n' on Linux). */

@@ -55,7 +55,6 @@ import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -86,12 +85,13 @@ public final class Application {
 	
 	private static volatile IndexRegistry indexRegistry;
 	private static volatile FolderWatcher folderWatcher;
+	@Nullable private static HotkeyHandler hotkeyHandler;
 	
 	private static FilesizePanel filesizePanel;
 	private static FileTypePanel fileTypePanel;
 	private static IndexPanel indexPanel;
 
-	private static Shell shell;
+	private static volatile Shell shell;
 	private static ThreePanelForm threePanelForm;
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
@@ -181,6 +181,7 @@ public final class Application {
 		initSystemTrayHider();
 		initThreePanelForm();
 		StatusBar statusBar = initStatusBar();
+		initHotkey();
 		
 		new SearchQueue(
 			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);
@@ -582,8 +583,7 @@ public final class Application {
 			}
 		}, new Runnable() {
 			public void run() {
-				PrefDialog prefDialog = new PrefDialog(shell);
-				prefDialog.open();
+				new PrefDialog(shell).open();
 			}
 		});
 	}
@@ -745,9 +745,57 @@ public final class Application {
 				if (folderWatcher != null)
 					folderWatcher.shutdown();
 				
+				if (hotkeyHandler != null)
+					hotkeyHandler.shutdown();
+				
 				indexRegistry.getSearcher().shutdown();
 			}
 		}.start();
+	}
+	
+	private static void initHotkey() {
+		try {
+			hotkeyHandler = new HotkeyHandler();
+		}
+		catch (UnsupportedOperationException e) {
+			return;
+		}
+		catch (Throwable e) {
+			Util.printErr(e);
+			return;
+		}
+		
+		hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<Void> () {
+			public void update(Void eventData) {
+				Util.runSyncExec(shell, new Runnable() {
+					public void run() {
+						if (systemTrayHider.isHidden()) {
+							systemTrayHider.restore();
+						}
+						else {
+							shell.setMinimized(false);
+							shell.setVisible(true);
+							shell.forceActive();
+							searchBar.setFocus();
+						}
+					}
+				});
+			}
+		});
+		hotkeyHandler.evtHotkeyConflict.add(new Event.Listener<int[]> () {
+			public void update(int[] eventData) {
+//				String key = UtilGui.toString(eventData); // TODO i18n
+				AppUtil.showError("Msg.hotkey_in_use.format(key)", false, true);
+				
+				/*
+				 * Don't open preferences dialog when the hotkey conflict occurs
+				 * at startup.
+				 */
+				if (shell.isVisible())
+					new PrefDialog(shell).open();
+			}
+		});
+		hotkeyHandler.registerHotkey();
 	}
 	
 	@Nullable

@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.pref;
 
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.gui.pref.PrefDialog.PrefOption;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -37,20 +38,20 @@ final class HotkeyOption extends PrefOption {
 		st.setCursor(st.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
 
 		hotkey = SettingsConf.IntArray.HotkeyToFront.get();
-		st.setText(HotkeyDialog.toString(hotkey));
+		st.setText(UtilGui.toString(hotkey));
 
 		st.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				HotkeyDialog dialog = new HotkeyDialog(st.getShell());
 				hotkey = dialog.open();
-				st.setText(HotkeyDialog.toString(hotkey));
+				st.setText(UtilGui.toString(hotkey));
 			}
 		});
 	}
 
 	protected void restoreDefault() {
 		hotkey = SettingsConf.IntArray.HotkeyToFront.defaultValue;
-		st.setText(HotkeyDialog.toString(hotkey));
+		st.setText(UtilGui.toString(hotkey));
 	}
 
 	protected void save() {

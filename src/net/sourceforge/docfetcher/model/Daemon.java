@@ -70,6 +70,9 @@ public final class Daemon {
 	 * index updates on all changed folders.
 	 */
 	public void enqueueUpdateTasks() {
+		if (!indexesFile.exists())
+			return; // Happens when we're inside the IDE
+		
 		final IndexingQueue queue = indexRegistry.getQueue();
 		try {
 			Files.readLines(indexesFile, Charsets.UTF_8, new LineProcessor<Void>() {
