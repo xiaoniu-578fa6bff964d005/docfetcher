@@ -39,7 +39,7 @@ Advanced Usage
 
 **Query syntax**: With DocFetcher, you can do much more than simple word lookup. For example, you can use wildcards to search for words with a common start, like so: `wiki*`. To search for a certain phrase (i.e. a sequence of words in a specific order), surround the phrase with quotation marks: `"the quick brown fox"`. But that's barely the start. For an overview of all the supported contructs, see the [query syntax section](DocFetcher_Manual_files/Query_Syntax.html).
 
-**Portable document repository**: The portable version of DocFetcher allows you create a bundle containing DocFetcher, your documents and the associated indexes. You can then freely move this bundle around, e.g. onto CD-ROMs, USB drives, encrypted volumes or other computers. This is also useful for sharing a single document repository across a local area network or across different operating systems in a dual-boot system. One important thing to keep in mind here is that the indexes must be created with *relative paths*. [Details](DocFetcher_Manual_files/Portable_Repositories.html).
+**Portable document repository**: The portable version of DocFetcher allows you create a bundle containing DocFetcher, your documents and the associated indexes, and then freely move this bundle around &mdash; even from one operating system to another, e.g. from Windows to Linux and vice versa. One important thing to keep in mind when using the portable version is that the indexes must be created with *relative paths*. Also, if you've been using DocFetcher 1.0.3 and earlier, note that you're not required to put your documents into the DocFetcher folder anymore. [Details](DocFetcher_Manual_files/Portable_Repositories.html).
 
 **Indexing configuration options**: For a detailed discussion of all those options on the indexing configuration window, click [here](DocFetcher_Manual_files/Indexing_Options.html). You can also reach this page directly from the configuration window by clicking on the `Help` button at the bottom of the window. Perhaps the most interesting configuration options are:
 
@@ -50,7 +50,11 @@ Advanced Usage
 
 **Regular expressions**: Both the file exclusion and the mime type detection rely on so-called *regular expressions*. These are user-defined patterns that DocFetcher will match against filenames or filepaths. For example, to exclude all files starting with the word "journal", you can use this regular expression: `journal.*`. Note that this is slightly different from DocFetcher's query syntax, where you would omit the dot: `journal*`. If you want to know more about regular expressions, read this [brief introduction](DocFetcher_Manual_files/Regular_Expressions.html).
 
+**Release notification**: DocFetcher does not (and should not?) automatically check for updates. If you *do* wish to be notified of new releases, there are [a couple of ways](DocFetcher_Manual_files/Release_Notification.html) to set this up.
+
 * * *
+
+<a name="Caveats"></a> <!-- Do not translate this line, just copy it verbatim. -->
 
 Caveats and Common Gotchas
 ==========================
@@ -76,7 +80,18 @@ With that said, it should be noted that support for zip and 7z archives is best 
 
 * * *
 
-Further information
-===================
+<a name="Subpages"></a> <!-- Do not translate this line, just copy it verbatim. -->
 
-**The DocFetcher wiki**: For more information, have a look at our [wiki](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page), and the wiki's [Advanced Usage](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Advanced_Usage) section in particular.
+Manual Subpages
+===============
+* [Query syntax](DocFetcher_Manual_files/Query_Syntax.html)
+* [Portable document repositories](DocFetcher_Manual_files/Portable_Repositories.html)
+* [Indexing options](DocFetcher_Manual_files/Indexing_Options.html)
+* [Regular expressions](DocFetcher_Manual_files/Regular_Expressions.html)
+* [Release notification](DocFetcher_Manual_files/Release_Notification.html)
+* [How to raise the memory limit](DocFetcher_Manual_files/Memory_Limit.html)
+* [Preferences](DocFetcher_Manual_files/Preferences.html)
+
+Further Information
+===================
+For more information, have a look at our [wiki](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page), and the wiki's [Advanced Usage](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Advanced_Usage) section in particular. If you have any questions, feel free to visit our [forum](http://sourceforge.net/projects/docfetcher/forums/forum/702424). Bug reports can be submitted on our [bug tracker](http://sourceforge.net/tracker/?group_id=197779&atid=962834).

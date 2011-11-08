@@ -1,6 +1,6 @@
 Basic Idea: A Queue of Indexing Tasks
 =====================================
-The indexing configuration window contains one or more tabs, each of which represents an index to be created or updated. All the tabs together form a task queue, whose items are processed one by one. You can add more tasks to the queue via the `'+'` button on the top right.
+The indexing configuration window is made up of one or more tabs, each of which represents an index to be created or updated. All the tabs together form a task queue, whose items are processed one by one. You can add more tasks to the queue via the `'+'` button on the top right.
 
 Each tab has a `Run` button on the bottom right. By clicking it, you confirm that the task is properly configured and ready for indexing. The indexing starts as soon as there is one ready task in the queue.
 

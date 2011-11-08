@@ -18,7 +18,7 @@ So, if we put all this together, we can write down a regex that matches all Micr
 
 Matching a sequence of digits: `journal\d+\.doc`
 ------------------------------------------------
-Suppose you want to exclude all Microsoft Word files that start with "journal" and end with a timestamp, like this: "journal2007.doc". Moreover, what you *don't* want is to exclude files like "journalism.doc".
+Suppose you want to match all Microsoft Word files that start with "journal" and end with a timestamp, like this: "journal2007.doc". Moreover, what you *don't* want is to match files like "journalism.doc".
 
 A regex like `journal.*\.doc` isn't going to work here because it would match "journalism.doc" as well. The first step towards the solution is to replace the dot with either `[0-9]` or `\d`, which both match exactly ***one digit***. The expression `[0-9]` is actually a more general notation than `\d`, because you can, for example, write `[4-6]` to match only the digits `4`, `5` and `6`. It even works for letters: `[m-p]` matches all lowercase letters from m through p.
 

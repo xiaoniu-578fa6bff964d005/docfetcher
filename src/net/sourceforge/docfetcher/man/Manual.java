@@ -35,6 +35,35 @@ import com.google.common.io.Files;
  */
 public final class Manual {
 	
+	private enum SubPageProperties {
+		Query_Syntax ("query_syntax", "Advanced_Usage"),
+		Portable_Repositories ("portable_repos", "Advanced_Usage"),
+		Indexing_Options ("indexing_options", "Advanced_Usage"),
+		Regular_Expressions ("regular_expressions", "Advanced_Usage"),
+		Release_Notification ("release_notification", "Advanced_Usage"),
+		
+		Memory_Limit ("memory_limit", "Caveats"),
+		Preferences ("preferences", "Subpages"),
+		;
+		private final String propsKey;
+		private final String backlink;
+		private String pageTitle;
+		
+		private SubPageProperties(	@NotNull String propsKey,
+									@NotNull String backlink) {
+			this.propsKey = propsKey;
+			this.backlink = backlink;
+		}
+		
+		public static void initPageTitles(@NotNull PageProperties props)
+				throws IOException {
+			for (SubPageProperties subPageProperties : values()) {
+				String key = subPageProperties.propsKey;
+				subPageProperties.pageTitle = props.getValue(key);
+			}
+		}
+	}
+	
 	private static final String packagePath = Manual.class.getPackage().getName().replace('.', '/');
 	private static final String manDir = String.format("src/%s", packagePath);
 	
@@ -50,6 +79,7 @@ public final class Manual {
 		PegDownProcessor processor = new PegDownProcessor(Extensions.TABLES);
 		File propsFile = new File(srcDir, "/page.properties");
 		PageProperties props = new PageProperties(propsFile);
+		SubPageProperties.initPageTitles(props);
 		convert(processor, props, srcDir, dstDir, true);
 		
 		for (File file : Util.listFiles(new File(manDir + "/all"))) {
@@ -85,7 +115,7 @@ public final class Manual {
 				String newFilename = Util.splitFilename(name)[0] + ".html";
 				File dstFile = new File(dstDir, newFilename);
 				String html = isTopLevel
-				? convertMainPage(props, file, htmlBody)
+					? convertMainPage(props, file, htmlBody)
 					: convertSubPage(props, file, htmlBody);
 				Files.write(html, dstFile, Charsets.UTF_8);
 			}
@@ -131,18 +161,15 @@ public final class Manual {
 			template = UtilGlobal.replace(path, template, key, pair.value);
 		}
 		
-		String key = null;
-		SubPageData matchingData = null;
-		for (SubPageData data : props.subPageData) {
-			key = "${" + data.key + "}";
-			if (!template.contains(key))
-				continue;
-			matchingData = data;
-			break;
+		String fileBasename = Util.splitFilename(file)[0];
+		SubPageProperties subProps = SubPageProperties.valueOf(fileBasename);
+		if (subProps == null) {
+			String msg = "Could not find subpage properties for file " + file.getPath();
+			throw new IllegalStateException(msg);
 		}
-		Util.checkNotNull(key, matchingData);
-		template = UtilGlobal.replace(path, template, key, matchingData.title);
-		String link = "../DocFetcher_Manual.html#" + matchingData.backLink;
+		
+		template = UtilGlobal.replace(path, template, "${subpage_title}", subProps.pageTitle);
+		String link = "../DocFetcher_Manual.html#" + subProps.backlink;
 		template = UtilGlobal.replace(path, template, "${back_link}", link);
 		
 		return UtilGlobal.replace(path, template, "${contents}", htmlBody);
@@ -158,20 +185,6 @@ public final class Manual {
 		}
 	}
 	
-	private static final class SubPageData {
-		public final String key;
-		public final String title;
-		public final String backLink;
-		
-		public SubPageData(	@NotNull String key,
-							@NotNull String title,
-							@NotNull String backLink) {
-			this.key = key;
-			this.title = title;
-			this.backLink = backLink;
-		}
-	}
-	
 	private static final class PageProperties {
 		private final File propsFile;
 		private final Properties props = new Properties();
@@ -180,7 +193,6 @@ public final class Manual {
 		public final Pair docfetcherManual;
 		public final Pair mainFooter;
 		public final Pair backToMainPage;
-		public final SubPageData[] subPageData;
 
 		public PageProperties(@NotNull File propsFile) throws IOException {
 			this.propsFile = propsFile;
@@ -192,10 +204,6 @@ public final class Manual {
 			mainFooter = getPair("main_footer");
 			backToMainPage = getPair("back_to_main_page");
 			
-			subPageData = new SubPageData[] {
-				getSubPageData("portable_doc_repos", "Advanced_Usage"),
-				getSubPageData("query_syntax", "Advanced_Usage") };
-			
 			String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
 			mainFooter.value = mainFooter.value.replace("${year}", year);
 			mainFooter.value = docfetcherManual.value + " &ndash; " + mainFooter.value;
@@ -204,13 +212,6 @@ public final class Manual {
 		@NotNull
 		private Pair getPair(@NotNull String key) throws IOException {
 			return new Pair(key, getValue(key));
-		}
-		
-		@NotNull
-		private SubPageData getSubPageData(	@NotNull String key,
-											@NotNull String backLink)
-				throws IOException {
-			return new SubPageData(key, getValue(key), backLink);
 		}
 		
 		@NotNull
