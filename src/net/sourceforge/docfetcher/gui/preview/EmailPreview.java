@@ -179,7 +179,7 @@ final class EmailPreview extends Composite {
 
 	public void setEmail(@NotNull MailResource mailResource) {
 		// TODO websearch: Make email addresses clickable -> use HighlightedString to encode links?
-		// TODO now: If loading info from the document repository failed, try to load it from the Lucene index
+		// TODO post-release-1.1: If loading info from the document repository failed, try to load it from the Lucene index
 		
 		fromField.setText(mailResource.getSender());
 		List<String> recipients = mailResource.getRecipients();
@@ -192,7 +192,7 @@ final class EmailPreview extends Composite {
 		dateField.setText(dateFormat.format(mailResource.getDate()));
 		toolBarWithTextViewer.setText(mailResource.getBody());
 		
-		// TODO now: set attachments -> maybe do this in separate threads;
+		// TODO post-release-1.1: set attachments -> maybe do this in separate threads;
 		// archives and other unparsable files: show 'open' button
 		
 		headerComp.layout(); // size of date field may have changed

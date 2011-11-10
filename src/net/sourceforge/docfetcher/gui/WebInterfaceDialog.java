@@ -74,6 +74,7 @@ final class WebInterfaceDialog {
 				/*
 				 * TODO web interface: start or stop web interface
 				 * TODO web interface: also stop web interface automatically when the program exits (in Main class)
+				 * TODO web interface: remove comment in ProgramConf.Int.WebInterfacePageSize.
 				 */
 			}
 		});

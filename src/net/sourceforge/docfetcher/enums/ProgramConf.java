@@ -71,6 +71,7 @@ public final class ProgramConf {
 		MaxResultsTotal (10000, 1),
 		WebInterfacePageSize (50, 1),
 		PatternTableHeight (4, 1),
+		UnpackCacheCapacity (20, 1),
 		;
 
 		private int value;

@@ -45,7 +45,7 @@ public abstract class MailResource {
 		}
 		@Nullable
 		public HighlightedString getHighlightedText() {
-			// TODO now: implement this
+			// TODO post-release-1.1: implement this
 			// what to do if attachment cannot be parsed? (e.g. archive) -> return null?
 			return null;
 		}

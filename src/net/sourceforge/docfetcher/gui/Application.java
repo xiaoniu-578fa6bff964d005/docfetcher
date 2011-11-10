@@ -314,9 +314,10 @@ public final class Application {
 			indexParentDir = AppUtil.getAppDataDir();
 		indexParentDir.mkdirs();
 		
-		// TODO now: make cache capacity customizable
+		int cacheCapacity = ProgramConf.Int.UnpackCacheCapacity.get();
 		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
-		indexRegistry = new IndexRegistry(indexParentDir, 20, reporterCapacity);
+		indexRegistry = new IndexRegistry(
+			indexParentDir, cacheCapacity, reporterCapacity);
 		final Daemon daemon = new Daemon(indexRegistry);
 		IndexingQueue queue = indexRegistry.getQueue();
 		
