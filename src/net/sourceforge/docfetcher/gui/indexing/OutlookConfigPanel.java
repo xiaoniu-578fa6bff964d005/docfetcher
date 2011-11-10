@@ -11,10 +11,15 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.util.Collections;
+
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.PatternAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchAction;
+import net.sourceforge.docfetcher.model.index.PatternAction.MatchTarget;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.GroupWrapper;
@@ -78,6 +83,13 @@ final class OutlookConfigPanel extends ConfigPanel {
 		config.setIndexFilenames(indexFilenameBt.getSelection());
 		config.setStoreRelativePaths(storeRelativePathsBt.getSelection());
 		config.setWatchFolders(watchFolderBt.getSelection());
+		
+		// Turn mime type detection on for all attachments
+		PatternAction alwaysDetectMime = new PatternAction(".*");
+		alwaysDetectMime.setAction(MatchAction.DETECT_MIME);
+		alwaysDetectMime.setTarget(MatchTarget.FILENAME);
+		config.setPatternActions(Collections.singletonList(alwaysDetectMime));
+		
 		return true;
 	}
 	

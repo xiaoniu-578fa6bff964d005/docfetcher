@@ -106,15 +106,12 @@ final class OutlookContext {
 		luceneDoc.add(Fields.DATE.create(String.valueOf(date)));
 		luceneDoc.add(Fields.SIZE.create(size));
 		luceneDoc.add(Fields.PARSER.create(Fields.EMAIL_PARSER));
-		// TODO pre-release: Fill in more fields as necessary
 		
 		StringBuilder contents = new StringBuilder();
 		contents.append(subject).append(" ");
 		contents.append(sender).append(" ");
 		contents.append(recipients).append(" ");
 		contents.append(body).append(" ");
-		// TODO pre-release: Fill in more fields as necessary
-		
 		luceneDoc.add(Fields.createContent(contents));
 		
 		// Parse and append attachments
@@ -124,8 +121,13 @@ final class OutlookContext {
 			protected void handleAttachment(String filename,
 											File tempFile)
 					throws ParseException, CheckedOutOfMemoryError {
-				// TODO now: Don't try to parse all files -> call ParseService.canParse
 				// TODO post-release-1.1: Maybe recurse into archive attachments
+
+				/*
+				 * It is assumed here that mime type detection is turned on for
+				 * all attachments, so we'll just hand over all attachments to
+				 * the parse service.
+				 */
 				Path path = doc.getPath().createSubPath(filename);
 				ParseResult parseResult = ParseService.parse(
 					config, tempFile, filename, path, reporter, cancelable);
