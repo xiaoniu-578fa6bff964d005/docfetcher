@@ -295,7 +295,7 @@ public final class Util {
 		shell.setSize(width, height);
 		Composite parent = shell.getParent();
 		Rectangle parentBounds = null;
-		if (parent == null)
+		if (parent == null || !parent.isVisible())
 			parentBounds = shell.getMonitor().getBounds();
 		else
 			parentBounds = parent.getBounds();
@@ -318,7 +318,7 @@ public final class Util {
 		Point shellSize = shell.getSize();
 		Composite parent = shell.getParent();
 		Rectangle parentBounds = null;
-		if (parent == null)
+		if (parent == null || !parent.isVisible())
 			parentBounds = shell.getMonitor().getBounds();
 		else
 			parentBounds = parent.getBounds();
