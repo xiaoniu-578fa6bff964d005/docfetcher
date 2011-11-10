@@ -69,6 +69,8 @@ Caveats and Common Gotchas
 
 **Unicode support**: DocFetcher has full Unicode support for all document formats except CHM files. In case of plain text files, DocFetcher has to use [certain heuristics](http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html) to guess the correct encoding, since plain text files don't contain any explicit encoding information.
 
+**CHM files**: CHM files are not supported on Mac OS X and 64-bit Java. This means on Windows and Linux you might have to replace your 64-bit Java runtime with its 32-bit counterpart to get support for CHM files.
+
 **Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well, but not executable rar archives. DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
 With that said, it should be noted that support for zip and 7z archives is best in terms of robustness and speed. On the other hand, indexing of tar.gz, tar.bz2 and similar formats tends to be less efficient. This is due to the fact that these formats don't have an internal "summary" of the archive contents, which forces DocFetcher to unpack the entire archive rather than only individual archive entries. Bottom line: If you have the choice, compress your files either as zip or 7z archives for maximum compatibility with DocFetcher.
 

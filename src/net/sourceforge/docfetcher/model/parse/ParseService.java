@@ -101,7 +101,7 @@ public final class ParseService {
 	);
 	
 	static {
-		if (!Util.IS_MAC_OS_X)
+		if (!Util.IS_MAC_OS_X && !Util.IS_64_BIT_JVM)
 			parsers.add(new ChmParser());
 	}
 
