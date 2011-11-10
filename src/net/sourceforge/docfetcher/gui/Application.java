@@ -101,6 +101,7 @@ public final class Application {
 	private static PreviewPanel previewPanel;
 	private static StatusBarPart indexingStatus;
 	private static SystemTrayHider systemTrayHider;
+	private static StatusBar statusBar;
 
 	private Application() {
 		throw new UnsupportedOperationException();
@@ -192,8 +193,9 @@ public final class Application {
 		initCocoaMenu(display);
 		initSystemTrayHider();
 		initThreePanelForm();
-		StatusBar statusBar = initStatusBar();
+		initStatusBar();
 		initHotkey();
+		initGlobalKeys(display);
 		
 		new SearchQueue(
 			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);
@@ -223,13 +225,6 @@ public final class Application {
 			String msg = Msg.press_f1_for_help.get();
 			statusBar.getLeftPart().setContents(Img.HELP.get(), msg);
 		}
-		
-		// Global keyboard shortcuts
-		display.addFilter(SWT.KeyUp, new Listener() {
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				// TODO pre-release: global keys
-			}
-		});
 		
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(final ShellEvent e) {
@@ -268,6 +263,43 @@ public final class Application {
 				AppUtil.showStackTraceInOwnDisplay(e);
 			}
 		}
+	}
+
+	private static void initGlobalKeys(@NotNull Display display) {
+		/*
+		 * This filter must be added to SWT.KeyDown rather than SWT.KeyUp,
+		 * otherwise we won't be able to prevent the events from propagating
+		 * further.
+		 */
+		display.addFilter(SWT.KeyDown, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event e) {
+				// TODO pre-release: global keys
+				
+				// Disable global keys when the main shell is inactive
+				if (Display.getCurrent().getActiveShell() != shell)
+					return;
+				
+				e.doit = false;
+				int m = e.stateMask;
+				int k = e.keyCode;
+				
+				if (k == SWT.F1) {
+					showManual();
+					
+					// Clear "Press F1" help message from status bar
+					String msg = Msg.press_f1_for_help.get();
+					StatusBarPart statusBarPart = statusBar.getLeftPart();
+					if (msg.equals(statusBarPart.getText()))
+						statusBarPart.setContents(null, "");
+				}
+				else if ((m & (SWT.ALT | SWT.CTRL | SWT.COMMAND)) != 0 && k == 'f') {
+					searchBar.setFocus();
+				}
+				else {
+					e.doit = true;
+				}
+			}
+		});
 	}
 
 	private static void loadIndexRegistry(@NotNull final Display display) {
@@ -503,17 +535,7 @@ public final class Application {
 		
 		searchBar.evtOpenManual.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
-				File file = ManualLocator.getManualFile();
-				if (file != null) {
-					if (previewPanel.setHtmlFile(file))
-						threePanelForm.setSecondSubControlVisible(true);
-					else
-						Util.launch(file);
-				}
-				else {
-					String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
-					AppUtil.showError(msg, true, true);
-				}
+				showManual();
 			}
 		});
 
@@ -703,8 +725,8 @@ public final class Application {
 	}
 	
 	@NotNull
-	private static StatusBar initStatusBar() {
-		return new StatusBar(shell) {
+	private static void initStatusBar() {
+		statusBar = new StatusBar(shell) {
 			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
 				indexingStatus = new StatusBarPart(statusBar, true);
 				indexingStatus.setContents(Img.INDEXING.get(), Msg.indexing.get());
@@ -823,6 +845,20 @@ public final class Application {
 		dialog.addButton(Msg.discard.get(), CancelAction.DISCARD);
 		dialog.addButton(Msg.dont_exit.get(), null);
 		return dialog.open();
+	}
+
+	private static void showManual() {
+		File file = ManualLocator.getManualFile();
+		if (file != null) {
+			if (previewPanel.setHtmlFile(file))
+				threePanelForm.setSecondSubControlVisible(true);
+			else
+				Util.launch(file);
+		}
+		else {
+			String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
+			AppUtil.showError(msg, true, true);
+		}
 	}
 
 }
