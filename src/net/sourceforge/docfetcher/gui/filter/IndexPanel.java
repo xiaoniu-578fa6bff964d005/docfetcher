@@ -51,6 +51,8 @@ import net.sourceforge.docfetcher.util.gui.dialog.InputLoop;
 import net.sourceforge.docfetcher.util.gui.viewer.SimpleTreeViewer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -83,6 +85,9 @@ public final class IndexPanel {
 	private final Tree tree;
 	private final IndexRegistry indexRegistry;
 	private final DialogFactory dialogFactory;
+	
+	@NotNull private MenuAction updateIndexAction;
+	@NotNull private MenuAction removeIndexAction;
 
 	public IndexPanel(	@NotNull final Composite parent,
 						@NotNull final IndexRegistry indexRegistry) {
@@ -186,12 +191,11 @@ public final class IndexPanel {
 		});
 
 		initContextMenu();
+		initAccelerators();
 	}
 
 	private void initContextMenu() {
 		ContextMenuManager menuManager = new ContextMenuManager(tree);
-		// TODO pre-release: check that enabled states of menu items are set correctly
-		// TODO pre-release: check that keyboard shortcuts of menu items are set correctly
 		
 		Menu indexSubMenu = menuManager.addSubmenu(new MenuAction(
 			Msg.create_index_from.get()));
@@ -222,9 +226,11 @@ public final class IndexPanel {
 			}
 		});
 		
-		// TODO now: Implement keyboard shortcut
+		String clipboardLabel = Util.IS_MAC_OS_X
+			? Msg.clipboard_macosx.get()
+			: Msg.clipboard.get();
 		menuManager.add(indexSubMenu, new MenuAction(
-			Img.CLIPBOARD.get(), Msg.clipboard.get()) {
+			Img.CLIPBOARD.get(), clipboardLabel) {
 			public void run() {
 				createTaskFromClipboard(
 					tree.getShell(), indexRegistry, dialogFactory);
@@ -266,12 +272,13 @@ public final class IndexPanel {
 				}
 			}
 		}
-		menuManager.add(new UpdateOrRebuildAction(Msg.update_index.get(), true));
+		updateIndexAction = new UpdateOrRebuildAction(Msg.update_index.get(), true);
+		menuManager.add(updateIndexAction);
 		menuManager.add(new UpdateOrRebuildAction(Msg.rebuild_index.get(), false));
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction(Msg.remove_index.get()) {
+		removeIndexAction = new MenuAction(Msg.remove_index.get()) {
 			public boolean isEnabled() {
 				return isOnlyIndexesSelected();
 			}
@@ -281,7 +288,8 @@ public final class IndexPanel {
 				if (AppUtil.showConfirmation(Msg.remove_sel_indexes.get(), false))
 					indexRegistry.removeIndexes(selectedIndexes, true);
 			}
-		});
+		};
+		menuManager.add(removeIndexAction);
 		
 		menuManager.add(new MenuAction(Msg.remove_orphaned_indexes.get()) {
 			public boolean isEnabled() {
@@ -419,6 +427,25 @@ public final class IndexPanel {
 			}
 			public void menuHidden(MenuEvent e) {
 				Folder.evtFolderRemoved.remove(menuHider);
+			}
+		});
+	}
+	
+	private void initAccelerators() {
+		tree.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.F5) {
+					if (updateIndexAction.isEnabled())
+						updateIndexAction.run();
+				}
+				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'v') {
+					createTaskFromClipboard(
+						tree.getShell(), indexRegistry, dialogFactory);
+				}
+				else if (e.keyCode == SWT.DEL) {
+					if (removeIndexAction.isEnabled())
+						removeIndexAction.run();
+				}
 			}
 		});
 	}

@@ -146,6 +146,11 @@ public enum Msg {
 	clipboard ("Clipboard...\tCtrl+V",
 		Comments.createIndexFromEntry + " The '\tCtrl+V' is a keyboard shortcut " +
 		"and might need translation. For example, in German it would be '\tStrg+V'."),
+	// TODO post-release-1.1: mac: Is this the correct way to write the keyboard shortcut? Maybe use minus symbol instead?
+	clipboard_macosx ("Clipboard...\t\u2318+V",
+		Comments.createIndexFromEntry + " The '\t\u2318+V' is a keyboard shortcut, " +
+		"with 'u2318' being a Mac OS X specific modifier key known as " +
+		"'Command'. Do not translate it."),
 	update_index (
 		"Update Index...\tF5",
 		Comments.searchScopeEntry +
