@@ -638,7 +638,13 @@ public final class Application {
 				return createRightTopPanel(parent);
 			}
 			protected Control createSecondSubControl(Composite parent) {
-				return previewPanel = new PreviewPanel(parent);
+				previewPanel = new PreviewPanel(parent);
+				previewPanel.evtHideInSystemTray.add(new Event.Listener<Void>() {
+					public void update(Void eventData) {
+						systemTrayHider.hide();
+					}
+				});
+				return previewPanel;
 			}
 		};
 

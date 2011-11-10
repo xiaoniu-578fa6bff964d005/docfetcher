@@ -17,6 +17,7 @@ import java.net.URI;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.ToolItem;
 final class HtmlPreview extends ToolBarForm {
 	
 	public final Event<Void> evtHtmlToTextBt = new Event<Void>();
+	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	
 	@NotNull private ToolItem backBt;
 	@NotNull private ToolItem forwardBt;
@@ -106,8 +108,8 @@ final class HtmlPreview extends ToolBarForm {
 						if (url.equals(""))
 							return;
 						Util.launch(url);
-						// TODO now: minimize DocFetcher to system tray
-						// (depends on program settings)
+						if (SettingsConf.Bool.HideOnOpen.get())
+							evtHideInSystemTray.fire(null);
 					}
 				}).create();
 		

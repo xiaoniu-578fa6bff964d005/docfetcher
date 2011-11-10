@@ -51,6 +51,8 @@ import org.eclipse.swt.widgets.Widget;
  */
 public final class PreviewPanel extends Composite {
 	
+	public final Event<Void> evtHideInSystemTray = new Event<Void>();
+	
 	/*
 	 * Mixing custom locking with SWT code has been found to be very dead-lock
 	 * prone, so this class relies exclusively on SWT's synchronization
@@ -183,6 +185,9 @@ public final class PreviewPanel extends Composite {
 		if (htmlPreview == null) {
 			try {
 				htmlPreview = new HtmlPreview(stackComp);
+				Event.redirect(
+					htmlPreview.evtHideInSystemTray,
+					evtHideInSystemTray);
 			}
 			catch (SWTError e) {
 				browserCreationFailed = true;
