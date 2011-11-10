@@ -17,6 +17,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -124,13 +125,11 @@ public final class PrefDialog {
 	
 	@NotNull
 	private Control createButtonArea(@NotNull Composite parent) {
-		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
 		
 		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
-//				UtilFile.launch(Const.HELP_FILE_INDEXING);
+				Util.launch(ManualLocator.getManualSubpageFile("Preferences.html"));
 			}
 		});
 		

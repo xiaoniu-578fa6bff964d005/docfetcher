@@ -24,7 +24,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 /**
  * @author Tran Nam Quang
  */
-final class ManualLocator {
+public final class ManualLocator {
 	
 	public static final String manualFilename = "DocFetcher_Manual.html";
 	
@@ -52,20 +52,23 @@ final class ManualLocator {
 		return new File(manualParentDir, manualFilename);
 	}
 	
-	// Returns an empty string if the HTML file is not found.
 	@NotNull
-	public static String getMemoryLimitPageUrl() {
+	public static File getManualSubpageFile(@NotNull String htmlFilename) {
 		File manFile = getManualFile();
 		if (manFile == null)
-			return "";
+			return new File(""); // TODO post-release-1.1: Show error message instead
 		String parentPath = Util.getParentFile(manFile).getPath();
-		String path = Util.joinPath(parentPath, "DocFetcher_Manual_files/Memory_Limit.html");
-		File htmlFile = new File(path);
+		String path = Util.joinPath(parentPath, "DocFetcher_Manual_files/" + htmlFilename);
+		return new File(path);
+	}
+	
+	@NotNull
+	public static String getManualSubpageUrl(@NotNull String htmlFilename) {
 		try {
-			return htmlFile.toURI().toURL().toString();
+			return getManualSubpageFile(htmlFilename).toURI().toURL().toString();
 		}
 		catch (MalformedURLException e) {
-			return "";
+			return ""; // TODO post-release-1.1: Show error message instead
 		}
 	}
 	

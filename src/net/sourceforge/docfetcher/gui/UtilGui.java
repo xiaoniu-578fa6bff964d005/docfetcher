@@ -85,7 +85,7 @@ public final class UtilGui {
 		
 		Util.runSwtSafe(control, new Runnable() {
 			public void run() {
-				String url = ManualLocator.getMemoryLimitPageUrl();
+				String url = ManualLocator.getManualSubpageUrl("Memory_Limit.html");
 				
 				// Note: getShell() must be called in the SWT thread
 				InfoDialog dialog = new InfoDialog(control.getShell());

@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.gui.indexing;
 import java.io.File;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -110,8 +111,7 @@ abstract class ConfigPanel {
 		
 		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// TODO now: implement
-//				UtilFile.launch(Const.HELP_FILE_INDEXING);
+				Util.launch(ManualLocator.getManualSubpageFile("Indexing_Options.html"));
 			}
 		});
 		
