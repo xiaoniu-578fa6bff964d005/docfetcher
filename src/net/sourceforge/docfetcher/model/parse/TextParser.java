@@ -15,6 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.mozilla.universalchardet.UniversalDetector;
@@ -70,7 +72,7 @@ public final class TextParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "Plain Text"; // TODO i18n
+		return Msg.filetype_txt.get();
 	}
 
 }

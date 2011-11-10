@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.preview;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
@@ -52,15 +53,13 @@ class HighlightingToolBarWithTextViewer {
 		int margin = Util.IS_WINDOWS ? 2 : 0;
 		toolBarComp.setLayout(Util.createGridLayout(2, false, margin, 0));
 		
-		// TODO i18n for counter and buttons
-		
 		int textStyle = SWT.BORDER | SWT.SINGLE | SWT.CENTER | SWT.READ_ONLY;
 		counter = new Text(toolBarComp, textStyle);
 		GridData counterGridData = new GridData(SWT.RIGHT, SWT.FILL, true, true);
-		counterGridData.minimumWidth = 75;
+		counterGridData.minimumWidth = Util.BTW;
 		counter.setLayoutData(counterGridData);
 		counter.setBackground(Col.WIDGET_BACKGROUND.get());
-		counter.setToolTipText("occurrence_count");
+		counter.setToolTipText(Msg.occurrence_count.get());
 		
 		ToolBar toolBar = new ToolBar(toolBarComp, SWT.FLAT);
 		toolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -83,17 +82,17 @@ class HighlightingToolBarWithTextViewer {
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		tif.enabled(false);
 		
-		upBt = tif.image(Img.ARROW_UP.get()).toolTip("prev_occurrence")
+		upBt = tif.image(Img.ARROW_UP.get()).toolTip(Msg.prev_occurrence.get())
 				.listener(new ButtonHandler(false)).create();
 		
-		downBt = tif.image(Img.ARROW_DOWN.get()).toolTip("next_occurrence")
+		downBt = tif.image(Img.ARROW_DOWN.get()).toolTip(Msg.next_occurrence.get())
 				.listener(new ButtonHandler(true)).create();
 		
 		new ToolItem(toolBar, SWT.SEPARATOR);
 		tif.style(SWT.CHECK);
 		
 		highlightBt = tif.image(Img.HIGHLIGHT.get())
-				.toolTip("Highlighting On/Off")
+				.toolTip(Msg.highlighting_on_off.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						boolean selected = highlightBt.getSelection();
@@ -143,9 +142,9 @@ class HighlightingToolBarWithTextViewer {
 	
 	private void updateCounter() {
 		if (currentOcc != null)
-			counter.setText(currentOcc + "/" + textViewer.getOccCount());
+			counter.setText(currentOcc + "/" + textViewer.getOccCount()); //$NON-NLS-1$
 		else
-			counter.setText(textViewer.getOccCount() + "");
+			counter.setText(String.valueOf(textViewer.getOccCount()));
 	}
 	
 	public void setUseMonoFont(boolean useMonoFont) {
@@ -155,7 +154,7 @@ class HighlightingToolBarWithTextViewer {
 	public final void setText(@NotNull HighlightedString string) {
 		textViewer.setText(string);
 		int occCount = string.getRangeCount();
-		counter.setText(occCount + "");
+		counter.setText(String.valueOf(occCount));
 		upBt.setEnabled(occCount > 0);
 		downBt.setEnabled(occCount > 0);
 		currentOcc = null;

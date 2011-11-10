@@ -18,6 +18,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 import net.contentobjects.jnotify.JNotify;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
@@ -238,10 +239,7 @@ public final class FolderWatcher {
 					watchIdMap.put(index, id);
 				}
 				catch (Exception e) {
-					// TODO now: suggest raising the global watch limit
-					String msg = String.format(
-						"Failed to install watch for folder '%s'.\n\n"
-								+ "Internal error message:\n%s",
+					String msg = Msg.install_watch_failed.format(
 						index.getDisplayName(), e.getMessage());
 					AppUtil.showError(msg, true, false);
 				}

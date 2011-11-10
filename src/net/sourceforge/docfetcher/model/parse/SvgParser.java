@@ -19,6 +19,7 @@ import java.util.Collections;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
+import net.sourceforge.docfetcher.enums.Msg;
 
 /**
  * @author Tran Nam Quang
@@ -74,7 +75,7 @@ final class SvgParser extends StreamParser {
 	}
 
 	public String getTypeLabel() {
-		return "SVG"; // TODO i18n filetype_svg
+		return Msg.filetype_svg.get();
 	}
 
 }

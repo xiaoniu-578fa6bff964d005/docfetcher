@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.enums.SettingsConf.FontDescription;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
@@ -82,15 +83,15 @@ public final class UtilGui {
 												@NotNull CheckedOutOfMemoryError e) {
 		Util.printErr(e.getOutOfMemoryError());
 		
-		// TODO pre-release: Insert link to manual page
 		Util.runSwtSafe(control, new Runnable() {
 			public void run() {
+				String url = ManualLocator.getMemoryLimitPageUrl();
+				
 				// Note: getShell() must be called in the SWT thread
 				InfoDialog dialog = new InfoDialog(control.getShell());
-				dialog.setTitle("Out Of Memory");
+				dialog.setTitle(Msg.out_of_memory.get());
 				dialog.setImage(SWT.ICON_ERROR);
-				dialog.setText("DocFetcher has run out of memory. " +
-						"Please see the relevant <a href=\"www.google.com\">manual page</a> for further instructions.");
+				dialog.setText(Msg.out_of_memory_instructions.format(url));
 				dialog.open();
 			}
 		});
@@ -128,43 +129,43 @@ public final class UtilGui {
 		boolean ctrl = (stateMask & SWT.CTRL) != 0;
 		boolean shift = (stateMask & SWT.SHIFT) != 0;
 		boolean alt = (stateMask & SWT.ALT) != 0;
-		String key = ""; //$NON-NLS-1$
+		String key = "";
 		
 		switch (keyCode) {
-		case SWT.F1: key = "F1"; break; //$NON-NLS-1$
-		case SWT.F2: key = "F2"; break; //$NON-NLS-1$
-		case SWT.F3: key = "F3"; break; //$NON-NLS-1$
-		case SWT.F4: key = "F4"; break; //$NON-NLS-1$
-		case SWT.F5: key = "F5"; break; //$NON-NLS-1$
-		case SWT.F6: key = "F6"; break; //$NON-NLS-1$
-		case SWT.F7: key = "F7"; break; //$NON-NLS-1$
-		case SWT.F8: key = "F8"; break; //$NON-NLS-1$
-		case SWT.F9: key = "F9"; break; //$NON-NLS-1$
-		case SWT.F10: key = "F10"; break; //$NON-NLS-1$
-		case SWT.F11: key = "F11"; break; //$NON-NLS-1$
-		case SWT.F12: key = "F12"; break; //$NON-NLS-1$
-		case SWT.PAUSE: key = "Pause"; break; //$NON-NLS-1$
-		case SWT.PRINT_SCREEN: key = "Print Screen"; break; //$NON-NLS-1$
-		case SWT.BS: key = "Backspace"; break; //$NON-NLS-1$
-		case SWT.CR: key = "Enter"; break; //$NON-NLS-1$
-		case SWT.INSERT: key = "Insert"; break; //$NON-NLS-1$
-		case SWT.DEL: key = "Delete"; break; //$NON-NLS-1$
-		case SWT.HOME: key = "Home"; break; //$NON-NLS-1$
-		case SWT.END: key = "End"; break; //$NON-NLS-1$
-		case SWT.PAGE_UP: key = "Page Up"; break; //$NON-NLS-1$
-		case SWT.PAGE_DOWN: key = "Page Down"; break; //$NON-NLS-1$
-		case SWT.ARROW_UP: key = "Arrow Up"; break; //$NON-NLS-1$
-		case SWT.ARROW_DOWN: key = "Arrow Down"; break; //$NON-NLS-1$
-		case SWT.ARROW_LEFT: key = "Arrow Left"; break; //$NON-NLS-1$
-		case SWT.ARROW_RIGHT: key = "Arrow Right"; break; //$NON-NLS-1$
+		case SWT.F1: key = Msg.f1.get(); break;
+		case SWT.F2: key = Msg.f2.get(); break;
+		case SWT.F3: key = Msg.f3.get(); break;
+		case SWT.F4: key = Msg.f4.get(); break;
+		case SWT.F5: key = Msg.f5.get(); break;
+		case SWT.F6: key = Msg.f6.get(); break;
+		case SWT.F7: key = Msg.f7.get(); break;
+		case SWT.F8: key = Msg.f8.get(); break;
+		case SWT.F9: key = Msg.f9.get(); break;
+		case SWT.F10: key = Msg.f10.get(); break;
+		case SWT.F11: key = Msg.f11.get(); break;
+		case SWT.F12: key = Msg.f12.get(); break;
+		case SWT.PAUSE: key = Msg.pause_key.get(); break;
+		case SWT.PRINT_SCREEN: key = Msg.print_screen_key.get(); break;
+		case SWT.BS: key = Msg.backspace_key.get(); break;
+		case SWT.CR: key = Msg.enter_key.get(); break;
+		case SWT.INSERT: key = Msg.insert_key.get(); break;
+		case SWT.DEL: key = Msg.delete_key.get(); break;
+		case SWT.HOME: key = Msg.home_key.get(); break;
+		case SWT.END: key = Msg.end_key.get(); break;
+		case SWT.PAGE_UP: key = Msg.page_up_key.get(); break;
+		case SWT.PAGE_DOWN: key = Msg.page_down_key.get(); break;
+		case SWT.ARROW_UP: key = Msg.arrow_up.get(); break;
+		case SWT.ARROW_DOWN: key = Msg.arrow_down.get(); break;
+		case SWT.ARROW_LEFT: key = Msg.arrow_left.get(); break;
+		case SWT.ARROW_RIGHT: key = Msg.arrow_right.get(); break;
 		default: {
 			key = String.valueOf((char) keyCode).toUpperCase();
 		}
 		}
 		
-		if (alt) key = "Alt + " + key; //$NON-NLS-1$
-		if (shift) key = "Shift + " + key; //$NON-NLS-1$
-		if (ctrl) key = "Ctrl + " + key; //$NON-NLS-1$
+		if (alt) key = Msg.alt_key.get() + " + " + key;
+		if (shift) key = Msg.shift_key.get() + " + " + key;
+		if (ctrl) key = Msg.ctrl_key.get() + " + " + key;
 		return key;
 	}
 	

@@ -34,7 +34,6 @@ import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
-import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.CallOnce;
@@ -467,16 +466,10 @@ public final class IndexRegistry {
 			}
 			finally {
 				Closeables.closeQuietly(out);
-				
-				// TODO pre-release: temporary code
-				if (serFile.length() == 0)
-					AppUtil.showError("Corrupted file: " + serFile.getPath(), true, false);
 			}
 			
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());
-			
-			// TODO now: Write indexes.txt file used by the daemon
 		}
 		finally {
 			writeLock.unlock();

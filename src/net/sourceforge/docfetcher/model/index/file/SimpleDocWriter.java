@@ -15,6 +15,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.document.Document;
@@ -37,7 +38,8 @@ final class SimpleDocWriter extends LuceneDocWriter implements Closeable {
 	
 	public void write(	@NotNull FileDocument doc,
 						@NotNull Document luceneDoc,
-						@NotNull boolean added) throws IOException {
+						@NotNull boolean added) throws IOException,
+			CheckedOutOfMemoryError {
 		if (added)
 			writer.add(luceneDoc);
 		else

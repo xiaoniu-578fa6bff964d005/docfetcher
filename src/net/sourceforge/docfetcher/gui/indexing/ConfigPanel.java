@@ -11,8 +11,12 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import java.io.File;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -102,24 +106,31 @@ abstract class ConfigPanel {
 	protected abstract void restoreDefaults();
 	
 	protected final Control createButtonArea(Composite parent) {
-		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
 		
-		Button helpBt = Util.createPushButton(comp, "help", new SelectionAdapter() {
+		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				// TODO now: implement
 //				UtilFile.launch(Const.HELP_FILE_INDEXING);
 			}
 		});
 		
-		Button resetBt = Util.createPushButton(comp, "restore_defaults", new SelectionAdapter() {
+		Button resetBt = Util.createPushButton(comp, Msg.restore_defaults.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				restoreDefaults();
 			}
 		});
 		
-		runBt = Util.createPushButton(comp, "run", new SelectionAdapter() {
+		runBt = Util.createPushButton(comp, Msg.run.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				// Check that the target file or directory still exists
+				File rootFile = index.getCanonicalRootFile();
+				if (!rootFile.exists()) {
+					String msg = Msg.file_or_folder_not_found.format(rootFile.getPath());
+					AppUtil.showError(msg, true, true);
+					return;
+				}
+				
 				if (writeToConfig())
 					evtRunButtonClicked.fire(null);
 			}
@@ -127,7 +138,7 @@ abstract class ConfigPanel {
 		
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.margin(0).top().bottom().minWidth(75).applyTo(helpBt);
+		fdf.margin(0).top().bottom().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt).applyTo(resetBt);
 		fdf.unleft().right().applyTo(runBt);
 		

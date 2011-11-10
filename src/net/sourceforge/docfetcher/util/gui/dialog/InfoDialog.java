@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.util.gui.dialog;
 
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -52,7 +53,7 @@ public class InfoDialog {
 		});
 		
 		bt = new Button(shell, SWT.PUSH);
-		bt.setText("&OK");
+		bt.setText(AppUtil.Messages.ok.get());
 		bt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
@@ -67,7 +68,7 @@ public class InfoDialog {
 		label.setLayoutData(labelGridData);
 		
 		GridData btGridData = new GridData(SWT.CENTER, SWT.FILL, true, false, 2, 1);
-		btGridData.minimumWidth = 75;
+		btGridData.minimumWidth = Util.BTW;
 		bt.setLayoutData(btGridData);
 	}
 	

@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
@@ -44,25 +45,29 @@ public final class IndexWriterAdapter implements Closeable {
 	}
 
 	// may throw OutOfMemoryError
-	public void add(@NotNull Document document) throws IOException {
+	public void add(@NotNull Document document) throws IOException,
+			CheckedOutOfMemoryError {
 		try {
 			writer.addDocument(document);
-		} catch (OutOfMemoryError e) {
+		}
+		catch (OutOfMemoryError e) {
 			reopenWriterAndThrow(e);
 		}
 	}
 
 	// may throw OutOfMemoryError
-	public void update(	@NotNull String uid,
-						@NotNull Document document) throws IOException {
+	public void update(@NotNull String uid, @NotNull Document document)
+			throws IOException, CheckedOutOfMemoryError {
 		try {
 			writer.updateDocument(idTerm.createTerm(uid), document);
-		} catch (OutOfMemoryError e) {
+		}
+		catch (OutOfMemoryError e) {
 			reopenWriterAndThrow(e);
 		}
 	}
 	
-	private void reopenWriterAndThrow(@NotNull OutOfMemoryError e) throws IOException {
+	private void reopenWriterAndThrow(@NotNull OutOfMemoryError e)
+			throws IOException, CheckedOutOfMemoryError {
 		/*
 		 * According to the IndexWriter javadoc, we're supposed to immediately
 		 * close the IndexWriter if IndexWriter.addDocument(...) or
@@ -71,7 +76,7 @@ public final class IndexWriterAdapter implements Closeable {
 		Directory indexDir = writer.getDirectory();
 		Closeables.closeQuietly(writer);
 		writer = new IndexWriter(indexDir, IndexRegistry.analyzer, MaxFieldLength.UNLIMITED);
-		throw e;
+		throw new CheckedOutOfMemoryError(e);
 	}
 
 	public void delete(@NotNull String uid) throws IOException {

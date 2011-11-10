@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
@@ -80,12 +81,11 @@ final class FileExtensionChooser {
 	@Nullable private ListMap<String, Boolean> output;
 	
 	private FileExtensionChooser(@NotNull Factory factory) {
-		// TODO i18n
 		this.factory = factory;
 		shell = new Shell(factory.parentShell, UtilGui.DIALOG_STYLE);
 		
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("select_exts");
+		label.setText(Msg.select_exts.get());
 		
 		comp = new Composite(shell, SWT.NONE);
 		stackLayout = new StackLayout();
@@ -97,7 +97,7 @@ final class FileExtensionChooser {
 		
 		StyledText loadingMsg = new StyledText(textContainer, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 		loadingMsg.setBackground(Col.LIST_BACKGROUND.get()); // don't use WHITE, it won't work with dark themes
-		loadingMsg.setText("loading");
+		loadingMsg.setText(Msg.loading.get());
 		loadingMsg.getCaret().setVisible(false);
 		stackLayout.topControl = textContainer;
 		
@@ -106,14 +106,14 @@ final class FileExtensionChooser {
 		Util.disposeWith(loadingMsg, font);
 		
 		okBt = new Button(shell, SWT.PUSH);
-		okBt.setText("ok");
+		okBt.setText(Msg.ok.get());
 		Button cancelBt = new Button(shell, SWT.PUSH);
-		cancelBt.setText("cancel");
+		cancelBt.setText(Msg.cancel.get());
 		
 		shell.setLayout(Util.createFormLayout(5));
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top().left().right().applyTo(label);
-		fdf.reset().minWidth(75).bottom().right().applyTo(cancelBt);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(cancelBt);
 		fdf.right(cancelBt).applyTo(okBt);
 		fdf.reset().left().right().top(label).bottom(okBt).applyTo(comp);
 		
@@ -147,7 +147,7 @@ final class FileExtensionChooser {
 			private final boolean value;
 
 			private CheckAllAction(boolean value) {
-				super(value ? "check_all" : "uncheck_all");
+				super(value ? Msg.check_all.get() : Msg.uncheck_all.get());
 				this.value = value;
 			}
 			public void run() {
@@ -162,7 +162,7 @@ final class FileExtensionChooser {
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction("invert_selection") {
+		menuManager.add(new MenuAction(Msg.invert_selection.get()) {
 			public void run() {
 				for (TableItem item : table.getItems())
 					item.setChecked(!item.getChecked());

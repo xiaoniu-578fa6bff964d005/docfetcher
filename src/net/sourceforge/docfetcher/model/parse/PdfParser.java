@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -43,7 +44,7 @@ public final class PdfParser extends StreamParser {
 		PDDocument pdfDoc = null;
 		try {
 			/*
-			 * TODO pre-release: check if 'force' argument in PDDocument/Stripper increases
+			 * TODO post-release-1.1: check if 'force' argument in PDDocument/Stripper increases
 			 * number of parsed PDF files
 			 */
 			pdfDoc = PDDocument.load(in, true);
@@ -78,6 +79,11 @@ public final class PdfParser extends StreamParser {
 					.addMiscMetadata(pdInfo.getKeywords());
 		}
 		catch (IOException e) {
+			/*
+			 * TODO post-release-1.1: write unit test to see what happens when
+			 * the PDF is encrypted with a non-empty password. -> show
+			 * translated error message: Msg.doc_pw_protected.get()
+			 */
 			throw new ParseException(e);
 		}
 		finally {
@@ -104,7 +110,7 @@ public final class PdfParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "PDF"; // TODO i18n
+		return Msg.filetype_pdf.get();
 	}
 
 }

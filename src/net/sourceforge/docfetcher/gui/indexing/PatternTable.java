@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -78,7 +79,6 @@ final class PatternTable extends Composite {
 	
 	public PatternTable(@NotNull Composite parent,
 						@NotNull LuceneIndex index) {
-		// TODO i18n
 		super(parent, SWT.NONE);
 		this.index = index;
 		setLayout(Util.createGridLayout(2, false, 0, 5));
@@ -110,7 +110,7 @@ final class PatternTable extends Composite {
 		tableViewer = new SimpleTableViewer<PatternAction>(this, style);
 		tableViewer.enableEditSupport();
 		
-		tableViewer.addColumn(new Column<PatternAction>("Pattern (regex)") {
+		tableViewer.addColumn(new Column<PatternAction>(Msg.pattern_regex.get()) {
 			protected String getLabel(PatternAction element) {
 				return element.getRegex();
 			}
@@ -124,7 +124,7 @@ final class PatternTable extends Composite {
 			}
 		});
 		
-		tableViewer.addColumn(new Column<PatternAction>("Match Against") {
+		tableViewer.addColumn(new Column<PatternAction>(Msg.match_against.get()) {
 			protected String getLabel(PatternAction element) {
 				return getLabel(element.getTarget());
 			}
@@ -142,21 +142,21 @@ final class PatternTable extends Composite {
 			}
 			private String getLabel(MatchTarget target) {
 				switch (target) {
-				case FILENAME: return "Filename";
+				case FILENAME: return Msg.filename.get();
 				case PATH:
 					return storeRelativePaths
-						? "Relative path"
-						: "Absolute path";
+						? Msg.relative_path.get()
+						: Msg.absolute_path.get();
 				}
 				throw new IllegalStateException();
 			}
 		});
 		
-		tableViewer.addColumn(new Column<PatternAction>("Action") {
+		tableViewer.addColumn(new Column<PatternAction>(Msg.action.get()) {
 			protected String getLabel(PatternAction element) {
 				switch (element.getAction()) {
-				case EXCLUDE: return "Exclude";
-				case DETECT_MIME: return "Detect mime type (slower)";
+				case EXCLUDE: return Msg.exclude.get();
+				case DETECT_MIME: return Msg.detect_mime_type.get();
 				}
 				throw new IllegalStateException();
 			}
@@ -197,16 +197,18 @@ final class PatternTable extends Composite {
 		comp.setLayout(Util.createGridLayout(1, false, 0, 5));
 		
 		Util.createPushButton(
-			comp, Img.ADD.get(), "Add pattern", new SelectionAdapter() {
+			comp, Img.ADD.get(), Msg.add_pattern.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				tableViewer.add(new PatternAction());
-				tableViewer.showElement(tableViewer.getItemCount() - 1);
+				PatternAction patternAction = new PatternAction();
+				tableViewer.add(patternAction);
+				tableViewer.showElement(patternAction);
+				tableViewer.setSelection(patternAction);
 				updateRegexTestPanel();
 			}
 		});
 		
 		Util.createPushButton(
-			comp, Img.REMOVE.get(), "Remove selected pattern",
+			comp, Img.REMOVE.get(), Msg.remove_sel_pattern.get(),
 			new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PatternAction patternAction : tableViewer.getSelection())
@@ -216,7 +218,7 @@ final class PatternTable extends Composite {
 		});
 		
 		Util.createPushButton(
-			comp, Img.ARROW_UP.get(), "Increase priority of selected pattern", new SelectionAdapter() {
+			comp, Img.ARROW_UP.get(), Msg.increase_pattern_priority.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				List<PatternAction> sel = tableViewer.getSelection();
 				if (sel.size() == 1)
@@ -225,7 +227,7 @@ final class PatternTable extends Composite {
 		});
 		
 		Util.createPushButton(
-			comp, Img.ARROW_DOWN.get(), "Decrease priority of selected pattern", new SelectionAdapter() {
+			comp, Img.ARROW_DOWN.get(), Msg.decrease_pattern_priority.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				List<PatternAction> sel = tableViewer.getSelection();
 				if (sel.size() == 1)

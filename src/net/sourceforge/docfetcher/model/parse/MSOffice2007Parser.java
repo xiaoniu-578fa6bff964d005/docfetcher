@@ -14,6 +14,8 @@ package net.sourceforge.docfetcher.model.parse;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.extractor.ExtractorFactory;
@@ -28,19 +30,19 @@ abstract class MSOffice2007Parser extends FileParser {
 	
 	public static final class MSWord2007Parser extends MSOffice2007Parser {
 		public MSWord2007Parser() {
-			super("MS Word 2007", "docx", "docm", "dotx"); // TODO i18n filetype_docx
+			super(Msg.filetype_docx.get(), "docx", "docm", "dotx");
 		}
 	}
 	
 	public static final class MSExcel2007Parser extends MSOffice2007Parser {
 		public MSExcel2007Parser() {
-			super("MS Excel 2007", "xlsx", "xlsm", "xltx"); // TODO i18n filetype_xlsx
+			super(Msg.filetype_xlsx.get(), "xlsx", "xlsm", "xltx");
 		}
 	}
 	
 	public static final class MSPowerPoint2007Parser extends MSOffice2007Parser {
 		public MSPowerPoint2007Parser() {
-			super("MS PowerPoint 2007", "pptx", "pptm", "ppsx"); // TODO i18n filetype_pptx
+			super(Msg.filetype_pptx.get(), "pptx", "pptm", "ppsx");
 		}
 	}
 	

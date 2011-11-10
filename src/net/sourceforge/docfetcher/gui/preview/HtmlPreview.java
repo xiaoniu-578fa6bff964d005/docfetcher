@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
@@ -65,19 +66,17 @@ final class HtmlPreview extends ToolBarForm {
 		ToolBar leftToolBar = new ToolBar(comp, SWT.FLAT);
 		leftToolBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		
-		// TODO i18n for all button tooltips
-		
 		ToolItemFactory tif = new ToolItemFactory(leftToolBar);
 		tif.enabled(false);
 		
-		backBt = tif.image(Img.ARROW_LEFT.get()).toolTip("prev_page")
+		backBt = tif.image(Img.ARROW_LEFT.get()).toolTip(Msg.prev_page.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						browser.back();
 					}
 				}).create();
 		
-		forwardBt = tif.image(Img.ARROW_RIGHT.get()).toolTip("next_page")
+		forwardBt = tif.image(Img.ARROW_RIGHT.get()).toolTip(Msg.next_page.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						browser.forward();
@@ -86,21 +85,21 @@ final class HtmlPreview extends ToolBarForm {
 		
 		tif.enabled(true);
 		
-		tif.image(Img.STOP.get()).toolTip("browser_stop")
+		tif.image(Img.STOP.get()).toolTip(Msg.browser_stop.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						browser.stop();
 					}
 				}).create();
 		
-		tif.image(Img.REFRESH.get()).toolTip("browser_refresh")
+		tif.image(Img.REFRESH.get()).toolTip(Msg.browser_refresh.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						browser.refresh();
 					}
 				}).create();
 
-		tif.image(Img.WINDOW.get()).toolTip("browser_launch_external")
+		tif.image(Img.WINDOW.get()).toolTip(Msg.browser_launch_external.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						String url = browser.getUrl();
@@ -130,7 +129,7 @@ final class HtmlPreview extends ToolBarForm {
 		tif.style(SWT.CHECK);
 		
 		htmlBt = tif.image(Img.BUILDING_BLOCKS.get())
-				.toolTip("use_embedded_html_viewer")
+				.toolTip(Msg.use_embedded_html_viewer.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						evtHtmlToTextBt.fire(null);
@@ -160,7 +159,7 @@ final class HtmlPreview extends ToolBarForm {
 				if (path.equals("about:blank")) {
 					path = "";
 				}
-				else if (path.startsWith("file:///")) { //$NON-NLS-1$
+				else if (path.startsWith("file:///")) {
 					try {
 						path = Util.getSystemAbsPath(new File(new URI(path)));
 					}

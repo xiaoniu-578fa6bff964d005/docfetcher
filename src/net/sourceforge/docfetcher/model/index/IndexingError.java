@@ -13,6 +13,9 @@ package net.sourceforge.docfetcher.model.index;
 
 import java.io.Serializable;
 
+import com.google.common.base.Throwables;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -30,13 +33,12 @@ public final class IndexingError implements Serializable {
 		// Files
 		ARCHIVE,
 		ARCHIVE_UNPACK_DISKSPACE,
-		ARCHIVE_ENCRYPTED,
+		ARCHIVE_ENCRYPTED (Msg.archive_encrypted.get()),
 		ARCHIVE_ENTRY,
-		ARCHIVE_ENTRY_ENCRYPTED,
+		ARCHIVE_ENTRY_ENCRYPTED (Msg.archive_entry_encrypted.get()),
 		PARSING,
-		OUT_OF_MEMORY,
-		STACK_OVERFLOW,
-		NOT_AN_ARCHIVE,
+		OUT_OF_MEMORY (Msg.out_of_memory_instructions_brief.get()),
+		NOT_AN_ARCHIVE (Msg.not_an_archive.get()),
 		ENCODING,
 		
 		// Outlook
@@ -44,6 +46,29 @@ public final class IndexingError implements Serializable {
 		
 		// Files and Outlook
 		IO_EXCEPTION,
+		;
+		
+		@Nullable private String overrideMsg;
+		
+		private ErrorType() {
+		}
+		private ErrorType(@Nullable String overrideMsg) {
+			this.overrideMsg = overrideMsg;
+		}
+		
+		@NotNull
+		private String getMessage(@Nullable Throwable t) {
+			if (overrideMsg != null)
+				return overrideMsg;
+			return getRootMessage(t);
+		}
+		@NotNull
+		private static String getRootMessage(@Nullable Throwable t) {
+			if (t == null)
+				return "";
+			String message = Throwables.getRootCause(t).getMessage();
+			return message == null ? "" : message;
+		}
 	}
 	
 	private final ErrorType errorType;
@@ -73,6 +98,11 @@ public final class IndexingError implements Serializable {
 	@Nullable
 	public Throwable getThrowable() {
 		return throwable;
+	}
+	
+	@NotNull
+	public String getLocalizedMessage() {
+		return errorType.getMessage(throwable);
 	}
 	
 }

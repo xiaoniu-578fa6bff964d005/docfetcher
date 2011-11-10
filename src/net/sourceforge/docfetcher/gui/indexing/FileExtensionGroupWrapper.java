@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
@@ -56,7 +57,7 @@ final class FileExtensionGroupWrapper {
 		extChooserFactory = new FileExtensionChooser.Factory(
 			parent.getShell(), index.getCanonicalRootFile());
 		
-		groupWrapper = new GroupWrapper(parent, "File extensions") {
+		groupWrapper = new GroupWrapper(parent, Msg.file_extensions.get()) {
 			protected void createLayout(Group parent) {
 				FileExtensionGroupWrapper.this.createLayout(parent);
 			}
@@ -79,9 +80,9 @@ final class FileExtensionGroupWrapper {
 
 	private void createContents(Group parent) {
 		textExtField = createExtField(
-			parent, "Plain text:", index.getConfig().getTextExtensions());
+			parent, Msg.plain_text.get(), index.getConfig().getTextExtensions());
 		zipExtField = createExtField(
-			parent, "Zip archives:", index.getConfig().getZipExtensions());
+			parent, Msg.zip_archives.get(), index.getConfig().getZipExtensions());
 	}
 	
 	@NotNull
@@ -103,15 +104,9 @@ final class FileExtensionGroupWrapper {
 	}
 	
 	private void onChooserButtonClicked(@NotNull final Text field) {
-		// TODO i18n
 		File rootFile = index.getCanonicalRootFile();
 		if (rootFile.isFile()) {
-			AppUtil.showError("Sorry, listing file extensions inside archives is not supported.", true, true);
-			return;
-		}
-		
-		if (!rootFile.exists()) {
-			AppUtil.showError("File not found: " + rootFile.getPath(), true, true);
+			AppUtil.showError(Msg.listing_ext_inside_archives.get(), true, true);
 			return;
 		}
 		
@@ -131,8 +126,8 @@ final class FileExtensionGroupWrapper {
 			field.setText(Util.join(" ", extsNew));
 		}
 		catch (FileNotFoundException e1) {
-			// TODO now: Show error message: "File not found: %s"
-			Util.printErr(e1);
+			String msg = Msg.folder_not_found.format(rootFile.getPath());
+			AppUtil.showError(msg, true, true);
 		}
 	}
 	

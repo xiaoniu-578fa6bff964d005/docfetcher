@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
@@ -49,25 +50,25 @@ public final class PrefDialog {
 		Util.checkNotNull(parent);
 		shell = new Shell(parent, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM);
 		shell.setLayout(Util.createFillLayout(10));
-		shell.setText("Preferences");
+		shell.setText(Msg.preferences.get());
 		shell.setImage(Img.PREFERENCES.get());
 		SettingsConf.ShellBounds.PreferencesDialog.bind(shell);
 		
 		checkOptions = Arrays.<PrefOption> asList(
 			new CheckOption(
-				"Show manual on startup",
+				Msg.pref_manual_on_startup.get(),
 				SettingsConf.Bool.ShowManualOnStartup),
 
 			new CheckOption(
-				"Use OR operator as default in queries (instead of AND)",
+				Msg.pref_use_or_operator.get(),
 				SettingsConf.Bool.UseOrOperator),
 
 			new CheckOption(
-				"Hide program in System Tray after opening files",
+				Msg.pref_hide_in_systray.get(),
 				SettingsConf.Bool.HideOnOpen),
 
 			new CheckOption(
-				"Clear search history on exit",
+				Msg.pref_clear_search_history_on_exit.get(),
 				SettingsConf.Bool.ClearSearchHistoryOnExit)
 
 			// TODO post-release-1.1: Implement this; requires saving and restoring the tree expansion state
@@ -78,19 +79,19 @@ public final class PrefDialog {
 		
 		fieldOptions = Util.createList(1,
 			new ColorOption(
-				"Highlight color:",
+				Msg.pref_highlight_color.get(),
 				SettingsConf.IntArray.PreviewHighlighting),
 				
 			new FontOption(
-				"Preview font (normal):",
+				Msg.pref_font_normal.get(),
 				UtilGui.getPreviewFontNormal()),
 			
 			new FontOption(
-				"Preview font (fixed width):",
+				Msg.pref_font_fixed_width.get(),
 				UtilGui.getPreviewFontMono())
 		);
 		if (!Util.IS_MAC_OS_X)
-			fieldOptions.add(new HotkeyOption("Global hotkey:"));
+			fieldOptions.add(new HotkeyOption(Msg.pref_hotkey.get()));
 		
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
@@ -126,14 +127,14 @@ public final class PrefDialog {
 		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
 		
-		Button helpBt = Util.createPushButton(comp, "help", new SelectionAdapter() {
+		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				// TODO now: implement
 //				UtilFile.launch(Const.HELP_FILE_INDEXING);
 			}
 		});
 		
-		Button resetBt = Util.createPushButton(comp, "restore_defaults", new SelectionAdapter() {
+		Button resetBt = Util.createPushButton(comp, Msg.restore_defaults.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PrefOption checkOption : checkOptions)
 					checkOption.restoreDefault();
@@ -142,7 +143,7 @@ public final class PrefDialog {
 			}
 		});
 		
-		okBt = Util.createPushButton(comp, "&OK", new SelectionAdapter() {
+		okBt = Util.createPushButton(comp, Msg.ok.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PrefOption checkOption : checkOptions)
 					checkOption.save();
@@ -152,7 +153,7 @@ public final class PrefDialog {
 			}
 		});
 		
-		Button cancelBt = Util.createPushButton(comp, "&Cancel", new SelectionAdapter() {
+		Button cancelBt = Util.createPushButton(comp, Msg.cancel.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
 			}
@@ -160,7 +161,7 @@ public final class PrefDialog {
 		
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.margin(0).top().bottom().minWidth(75).applyTo(helpBt);
+		fdf.margin(0).top().bottom().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt, 5).applyTo(resetBt);
 		fdf.unleft().right().applyTo(cancelBt);
 		fdf.right(cancelBt, -5).applyTo(okBt);

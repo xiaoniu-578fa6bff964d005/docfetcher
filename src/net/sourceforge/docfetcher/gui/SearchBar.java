@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.pref.PrefDialog;
@@ -78,7 +79,7 @@ public final class SearchBar {
 		searchBox.setItems(getHistoryArray());
 		
 		searchBt = new Button(comp, SWT.PUSH);
-		searchBt.setText("Search");
+		searchBt.setText(Msg.search.get());
 		searchBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String query = searchBox.getText().trim();
@@ -90,16 +91,14 @@ public final class SearchBar {
 		toolBar = new ToolBar(comp, SWT.FLAT);
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
-		// TODO i18n
-		
-		tif.image(Img.HELP.get()).toolTip("Open Manual")
+		tif.image(Img.HELP.get()).toolTip(Msg.open_manual.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						evtOpenManual.fire(null);
 					}
 				}).create();
 		
-		tif.image(Img.PREFERENCES.get()).toolTip("Preferences")
+		tif.image(Img.PREFERENCES.get()).toolTip(Msg.preferences.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						PrefDialog prefDialog = new PrefDialog(comp.getShell());
@@ -107,7 +106,7 @@ public final class SearchBar {
 					}
 				}).create();
 
-		tif.image(Img.BROWSER.get()).toolTip("Web Interface")
+		tif.image(Img.BROWSER.get()).toolTip(Msg.web_interface.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
@@ -115,7 +114,7 @@ public final class SearchBar {
 					}
 				}).create();
 		
-		tif.image(Img.HIDE.get()).toolTip("to_systray")
+		tif.image(Img.HIDE.get()).toolTip(Msg.to_systray.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						evtHideInSystemTray.fire(null);
@@ -156,7 +155,7 @@ public final class SearchBar {
 							int width,
 							int compHeight,
 							int controlHeight) {
-		int y = Math.max(0, (compHeight - controlHeight) / 2); 
+		int y = Math.max(0, (compHeight - controlHeight) / 2);
 		control.setLocation(x, y);
 		control.setSize(width, Math.min(compHeight, controlHeight));
 	}

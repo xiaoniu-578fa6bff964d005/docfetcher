@@ -19,7 +19,6 @@ import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
@@ -168,9 +167,6 @@ class FileContext {
 		catch (CheckedOutOfMemoryError e) {
 			fail(ErrorType.OUT_OF_MEMORY, doc, e.getCause());
 		}
-		catch (StackOverflowError e) {
-			fail(ErrorType.STACK_OVERFLOW, doc, e);
-		}
 		return false;
 	}
 	
@@ -205,9 +201,7 @@ class FileContext {
 	public final void fail(	@NotNull ErrorType type,
 							@NotNull TreeNode treeNode,
 							@Nullable Throwable cause) {
-		IndexingError error = new IndexingError(type, treeNode, cause);
-		treeNode.setError(error);
-		reporter.fail(error);
+		UtilModel.fail(reporter, type, treeNode, cause);
 	}
 	
 	/**

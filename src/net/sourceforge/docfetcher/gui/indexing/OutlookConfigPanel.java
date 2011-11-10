@@ -11,10 +11,10 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
-import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.GroupWrapper;
@@ -43,7 +43,7 @@ final class OutlookConfigPanel extends ConfigPanel {
 	protected Control createContents(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		
-		Group optionsGroup = new GroupWrapper(comp, "Indexing Options") {
+		Group optionsGroup = new GroupWrapper(comp, Msg.indexing_options.get()) {
 			protected void createLayout(Group parent) {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
@@ -62,9 +62,9 @@ final class OutlookConfigPanel extends ConfigPanel {
 	}
 	
 	private void createGroupContents(@NotNull Group parent) {
-		indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
-		storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
-		watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
+		indexFilenameBt = Util.createCheckButton(parent, Msg.index_filenames.get());
+		storeRelativePathsBt = Util.createCheckButton(parent, Msg.store_relative_paths.get());
+		watchFolderBt = Util.createCheckButton(parent, Msg.watch_folders.get());
 		
 		IndexingConfig config = index.getConfig();
 		
@@ -74,12 +74,6 @@ final class OutlookConfigPanel extends ConfigPanel {
 	}
 	
 	protected boolean writeToConfig() {
-		// Check that the PST file still exists
-		if (!index.getCanonicalRootFile().exists()) {
-			AppUtil.showError("Outlook PST file has been deleted!", true, true);
-			return false;
-		}
-		
 		IndexingConfig config = index.getConfig();
 		config.setIndexFilenames(indexFilenameBt.getSelection());
 		config.setStoreRelativePaths(storeRelativePathsBt.getSelection());

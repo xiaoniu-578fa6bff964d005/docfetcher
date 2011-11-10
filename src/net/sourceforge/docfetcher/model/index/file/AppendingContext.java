@@ -15,9 +15,10 @@ import java.io.IOException;
 
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
-import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.lucene.document.Document;
@@ -64,7 +65,7 @@ final class AppendingContext extends FileContext {
 		catch (IOException e) {
 			throw new IndexingException(e);
 		}
-		catch (OutOfMemoryError e) {
+		catch (CheckedOutOfMemoryError e) {
 			outerContext.fail(ErrorType.OUT_OF_MEMORY, doc, e);
 		}
 		return false;

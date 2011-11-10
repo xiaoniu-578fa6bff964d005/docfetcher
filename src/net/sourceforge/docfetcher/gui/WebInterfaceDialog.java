@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
@@ -60,13 +61,13 @@ final class WebInterfaceDialog {
 	public WebInterfaceDialog(@NotNull Shell parentShell) {
 		shell = new Shell(parentShell, SWT.PRIMARY_MODAL | SWT.DIALOG_TRIM);
 		shell.setLayout(Util.createFormLayout(5));
-		shell.setText("Web Interface Configuration"); // TODO i18n
+		shell.setText(Msg.web_interface.get());
 		
 		Composite comp = new Composite(shell, SWT.NONE);
 		comp.setLayout(new RowLayout());
 		
 		Button enableButton = new Button(comp, SWT.CHECK);
-		enableButton.setText("&Enable Web Interface"); // TODO i18n
+		enableButton.setText(Msg.enable_web_interface.get());
 		
 		enableButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -78,7 +79,7 @@ final class WebInterfaceDialog {
 		});
 		
 		Button closeButton = new Button(shell, SWT.PUSH);
-		closeButton.setText("&Close"); // TODO i18n
+		closeButton.setText(Msg.close.get());
 		closeButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
@@ -86,7 +87,7 @@ final class WebInterfaceDialog {
 		});
 		
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.bottom().right().minWidth(75).applyTo(closeButton); // TODO now: set button width
+		fdf.bottom().right().minWidth(Util.BTW).applyTo(closeButton);
 		fdf.reset().bottom(closeButton).left().top().right().applyTo(comp);
 	}
 	

@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.enums.SystemConf;
@@ -123,8 +124,6 @@ public final class Application {
 			System.exit(1);
 		}
 
-		// TODO now: See what happens if we don't initialize all constants
-		// TODO i18n: Initialize MsgUtil and AppUtil.Msg, should be done as early as possible
 		AppUtil.Const.PROGRAM_NAME.set(SystemConf.Str.ProgramName.get());
 		AppUtil.Const.PROGRAM_VERSION.set(SystemConf.Str.ProgramVersion.get());
 		AppUtil.Const.PROGRAM_BUILD_DATE.set(SystemConf.Str.BuildDate.get());
@@ -132,6 +131,17 @@ public final class Application {
 		AppUtil.Const.IS_PORTABLE.set(SystemConf.Bool.IsPortable.get());
 		AppUtil.Const.IS_DEVELOPMENT_VERSION.set(SystemConf.Bool.IsDevelopmentVersion.get());
 
+		Msg.setCheckEnabled(false);
+		AppUtil.Messages.system_error.set(Msg.system_error.get());
+		AppUtil.Messages.confirm_operation.set(Msg.confirm_operation.get());
+		AppUtil.Messages.invalid_operation.set(Msg.invalid_operation.get());
+		AppUtil.Messages.program_died_stacktrace_written.set(Msg.report_bug.get());
+		AppUtil.Messages.program_running_launch_another.set(Msg.program_running_launch_another.get());
+		AppUtil.Messages.ok.set(Msg.ok.get());
+		AppUtil.Messages.cancel.set(Msg.cancel.get());
+		Msg.setCheckEnabled(true);
+		AppUtil.Messages.checkInitialized();
+		
 		if (!AppUtil.checkSingleInstance()) return;
 
 		// Load program configuration and preferences
@@ -157,7 +167,7 @@ public final class Application {
 			display, AppUtil.getImageDir());
 		Img.initialize(lazyImageCache);
 		lazyImageCache.reportMissingFiles(
-			shell, Img.class, "Missing image files:");
+			shell, Img.class, Msg.missing_image_files.get());
 
 		// Set shell icons, must be done *after* loading the images
 		shell.setImages(new Image[] {
@@ -200,14 +210,15 @@ public final class Application {
 			File file = ManualLocator.getManualFile();
 			if (file == null) {
 				showManualHint = false;
-				AppUtil.showError("Manual not found!", true, true);
+				String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
+				AppUtil.showError(msg, true, true);
 			}
 			else if (previewPanel.setHtmlFile(file)) {
 				showManualHint = false;
 			}
 		}
 		if (showManualHint) {
-			String msg = "Msg.press_help_button.format(Key.Help.toString())";
+			String msg = Msg.press_f1_for_help.get();
 			statusBar.getLeftPart().setContents(Img.HELP.get(), msg);
 		}
 		
@@ -354,11 +365,8 @@ public final class Application {
 					notLoaded.size());
 				for (Loadable entry : notLoaded)
 					entryNames.add("  " + entry.name());
-				String msg = String.format(
-					"The following entries in '%s' "
-							+ "are missing or have invalid values:\n",
-					confFile.getName());
-				msg += Joiner.on("\n").join(entryNames);
+				String msg = Msg.entries_missing.format(confFile.getName());
+				msg += "\n" + Joiner.on("\n").join(entryNames);
 				AppUtil.showErrorOnStart(msg, false);
 			}
 		}
@@ -438,7 +446,7 @@ public final class Application {
 				return filesizePanel.getControl();
 			}
 		};
-		filesizeForm.setText("Minimum / Maximum Filesize");
+		filesizeForm.setText(Msg.min_max_filesize.get());
 
 		TwoFormExpander expander = new TwoFormExpander(comp) {
 			protected Control createFirstContents(Composite parent) {
@@ -461,8 +469,8 @@ public final class Application {
 				return indexPanel.getControl();
 			}
 		};
-		expander.setTopText("Document Types");
-		expander.setBottomText("Search Scope");
+		expander.setTopText(Msg.document_types.get());
+		expander.setBottomText(Msg.search_scope.get());
 		expander.setSashWidth(sashWidth);
 
 		FormDataFactory fdf = FormDataFactory.getInstance();
@@ -498,7 +506,8 @@ public final class Application {
 						Util.launch(file);
 				}
 				else {
-					AppUtil.showError("Manual not found!", true, true);
+					String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
+					AppUtil.showError(msg, true, true);
 				}
 			}
 		});
@@ -579,7 +588,9 @@ public final class Application {
 		}, new Runnable() {
 			public void run() {
 				// TODO post-release-1.1: Show an about dialog? Or maybe open a manual page?
-				AppUtil.showInfo("Dummy Message");
+				String name = SystemConf.Str.ProgramName.get();
+				String version = SystemConf.Str.ProgramVersion.get();
+				AppUtil.showInfo(name + " " + version);
 			}
 		}, new Runnable() {
 			public void run() {
@@ -691,7 +702,7 @@ public final class Application {
 		return new StatusBar(shell) {
 			public List<StatusBarPart> createRightParts(StatusBar statusBar) {
 				indexingStatus = new StatusBarPart(statusBar, true);
-				indexingStatus.setContents(Img.INDEXING.get(), "Indexing...");
+				indexingStatus.setContents(Img.INDEXING.get(), Msg.indexing.get());
 				indexingStatus.setVisible(false);
 				
 				indexPanel.evtIndexingDialogOpened.add(new Event.Listener<Void>() {
@@ -707,11 +718,11 @@ public final class Application {
 				});
 				
 				StatusBarPart webInterfaceStatus = new StatusBarPart(statusBar, true);
-				webInterfaceStatus.setContents(Img.INDEXING.get(), "Web Interface");
+				webInterfaceStatus.setContents(Img.INDEXING.get(), Msg.web_interface.get());
 
 				List<StatusBarPart> parts = new ArrayList<StatusBarPart>(2);
 				parts.add(indexingStatus);
-				parts.add(webInterfaceStatus);
+//				parts.add(webInterfaceStatus); // TODO web interface
 				return parts;
 			}
 		};
@@ -784,8 +795,8 @@ public final class Application {
 		});
 		hotkeyHandler.evtHotkeyConflict.add(new Event.Listener<int[]> () {
 			public void update(int[] eventData) {
-//				String key = UtilGui.toString(eventData); // TODO i18n
-				AppUtil.showError("Msg.hotkey_in_use.format(key)", false, true);
+				String key = UtilGui.toString(eventData);
+				AppUtil.showError(Msg.hotkey_in_use.format(key), false, true);
 				
 				/*
 				 * Don't open preferences dialog when the hotkey conflict occurs
@@ -801,14 +812,11 @@ public final class Application {
 	@Nullable
 	private static CancelAction confirmExit() {
 		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
-		dialog.setTitle("Abort Indexing?");
-		dialog.setText("An indexing process is still running and must be cancelled before terminating the program." +
-				" Do you want to keep the index created so far? " +
-				"Keeping it allows you to continue indexing later by running an index update.");
-		
-		dialog.addButton("&Keep", CancelAction.KEEP);
-		dialog.addButton("&Discard", CancelAction.DISCARD);
-		dialog.addButton("Don't &Exit", null);
+		dialog.setTitle(Msg.abort_indexing.get());
+		dialog.setText(Msg.keep_partial_index_on_exit.get());
+		dialog.addButton(Msg.keep.get(), CancelAction.KEEP);
+		dialog.addButton(Msg.discard.get(), CancelAction.DISCARD);
+		dialog.addButton(Msg.dont_exit.get(), null);
 		return dialog.open();
 	}
 

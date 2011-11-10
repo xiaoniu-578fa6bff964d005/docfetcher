@@ -19,8 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public abstract class InputDialogLoop<T> extends InputLoop<T> {
 	
-	// TODO i18n
-	public static String ENTER_NAME = "Please enter a new name:";
+	public static final String ENTER_NAME = "Please enter a new name:";
 	
 	@NotNull private final Shell parent;
 	@NotNull private String shellTitle = "";

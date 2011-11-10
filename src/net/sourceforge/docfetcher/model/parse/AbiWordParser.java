@@ -21,6 +21,7 @@ import java.util.zip.GZIPInputStream;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -117,7 +118,7 @@ final class AbiWordParser extends StreamParser {
 	}
 
 	public String getTypeLabel() {
-		return "Abiword"; // TODO i18n filetype_abi
+		return Msg.filetype_abi.get();
 	}
 
 }

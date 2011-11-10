@@ -131,6 +131,11 @@ public final class Util {
 	 * '/'.
 	 */
 	public static final String FS = System.getProperty("file.separator");
+	
+	/**
+	 * Default minimum value for the width of a button.
+	 */
+	public static final int BTW = 75;
 
 	private Util() {}
 

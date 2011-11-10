@@ -19,6 +19,7 @@ import java.io.InputStream;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.hssf.OldExcelFormatException;
@@ -33,7 +34,7 @@ import com.google.common.io.Closeables;
 final class MSExcelParser extends MSOfficeParser {
 	
 	public MSExcelParser() {
-		super("MS Excel", "xls", "xlt"); // TODO i18n filetype_xls
+		super(Msg.filetype_xls.get(), "xls", "xlt");
 	}
 
 	@Override
@@ -64,6 +65,10 @@ final class MSExcelParser extends MSOfficeParser {
 			return extractor.getText();
 		}
 		catch (IOException e) {
+			throw new ParseException(e);
+		}
+		catch (RuntimeException e) {
+			// POI can throw NullPointerExceptions on some odd Excel files
 			throw new ParseException(e);
 		}
 		finally {

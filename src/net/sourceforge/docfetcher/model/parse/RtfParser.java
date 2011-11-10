@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.sourceforge.docfetcher.enums.Msg;
+
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.rtf.TextExtractor;
 import org.apache.tika.sax.BodyContentHandler;
@@ -80,7 +82,7 @@ final class RtfParser extends StreamParser {
 	}
 
 	public String getTypeLabel() {
-		return "RTF Document"; // TODO i18n filetype_rtf
+		return Msg.filetype_rtf.get();
 	}
 
 }

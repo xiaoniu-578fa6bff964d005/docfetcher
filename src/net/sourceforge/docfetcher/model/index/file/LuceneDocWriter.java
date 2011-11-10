@@ -17,6 +17,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.parse.ParseResult;
+import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -30,7 +31,7 @@ abstract class LuceneDocWriter {
 	public final void add(	@NotNull FileDocument doc,
 							@NotNull File file,
 							@NotNull ParseResult parseResult)
-			throws IOException {
+			throws IOException, CheckedOutOfMemoryError {
 		Document luceneDoc = createLuceneDoc(doc, file, parseResult);
 		write(doc, luceneDoc, true);
 	}
@@ -38,7 +39,7 @@ abstract class LuceneDocWriter {
 	public void update(	@NotNull FileDocument doc,
 						@NotNull File file,
 						@NotNull ParseResult parseResult)
-			throws IOException {
+			throws IOException, CheckedOutOfMemoryError {
 		Document luceneDoc = createLuceneDoc(doc, file, parseResult);
 		write(doc, luceneDoc, false);
 	}
@@ -83,7 +84,8 @@ abstract class LuceneDocWriter {
 	
 	public abstract void write(	@NotNull FileDocument doc,
 								@NotNull Document luceneDoc,
-								boolean added) throws IOException;
+								boolean added) throws IOException,
+			CheckedOutOfMemoryError;
 	
 	public abstract void delete(@NotNull String uid) throws IOException;
 

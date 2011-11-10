@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
@@ -54,14 +55,12 @@ public final class SystemTrayHider {
 	 * Hides the shell in the system tray.
 	 */
 	public void hide() {
-		// TODO i18n
-		
 		if (!shell.isVisible())
 			return;
 		
 		Tray tray = shell.getDisplay().getSystemTray();
 		if (tray == null) {
-			AppUtil.showError("systray_not_available", true, false);
+			AppUtil.showError(Msg.systray_not_available.get(), true, false);
 			return;
 		}
 		
@@ -79,8 +78,8 @@ public final class SystemTrayHider {
 		final Menu trayMenu = new Menu(shell, SWT.POP_UP);
 		MenuItem restoreItem = new MenuItem(trayMenu, SWT.PUSH);
 		MenuItem closeItem = new MenuItem(trayMenu, SWT.PUSH);
-		restoreItem.setText("restore_app");
-		closeItem.setText("exit");
+		restoreItem.setText(Msg.restore_app.get());
+		closeItem.setText(Msg.exit.get());
 		trayMenu.setDefaultItem(restoreItem);
 		
 		/*

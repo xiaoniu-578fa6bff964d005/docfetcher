@@ -21,6 +21,7 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -112,7 +113,7 @@ public final class HtmlParser extends StreamParser {
 	}
 	
 	public String getTypeLabel() {
-		return "HTML"; // TODO i18n
+		return Msg.filetype_html.get();
 	}
 
 }

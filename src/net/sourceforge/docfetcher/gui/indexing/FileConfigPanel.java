@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.gui.indexing;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -55,13 +56,12 @@ final class FileConfigPanel extends ConfigPanel {
 	}
 	
 	protected Control createContents(Composite parent) {
-		// TODO i18n
 		Composite comp = new Composite(parent, SWT.NONE);
 		
 		extGroupWrapper = new FileExtensionGroupWrapper(comp, index);
 		Group extGroup = extGroupWrapper.getGroup();
 		
-		Group patternGroup = new GroupWrapper(comp, "Exclude files / detect mime type") {
+		Group patternGroup = new GroupWrapper(comp, Msg.exclude_files_detect_mime_type.get()) {
 			protected void createLayout(Group parent) {
 				parent.setLayout(Util.createFillLayout(5));
 			}
@@ -70,7 +70,7 @@ final class FileConfigPanel extends ConfigPanel {
 			}
 		}.getGroup();
 		
-		Group miscGroup = new GroupWrapper(comp, "Miscellaneous") {
+		Group miscGroup = new GroupWrapper(comp, Msg.miscellaneous.get()) {
 			protected void createLayout(Group parent) {
 				parent.setLayout(Util.createGridLayout(1, false, 3, 3));
 			}
@@ -90,11 +90,11 @@ final class FileConfigPanel extends ConfigPanel {
 	}
 	
 	private void createMiscGroupContents(@NotNull Group parent) {
-		htmlPairingBt = Util.createCheckButton(parent, "ipref_detect_html_pairs");
-		detectExecArchivesBt = Util.createCheckButton(parent, "Detect executable zip and 7z archives (slower)");
-		indexFilenameBt = Util.createCheckButton(parent, "Index filename even if file contents can't be extracted");
-		storeRelativePathsBt = Util.createCheckButton(parent, "Store relative paths if possible (for portability)");
-		watchFolderBt = Util.createCheckButton(parent, "Watch folders for file changes");
+		htmlPairingBt = Util.createCheckButton(parent, Msg.index_html_pairs.get());
+		detectExecArchivesBt = Util.createCheckButton(parent, Msg.detect_exec_archives.get());
+		indexFilenameBt = Util.createCheckButton(parent, Msg.index_filenames.get());
+		storeRelativePathsBt = Util.createCheckButton(parent, Msg.store_relative_paths.get());
+		watchFolderBt = Util.createCheckButton(parent, Msg.watch_folders.get());
 		
 		IndexingConfig config = index.getConfig();
 		
@@ -123,47 +123,30 @@ final class FileConfigPanel extends ConfigPanel {
 		for (PatternAction patternAction : patternTable.getPatternActions()) {
 			if (patternAction.getTarget() != MatchTarget.PATH)
 				continue;
-			String msg = "Changing the 'store relative paths' setting might require adapting " +
-					"some of the regular expressions in the pattern table that are matched against paths.";
-			AppUtil.showInfo(msg);
+			AppUtil.showInfo(Msg.changing_store_relative_paths_setting.get());
 			SettingsConf.Bool.ShowRelativePathsMessage.set(false);
 			break;
 		}
 	}
 	
 	protected boolean writeToConfig() {
-		// Check that the target file or directory still exists
-		if (!index.getCanonicalRootFile().exists()) {
-			AppUtil.showError("target_folder_deleted", true, true);
-			return false;
-		}
-		
 		// Validate the regexes
 		List<PatternAction> patternActions = patternTable.getPatternActions();
 		for (PatternAction patternAction : patternActions) {
 			if (!patternAction.validateRegex()) {
 				String regex = patternAction.getRegex();
-				String msg = "Malformed regular expression: " + regex;
+				String msg = Msg.malformed_regex.format(regex);
 				AppUtil.showError(msg, true, true);
 				return false;
 			}
 		}
 		
 		Collection<String> textExtensions = extGroupWrapper.getTextExtensions();
-		
-		String msg = "You've entered the following plain text extensions: %s. " +
-		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as simple text files." +
-		"\n\nThis is probably not what you want because the built-in support will generally give better text extraction results. Do you still want " +
-		"to continue?";
-		if (!confirmExtensionOverride(textExtensions, msg))
+		if (!confirmExtensionOverride(textExtensions, Msg.confirm_text_ext))
 			return false;
 		
 		Collection<String> zipExtensions = extGroupWrapper.getZipExtensions();
-		
-		msg = "You've entered the following zip extensions: %s. " +
-		"This will override DocFetcher's built-in support for files with these extensions, and the files will instead be treated as zip archives. " +
-		"Do you still want to continue?";
-		if (!confirmExtensionOverride(zipExtensions, msg))
+		if (!confirmExtensionOverride(zipExtensions, Msg.confirm_zip_ext))
 			return false;
 		
 		IndexingConfig config = index.getConfig();
@@ -183,7 +166,7 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	// given message must have one %s placeholder for inserting the overriding file extensions
 	private boolean confirmExtensionOverride(	@NotNull Collection<String> extensions,
-												@NotNull String message) {
+												@NotNull Msg msg) {
 		LazyList<String> overridingExtensions = new LazyList<String>();
 		for (String extension : extensions)
 			if (ParseService.isBuiltInExtension(index.getConfig(), extension))
@@ -191,7 +174,7 @@ final class FileConfigPanel extends ConfigPanel {
 					overridingExtensions.add(extension);
 		
 		if (!overridingExtensions.isEmpty()) {
-			message = String.format(message, Util.join(", ", overridingExtensions));
+			String message = msg.format(Util.join(", ", overridingExtensions));
 			if (!AppUtil.showConfirmation(message, true))
 				return false;
 		}

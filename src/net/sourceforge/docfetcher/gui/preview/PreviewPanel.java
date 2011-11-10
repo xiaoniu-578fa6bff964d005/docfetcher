@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.gui.preview;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
@@ -87,7 +88,7 @@ public final class PreviewPanel extends Composite {
 		
 		delayedOverlay = new DelayedOverlay(stackComp);
 		delayedOverlay.setDelay(500);
-		delayedOverlay.setMessage("Loading..."); // TODO i18n
+		delayedOverlay.setMessage(Msg.loading.get());
 		
 		errorField = new StyledText(this, SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
 		errorField.setMargins(5, 5, 5, 5);
@@ -249,7 +250,7 @@ public final class PreviewPanel extends Composite {
 				boolean wasShown = !gridData.exclude;
 				gridData.exclude = !show;
 				
-				errorField.setText(show ? message : "");
+				errorField.setText(show ? message : ""); //$NON-NLS-1$
 				
 				assert (lightRed == null) == !wasShown;
 				if (show && !wasShown) {
@@ -288,6 +289,11 @@ public final class PreviewPanel extends Composite {
 	                              	final boolean isPlainTextFile,
 									final long requestCount,
 									final boolean append) {
+		/*
+		 * TODO now: Number of characters in the text preview should be limited,
+		 * see setting Pref.Int.PreviewLimit.getValue(). -> Don't append error
+		 * message to preview text, instead display error message in error bar.
+		 */
 		return runSafely(requestCount, textPreview, new Runnable() {
 			public void run() {
 				textPreview.setUseMonoFont(isPlainTextFile);
@@ -346,7 +352,6 @@ public final class PreviewPanel extends Composite {
 			final FileResource htmlResource = doc.getFileResource();
 			boolean success = runSafely(startCount, stackComp, new Runnable() {
 				public void run() {
-					// TODO websearch: Browser may not be available on the system -> will throw an SWTError
 					htmlPreview.setFile(htmlResource.getFile(), true);
 					lastHtmlResource = htmlResource; // Save a reference for disposal
 				}
@@ -449,10 +454,10 @@ public final class PreviewPanel extends Composite {
 				doRun(hider);
 			}
 			catch (ParseException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
+				setError(e.getMessage(), startCount);
 			}
 			catch (FileNotFoundException e) {
-				setError("Error: " + e.getMessage(), startCount); // TODO i18n
+				setError(e.getMessage(), startCount);
 			}
 			catch (CheckedOutOfMemoryError e) {
 				UtilGui.showOutOfMemoryMessage(PreviewPanel.this, e);

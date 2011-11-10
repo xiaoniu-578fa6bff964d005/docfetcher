@@ -15,9 +15,9 @@ import java.io.File;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.enums.SystemConf;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
 import net.sourceforge.docfetcher.model.IndexRegistry;
@@ -91,11 +91,9 @@ public final class IndexingDialog implements Dialog {
 		this.indexRegistry = indexRegistry;
 
 		// Create shell
-		int style = SWT.SHELL_TRIM;
-		if (!SystemConf.Bool.IsDevelopmentVersion.get()) // TODO pre-release: remove after testing
-			style |= SWT.PRIMARY_MODAL;
+		int style = SWT.SHELL_TRIM | SWT.PRIMARY_MODAL;
 		shell = new Shell(parentShell, style);
-		shell.setText("index_management"); // TODO i18n
+		shell.setText(Msg.indexing_queue.get());
 		shell.setImage(Img.INDEXING_DIALOG.get());
 		shell.setLayout(Util.createFillLayout(5));
 		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
@@ -124,10 +122,8 @@ public final class IndexingDialog implements Dialog {
 	private void initToolBarMenu(@NotNull ToolBar toolBar) {
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		
-		// TODO i18n for all buttons
-		
 		final ToolItem addItem = tif.image(Img.ADD.get())
-				.toolTip("add_to_queue").create();
+				.toolTip(Msg.add_to_queue.get()).create();
 		
 		addItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -161,7 +157,7 @@ public final class IndexingDialog implements Dialog {
 					addItem, tabFolder);
 				
 				menuManager.add(new ChildDialogAction(
-					Img.FOLDER.get(), "Add Folder...") {
+					Img.FOLDER.get(), Msg.add_folder.get()) {
 					public boolean doRun() {
 						return IndexPanel.createFileTaskFromDialog(
 							shell, indexRegistry, null, true);
@@ -171,7 +167,7 @@ public final class IndexingDialog implements Dialog {
 				menuManager.addSeparator();
 
 				menuManager.add(new ChildDialogAction(
-					Img.PACKAGE.get(), "Add Archive...") {
+					Img.PACKAGE.get(), Msg.add_archive.get()) {
 					public boolean doRun() {
 						return IndexPanel.createFileTaskFromDialog(
 							shell, indexRegistry, null, false);
@@ -179,7 +175,7 @@ public final class IndexingDialog implements Dialog {
 				});
 
 				menuManager.add(new ChildDialogAction(
-					Img.EMAIL.get(), "Add Outlook PST...") {
+					Img.EMAIL.get(), Msg.add_outlook_pst.get()) {
 					public boolean doRun() {
 						return IndexPanel.createOutlookTaskFromDialog(
 							shell, indexRegistry, null);
@@ -187,7 +183,7 @@ public final class IndexingDialog implements Dialog {
 				});
 				
 				menuManager.add(new MenuAction(
-					Img.CLIPBOARD.get(), "Add From Clipboard...") {
+					Img.CLIPBOARD.get(), Msg.add_from_clipboard.get()) {
 					public void run() {
 						IndexPanel.createTaskFromClipboard(
 							shell, indexRegistry, null);
@@ -198,7 +194,7 @@ public final class IndexingDialog implements Dialog {
 			}
 		});
 		
-		tif.image(Img.HIDE.get()).toolTip("Minimize To Status Bar")
+		tif.image(Img.HIDE.get()).toolTip(Msg.minimize_to_status_bar.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						Rectangle bounds = shell.getBounds();
@@ -319,13 +315,11 @@ public final class IndexingDialog implements Dialog {
 	@Nullable
 	private CancelAction confirmCancel() {
 		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
-		dialog.setTitle("Abort Indexing?");
-		dialog.setText("You are about to abort an indexing process. Do you want to keep the"
-			+ " index created so far? Keeping it allows you to continue indexing later by running an index update.");
-		
-		dialog.addButton("&Keep", CancelAction.KEEP);
-		dialog.addButton("&Discard", CancelAction.DISCARD);
-		dialog.addButton("Don't &Abort", null);
+		dialog.setTitle(Msg.abort_indexing.get());
+		dialog.setText(Msg.keep_partial_index.get());
+		dialog.addButton(Msg.keep.get(), CancelAction.KEEP);
+		dialog.addButton(Msg.discard.get(), CancelAction.DISCARD);
+		dialog.addButton(Msg.dont_abort.get(), null);
 		return dialog.open();
 	}
 

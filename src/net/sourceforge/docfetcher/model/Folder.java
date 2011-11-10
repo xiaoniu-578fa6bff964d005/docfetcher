@@ -209,15 +209,17 @@ public abstract class Folder
 	
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
-	public synchronized final void putSubFolder(@NotNull F subFolder) {
-		if (subFolders == null)
-			subFolders = Maps.newHashMap();
-		if (subFolder.parent != null)
-			subFolder.parent.subFolders.remove(subFolder);
-		subFolder.parent = (F) this;
-		subFolder.path = null;
-		subFolder.updatePathHashCode();
-		subFolders.put(subFolder.getName(), subFolder);
+	public final void putSubFolder(@NotNull F subFolder) {
+		synchronized (this) {
+			if (subFolders == null)
+				subFolders = Maps.newHashMap();
+			if (subFolder.parent != null)
+				subFolder.parent.subFolders.remove(subFolder);
+			subFolder.parent = (F) this;
+			subFolder.path = null;
+			subFolder.updatePathHashCode();
+			subFolders.put(subFolder.getName(), subFolder);
+		}
 		evtFolderAdded.fire(new FolderEvent(this, subFolder));
 	}
 	
@@ -234,23 +236,27 @@ public abstract class Folder
 			documents = null;
 	}
 	
-	public synchronized final void removeChildren() {
-		if (documents != null) {
-			for (D doc : documents.values())
-				doc.parent = null;
-			documents.clear();
-			documents = null;
-		}
-		if (subFolders != null) {
-			Collection<F> toNotify = subFolders.values();
-			subFolders = null;
-			for (F subFolder : toNotify) {
-				subFolder.path = subFolder.getPath();
-				subFolder.parent = null;
+	public final void removeChildren() {
+		Collection<F> toNotify = subFolders == null
+			? Collections.<F>emptyList()
+			: subFolders.values();
+		synchronized (this) {
+			if (documents != null) {
+				for (D doc : documents.values())
+					doc.parent = null;
+				documents.clear();
+				documents = null;
 			}
-			for (F subFolder : toNotify)
-				evtFolderRemoved.fire(new FolderEvent(this, subFolder));
+			if (subFolders != null) {
+				subFolders = null;
+				for (F subFolder : toNotify) {
+					subFolder.path = subFolder.getPath();
+					subFolder.parent = null;
+				}
+			}
 		}
+		for (F subFolder : toNotify)
+			evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
 	
 	/**
@@ -258,22 +264,26 @@ public abstract class Folder
 	 * subfolder is null. After it is removed, it will still have a valid path
 	 * that can be obtained via {@link #getPath()}.
 	 */
-	public synchronized final void removeSubFolder(@Nullable F subFolder) {
-		if (subFolders == null || subFolder == null)
+	public final void removeSubFolder(@Nullable F subFolder) {
+		if (subFolder == null)
 			return;
-		F candidate = subFolders.remove(subFolder.getName());
-		Util.checkThat(candidate == subFolder);
-		
-		/*
-		 * Folder instances must always either have a parent or a path, so we'll
-		 * reconstruct the subfolder's path and set it before we nullify the
-		 * parent.
-		 */
-		subFolder.path = subFolder.getPath();
-		subFolder.parent = null;
-		
-		if (subFolders.isEmpty())
-			subFolders = null;
+		synchronized (this) {
+			if (subFolders == null)
+				return;
+			F candidate = subFolders.remove(subFolder.getName());
+			Util.checkThat(candidate == subFolder);
+
+			/*
+			 * Folder instances must always either have a parent or a path, so we'll
+			 * reconstruct the subfolder's path and set it before we nullify the
+			 * parent.
+			 */
+			subFolder.path = subFolder.getPath();
+			subFolder.parent = null;
+
+			if (subFolders.isEmpty())
+				subFolders = null;
+		}
 		evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
 	
@@ -297,20 +307,22 @@ public abstract class Folder
 	 * obtained via {@link #getPath()}.
 	 */
 	public synchronized final void removeSubFolders(@NotNull Predicate<F> predicate) {
-		if (subFolders == null) return;
-		Iterator<F> subFolderIt = subFolders.values().iterator();
-		List<F> toNotify = new ArrayList<F>(subFolders.size());
-		while (subFolderIt.hasNext()) {
-			F subFolder = subFolderIt.next();
-			if (predicate.apply(subFolder)) {
-				subFolderIt.remove();
-				subFolder.path = subFolder.getPath();
-				subFolder.parent = null;
-				toNotify.add(subFolder);
+		List<F> toNotify = new ArrayList<F>(subFolders == null ? 0 : subFolders.size());
+		synchronized (this) {
+			if (subFolders == null) return;
+			Iterator<F> subFolderIt = subFolders.values().iterator();
+			while (subFolderIt.hasNext()) {
+				F subFolder = subFolderIt.next();
+				if (predicate.apply(subFolder)) {
+					subFolderIt.remove();
+					subFolder.path = subFolder.getPath();
+					subFolder.parent = null;
+					toNotify.add(subFolder);
+				}
 			}
+			if (subFolders.isEmpty())
+				subFolders = null;
 		}
-		if (subFolders.isEmpty())
-			subFolders = null;
 		for (F subFolder : toNotify)
 			evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}

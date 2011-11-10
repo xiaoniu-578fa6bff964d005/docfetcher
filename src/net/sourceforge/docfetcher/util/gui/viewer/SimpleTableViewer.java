@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.util.gui.viewer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -193,13 +194,10 @@ public final class SimpleTableViewer<E> {
 		return elementToItemMap.size();
 	}
 	
-	@NotNull
-	public void showElement(int index) {
+	public void showElement(@NotNull E element) {
 		Util.checkThat(!elementToItemMap.isEmpty());
-		Util.checkThat(index >= 0 && index < elementToItemMap.size());
-		TableItem item = elementToItemMap.getEntry(index).getValue();
+		TableItem item = elementToItemMap.getValue(element);
 		table.showItem(item);
-		table.setSelection(index);
 	}
 	
 	@MutableCopy
@@ -211,6 +209,26 @@ public final class SimpleTableViewer<E> {
 		for (TableItem item : selection)
 			selElements.add((E) item.getData());
 		return selElements;
+	}
+	
+	public void setSelection(@NotNull E element) {
+		Util.checkNotNull(element);
+		TableItem item = elementToItemMap.getValue(element);
+		Util.checkNotNull(item);
+		table.setSelection(item);
+	}
+	
+	public void setSelection(@NotNull Collection<E> selection) {
+		Util.checkNotNull(selection);
+		TableItem[] selItems = new TableItem[selection.size()];
+		int i = 0;
+		for (E element : selection) {
+			TableItem item = elementToItemMap.getValue(element);
+			Util.checkNotNull(item);
+			selItems[i] = item;
+			i++;
+		}
+		table.setSelection(selItems);
 	}
 	
 	@MutableCopy

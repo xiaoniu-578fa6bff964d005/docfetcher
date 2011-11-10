@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -47,10 +48,32 @@ final class ProgressReporter extends IndexingReporter {
 	}
 	
 	public void setEndTime(long time) {
-		long duration = (time - start) / 1000;
-		String msg = "Duration: " + duration + " s";
+		String duration = toHumanReadableDuration(time - start);
+		String msg = Msg.total_elapsed_time.format(duration);
 		progressTable.append(msg);
-		Util.println(msg); // TODO pre-release: remove this
+	}
+	
+	/**
+	 * Converts the given period of time in milliseconds into something more
+	 * human-friendly (e.g. "1 h 24 min 3 s").
+	 */
+	@NotNull
+	private static String toHumanReadableDuration(long millis) {
+		int secs = (int) (millis / 1000);
+		int hrs = secs / 3600;
+		secs -= hrs * 3600;
+		int mins = secs / 60;
+		secs -= mins * 60;
+		String ret = ""; //$NON-NLS-1$
+		if (hrs != 0)
+			ret += hrs + " h"; //$NON-NLS-1$
+		if (mins != 0)
+			ret += (hrs == 0 ? "" : " ") + mins + " min"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (secs != 0)
+			ret += (hrs == 0 && mins == 0 ? "" : " ") + secs + " s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (ret.equals("")) //$NON-NLS-1$
+			return "0 s"; //$NON-NLS-1$
+		return ret;
 	}
 	
 	public void info(@NotNull IndexingInfo info) {
@@ -76,8 +99,8 @@ final class ProgressReporter extends IndexingReporter {
 	}
 	
 	public void fail(@NotNull IndexingError error) {
-		progressTable.append("ERROR " + error.getErrorType().name() + ": "
-				+ error.getTreeNode().getDisplayName());
+		String displayName = error.getTreeNode().getDisplayName();
+		progressTable.append("### " + Msg.error.format(displayName));
 		errorTable.addError(error);
 	}
 

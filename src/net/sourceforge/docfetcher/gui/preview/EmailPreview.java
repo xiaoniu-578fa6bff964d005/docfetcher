@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.util.AppUtil;
@@ -92,7 +93,7 @@ final class EmailPreview extends Composite {
 		tabFolder.setTopRight(toolBarWithTextViewer.getToolBar());
 
 		CTabItem tabItem = new CTabItem(tabFolder, SWT.NONE);
-		tabItem.setText("Email");
+		tabItem.setText(Msg.email.get());
 		tabItem.setImage(Img.EMAIL.get());
 
 		tabItem.setControl(createEmailTab(tabFolder));
@@ -122,14 +123,14 @@ final class EmailPreview extends Composite {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new FormLayout());
 		
-		Label fromLabel = createHeaderLabel(comp, "From:"); // TODO i18n
+		Label fromLabel = createHeaderLabel(comp, Msg.from_field.get());
 		fromField = createHeaderField(comp);
-		Label toLabel = createHeaderLabel(comp, "To:"); // TODO i18n
+		Label toLabel = createHeaderLabel(comp, Msg.to_field.get());
 		toField = createHeaderField(comp);
 		
-		Label subjectLabel = createHeaderLabel(comp, "Subject:"); // TODO i18n
+		Label subjectLabel = createHeaderLabel(comp, Msg.subject_field.get());
 		subjectField = createHeaderField(comp);
-		Label dateLabel = createHeaderLabel(comp, "Date:"); // TODO i18n
+		Label dateLabel = createHeaderLabel(comp, Msg.date_field.get());
 		dateField = createHeaderField(comp);
 		
 		allFields = new StyledText[] {

@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -51,14 +52,15 @@ public final class MultiFileLauncher {
 		// Abort with an error message if any files are missing
 		if (!missing.isEmpty()) {
 			String items = Util.join("\n", missing);
-			String msg = "Files or folders not found:" + "\n" + items; // TODO i18n
+			String msg = Msg.files_or_folders_not_found.format(items);
 			AppUtil.showError(msg, true, false);
 			return false;
 		}
 		
 		// Abort with an error message if the user tried to open too many files
 		if (files.getVirtualSize() > files.getCapacity()) {
-			AppUtil.showError("open_limit", true, true); // TODO i18n
+			String msg = Msg.open_limit.format(UtilGui.OPEN_LIMIT);
+			AppUtil.showError(msg, true, true);
 			return false;
 		}
 		

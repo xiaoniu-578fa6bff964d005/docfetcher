@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.MultiFileLauncher;
 import net.sourceforge.docfetcher.model.index.IndexingError;
@@ -22,6 +23,8 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
+import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer;
+import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer.Column;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -29,48 +32,55 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author Tran Nam Quang
  */
 final class ErrorTable {
 	
-	private final Table table;
+	private final SimpleTableViewer<IndexingError> tv;
 	
 	public ErrorTable(@NotNull Composite parent) {
 		int style = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER;
-		table = new Table(parent, style);
-		table.setLinesVisible(true);
-		table.setHeaderVisible(true);
+		tv = new SimpleTableViewer<IndexingError>(parent, style);
+		tv.getControl().setLinesVisible(true);
 		
-		// TODO i18n: column titles, context menu entries
+		tv.addColumn(new Column<IndexingError>(Msg.document.get()) {
+			protected String getLabel(IndexingError element) {
+				return element.getTreeNode().getDisplayName();
+			}
+		});
 		
-		TableColumn errorTypeCol = new TableColumn(table, SWT.LEFT);
-		TableColumn pathCol = new TableColumn(table, SWT.LEFT);
-		errorTypeCol.setText("error_type");
-		pathCol.setText("property_path");
-		SettingsConf.ColumnWidths.IndexingErrorTable.bind(table);
+		tv.addColumn(new Column<IndexingError>(Msg.error_message.get()) {
+			protected String getLabel(IndexingError element) {
+				return element.getLocalizedMessage();
+			}
+		});
+		
+		tv.addColumn(new Column<IndexingError>(Msg.path.get()) {
+			protected String getLabel(IndexingError element) {
+				return element.getTreeNode().getPath().getCanonicalPath();
+			}
+		});
+		
+		SettingsConf.ColumnWidths.IndexingErrorTable.bind(tv.getControl());
 		
 		/*
 		 * Open file associated with error item on doubleclick or when spacebar
 		 * is pressed.
 		 */
-		table.addSelectionListener(new SelectionAdapter() {
+		tv.getControl().addSelectionListener(new SelectionAdapter() {
 			public void widgetDefaultSelected(SelectionEvent e) {
-				TableItem item = (TableItem) e.item;
-				launchSelection(item);
+				launchSelection();
 			}
 		});
 		
 		// Some keyboard shortcuts
-		table.addKeyListener(new KeyAdapter() {
+		tv.getControl().addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				if (e.stateMask == SWT.MOD1) {
 					switch (e.keyCode) {
-					case 'a': table.selectAll(); break;
+					case 'a': tv.getControl().selectAll(); break;
 					case 'c': copySelectedErrorsToClipboard(); break;
 					}
 				}
@@ -83,26 +93,23 @@ final class ErrorTable {
 	@ThreadSafe
 	public void addError(@NotNull final IndexingError error) {
 		Util.checkNotNull(error);
-		Util.runAsyncExec(table, new Runnable() {
+		Util.runAsyncExec(tv.getControl(), new Runnable() {
 			public void run() {
-				TableItem item = new TableItem(table, SWT.NONE);
-				String errorType = error.getErrorType().name();
-				String filePath = error.getTreeNode().getPath().getCanonicalPath();
-				item.setText(new String[] {errorType, filePath});
+				tv.add(error);
+				tv.showElement(error);
 			}
 		});
 	}
 
 	private void initContextMenu() {
-		ContextMenuManager menuManager = new ContextMenuManager(table);
+		ContextMenuManager menuManager = new ContextMenuManager(tv.getControl());
 		
-		menuManager.add(new MenuAction("open") {
+		menuManager.add(new MenuAction(Msg.open.get()) {
 			public boolean isEnabled() {
-				return table.getSelectionCount() > 0;
+				return !tv.getSelection().isEmpty();
 			}
 			public void run() {
-				TableItem[] selection = table.getSelection();
-				launchSelection(selection);
+				launchSelection();
 			}
 			public boolean isDefaultItem() {
 				// TODO now: windows: Does this work on Windows?
@@ -110,16 +117,17 @@ final class ErrorTable {
 			}
 		});
 		
-		menuManager.add(new MenuAction("open_parent") {
+		menuManager.add(new MenuAction(Msg.open_parent.get()) {
 			public boolean isEnabled() {
-				return table.getSelectionCount() > 0;
+				return !tv.getSelection().isEmpty();
 			}
 			public void run() {
 				MultiFileLauncher launcher = new MultiFileLauncher();
-				for (TableItem item : table.getSelection()) {
-					File file = Util.getParentFile(item.getText(1));
-					if (file.exists())
-						launcher.addFile(file);
+				for (IndexingError error : tv.getSelection()) {
+					File file = error.getTreeNode().getPath().getCanonicalFile();
+					File parent = Util.getParentFile(file);
+					if (parent.exists())
+						launcher.addFile(parent);
 				}
 				launcher.launch();
 			}
@@ -127,9 +135,9 @@ final class ErrorTable {
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction("copy\tCtrl+C") {
+		menuManager.add(new MenuAction(Msg.copy.get()) {
 			public boolean isEnabled() {
-				return table.getItemCount() > 0;
+				return tv.getItemCount() > 0;
 			}
 			public void run() {
 				copySelectedErrorsToClipboard();
@@ -143,26 +151,26 @@ final class ErrorTable {
 	 * there are no errors, this method does nothing.
 	 */
 	private void copySelectedErrorsToClipboard() {
-		if (table.getItemCount() == 0)
+		if (tv.getItemCount() == 0)
 			return;
 		
-		TableItem[] items = table.getSelection();
-		if (items.length == 0)
-			items = table.getItems();
+		List<IndexingError> errors = tv.getSelection();
+		if (errors.isEmpty())
+			tv.getElements();
 		
-		List<File> files = new ArrayList<File>(items.length);
-		for (int i = 0; i < items.length; i++)
-			files.add(new File(items[i].getText(1)));
+		List<File> files = new ArrayList<File>(errors.size());
+		for (IndexingError error : errors)
+			files.add(error.getTreeNode().getPath().getCanonicalFile());
 		
 		Util.setClipboard(files);
 	}
 
-	private void launchSelection(@NotNull TableItem... selection) {
+	private void launchSelection() {
 		MultiFileLauncher launcher = new MultiFileLauncher();
-		for (TableItem item : selection) {
+		for (IndexingError error : tv.getSelection()) {
 			// Ignore non-existent files - these could be archive entries or
 			// Outlook PST entries
-			File file = new File(item.getText(1));
+			File file = error.getTreeNode().getPath().getCanonicalFile();
 			if (file.exists())
 				launcher.addFile(file);
 		}

@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.indexing;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.util.Util;
@@ -34,12 +35,11 @@ final class ProgressPanel {
 	public ProgressPanel(@NotNull Composite parent) {
 		sash = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
 		
-		// TODO i18n
 		Group topGroup = new Group(sash, SWT.SHADOW_OUT);
-		topGroup.setText("progress");
+		topGroup.setText(Msg.progress.get());
 		topGroup.setLayout(Util.createFillLayout(1));
 		Group bottomGroup = new Group(sash, SWT.SHADOW_OUT);
-		bottomGroup.setText("errors");
+		bottomGroup.setText(Msg.errors.get());
 		bottomGroup.setLayout(Util.createFillLayout(1));
 		
 		SettingsConf.SashWeights.ProgressPanel.bind(sash);

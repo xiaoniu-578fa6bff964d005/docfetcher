@@ -12,7 +12,7 @@
 package net.sourceforge.docfetcher.util.gui.dialog;
 
 import net.sourceforge.docfetcher.util.Util;
-import net.sourceforge.docfetcher.util.AppUtil.Msg;
+import net.sourceforge.docfetcher.util.AppUtil.Messages;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
@@ -34,7 +34,7 @@ public class StackTraceWindow {
 	
 	public StackTraceWindow(Display display) {
 		shell = new Shell(display, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM | SWT.RESIZE);
-		shell.setText(Msg.system_error.get()); // Default shell title
+		shell.setText(Messages.system_error.get()); // Default shell title
 		
 		label = new Link(shell, SWT.NONE);
 		label.addSelectionListener(new SelectionAdapter() {

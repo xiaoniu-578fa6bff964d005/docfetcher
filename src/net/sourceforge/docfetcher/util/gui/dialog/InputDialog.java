@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.util.gui.dialog;
 
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
@@ -31,11 +32,6 @@ import org.eclipse.swt.widgets.Shell;
  * @author Tran Nam Quang
  */
 public class InputDialog {
-	
-	// TODO i18n
-	public static int BUTTON_WIDTH = 75;
-	public static String OK = "&OK";
-	public static String CANCEL = "&Cancel";
 	
 	private Shell shell;
 	private String answer;
@@ -70,8 +66,8 @@ public class InputDialog {
 		label.setText(msg);
 		text.setText(defaultValue);
 		text.setSelection(new Point(0, text.getText().length()));
-		okBt.setText(OK);
-		cancelBt.setText(CANCEL);
+		okBt.setText(AppUtil.Messages.ok.get());
+		cancelBt.setText(AppUtil.Messages.cancel.get());
 		
 		boolean leftAlign = shell.getDisplay().getDismissalAlignment() == SWT.LEFT;
 		Button leftBt = leftAlign ? okBt : cancelBt;
@@ -81,7 +77,7 @@ public class InputDialog {
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top().left().right().applyTo(label);
 		fdf.top(label).applyTo(text);
-		fdf.reset().minWidth(BUTTON_WIDTH).bottom().right().applyTo(rightBt);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(rightBt);
 		fdf.right(rightBt).applyTo(leftBt);
 		fdf.reset().left().right().bottom(rightBt).applyTo(separator);
 		fdf.top(text).bottom(separator).applyTo(fillerLabel);

@@ -21,6 +21,7 @@ import java.util.Set;
 
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.MultiFileLauncher;
 import net.sourceforge.docfetcher.gui.indexing.IndexingDialog;
@@ -191,13 +192,12 @@ public final class IndexPanel {
 		ContextMenuManager menuManager = new ContextMenuManager(tree);
 		// TODO pre-release: check that enabled states of menu items are set correctly
 		// TODO pre-release: check that keyboard shortcuts of menu items are set correctly
-		// TODO i18n menu item labels
 		
 		Menu indexSubMenu = menuManager.addSubmenu(new MenuAction(
-			"Create Index From"));
+			Msg.create_index_from.get()));
 		
 		menuManager.add(indexSubMenu, new MenuAction(
-			Img.FOLDER.get(), "Folder...") {
+			Img.FOLDER.get(), Msg.folder.get()) {
 			public void run() {
 				createFileTaskFromDialog(
 					tree.getShell(), indexRegistry, dialogFactory, true);
@@ -207,7 +207,7 @@ public final class IndexPanel {
 		menuManager.addSeparator(indexSubMenu);
 		
 		menuManager.add(indexSubMenu, new MenuAction(
-			Img.PACKAGE.get(), "Archive...") {
+			Img.PACKAGE.get(), Msg.archive.get()) {
 			public void run() {
 				createFileTaskFromDialog(
 					tree.getShell(), indexRegistry, dialogFactory, false);
@@ -215,7 +215,7 @@ public final class IndexPanel {
 		});
 		
 		menuManager.add(indexSubMenu, new MenuAction(
-			Img.EMAIL.get(), "Outlook PST...") {
+			Img.EMAIL.get(), Msg.outlook_pst.get()) {
 			public void run() {
 				createOutlookTaskFromDialog(
 					tree.getShell(), indexRegistry, dialogFactory);
@@ -224,7 +224,7 @@ public final class IndexPanel {
 		
 		// TODO now: Implement keyboard shortcut
 		menuManager.add(indexSubMenu, new MenuAction(
-			Img.CLIPBOARD.get(), "Clipboard...\tCtrl+V") {
+			Img.CLIPBOARD.get(), Msg.clipboard.get()) {
 			public void run() {
 				createTaskFromClipboard(
 					tree.getShell(), indexRegistry, dialogFactory);
@@ -261,31 +261,29 @@ public final class IndexPanel {
 				
 				for (LuceneIndex index : sel) {
 					Rejection rejection = queue.addTask(index, action);
-					
 					if (action == IndexAction.REBUILD)
 						assert rejection == null;
 				}
 			}
 		}
-		menuManager.add(new UpdateOrRebuildAction("Update Index...", true));
-		menuManager.add(new UpdateOrRebuildAction("Rebuild Index...", false));
+		menuManager.add(new UpdateOrRebuildAction(Msg.update_index.get(), true));
+		menuManager.add(new UpdateOrRebuildAction(Msg.rebuild_index.get(), false));
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction("Remove Index...") {
+		menuManager.add(new MenuAction(Msg.remove_index.get()) {
 			public boolean isEnabled() {
 				return isOnlyIndexesSelected();
 			}
 			public void run() {
 				List<LuceneIndex> selectedIndexes = getSelectedIndexes();
 				assert !selectedIndexes.isEmpty();
-				// TODO i18n
-				if (AppUtil.showConfirmation("remove_sel_indexes", false))
+				if (AppUtil.showConfirmation(Msg.remove_sel_indexes.get(), false))
 					indexRegistry.removeIndexes(selectedIndexes, true);
 			}
 		});
 		
-		menuManager.add(new MenuAction("Remove Orphaned Indexes") {
+		menuManager.add(new MenuAction(Msg.remove_orphaned_indexes.get()) {
 			public boolean isEnabled() {
 				return tree.getItemCount() > 0;
 			}
@@ -297,8 +295,8 @@ public final class IndexPanel {
 						toRemove.add(index);
 				if (toRemove.isEmpty())
 					return;
-				// TODO i18n; also display the indexes to be removed
-				String msg = "remove_orphaned_indexes_msg";
+				// TODO post-release-1.1: Also display the indexes to be removed?
+				String msg = Msg.remove_orphaned_indexes_msg.get();
 				if (AppUtil.showConfirmation(msg, false))
 					indexRegistry.removeIndexes(toRemove, true);
 			}
@@ -309,7 +307,7 @@ public final class IndexPanel {
 		class CheckAllAction extends MenuAction {
 			private final boolean checkAll;
 			public CheckAllAction(boolean checkAll) {
-				super(checkAll ? "Check All" : "Uncheck All");
+				super(checkAll ? Msg.check_all.get() : Msg.uncheck_all.get());
 				this.checkAll = checkAll;
 			}
 			public boolean isEnabled() {
@@ -326,7 +324,7 @@ public final class IndexPanel {
 		menuManager.add(new CheckAllAction(true));
 		menuManager.add(new CheckAllAction(false));
 		
-		menuManager.add(new MenuAction("Toggle Individual Check State") {
+		menuManager.add(new MenuAction(Msg.check_single.get()) {
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
 			}
@@ -349,7 +347,7 @@ public final class IndexPanel {
 		
 		menuManager.addSeparator();
 		
-		menuManager.add(new MenuAction("Open Folder") {
+		menuManager.add(new MenuAction(Msg.open_folder.get()) {
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
 			}
@@ -377,7 +375,7 @@ public final class IndexPanel {
 			}
 		});
 		
-		menuManager.add(new MenuAction("List Documents") {
+		menuManager.add(new MenuAction(Msg.list_docs.get()) {
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
 			}
@@ -498,14 +496,14 @@ public final class IndexPanel {
 			protected String getNewValue(String lastValue) {
 				if (dirNotFile) {
 					DirectoryDialog dialog = new DirectoryDialog(shell);
-					dialog.setText("scope_folder_title"); // TODO i18n
-					dialog.setMessage("scope_folder_msg"); // TODO i18n
+					dialog.setText(Msg.select_folder_title.get());
+					dialog.setMessage(Msg.select_folder_msg.get());
 					dialog.setFilterPath(lastValue);
 					return dialog.open();
 				}
 				else {
 					FileDialog dialog = new FileDialog(shell);
-					dialog.setText("scope_folder_title"); // TODO i18n
+					dialog.setText(Msg.select_archive_title.get());
 					dialog.setFilterPath(lastValue);
 					return dialog.open();
 				}
@@ -519,7 +517,7 @@ public final class IndexPanel {
 					index, IndexAction.CREATE);
 				if (rejection == null)
 					return null;
-				return "Rejected!"; // TODO i18n
+				return getMessage(rejection);
 			}
 
 			protected Object onAccept(String newValue) {
@@ -543,17 +541,17 @@ public final class IndexPanel {
 
 		File pstFile = getOutlookPSTFile();
 		if (pstFile != null) {
-			// TODO now: windows: If the path is very long, the message dialog's width is too large
-			// TODO now: windows: Don't open the file chooser if the user clicks OK on this message dialog
-			String msg = "PST file found: " + pstFile + ". Index this file?";
-			if (AppUtil.showConfirmation(msg, false)) // TODO i18n
+			// TODO post-release-1.1: windows: If the path is very long, the message dialog's width is too large
+			// TODO post-release-1.1: windows: Don't open the file chooser if the user clicks OK on this message dialog
+			String msg = Msg.found_pst_file.format(pstFile.getPath());
+			if (AppUtil.showConfirmation(msg, false))
 				lastPath = pstFile.getPath();
 		}
 
 		Object success = new InputLoop<Object>() {
 			protected String getNewValue(String lastValue) {
 				FileDialog dialog = new FileDialog(shell);
-				// TODO i18n set dialog text and message
+				dialog.setText(Msg.select_outlook_pst_title.get());
 				dialog.setFilterExtensions(new String[] { "*.pst" });
 				dialog.setFilterNames(new String[] { "Outlook Personal Storage Table (*.pst)" });
 				if (!lastValue.equals(""))
@@ -569,7 +567,7 @@ public final class IndexPanel {
 					index, IndexAction.CREATE);
 				if (rejection == null)
 					return null;
-				return "Rejected!"; // TODO i18n
+				return getMessage(rejection);
 			}
 
 			protected Void onAccept(String newValue) {
@@ -614,7 +612,7 @@ public final class IndexPanel {
 												@Nullable final DialogFactory dialogFactory) {
 		List<File> files = Util.getFilesFromClipboard();
 		if (files == null) {
-			AppUtil.showError("No files found on the clipboard.", true, true); // TODO i18n
+			AppUtil.showError(Msg.no_files_in_cb.get(), true, true);
 			return;
 		}
 		if (files.isEmpty())
@@ -633,13 +631,25 @@ public final class IndexPanel {
 			index, IndexAction.CREATE);
 		
 		if (rejection != null)
-			AppUtil.showError("Rejected!", true, true); // TODO i18n
+			AppUtil.showError(getMessage(rejection), true, true);
 		else if (dialogFactory != null)
 			dialogFactory.open();
 	}
 	
 	public void openIndexingDialog() {
 		dialogFactory.open();
+	}
+	
+	@NotNull
+	private static String getMessage(@NotNull Rejection rejection) {
+		switch (rejection) {
+		case OVERLAP_WITH_REGISTRY:
+		case OVERLAP_WITH_QUEUE:
+		case SAME_IN_REGISTRY:
+		case SAME_IN_QUEUE:
+			return Msg.overlaps_not_allowed.get();
+		default: return "";
+		}
 	}
 
 }

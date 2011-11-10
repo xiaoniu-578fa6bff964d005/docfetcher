@@ -22,6 +22,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.Fields;
@@ -461,9 +462,8 @@ public final class Searcher {
 			return new QueryWrapper(query, isPhraseQuery);
 		}
 		catch (ParseException e) {
-			// TODO i18n
-			throw new SearchException("invalid_query.value" + "\n"
-					+ e.getMessage());
+			String msg = Msg.invalid_query.get() + "\n\n" + e.getMessage();
+			throw new SearchException(msg);
 		}
 	}
 	
@@ -476,7 +476,7 @@ public final class Searcher {
 		for (LuceneIndex index : indexes) {
 			File indexDir = index.getIndexDirPath().getCanonicalFile();
 			if (indexDir != null && !indexDir.isDirectory()) {
-				String msg = "folders_not_found"; // TODO i18n
+				String msg = "Folders not found:"; // TODO i18n folders_not_found
 				msg += "\n" + indexDir;
 				throw new SearchException(msg);
 			}

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.htmlparser.jericho.Source;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.chm4j.ChmEntry;
@@ -177,7 +178,7 @@ final class ChmParser extends FileParser {
 	}
 	
 	public String getTypeLabel() {
-		return "CHM"; // TODO i18n filetype_chm
+		return Msg.filetype_chm.get();
 	}
 
 }

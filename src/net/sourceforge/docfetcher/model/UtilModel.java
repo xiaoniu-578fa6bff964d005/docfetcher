@@ -23,7 +23,10 @@ import java.util.Map;
 
 import net.sourceforge.docfetcher.model.index.DiskSpaceException;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
 import net.sourceforge.docfetcher.model.index.IndexingException;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -244,6 +247,16 @@ public final class UtilModel {
 				&& oldLastModified.equals(newLastModified))
 			return true;
 		return false;
+	}
+	
+	// Reports the given error and saves it in the given tree node
+	public static final void fail(	@NotNull IndexingReporter reporter,
+									@NotNull ErrorType type,
+									@NotNull TreeNode treeNode,
+									@Nullable Throwable cause) {
+		IndexingError error = new IndexingError(type, treeNode, cause);
+		treeNode.setError(error);
+		reporter.fail(error);
 	}
 	
 }

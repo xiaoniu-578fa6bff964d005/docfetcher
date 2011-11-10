@@ -29,6 +29,7 @@ import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -44,25 +45,25 @@ abstract class OpenOfficeParser extends FileParser {
 	
 	public static final class OpenOfficeWriterParser extends OpenOfficeParser {
 		public OpenOfficeWriterParser() {
-			super("OpenOffice.org Writer", "odt", "ott"); // TODO i18n filetype_odt
+			super(Msg.filetype_odt.get(), "odt", "ott");
 		}
 	}
 	
 	public static final class OpenOfficeCalcParser extends OpenOfficeParser {
 		public OpenOfficeCalcParser() {
-			super("OpenOffice.org Calc", "ods", "ots"); // TODO i18n filetype_ods
+			super(Msg.filetype_ods.get(), "ods", "ots");
 		}
 	}
 	
 	public static final class OpenOfficeDrawParser extends OpenOfficeParser {
 		public OpenOfficeDrawParser() {
-			super("OpenOffice.org Draw", "odg", "otg"); // TODO i18n filetype_odg
+			super(Msg.filetype_odg.get(), "odg", "otg");
 		}
 	}
 	
 	public static final class OpenOfficeImpressParser extends OpenOfficeParser {
 		public OpenOfficeImpressParser() {
-			super("OpenOffice.org Impress", "odp", "otp"); // TODO i18n filetype_odp
+			super(Msg.filetype_odp.get(), "odp", "otp");
 		}
 	}
 	
@@ -100,7 +101,7 @@ abstract class OpenOfficeParser extends FileParser {
 			ZipEntry metaZipEntry = zipFile.getEntry("meta.xml"); //$NON-NLS-1$
 			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
 			if (manifZipEntry == null || metaZipEntry == null || contentZipEntry == null)
-				throw new ParseException("file_corrupted");
+				throw new ParseException(Msg.file_corrupted.get());
 
 			// Find out if file is password protected
 			InputStream manifInputStream = zipFile.getInputStream(manifZipEntry);
@@ -109,7 +110,7 @@ abstract class OpenOfficeParser extends FileParser {
 			manifSource.setLogger(null);
 			StartTag encryptTag = manifSource.getNextStartTag(0, "manifest:encryption-data"); //$NON-NLS-1$
 			if (encryptTag != null)
-				throw new ParseException("doc_pw_protected");
+				throw new ParseException(Msg.doc_pw_protected.get());
 			
 			// Get tags from meta.xml file
 			InputStream metaInputStream = zipFile.getInputStream(metaZipEntry);
@@ -182,7 +183,7 @@ abstract class OpenOfficeParser extends FileParser {
 			zipFile = new ZipFile(file);
 			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
 			if (contentZipEntry == null)
-				throw new ParseException("file_corrupted");
+				throw new ParseException(Msg.file_corrupted.get());
 			
 			InputStream in = zipFile.getInputStream(contentZipEntry);
 			in = new OpenDocumentTextInputStream(in);

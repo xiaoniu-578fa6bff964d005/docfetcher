@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.UtilModel;
@@ -182,10 +183,7 @@ public class IndexingConfig implements Serializable {
 		File customTempDir = getTempDir();
 		long usableSpace = customTempDir.getUsableSpace();
 		if (requiredSpace > usableSpace) {
-			String msg = "Not enough disk space on '%s' " +
-					"to unpack archive entries. " +
-					"Available: %s MB. Needed: %s MB.";
-			msg = String.format(msg,
+			String msg = Msg.not_enough_diskspace.format(
 					Util.getSystemAbsPath(customTempDir),
 					toMegabyteString(usableSpace),
 					toMegabyteString(requiredSpace)

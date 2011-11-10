@@ -10,6 +10,7 @@ import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
+import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError;
@@ -72,6 +73,9 @@ final class OutlookContext {
 		}
 		catch (IOException e) {
 			throw new IndexingException(e);
+		}
+		catch (CheckedOutOfMemoryError e) {
+			UtilModel.fail(reporter, ErrorType.OUT_OF_MEMORY, doc, e.getCause());
 		}
 	}
 	

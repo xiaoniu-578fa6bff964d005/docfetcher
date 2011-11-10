@@ -39,7 +39,7 @@ import com.sun.jna.platform.win32.Shell32Util;
 /**
  * A container for various utility methods. These aren't members of the
  * {@link Util} package because they depend on some enum constants defined in
- * {@link Const} and {@link Msg}. The <code>Const</code> constants must have
+ * {@link Const} and {@link Messages}. The <code>Const</code> constants must have
  * been set before any method of this class can be called, otherwise an
  * <code>Exception</code> will be thrown. Setting the <code>Msg</code>
  * constants, on the other hand, is optional.
@@ -112,7 +112,7 @@ public final class AppUtil {
 		}
 	}
 	
-	public static enum Msg {
+	public static enum Messages {
 		system_error ("System Error"),
 		confirm_operation ("Confirm Operation"),
 		invalid_operation ("Invalid Operation"),
@@ -122,11 +122,14 @@ public final class AppUtil {
 		program_running_launch_another (
 				"It seems {0} is already running. " +
 				"Do you want to launch another instance?"),
+		ok ("&OK"),
+		cancel ("&Cancel"),
 		;
 		
+		private static int setCount = 0;
 		private String value;
 		
-		Msg(String defaultValue) {
+		Messages(String defaultValue) {
 			this.value = defaultValue;
 		}
 		
@@ -136,6 +139,7 @@ public final class AppUtil {
 		
 		public void set(@NotNull String value) {
 			this.value = Util.checkNotNull(value);
+			setCount++;
 		}
 		
 		/**
@@ -144,6 +148,10 @@ public final class AppUtil {
 		 */
 		private String format(Object... args) {
 			return MessageFormat.format(value, args);
+		}
+		
+		public static void checkInitialized() {
+			Util.checkThat(values().length == setCount);
 		}
 	}
 	
@@ -250,8 +258,8 @@ public final class AppUtil {
 			Display display = new Display();
 			Shell shell = new Shell(display);
 			MessageBox msgBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
-			msgBox.setText(Msg.confirm_operation.value);
-			msgBox.setMessage(Msg.program_running_launch_another.format(Const.PROGRAM_NAME.value));
+			msgBox.setText(Messages.confirm_operation.value);
+			msgBox.setMessage(Messages.program_running_launch_another.format(Const.PROGRAM_NAME.value));
 			int ans = msgBox.open();
 			display.dispose();
 			if(ans != SWT.OK)
@@ -315,7 +323,7 @@ public final class AppUtil {
 		Shell shell = new Shell(display);
 		int style = SWT.OK | (isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING);
 		MessageBox msgBox = new MessageBox(shell, style);
-		msgBox.setText(Msg.system_error.value);
+		msgBox.setText(Messages.system_error.value);
 		msgBox.setMessage(message);
 		msgBox.open();
 		shell.dispose();
@@ -340,7 +348,7 @@ public final class AppUtil {
 				int style = SWT.OK | SWT.CANCEL;
 				style |= warningNotQuestion ? SWT.ICON_WARNING : SWT.ICON_QUESTION;
 				MessageBox msgBox = new MessageBox(getActiveShell(), style);
-				msgBox.setText(Msg.confirm_operation.value);
+				msgBox.setText(Messages.confirm_operation.value);
 				msgBox.setMessage(message);
 				answer = msgBox.open() == SWT.OK;
 			}
@@ -389,8 +397,8 @@ public final class AppUtil {
 				int style = SWT.OK;
 				style |= errorNotWarning ? SWT.ICON_ERROR : SWT.ICON_WARNING;
 				MessageBox msgBox = new MessageBox(getActiveShell(), style);
-				msgBox.setText(isUserError ? Msg.invalid_operation.value
-						: Msg.system_error.value);
+				msgBox.setText(isUserError ? Messages.invalid_operation.value
+						: Messages.system_error.value);
 				msgBox.setMessage(message);
 				msgBox.open();
 			}
@@ -479,7 +487,7 @@ public final class AppUtil {
 				StackTraceWindow window = new StackTraceWindow(display);
 				window.setTitle(throwable.getClass().getSimpleName());
 				String path = Util.getSystemAbsPath(traceFile);
-				String msg = Msg.program_died_stacktrace_written.format(path, path);
+				String msg = Messages.program_died_stacktrace_written.format(path, path);
 				window.setText(msg);
 				Image icon = display.getSystemImage(SWT.ICON_WARNING);
 				window.setTitleImage(icon);

@@ -85,7 +85,7 @@ privileged aspect CodeConventions {
 	&& !within(ConfLoader):
 		"Don't call Loadable.load(..) outside the ConfLoader class.";
 	
-	declare warning: (call(TFile+.new(java.io.File)) 
+	declare warning: (call(TFile+.new(java.io.File))
 			|| call(TFile+.new(String))
 			|| call(TFile+.new(URI))
 			|| call(TFile+.new(java.io.File, String))

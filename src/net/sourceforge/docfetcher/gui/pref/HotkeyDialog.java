@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.pref;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
@@ -49,10 +50,10 @@ final class HotkeyDialog {
 		shell = new Shell(parentShell, SWT.RESIZE | SWT.CLOSE | SWT.TITLE);
 		shell.setLayout(new FormLayout());
 		shell.setImage(Img.LETTERS.get());
-		shell.setText("keybox_title");
+		shell.setText(Msg.keybox_title.get());
 		
 		Label keyLabel = new Label(shell, SWT.NONE);
-		keyLabel.setText("keybox_msg");
+		keyLabel.setText(Msg.keybox_msg.get());
 		hotkeyBox = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
 		hotkeyBox.setText(UtilGui.toString(hotkey));
 		
@@ -65,11 +66,11 @@ final class HotkeyDialog {
 		Label hSpacer = new Label(shell, SWT.NONE);
 		
 		Button okBt = new Button(shell, SWT.PUSH);
-		okBt.setText("&OK");
+		okBt.setText(Msg.ok.get());
 		Button cancelBt = new Button(shell, SWT.PUSH);
-		cancelBt.setText("&Cancel");
+		cancelBt.setText(Msg.cancel.get());
 		Button restoreBt = new Button(shell, SWT.PUSH);
-		restoreBt.setText("&Restore Default");
+		restoreBt.setText(Msg.restore_default.get());
 		
 		boolean leftAlign = shell.getDisplay().getDismissalAlignment() == SWT.LEFT;
 		Button leftBt = leftAlign ? okBt : cancelBt;
@@ -78,7 +79,7 @@ final class HotkeyDialog {
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top(0, 10).left(0, 10).right(100, -10).applyTo(keyLabel);
 		fdf.top(keyLabel, 10).left(0, 10).right(100, -10).applyTo(hotkeyBox);
-		fdf.reset().minWidth(75).bottom().right().applyTo(rightBt);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(rightBt);
 		fdf.right(rightBt).applyTo(leftBt);
 		fdf.right(leftBt).applyTo(restoreBt);
 		fdf.minWidth(0).right(restoreBt).left().applyTo(hSpacer);

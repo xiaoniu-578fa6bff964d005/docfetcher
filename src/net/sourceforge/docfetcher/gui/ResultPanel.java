@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.Path;
@@ -55,8 +56,9 @@ import com.google.common.primitives.Longs;
  */
 public final class ResultPanel {
 	
-	// TODO now: show an additional icon if an email has attachments
+	// TODO post-release-1.1: show an additional icon if an email has attachments
 	// TODO post-release-1.1: show some helpful overlay message if a search yielded no results
+	// TODO post-release-1.1: implement context menu: copy paths to clipboard, including Mod1+C shortcut (also: Mod1+A for selecting all items)
 	
 	public enum HeaderMode {
 		FILES { protected void setLabel(VariableHeaderColumn<?> column) {
@@ -120,15 +122,13 @@ public final class ResultPanel {
 		viewer.setSortingEnabled(true);
 		initContextMenu();
 		
-		// TODO i18n
-		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				evtSelection.fire(viewer.getSelection());
 			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Title", "Subject") {
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>(Msg.title.get(), Msg.subject.get()) {
 			protected String getLabel(ResultDocument element) {
 				return element.getTitle();
 			}
@@ -142,7 +142,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Score [%]", SWT.RIGHT) {
+		viewer.addColumn(new Column<ResultDocument>(Msg.score.get(), SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.valueOf(element.getScore());
 			}
@@ -151,7 +151,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Size", SWT.RIGHT) {
+		viewer.addColumn(new Column<ResultDocument>(Msg.size.get(), SWT.RIGHT) {
 			protected String getLabel(ResultDocument element) {
 				return String.format("%,d KB", element.getSizeInKB());
 			}
@@ -160,7 +160,7 @@ public final class ResultPanel {
 			}
 		});
 
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Filename", "Sender") {
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>(Msg.filename.get(), Msg.sender.get()) {
 			protected String getLabel(ResultDocument element) {
 				if (element.isEmail())
 					return element.getSender();
@@ -171,7 +171,7 @@ public final class ResultPanel {
 			}
 		});
 
-		viewer.addColumn(new Column<ResultDocument>("Type") {
+		viewer.addColumn(new Column<ResultDocument>(Msg.type.get()) {
 			protected String getLabel(ResultDocument element) {
 				return element.getType();
 			}
@@ -180,7 +180,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new Column<ResultDocument>("Path") {
+		viewer.addColumn(new Column<ResultDocument>(Msg.path.get()) {
 			protected String getLabel(ResultDocument element) {
 				return element.getPath().getPath();
 			}
@@ -189,7 +189,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Authors", "Sender") {
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>(Msg.authors.get(), Msg.sender.get()) {
 			protected String getLabel(ResultDocument element) {
 				return element.getAuthors();
 			}
@@ -198,7 +198,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		viewer.addColumn(new VariableHeaderColumn<ResultDocument>("Last Modified", "Send Date") {
+		viewer.addColumn(new VariableHeaderColumn<ResultDocument>(Msg.last_modified.get(), Msg.send_date.get()) {
 			protected String getLabel(ResultDocument element) {
 				return dateFormat.format(getDate(element));
 			}
@@ -221,11 +221,9 @@ public final class ResultPanel {
 	}
 
 	private void initContextMenu() {
-		// TODO i18n
-		
 		ContextMenuManager menuManager = new ContextMenuManager(viewer.getControl());
 		
-		menuManager.add(new MenuAction("open") {
+		menuManager.add(new MenuAction(Msg.open.get()) {
 			public boolean isEnabled() {
 				List<ResultDocument> sel = viewer.getSelection();
 				if (sel.isEmpty())
@@ -243,7 +241,7 @@ public final class ResultPanel {
 			}
 		});
 		
-		menuManager.add(new MenuAction("open_parent") {
+		menuManager.add(new MenuAction(Msg.open_parent.get()) {
 			public boolean isEnabled() {
 				return !viewer.getSelection().isEmpty();
 			}
@@ -308,7 +306,7 @@ public final class ResultPanel {
 				updateColumnHeaders(headerMode);
 			this.presetHeaderMode = headerMode;
 		}
-		setActualHeaderMode(results); // TODO now: needs some refactoring
+		setActualHeaderMode(results); // TODO post-release-1.1: needs some refactoring
 		
 		viewer.setRoot(results);
 		viewer.scrollToTop();

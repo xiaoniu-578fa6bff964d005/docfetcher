@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Locale;
 
 import net.sourceforge.docfetcher.enums.SystemConf;
@@ -24,6 +25,8 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
  * @author Tran Nam Quang
  */
 final class ManualLocator {
+	
+	public static final String manualFilename = "DocFetcher_Manual.html";
 	
 	private ManualLocator() {}
 	
@@ -46,7 +49,24 @@ final class ManualLocator {
 		if (manualParentDir == null)
 			return null;
 		
-		return new File(manualParentDir, "DocFetcher_Manual.html");
+		return new File(manualParentDir, manualFilename);
+	}
+	
+	// Returns an empty string if the HTML file is not found.
+	@NotNull
+	public static String getMemoryLimitPageUrl() {
+		File manFile = getManualFile();
+		if (manFile == null)
+			return "";
+		String parentPath = Util.getParentFile(manFile).getPath();
+		String path = Util.joinPath(parentPath, "DocFetcher_Manual_files/Memory_Limit.html");
+		File htmlFile = new File(path);
+		try {
+			return htmlFile.toURI().toURL().toString();
+		}
+		catch (MalformedURLException e) {
+			return "";
+		}
 	}
 	
 	/**

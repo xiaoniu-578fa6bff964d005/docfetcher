@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.preview;
 
 import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -44,7 +45,7 @@ final class TextPreview extends ToolBarForm {
 			protected void createToolItems(ToolItemFactory tif) {
 				tif.style(SWT.PUSH);
 				htmlBt = tif.image(Img.BUILDING_BLOCKS.get())
-						.toolTip("use_embedded_html_viewer") // TODO i18n
+						.toolTip(Msg.use_embedded_html_viewer.get())
 						.listener(new SelectionAdapter() {
 							public void widgetSelected(SelectionEvent e) {
 								evtTextToHtmlBt.fire(null);

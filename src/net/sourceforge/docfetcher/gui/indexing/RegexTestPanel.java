@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -48,21 +49,19 @@ final class RegexTestPanel extends Composite {
 	private List<PatternAction> patternActions = Collections.emptyList();
 	private boolean storeRelativePaths;
 
-	// TODO i18n
-	
 	public RegexTestPanel(	@NotNull Composite parent,
 							@NotNull final LuceneIndex index) {
 		super(parent, SWT.NONE);
 		Util.checkNotNull(index);
 		label = new Label(this, SWT.NONE);
-		label.setText("regex_matches_file_no");
+		label.setText(Msg.sel_regex_matches_file_no.get());
 		fileBox = new Text(this, SWT.BORDER | SWT.SINGLE);
 		
 		Button fileChooserBt = Util.createPushButton(this, "...", new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 				dialog.setFilterPath(index.getCanonicalRootFile().getPath());
-				dialog.setText("choose_regex_testfile_title");
+				dialog.setText(Msg.choose_regex_testfile_title.get());
 				String filepath = dialog.open();
 				if (filepath == null)
 					return;
@@ -111,11 +110,11 @@ final class RegexTestPanel extends Composite {
 	private void updateLabel() {
 		try {
 			label.setText(matches()
-				? "regex_matches_file_yes"
-				: "regex_matches_file_no");
+				? Msg.sel_regex_matches_file_yes.get()
+				: Msg.sel_regex_matches_file_no.get());
 		}
 		catch (PatternSyntaxException e) {
-			label.setText("regex_matches_file: (Malformed regex)");
+			label.setText(Msg.sel_regex_malformed.get());
 		}
 	}
 	

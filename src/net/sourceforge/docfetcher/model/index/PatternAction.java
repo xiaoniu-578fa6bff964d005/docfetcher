@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -26,8 +27,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 @SuppressWarnings("serial")
 public final class PatternAction implements Serializable {
 	
-	// TODO i18n
-	
 	public enum MatchTarget {
 		FILENAME,
 		PATH,
@@ -35,8 +34,8 @@ public final class PatternAction implements Serializable {
 	}
 	
 	public enum MatchAction {
-		EXCLUDE ("Exclude"),
-		DETECT_MIME ("Detect mime type (slower)"),
+		EXCLUDE (Msg.exclude.get()),
+		DETECT_MIME (Msg.detect_mime_type.get()),
 		;
 		public final String displayName;
 

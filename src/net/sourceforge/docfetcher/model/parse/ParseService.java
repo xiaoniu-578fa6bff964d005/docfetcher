@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Path;
@@ -233,7 +235,7 @@ public final class ParseService {
 		if (config.isIndexFilenames())
 			return new ParseResult("").setParserName(FILENAME_PARSER);
 		
-		throw new ParseException(new ParserNotFoundException());
+		throw new ParseException(Msg.parser_not_found.get());
 	}
 
 	// accepts TrueZIP files
@@ -350,7 +352,7 @@ public final class ParseService {
 		 * then moves DocFetcher to Mac OS X and tries to view the indexed CHM
 		 * file in the preview panel.
 		 */
-		throw new ParseException("Can't find a suitable parser.");
+		throw new ParseException(Msg.parser_not_found.get());
 //		throw new IllegalArgumentException();
 	}
 	
