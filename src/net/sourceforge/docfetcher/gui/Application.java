@@ -80,6 +80,8 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
 public final class Application {
+	
+	// TODO post-release-1.1: review visibility of all DocFetcher classes
 
 	/** The widths of the sashes in pixels */
 	private static final int sashWidth = 5;
@@ -235,13 +237,16 @@ public final class Application {
 			}
 		});
 		
-		// TODO pre-release: mark classes in gui package as final / package-visible when
-		// possible -> move GUI classes above into gui package
-
 		shell.open();
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
+			try {
+				if (!display.readAndDispatch())
+					display.sleep();
+			}
+			catch (Throwable t) {
+				AppUtil.showStackTrace(t);
+				continue;
+			}
 		}
 
 		/*

@@ -118,7 +118,7 @@ public final class AppUtil {
 		invalid_operation ("Invalid Operation"),
 		program_died_stacktrace_written (
 				"This program just died! " +
-				"The stacktrace below has been written to <a href=\"{0}\">{1}</a>."),
+				"The stacktrace below has been written to {0}."),
 		program_running_launch_another (
 				"It seems {0} is already running. " +
 				"Do you want to launch another instance?"),
@@ -487,7 +487,8 @@ public final class AppUtil {
 				StackTraceWindow window = new StackTraceWindow(display);
 				window.setTitle(throwable.getClass().getSimpleName());
 				String path = Util.getSystemAbsPath(traceFile);
-				String msg = Messages.program_died_stacktrace_written.format(path, path);
+				String link = String.format("<a href=\"%s\">%s</a>", path, path);
+				String msg = Messages.program_died_stacktrace_written.format(link);
 				window.setText(msg);
 				Image icon = display.getSystemImage(SWT.ICON_WARNING);
 				window.setTitleImage(icon);
