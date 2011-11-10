@@ -201,7 +201,7 @@ public enum Msg {
 	// Various GUI controls
 	search ("Search",
 		"Label of the 'Search' button right next to the search field."),
-	open_manual ("Open manual",
+	open_manual ("Open Manual (F1)",
 		"Tooltip text for the '?' button to open the manual."),
 	preferences ("Preferences",
 		"Window title for the preferences dialog and tooltip text for the button " +
@@ -213,7 +213,7 @@ public enum Msg {
 		"Window title for the web interface dialog and the tooltip text for " +
 		"the button to open the web interface dialog."),
 	to_systray (
-		"Minimize to system tray",
+		"Minimize To System Tray",
 		"Label for a button to minimize the program into the system tray."),
 	press_f1_for_help (
 		"Press F1 for help.",
@@ -382,7 +382,7 @@ public enum Msg {
 		"Miscellaneous",
 		"Group label for various indexing options."),
 	indexing_options (
-		"Indexing Options",
+		"Indexing options",
 		"Group label for various indexing options (applies to Oulook PST " +
 		"indexes, where this is the only group of controls)."),
 	index_html_pairs (
@@ -453,14 +453,14 @@ public enum Msg {
 	action ("Action"),
 	exclude ("Exclude"),
 	detect_mime_type ("Detect mime type (slower)"),
-	add_pattern ("Add pattern"),
-	remove_sel_pattern ("Remove selected pattern"),
-	increase_pattern_priority ("Increase priority of selected pattern"),
-	decrease_pattern_priority ("Decrease priority of selected pattern"),
+	add_pattern ("Add Pattern"),
+	remove_sel_pattern ("Remove Selected Pattern"),
+	increase_pattern_priority ("Increase Priority Of Selected Pattern"),
+	decrease_pattern_priority ("Decrease Priority Of Selected Pattern"),
 	sel_regex_matches_file_yes ("Selected regex matches following file: Yes."),
 	sel_regex_matches_file_no ("Selected regex matches following file: No."),
 	sel_regex_malformed ("Selected regex is malformed."),
-	choose_regex_testfile_title ("Select file"),
+	choose_regex_testfile_title ("Select File"),
 	
 	// Indexing dialog: Progress
 	progress ("Progress"),
@@ -489,37 +489,37 @@ public enum Msg {
 		"A generic loading message that is used at various places, e.g. when " +
 		"loading a file for display in the preview pane."),
 	occurrence_count (
-		"Number of occurrences",
+		"Number Of Occurrences",
 		"Number of textual matches (usually whole words) that are highlighted " +
 		"in the preview pane."),
 	prev_occurrence (
-		"Previous occurrence",
+		"Previous Occurrence",
 		"Label of a button for jumping to the previous match in the preview pane."),
 	next_occurrence (
-		"Next occurrence",
+		"Next Occurrence",
 		"Label of a button for jumping to the next match in the preview pane."),
 	highlighting_on_off (
 		"Highlighting On/Off",
 		"Label of a button for turning the match highlighting in the preview " +
 		"pane on and off."),
-	prev_page ("Previous page",
+	prev_page ("Previous Page",
 		"Built-in web browser: Go one page backwards in the history of " +
 		"visited pages."),
-	next_page ("Next page",
+	next_page ("Next Page",
 		"Built-in web browser: Go one page forwards in the history of " +
 		"visited pages."),
 	browser_stop (
-		"Stop loading current page",
+		"Stop Loading Current Page",
 		"Built-in web-browser: Stop loading the currently loaded page."),
 	browser_refresh (
-		"Refresh current page",
+		"Refresh Current Page",
 		"Built-in web-browser: Refresh the currently displayed page."),
 	browser_launch_external (
-		"Open in external browser",
+		"Open In External Browser",
 		"Built-in web-browser: Open the currently displayed page in an " +
 		"external web browser (e.g. Firefox)."),
 	use_embedded_html_viewer (
-		"Use embedded HTML viewer (if available)",
+		"Use Embedded HTML Viewer (If Available)",
 		"Preview pane: Switch from the text-only preview to the web browser " +
 		"based HTML preview."),
 	email ("Email"),
