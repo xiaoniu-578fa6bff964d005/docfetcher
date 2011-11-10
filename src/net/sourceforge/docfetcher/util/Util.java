@@ -361,6 +361,13 @@ public final class Util {
 		setCenteredBounds(shell, width, height);
 	}
 	
+	@NotNull
+	public static Button[] maybeSwapButtons(@NotNull Button b1,
+											@NotNull Button b2) {
+		boolean leftAlign = b1.getDisplay().getDismissalAlignment() == SWT.LEFT;
+		return new Button[] { leftAlign ? b1 : b2, leftAlign ? b2 : b1 };
+	}
+	
 	/**
 	 * Returns whether the first bit mask contains the second bit mask.
 	 * <p>

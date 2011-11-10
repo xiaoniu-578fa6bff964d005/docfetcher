@@ -71,19 +71,16 @@ final class HotkeyDialog {
 		cancelBt.setText(Msg.cancel.get());
 		Button restoreBt = new Button(shell, SWT.PUSH);
 		restoreBt.setText(Msg.restore_default.get());
-		
-		boolean leftAlign = shell.getDisplay().getDismissalAlignment() == SWT.LEFT;
-		Button leftBt = leftAlign ? okBt : cancelBt;
-		Button rightBt = leftAlign ? cancelBt : okBt;
+		Button[] okCancelBts = Util.maybeSwapButtons(okBt, cancelBt);
 		
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top(0, 10).left(0, 10).right(100, -10).applyTo(keyLabel);
 		fdf.top(keyLabel, 10).left(0, 10).right(100, -10).applyTo(hotkeyBox);
-		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(rightBt);
-		fdf.right(rightBt).applyTo(leftBt);
-		fdf.right(leftBt).applyTo(restoreBt);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(okCancelBts[1]);
+		fdf.right(okCancelBts[1]).applyTo(okCancelBts[0]);
+		fdf.right(okCancelBts[0]).applyTo(restoreBt);
 		fdf.minWidth(0).right(restoreBt).left().applyTo(hSpacer);
-		fdf.reset().left().right().bottom(rightBt).applyTo(sep);
+		fdf.reset().left().right().bottom(okCancelBts[1]).applyTo(sep);
 		fdf.bottom(sep).top(hotkeyBox).applyTo(vSpacer);
 		
 		hotkeyBox.addKeyListener(new KeyAdapter() {

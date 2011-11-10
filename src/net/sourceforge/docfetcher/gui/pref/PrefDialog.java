@@ -159,12 +159,14 @@ public final class PrefDialog {
 			}
 		});
 		
+		Button[] okCancelBts = Util.maybeSwapButtons(okBt, cancelBt);
+		
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).top().bottom().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt, 5).applyTo(resetBt);
-		fdf.unleft().right().applyTo(cancelBt);
-		fdf.right(cancelBt, -5).applyTo(okBt);
+		fdf.unleft().right().applyTo(okCancelBts[1]);
+		fdf.right(okCancelBts[1], -5).applyTo(okCancelBts[0]);
 		
 		return comp;
 	}

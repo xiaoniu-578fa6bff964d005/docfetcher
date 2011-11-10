@@ -68,18 +68,15 @@ public class InputDialog {
 		text.setSelection(new Point(0, text.getText().length()));
 		okBt.setText(AppUtil.Messages.ok.get());
 		cancelBt.setText(AppUtil.Messages.cancel.get());
-		
-		boolean leftAlign = shell.getDisplay().getDismissalAlignment() == SWT.LEFT;
-		Button leftBt = leftAlign ? okBt : cancelBt;
-		Button rightBt = leftAlign ? cancelBt : okBt;
+		Button[] okCancelBts = Util.maybeSwapButtons(okBt, cancelBt);
 		
 		shell.setLayout(Util.createFormLayout(5));
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top().left().right().applyTo(label);
 		fdf.top(label).applyTo(text);
-		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(rightBt);
-		fdf.right(rightBt).applyTo(leftBt);
-		fdf.reset().left().right().bottom(rightBt).applyTo(separator);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(okCancelBts[1]);
+		fdf.right(okCancelBts[1]).applyTo(okCancelBts[0]);
+		fdf.reset().left().right().bottom(okCancelBts[1]).applyTo(separator);
 		fdf.top(text).bottom(separator).applyTo(fillerLabel);
 		
 		okBt.addSelectionListener(new SelectionAdapter() {

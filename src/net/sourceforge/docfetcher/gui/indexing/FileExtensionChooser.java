@@ -109,13 +109,14 @@ final class FileExtensionChooser {
 		okBt.setText(Msg.ok.get());
 		Button cancelBt = new Button(shell, SWT.PUSH);
 		cancelBt.setText(Msg.cancel.get());
+		Button[] okCancelBts = Util.maybeSwapButtons(okBt, cancelBt);
 		
 		shell.setLayout(Util.createFormLayout(5));
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top().left().right().applyTo(label);
-		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(cancelBt);
-		fdf.right(cancelBt).applyTo(okBt);
-		fdf.reset().left().right().top(label).bottom(okBt).applyTo(comp);
+		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(okCancelBts[1]);
+		fdf.right(okCancelBts[1]).applyTo(okCancelBts[0]);
+		fdf.reset().left().right().top(label).bottom(okCancelBts[0]).applyTo(comp);
 		
 		okBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
