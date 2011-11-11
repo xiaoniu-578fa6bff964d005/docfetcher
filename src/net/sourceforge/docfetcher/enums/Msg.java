@@ -13,8 +13,8 @@ package net.sourceforge.docfetcher.enums;
 
 import java.text.MessageFormat;
 
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 public enum Msg {
 	
@@ -636,16 +636,15 @@ public enum Msg {
 	;
 	
 	private static boolean checkEnabled = true;
-	private String value;
-	
-	@SuppressWarnings("unused") // TODO post-release-1.1: Use this field and remove annotation
-	@Nullable private final String comment;
+	private final String value;
+	private final String comment;
 	
 	Msg(@NotNull String defaultValue) {
-		this(defaultValue, null);
+		this(defaultValue, "");
 	}
 	
-	Msg(@NotNull String defaultValue, @Nullable String comment) {
+	Msg(@NotNull String defaultValue, @NotNull String comment) {
+		Util.checkNotNull(defaultValue, comment);
 		this.value = defaultValue;
 		this.comment = comment;
 	}
@@ -654,6 +653,11 @@ public enum Msg {
 	public String get() {
 		assert !checkEnabled || !value.contains("{0}");
 		return value;
+	}
+	
+	@NotNull
+	public String getComment() {
+		return comment;
 	}
 	
 	/**

@@ -224,7 +224,7 @@ public final class ConfLoader {
 	/**
 	 * @see Properties#store(java.io.Writer, String)
 	 */
-	private static String convert(String input, boolean escapeSpace) {
+	public static String convert(String input, boolean escapeSpace) {
 		StringBuilder out = new StringBuilder(input.length() * 2);
 		for (int i = 0; i < input.length(); i++) {
 			char c = input.charAt(i);
