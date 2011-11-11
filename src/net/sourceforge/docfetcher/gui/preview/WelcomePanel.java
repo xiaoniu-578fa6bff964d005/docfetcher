@@ -116,7 +116,7 @@ public final class WelcomePanel extends Composite {
 				+ " folgen Sie bitte den Anweisungen"
 				+ " im <a>Handbuch</a>.";
 		
-		// TODO now: parse HTML link, store link offsets
+		// TODO post-release-1.1: parse HTML link, store link offsets
 		// fire link click event
 		// change mouse cursor when hovering over link
 		

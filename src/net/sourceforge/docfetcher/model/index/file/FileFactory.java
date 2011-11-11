@@ -351,7 +351,7 @@ public final class FileFactory {
 				assert ! currentPath.contains("\\");
 				assert noTrailingSlash(currentPath);
 
-				// TODO now: throw disk space exception
+				// TODO post-release-1.1: throw disk space exception
 				if (entryPath.equals(currentPath)) { // Exact match
 					File unpackedFile = unpack7zEntry(config, archive, currentPath, i);
 					Path cacheKey = originalArchivePath.createSubPath(currentPath);

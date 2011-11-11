@@ -295,7 +295,7 @@ public final class PreviewPanel extends Composite {
 									final long requestCount,
 									final boolean append) {
 		/*
-		 * TODO now: Number of characters in the text preview should be limited,
+		 * TODO post-release-1.1: Number of characters in the text preview should be limited,
 		 * see setting Pref.Int.PreviewLimit.getValue(). -> Don't append error
 		 * message to preview text, instead display error message in error bar.
 		 */

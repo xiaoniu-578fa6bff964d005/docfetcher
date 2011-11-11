@@ -106,13 +106,14 @@ public final class SearchBar {
 					}
 				}).create();
 
-		tif.image(Img.BROWSER.get()).toolTip(Msg.web_interface.get())
-				.listener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
-						dialog.open();
-					}
-				}).create();
+		// TODO web interface
+//		tif.image(Img.BROWSER.get()).toolTip(Msg.web_interface.get())
+//				.listener(new SelectionAdapter() {
+//					public void widgetSelected(SelectionEvent e) {
+//						WebInterfaceDialog dialog = new WebInterfaceDialog(comp.getShell());
+//						dialog.open();
+//					}
+//				}).create();
 		
 		tif.image(Img.HIDE.get()).toolTip(Msg.to_systray.get())
 				.listener(new SelectionAdapter() {

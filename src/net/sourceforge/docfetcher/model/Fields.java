@@ -58,7 +58,7 @@ public enum Fields {
 	// Fields available for emails
 	SUBJECT (Store.YES, Index.ANALYZED),
 	SENDER (Store.YES, Index.ANALYZED),
-	RECIPIENTS (Store.YES, Index.ANALYZED), // TODO now: show this field on results panel in "email mode"
+	RECIPIENTS (Store.YES, Index.ANALYZED), // TODO post-release-1.1: show this field on results panel in "email mode"
 	DATE (Store.YES, Index.NO),
 	;
 	

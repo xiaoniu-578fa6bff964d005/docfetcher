@@ -146,9 +146,8 @@ public enum Msg {
 	clipboard ("Clipboard...\tCtrl+V",
 		Comments.createIndexFromEntry + " The '\tCtrl+V' is a keyboard shortcut " +
 		"and might need translation. For example, in German it would be '\tStrg+V'."),
-	// TODO post-release-1.1: mac: Is this the correct way to write the keyboard shortcut? Maybe use minus symbol instead?
-	clipboard_macosx ("Clipboard...\t\u2318+V",
-		Comments.createIndexFromEntry + " The '\t\u2318+V' is a keyboard shortcut, " +
+	clipboard_macosx ("Clipboard...\t\u2318V",
+		Comments.createIndexFromEntry + " The '\t\u2318V' is a keyboard shortcut, " +
 		"with 'u2318' being a Mac OS X specific modifier key known as " +
 		"'Command'. Do not translate it."),
 	update_index (
@@ -600,7 +599,9 @@ public enum Msg {
 	ctrl_key ("Ctrl"),
 	command_key ("Command"),
 		
-	// Result panel
+	// Result panel and status bar
+	num_results ("Results: {0}"),
+	num_sel_results ("Selected: {0}"),
 	title ("Title"),
 	score ("Score [%]"),
 	size ("Size"),
@@ -630,10 +631,7 @@ public enum Msg {
 	filesize_out_of_range ("Filesizes must be between 0 and (2^63 - 1) Bytes."),
 	no_filetypes_selected ("No filetypes have been selected."),
 		
-	num_results ("Results: {0}"),
 	num_results_detail ("Results: {0}-{1} of {2}"),
-	page_m_n ("Page {0}/{1}"),
-	num_sel_results ("Selected: {0}"),
 	num_documents_added ("Documents added: {0}"),
 	;
 	

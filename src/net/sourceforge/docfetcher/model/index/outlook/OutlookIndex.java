@@ -147,7 +147,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		reporter.fail(error);
 	}
 	
-	// TODO now: method currently not in use
+	// TODO post-release-1.1: method currently not in use
 	@NotNull
 	public MailFolder getSimplifiedRootFolder() {
 		if (simplifiedRootFolder == null) // update method hasn't been called yet
