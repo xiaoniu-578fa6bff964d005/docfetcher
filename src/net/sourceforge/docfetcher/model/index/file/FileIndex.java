@@ -114,11 +114,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		return DocumentType.FILE;
 	}
 
-	public IndexingResult update(	@NotNull IndexingReporter reporter,
+	public IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
 									@NotNull Cancelable cancelable) {
-		if (cancelable.isCanceled())
-			return IndexingResult.SUCCESS_UNCHANGED;
-		
 		reporter.setStartTime(System.currentTimeMillis());
 		IndexingConfig config = getConfig();
 		FileFolder rootFolder = getRootFolder();

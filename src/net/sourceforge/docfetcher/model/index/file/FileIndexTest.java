@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
-import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
@@ -33,11 +32,11 @@ import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
 import org.apache.lucene.store.Directory;
-import org.apache.tika.io.NullOutputStream;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.google.common.io.NullOutputStream;
 
 /**
  * @author Tran Nam Quang
@@ -53,10 +52,10 @@ public final class FileIndexTest {
 		File file = TestFiles.archive_zip_rar_7z.get();
 		FileIndex index = new FileIndex(null, file);
 		CountingReporter reporter = new CountingReporter();
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertEquals(1, reporter.extractCount);
 		index.clear();
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertEquals(2, reporter.extractCount);
 	}
 	
@@ -73,7 +72,7 @@ public final class FileIndexTest {
 		for (File file : files) {
 			FileIndex index = new FileIndex(null, file);
 			index.getConfig().setDetectExecutableArchives(true);
-			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+			index.update(null, null);
 			Directory luceneDir = index.getLuceneDir();
 
 			/*
@@ -109,9 +108,9 @@ public final class FileIndexTest {
 		final CountingReporter reporter = new CountingReporter();
 		
 		// Index update should not detect any changes when nothing was modified
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertEquals(1, reporter.extractCount);
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertEquals(1, reporter.extractCount);
 		
 		// Index update must detect changes when files have been modified
@@ -128,7 +127,7 @@ public final class FileIndexTest {
 			int expectedCount = entry.getValue().intValue();
 			file.setLastModified(System.currentTimeMillis() + (i + 1) * 1000);
 			
-			index.update(reporter, Cancelable.nullCancelable);
+			index.update(reporter, null);
 			
 			String msg = String.format("On '%s'.", file.getName());
 			assertEquals(msg, expectedCount, reporter.extractCount);
@@ -138,7 +137,7 @@ public final class FileIndexTest {
 		// Index update must detect change when HTML folder is deleted
 		Files.deleteRecursively(htmlDir);
 		reporter.extractCount = 0;
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertEquals(1, reporter.extractCount);
 		
 		Files.deleteRecursively(tempDir);
@@ -168,12 +167,12 @@ public final class FileIndexTest {
 				
 				Files.copy(file1, target);
 				target.setLastModified(System.currentTimeMillis() - 1000);
-				index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+				index.update(null, null);
 				
 				Files.copy(file2, target);
 				CountingReporter reporter2 = new CountingReporter();
 				
-				index.update(reporter2, Cancelable.nullCancelable);
+				index.update(reporter2, null);
 				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.extractCount);
 				
 				Files.deleteDirectoryContents(tempDir);
@@ -213,13 +212,13 @@ public final class FileIndexTest {
 		
 		// Create index
 		FileIndex index = new FileIndex(null, tempDir);
-		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		// Rename subfolder, then update index
 		File subDir2 = new File(tempDir, "Test2");
 		subDir1.renameTo(subDir2);
-		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		Files.deleteRecursively(tempDir);
@@ -236,12 +235,12 @@ public final class FileIndexTest {
 		Files.write("Hello World", textFile, Charsets.UTF_8);
 		
 		FileIndex index = new FileIndex(null, tempDir);
-		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		textFile.renameTo(new File(tempDir, "test2.txt"));
 		
-		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
 		Files.deleteRecursively(tempDir);
@@ -268,11 +267,11 @@ public final class FileIndexTest {
 			Files.copy(oldFile, target);
 			
 			FileIndex index = new FileIndex(null, tempDir);
-			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+			index.update(null, null);
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 			
 			Files.copy(newFile, target);
-			index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+			index.update(null, null);
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		}
 		
@@ -288,11 +287,11 @@ public final class FileIndexTest {
 		File dir = TestFiles.index_update_html_in_html.get();
 		FileIndex index = new FileIndex(null, dir);
 		
-		index.update(IndexingReporter.nullReporter, Cancelable.nullCancelable);
+		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 2);
 		
 		CountingReporter countingReporter = new CountingReporter();
-		index.update(countingReporter, Cancelable.nullCancelable);
+		index.update(countingReporter, null);
 		assertEquals(0, countingReporter.extractCount);
 	}
 	
@@ -305,9 +304,11 @@ public final class FileIndexTest {
 				Throwable t = error.getThrowable();
 				assertTrue(t instanceof ArchiveEncryptedException);
 			}
-		}, Cancelable.nullCancelable);
+		}, null);
 		
 		// J7Zip will print to stdout and stderr
+		PrintStream stdOut = System.out;
+		PrintStream stdErr = System.err;
 		PrintStream nullOut = new PrintStream(new NullOutputStream());
 		System.setOut(nullOut);
 		System.setErr(nullOut);
@@ -315,9 +316,13 @@ public final class FileIndexTest {
 		archive = TestFiles.encrypted_7z.get();
 		index = new FileIndex(null, archive);
 		CountingReporter reporter = new CountingReporter();
-		index.update(reporter, Cancelable.nullCancelable);
+		index.update(reporter, null);
 		assertTrue(reporter.extractCount == 1); // will report file, but fail to unpack it
 		assertTrue(reporter.errorCount == 0);
+		
+		// Must be reset, otherwise the tests will stop printing output
+		System.setOut(stdOut);
+		System.setErr(stdErr);
 	}
 	
 }

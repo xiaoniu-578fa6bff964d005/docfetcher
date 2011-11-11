@@ -58,8 +58,8 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	public File getCanonicalRootFile();
 	
 	@NotNull
-	public IndexingResult update(	@NotNull IndexingReporter reporter,
-									@NotNull Cancelable cancelable);
+	public IndexingResult update(	@Nullable IndexingReporter reporter,
+	                             	@Nullable Cancelable cancelable);
 	
 	@NotNull
 	public Directory getLuceneDir() throws IOException;

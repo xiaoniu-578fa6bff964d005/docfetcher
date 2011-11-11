@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
+import net.sourceforge.docfetcher.model.index.IndexingReporter;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -112,6 +113,22 @@ public abstract class TreeIndex <
 	public final Path getIndexDirPath() {
 		return fileIndexDirPath;
 	}
+	
+	@NotNull
+	public final IndexingResult update(	@Nullable IndexingReporter reporter,
+										@Nullable Cancelable cancelable) {
+		if (reporter == null)
+			reporter = IndexingReporter.nullReporter;
+		if (cancelable == null)
+			cancelable = Cancelable.nullCancelable;
+		if (cancelable.isCanceled())
+			return IndexingResult.SUCCESS_UNCHANGED;
+		return doUpdate(reporter, cancelable);
+	}
+	
+	@NotNull
+	protected abstract IndexingResult doUpdate(	@NotNull IndexingReporter reporter,
+												@NotNull Cancelable cancelable);
 	
 	@NotNull
 	public final Directory getLuceneDir() throws IOException {
