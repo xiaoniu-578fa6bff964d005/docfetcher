@@ -43,6 +43,7 @@ public enum Img implements FilenameProvider {
 	DOCFETCHER_128 ("docfetcher128.png"),
 	
 	HELP ("help.gif"),
+	INFO ("info.gif"),
 	PREFERENCES ("preferences.gif"),
 	LETTERS ("letters.gif"),
 	INDEXING ("indexing.gif"),

@@ -32,6 +32,7 @@ import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
@@ -294,6 +295,16 @@ public final class ResultPanel {
 	@NotNull
 	public Table getControl() {
 		return viewer.getControl();
+	}
+	
+	public int getItemCount() {
+		return viewer.getControl().getItemCount();
+	}
+	
+	@MutableCopy
+	@NotNull
+	public List<ResultDocument> getSelection() {
+		return viewer.getSelection();
 	}
 	
 	// header mode: auto-detect for "files + emails", no auto-detect for files and emails mode

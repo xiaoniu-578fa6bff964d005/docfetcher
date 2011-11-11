@@ -110,7 +110,7 @@ public final class Searcher {
 	}
 	
 	private static final int PAGE_SIZE = ProgramConf.Int.WebInterfacePageSize.get();
-	private static final int MAX_RESULTS = ProgramConf.Int.MaxResultsTotal.get();
+	public static final int MAX_RESULTS = ProgramConf.Int.MaxResultsTotal.get();
 	
 	private final IndexRegistry indexRegistry;
 	private final FileFactory fileFactory;

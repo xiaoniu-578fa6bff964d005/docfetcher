@@ -198,7 +198,8 @@ public final class Application {
 		initGlobalKeys(display);
 		
 		new SearchQueue(
-			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);
+			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel,
+			statusBar);
 
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.bottom().left().right().applyTo(statusBar);
@@ -273,8 +274,6 @@ public final class Application {
 		 */
 		display.addFilter(SWT.KeyDown, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event e) {
-				// TODO pre-release: global keys
-				
 				// Disable global keys when the main shell is inactive
 				if (Display.getCurrent().getActiveShell() != shell)
 					return;
@@ -542,9 +541,8 @@ public final class Application {
 
 		resultPanel.evtSelection.add(new Event.Listener<List<ResultDocument>>() {
 			public void update(List<ResultDocument> eventData) {
-				if (eventData.isEmpty()) return;
-				previewPanel.setPreview(eventData.get(0));
-				// TODO now: update status bar
+				if (!eventData.isEmpty())
+					previewPanel.setPreview(eventData.get(0));
 			}
 		});
 		

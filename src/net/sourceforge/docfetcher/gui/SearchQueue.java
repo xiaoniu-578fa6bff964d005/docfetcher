@@ -19,6 +19,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.gui.ResultPanel.HeaderMode;
 import net.sourceforge.docfetcher.gui.filter.FileTypePanel;
 import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
@@ -42,6 +44,7 @@ import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 /**
@@ -52,12 +55,15 @@ public final class SearchQueue {
 	private static enum GuiEvent {
 		SEARCH_OR_LIST, SIZE, TYPE, LOCATION
 	}
+	
+	private static final String spaces = Strings.repeat(" ", 5);
 
 	private final SearchBar searchBar;
 	private final FilesizePanel filesizePanel;
 	private final FileTypePanel fileTypePanel;
 	private final IndexPanel indexPanel;
 	private final ResultPanel resultPanel;
+	private final StatusBar statusBar;
 	
 	private final Thread thread;
 	private final Lock lock = new ReentrantLock(true);
@@ -75,14 +81,22 @@ public final class SearchQueue {
 						@NotNull FilesizePanel filesizePanel,
 						@NotNull FileTypePanel fileTypePanel,
 						@NotNull IndexPanel indexPanel,
-						@NotNull ResultPanel resultPanel) {
-		Util.checkNotNull(
-			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel);
+						@NotNull ResultPanel resultPanel,
+						@NotNull StatusBar statusBar) {
+		Util.checkNotNull(searchBar, filesizePanel, fileTypePanel);
+		Util.checkNotNull(indexPanel, resultPanel, statusBar);
 		this.searchBar = searchBar;
 		this.filesizePanel = filesizePanel;
 		this.fileTypePanel = fileTypePanel;
 		this.indexPanel = indexPanel;
 		this.resultPanel = resultPanel;
+		this.statusBar = statusBar;
+		
+		resultPanel.evtSelection.add(new Event.Listener<List<ResultDocument>>() {
+			public void update(List<ResultDocument> eventData) {
+				updateResultStatus();
+			}
+		});
 		
 		thread = new Thread(SearchQueue.class.getName()) {
 			public void run() {
@@ -287,8 +301,9 @@ public final class SearchQueue {
 		Util.runSyncExec(searchBar.getControl(), new Runnable() {
 			public void run() {
 				resultPanel.setResults(visibleResults, mode);
+				resultPanel.getControl().setFocus();
+				updateResultStatus(); // Must be done *after* setting the results
 				searchBar.setEnabled(true);
-				// TODO now: move focus to result panel
 				
 				if (query != null)
 					searchBar.addToSearchHistory(query);
@@ -308,6 +323,17 @@ public final class SearchQueue {
 			checkedParsers.add(parserName);
 		}
 		allParsersChecked = checkedParsers.size() == map.size();
+	}
+	
+	private void updateResultStatus() {
+		int resultCount = resultPanel.getItemCount();
+		String msg = Msg.num_results.format(resultCount);
+		if (resultCount >= Searcher.MAX_RESULTS)
+			msg += "+";
+		int selCount = resultPanel.getSelection().size();
+		if (selCount > 1)
+			msg += spaces + Msg.num_sel_results.format(selCount);
+		statusBar.getLeftPart().setContents(Img.INFO.get(), msg);
 	}
 
 }
