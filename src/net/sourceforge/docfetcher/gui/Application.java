@@ -216,7 +216,7 @@ public final class Application {
 			File file = ManualLocator.getManualFile();
 			if (file == null) {
 				showManualHint = false;
-				String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
+				String msg = Msg.file_not_found.get() + "\n" + ManualLocator.manualFilename;
 				AppUtil.showError(msg, true, true);
 			}
 			else if (previewPanel.setHtmlFile(file)) {
@@ -894,7 +894,7 @@ public final class Application {
 				Util.launch(file);
 		}
 		else {
-			String msg = Msg.file_not_found.format(ManualLocator.manualFilename);
+			String msg = Msg.file_not_found.get() + "\n" + ManualLocator.manualFilename;
 			AppUtil.showError(msg, true, true);
 		}
 	}

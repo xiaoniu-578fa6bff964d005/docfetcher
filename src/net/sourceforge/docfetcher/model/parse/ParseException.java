@@ -27,4 +27,8 @@ public final class ParseException extends Exception {
 		super(message);
 	}
 	
+	public ParseException(@NotNull String message, @NotNull Throwable cause) {
+		super(message, cause);
+	}
+	
 }

@@ -13,8 +13,6 @@ package net.sourceforge.docfetcher.model.index;
 
 import java.io.Serializable;
 
-import com.google.common.base.Throwables;
-
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.util.Util;
@@ -60,14 +58,7 @@ public final class IndexingError implements Serializable {
 		private String getMessage(@Nullable Throwable t) {
 			if (overrideMsg != null)
 				return overrideMsg;
-			return getRootMessage(t);
-		}
-		@NotNull
-		private static String getRootMessage(@Nullable Throwable t) {
-			if (t == null)
-				return "";
-			String message = Throwables.getRootCause(t).getMessage();
-			return message == null ? "" : message;
+			return Util.getLowestMessage(t);
 		}
 	}
 	

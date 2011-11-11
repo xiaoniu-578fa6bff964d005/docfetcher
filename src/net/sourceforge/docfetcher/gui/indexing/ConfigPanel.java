@@ -126,7 +126,7 @@ abstract class ConfigPanel {
 				// Check that the target file or directory still exists
 				File rootFile = index.getCanonicalRootFile();
 				if (!rootFile.exists()) {
-					String msg = Msg.file_or_folder_not_found.format(rootFile.getPath());
+					String msg = Msg.file_or_folder_not_found.get() + "\n" + rootFile.getPath();
 					AppUtil.showError(msg, true, true);
 					return;
 				}

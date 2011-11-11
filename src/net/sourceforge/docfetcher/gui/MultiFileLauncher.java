@@ -52,7 +52,7 @@ public final class MultiFileLauncher {
 		// Abort with an error message if any files are missing
 		if (!missing.isEmpty()) {
 			String items = Util.join("\n", missing);
-			String msg = Msg.files_or_folders_not_found.format(items);
+			String msg = Msg.files_or_folders_not_found.get() + "\n" + items;
 			AppUtil.showError(msg, true, false);
 			return false;
 		}

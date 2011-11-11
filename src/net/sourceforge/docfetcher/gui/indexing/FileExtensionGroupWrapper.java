@@ -126,7 +126,7 @@ final class FileExtensionGroupWrapper {
 			field.setText(Util.join(" ", extsNew));
 		}
 		catch (FileNotFoundException e1) {
-			String msg = Msg.folder_not_found.format(rootFile.getPath());
+			String msg = Msg.folder_not_found.get() + "\n" + rootFile.getPath();
 			AppUtil.showError(msg, true, true);
 		}
 	}

@@ -69,6 +69,8 @@ import org.eclipse.swt.widgets.Widget;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -1371,6 +1373,19 @@ public final class Util {
 	@SuppressAjWarnings
 	public static void printErr(@NotNull Throwable t) {
 		t.printStackTrace();
+	}
+	
+	@NotNull
+	public static String getLowestMessage(@Nullable Throwable throwable) {
+		if (throwable == null)
+			return "";
+		List<Throwable> chain = Throwables.getCausalChain(throwable);
+		for (Throwable t : Lists.reverse(chain)) {
+			String msg = t.getMessage();
+			if (msg != null && !msg.trim().equals(""))
+				return msg;
+		}
+		return "";
 	}
 
 	/**

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.HotColdFileCache;
 import net.sourceforge.docfetcher.model.HotColdFileCache.PermanentFileResource;
@@ -104,16 +105,19 @@ public final class FileFactory {
 				config, archivePath, cachedResource[0], entryPath);
 		}
 		catch (FileNotFoundException e) {
-			throw e; // should not be caught by IOException catch clause
+			// Discard original exception to provide a more helpful message
+			String msg = Msg.file_not_found.get() + " " + path.getPath();
+			throw new FileNotFoundException(msg);
 		}
 		catch (ArchiveEncryptedException e) {
-			throw new ParseException(e); // TODO i18n: add localized error message
+			String msg = Msg.archive_encrypted.get();
+			throw new ParseException(msg, e);
 		}
 		catch (DiskSpaceException e) {
 			throw new ParseException(e); // TODO i18n: add localized error message
 		}
 		catch (IOException e) {
-			throw new ParseException(e); // TODO i18n: add localized error message
+			throw new ParseException(e);
 		}
 	}
 	

@@ -69,20 +69,20 @@ public enum Msg {
 		"of the program will be inserted in the {0} slot - this is usually " +
 		"'DocFetcher'."),
 	file_not_found (
-		"File not found:\n{0}",
+		"File not found:",
 		"An error message that is shown when the program fails to find a " +
-		"certain file. The path of the file will be inserted into the {0} slot."),
+		"certain file. The path of the file will be appended to the message."),
 	folder_not_found (
-		"Folder not found:\n{0}",
+		"Folder not found:",
 		"An error message that is shown when the program fails to find a " +
 		"certain folder. The path of the file will be inserted into the {0} slot."),
 	file_or_folder_not_found (
-		"File or folder not found:\n{0}",
+		"File or folder not found:",
 		"An error message that is shown when the program fails to find a " +
 		"certain file or folder. The path of the file/folder will be " +
 		"inserted into the {0} slot."),
 	files_or_folders_not_found (
-		"Files or folders not found:\n{0}",
+		"Files or folders not found:",
 		"An error message that is shown when the program fails to find " +
 		"certain files or folders. The path of the files and folders will be " +
 		"inserted into the {0} slot."),
