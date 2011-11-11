@@ -6,9 +6,10 @@
 ; When building a new release, remember to update the version number in the next
 ; command.
 
-!define VERSION 1.1
+!define VERSION 1.1-beta1
 !define PORTABLE_PATH build\DocFetcher-${VERSION}
 
+RequestExecutionLevel admin ; without this, the startmenu links won't be removed on Windows Vista/7
 SetCompress force
 SetCompressor /SOLID lzma
 Name "DocFetcher ${VERSION}"
@@ -103,15 +104,17 @@ Function .onInit
 FunctionEnd
 
 Section "DocFetcher"
+	SetShellVarContext all
+
 	; Copy files
     SetOutPath $INSTDIR
     File ${PORTABLE_PATH}\*.exe
-    File ${PORTABLE_PATH}\*.txt
+    ; File ${PORTABLE_PATH}\*.txt
 	
 	SetOutPath $INSTDIR\misc
 	File ${PORTABLE_PATH}\misc\*.bat
 	File ${PORTABLE_PATH}\misc\*.exe
-	File ${PORTABLE_PATH}\misc\ChangeLog.html
+	; File ${PORTABLE_PATH}\misc\ChangeLog.html
 	File ${PORTABLE_PATH}\misc\licenses.zip
 	
 	SetOutPath $INSTDIR\help
@@ -126,13 +129,6 @@ Section "DocFetcher"
     
     ; Uninstaller
     WriteUninstaller $INSTDIR\uninstaller.exe
-    
-    ; Start menu entries
-    CreateDirectory $SMPROGRAMS\DocFetcher
-    CreateShortCut $SMPROGRAMS\DocFetcher\DocFetcher.lnk $INSTDIR\DocFetcher.exe
-    CreateShortCut "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk" $INSTDIR\uninstaller.exe
-    CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
-    CreateShortCut $SMPROGRAMS\DocFetcher\ChangeLog.lnk $INSTDIR\misc\ChangeLog.html
     
     ; Write to registry
     Var /GLOBAL regkey
@@ -151,11 +147,22 @@ Section "DocFetcher"
     WriteRegDWORD HKLM $regkey "NoRepair" 1
     WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon" "$INSTDIR\docfetcher-daemon-win.exe"
 	
+	SetShellVarContext current
+	
+	; Start menu entries
+    CreateDirectory $SMPROGRAMS\DocFetcher
+    CreateShortCut $SMPROGRAMS\DocFetcher\DocFetcher.lnk $INSTDIR\DocFetcher.exe
+    CreateShortCut "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk" $INSTDIR\uninstaller.exe
+    ; CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
+    ; CreateShortCut $SMPROGRAMS\DocFetcher\ChangeLog.lnk $INSTDIR\misc\ChangeLog.html
+	
 	; Launch daemon
 	Exec '"$INSTDIR\docfetcher-daemon-windows.exe"'
 SectionEnd
 
 Section "un.Uninstall"
+	SetShellVarContext all
+
 	; Kill daemon
 	Processes::KillProcess "docfetcher-daemon-windows"
 	Sleep 1000
@@ -172,17 +179,19 @@ Section "un.Uninstall"
 	RMDir /r $INSTDIR\lib
 	RMDir $INSTDIR
 	
+	; Remove registry key
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon"
+	
+	SetShellVarContext current
+	
 	; Remove application data folder
     RMDir /r $APPDATA\DocFetcher
 	
 	; Remove start menu entries
 	Delete $SMPROGRAMS\DocFetcher\DocFetcher.lnk
 	Delete "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk"
-	Delete $SMPROGRAMS\DocFetcher\Readme.lnk
-	Delete $SMPROGRAMS\DocFetcher\ChangeLog.lnk
+	; Delete $SMPROGRAMS\DocFetcher\Readme.lnk
+	; Delete $SMPROGRAMS\DocFetcher\ChangeLog.lnk
 	RMDir $SMPROGRAMS\DocFetcher
-    
-    ; Remove registry key
-    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher"
-    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon"
 SectionEnd
