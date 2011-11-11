@@ -42,7 +42,7 @@ import com.google.common.base.Strings;
 public final class BuildMain {
 	
 	public static final String appName = "DocFetcher";
-	public static final String version = "1.1";
+	public static final String version = "1.1-beta1";
 	
 	private static final String packageId = Main.class.getPackage().getName();
 	private static final String packagePath = packageId.replace(".", "/");
