@@ -45,6 +45,9 @@ public enum TestFiles {
 	index_update_rename_in_7z ("index-update-rename-in-7z"),
 	index_update_html_in_html ("index-update-html-in-html"),
 	
+	encrypted_7z ("7z-encrypted-(password='docfetcher').7z"),
+	encrypted_7z_filenames ("7z-encrypted-including-filenames-(password='docfetcher').7z"),
+	
 	lorem_ipsum_abw ("lorem-ipsum/lorem-ipsum.abw"),
 	lorem_ipsum_abw_gz ("lorem-ipsum/lorem-ipsum.abw.gz"),
 	lorem_ipsum_docx ("lorem-ipsum/lorem-ipsum.docx"),

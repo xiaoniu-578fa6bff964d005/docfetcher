@@ -58,28 +58,34 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 		// Do nothing
 	}
 	
-	protected ArchiveIterator<FileHeader> getArchiveIterator(File archiveFile)
-			throws IOException {
+	protected ArchiveIterator<FileHeader> getArchiveIterator(	File archiveFile,
+																String archivePath)
+			throws IOException, ArchiveEncryptedException {
+		Archive archive = null;
 		try {
-			final Archive archive = new Archive(archiveFile);
+			archive = new Archive(archiveFile);
+			if (archive.isEncrypted()) {
+				Closeables.closeQuietly(archive);
+				throw new ArchiveEncryptedException(archiveFile, archivePath);
+			}
+			final Archive fArchive = archive;
 			return new ArchiveIterator<FileHeader>() {
-				private FileHeader nextFileHeader = archive.nextFileHeader();
+				private FileHeader nextFileHeader = fArchive.nextFileHeader();
 				public FileHeader next() {
 					FileHeader fh = nextFileHeader;
-					nextFileHeader = archive.nextFileHeader();
+					nextFileHeader = fArchive.nextFileHeader();
 					return fh;
 				}
 				public boolean hasNext() {
 					return nextFileHeader != null;
 				}
 				public void finished() {
-					Closeables.closeQuietly(archive);
-				}
-				public boolean isEncrypted() {
-					return archive.isEncrypted();
+					Closeables.closeQuietly(fArchive);
 				}
 			};
-		} catch (RarException e) {
+		}
+		catch (RarException e) {
+			Closeables.closeQuietly(archive);
 			throw new IOException(e);
 		}
 	}

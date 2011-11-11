@@ -58,13 +58,26 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 		super(archiveFile, config, isHtmlPairing, originalPath, failReporter);
 	}
 	
-	protected ArchiveIterator<SevenZipEntry> getArchiveIterator(File archiveFile)
-			throws IOException {
+	protected ArchiveIterator<SevenZipEntry> getArchiveIterator(File archiveFile,
+																String archivePath)
+			throws IOException, ArchiveEncryptedException {
 		if (archive == null) {
 			SevenZipInputStream istream = new SevenZipInputStream(archiveFile);
 			archive = new Handler();
-			if (archive.Open(istream) != 0)
-				throw new IOException();
+			try {
+				if (archive.Open(istream) != 0) {
+					archive.close();
+					throw new IOException();
+				}
+			}
+			catch (IOException e) {
+				archive.close();
+				if ("k_7zAES not implemented".equals(e.getMessage())) {
+					throw new ArchiveEncryptedException(
+						archiveFile, archivePath);
+				}
+				throw e;
+			}
 		}
 		return new ArchiveIterator<SevenZipEntry>() {
 			private int index = 0;
@@ -79,10 +92,6 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 			}
 			public void finished() {
 				// do nothing
-			}
-			public boolean isEncrypted() {
-				// TODO now: to implement
-				return false;
 			}
 		};
 	}
@@ -131,7 +140,7 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 			return entry.getSize();
 		}
 		public boolean isEncrypted(SevenZipEntry entry) {
-			// TODO now: To implement
+			// J7Zip doesn't provide us with enough info to implement this
 			return false;
 		}
 	}

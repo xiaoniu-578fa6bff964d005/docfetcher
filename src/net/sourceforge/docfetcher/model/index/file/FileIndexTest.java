@@ -12,8 +12,10 @@
 package net.sourceforge.docfetcher.model.index.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.UtilModel;
+import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
 import net.sourceforge.docfetcher.model.index.IndexingInfo.InfoType;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
@@ -30,6 +33,7 @@ import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
 import org.apache.lucene.store.Directory;
+import org.apache.tika.io.NullOutputStream;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
@@ -50,10 +54,10 @@ public final class FileIndexTest {
 		FileIndex index = new FileIndex(null, file);
 		CountingReporter reporter = new CountingReporter();
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(1, reporter.counter);
+		assertEquals(1, reporter.extractCount);
 		index.clear();
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(2, reporter.counter);
+		assertEquals(2, reporter.extractCount);
 	}
 	
 	@Test
@@ -106,9 +110,9 @@ public final class FileIndexTest {
 		
 		// Index update should not detect any changes when nothing was modified
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(1, reporter.counter);
+		assertEquals(1, reporter.extractCount);
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(1, reporter.counter);
+		assertEquals(1, reporter.extractCount);
 		
 		// Index update must detect changes when files have been modified
 		ListMap<File, Integer> fileMap = ListMap.<File, Integer> create()
@@ -118,7 +122,7 @@ public final class FileIndexTest {
 			.add(subFile3, 1);
 		int i = 0;
 		for (ListMap.Entry<File, Integer> entry : fileMap) {
-			reporter.counter = 0;
+			reporter.extractCount = 0;
 			
 			File file = entry.getKey();
 			int expectedCount = entry.getValue().intValue();
@@ -127,15 +131,15 @@ public final class FileIndexTest {
 			index.update(reporter, Cancelable.nullCancelable);
 			
 			String msg = String.format("On '%s'.", file.getName());
-			assertEquals(msg, expectedCount, reporter.counter);
+			assertEquals(msg, expectedCount, reporter.extractCount);
 			i++;
 		}
 		
 		// Index update must detect change when HTML folder is deleted
 		Files.deleteRecursively(htmlDir);
-		reporter.counter = 0;
+		reporter.extractCount = 0;
 		index.update(reporter, Cancelable.nullCancelable);
-		assertEquals(1, reporter.counter);
+		assertEquals(1, reporter.extractCount);
 		
 		Files.deleteRecursively(tempDir);
 	}
@@ -170,7 +174,7 @@ public final class FileIndexTest {
 				CountingReporter reporter2 = new CountingReporter();
 				
 				index.update(reporter2, Cancelable.nullCancelable);
-				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.counter);
+				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.extractCount);
 				
 				Files.deleteDirectoryContents(tempDir);
 				i++;
@@ -181,11 +185,16 @@ public final class FileIndexTest {
 	}
 	
 	private static class CountingReporter extends IndexingReporter {
-		private int counter = 0;
+		private int extractCount = 0;
+		private int errorCount = 0;
 		
 		public void info(IndexingInfo info) {
 			if (info.is(InfoType.EXTRACTING))
-				counter++;
+				extractCount++;
+		}
+		
+		public void fail(IndexingError error) {
+			errorCount++;
 		}
 	}
 	
@@ -284,7 +293,31 @@ public final class FileIndexTest {
 		
 		CountingReporter countingReporter = new CountingReporter();
 		index.update(countingReporter, Cancelable.nullCancelable);
-		assertEquals(0, countingReporter.counter);
+		assertEquals(0, countingReporter.extractCount);
+	}
+	
+	@Test
+	public void testIndexEncrypted7zArchives() {
+		File archive = TestFiles.encrypted_7z_filenames.get();
+		FileIndex index = new FileIndex(null, archive);
+		index.update(new IndexingReporter() {
+			public void fail(IndexingError error) {
+				Throwable t = error.getThrowable();
+				assertTrue(t instanceof ArchiveEncryptedException);
+			}
+		}, Cancelable.nullCancelable);
+		
+		// J7Zip will print to stdout and stderr
+		PrintStream nullOut = new PrintStream(new NullOutputStream());
+		System.setOut(nullOut);
+		System.setErr(nullOut);
+		
+		archive = TestFiles.encrypted_7z.get();
+		index = new FileIndex(null, archive);
+		CountingReporter reporter = new CountingReporter();
+		index.update(reporter, Cancelable.nullCancelable);
+		assertTrue(reporter.extractCount == 1); // will report file, but fail to unpack it
+		assertTrue(reporter.errorCount == 0);
 	}
 	
 }

@@ -72,7 +72,6 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		 * after the iteration.
 		 */
 		public void finished();
-		public boolean isEncrypted();
 	}
 	
 	protected interface ArchiveEntryReader<E> {
@@ -158,9 +157,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		 */
 		archiveFolder = new FileFolder(archivePath, null);
 		
-		ArchiveIterator<E> archiveIt = getArchiveIterator(archiveFile);
-		if (archiveIt.isEncrypted())
-			throw new ArchiveEncryptedException(archiveFile, archivePath.getPath());
+		ArchiveIterator<E> archiveIt = getArchiveIterator(
+			archiveFile, archivePath.getPath());
 		ArchiveEntryReader<E> entryReader = getArchiveEntryReader();
 		
 		// Build tree structure from flat list of paths
@@ -263,9 +261,11 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		});
 	}
 	
+	// Implementor is expected to close any open resources in case of failure
 	@NotNull
-	protected abstract ArchiveIterator<E> getArchiveIterator(File archiveFile)
-			throws IOException;
+	protected abstract ArchiveIterator<E> getArchiveIterator(	File archiveFile,
+																String archivePath)
+			throws IOException, ArchiveEncryptedException;
 	
 	@NotNull
 	protected abstract ArchiveEntryReader<E> getArchiveEntryReader();

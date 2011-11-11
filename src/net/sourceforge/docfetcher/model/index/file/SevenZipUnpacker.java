@@ -44,6 +44,13 @@ abstract class SevenZipUnpacker<T> {
 		// don't know if J7Zip expects the indices to be sorted
 		Arrays.sort(unpackIndices);
 
+		/*
+		 * If the archive is encrypted (without encryption of filenames), the
+		 * IInArchive.Extract call will print an IOException
+		 * "k_7zAES not implemented" on stderr, but then swallow the
+		 * IOException. This means there's no simple way for us to get feedback
+		 * about whether the archive was encrypted or not.
+		 */
 		Callback callback = new Callback(unpackIndices);
 		archive.Extract(unpackIndices, unpackIndices.length, mode, callback);
 		return getUnpackResult();
