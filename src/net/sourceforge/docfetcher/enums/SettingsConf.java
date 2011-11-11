@@ -81,6 +81,10 @@ public final class SettingsConf {
 		ShowPreviewPanel (true),
 		ShowPreviewPanelAtBottom (true),
 		
+		FilesizeFilterMaximized (false),
+		TypesFilterMaximized (false),
+		LocationFilterMaximized (false),
+		
 		MainShellMaximized (false),
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
@@ -183,6 +187,7 @@ public final class SettingsConf {
 		PreviewHighlighting (255, 255, 0),
 		HotkeyToFront (SWT.CTRL, SWT.F8),
 		
+		FilterSash (1, 1),
 		RightSashHorizontal (1, 1),
 		RightSashVertical (1, 1),
 		;

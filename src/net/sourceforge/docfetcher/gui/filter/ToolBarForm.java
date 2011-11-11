@@ -21,7 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-public class ToolBarForm extends Composite {
+public abstract class ToolBarForm extends Composite {
 	
 	@NotNull private final ToolBarFormHeader header;
 	@NotNull private final Control contents;
@@ -64,12 +64,9 @@ public class ToolBarForm extends Composite {
 	}
 	
 	@NotNull
-	protected Control createContents(Composite parent) {
-		return new Composite(parent, SWT.NONE);
-	}
+	protected abstract Control createContents(Composite parent);
 	
 	public final void setContentsVisible(boolean isVisible) {
-		if (isVisible == contents.isVisible()) return;
 		contents.setVisible(isVisible);
 		GridData gridData = (GridData) contents.getLayoutData();
 		gridData.exclude = ! isVisible;

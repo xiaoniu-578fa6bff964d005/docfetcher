@@ -28,6 +28,13 @@ import org.eclipse.swt.widgets.Label;
 
 public abstract class TwoFormExpander extends Composite {
 	
+	public enum MaximizedControl {
+		TOP, BOTTOM, NONE
+	}
+	
+	@NotNull private Control firstControl;
+	@NotNull private Control secondControl;
+	
 	@NotNull private Label itemLeftTop0;
 	@NotNull private Label itemRightTop0;
 	@NotNull private Label itemLeftTop;
@@ -41,8 +48,6 @@ public abstract class TwoFormExpander extends Composite {
 	@NotNull private ToolBarForm formBottom;
 	@NotNull private ToolBarFormHeader formTop0;
 	@NotNull private ToolBarFormHeader formBottom0;
-	
-	// TODO now: store sash weights in maximized state, persist maximized state
 	
 	public TwoFormExpander(Composite parent) {
 		super(parent, SWT.NONE);
@@ -65,7 +70,7 @@ public abstract class TwoFormExpander extends Composite {
 			}
 			@NotNull
 			protected Control createContents(Composite parent) {
-				return createFirstContents(parent);
+				return firstControl = createFirstContents(parent);
 			}
 		};
 		
@@ -76,7 +81,7 @@ public abstract class TwoFormExpander extends Composite {
 			}
 			@NotNull
 			protected Control createContents(Composite parent) {
-				return createSecondContents(parent);
+				return secondControl = createSecondContents(parent);
 			}
 		};
 		
@@ -94,6 +99,7 @@ public abstract class TwoFormExpander extends Composite {
 			public void mouseUp(MouseEvent e) {
 				sash.setMaximizedControl(null);
 				updateLayout();
+				onMaximizationChanged();
 			}
 		};
 		
@@ -101,6 +107,7 @@ public abstract class TwoFormExpander extends Composite {
 			public void mouseUp(MouseEvent e) {
 				sash.setMaximizedControl(formBottom);
 				updateLayout();
+				onMaximizationChanged();
 			}
 		};
 		
@@ -108,6 +115,7 @@ public abstract class TwoFormExpander extends Composite {
 			public void mouseUp(MouseEvent e) {
 				sash.setMaximizedControl(formTop);
 				updateLayout();
+				onMaximizationChanged();
 			}
 		};
 		
@@ -123,6 +131,7 @@ public abstract class TwoFormExpander extends Composite {
 				else if (sash.getMaximizedControl() == formTop)
 					sash.setMaximizedControl(null);
 				updateLayout();
+				onMaximizationChanged();
 			}
 		});
 		
@@ -135,6 +144,7 @@ public abstract class TwoFormExpander extends Composite {
 				else if (sash.getMaximizedControl() == formBottom)
 					sash.setMaximizedControl(null);
 				updateLayout();
+				onMaximizationChanged();
 			}
 		});
 		
@@ -147,7 +157,7 @@ public abstract class TwoFormExpander extends Composite {
 				itemLeftBottom, itemRightBottom,
 				itemLeftBottom0, itemRightBottom0,
 		};
-		for (final Label item : items)
+		for (Label item : items)
 			Util.addMouseHighlighter(item);
 	}
 	
@@ -227,13 +237,58 @@ public abstract class TwoFormExpander extends Composite {
 	}
 	
 	@NotNull
-	protected Control createFirstContents(Composite parent) {
-		return new Composite(parent, SWT.NONE);
+	protected abstract Control createFirstContents(@NotNull Composite parent);
+	
+	@NotNull
+	protected abstract Control createSecondContents(@NotNull Composite parent);
+	
+	protected void onMaximizationChanged() {}
+	
+	@NotNull
+	public final Control getFirstControl() {
+		return firstControl;
 	}
 	
 	@NotNull
-	protected Control createSecondContents(Composite parent) {
-		return new Composite(parent, SWT.NONE);
+	public final Control getSecondControl() {
+		return secondControl;
+	}
+	
+	@NotNull
+	public final int[] getSashWeights() {
+		return sash.getWeights();
+	}
+	
+	public final void setSashWeights(@NotNull int[] weights) {
+		sash.setWeights(weights);
+	}
+	
+	@NotNull
+	public final MaximizedControl getMaximizedControl() {
+		Control control = sash.getMaximizedControl();
+		if (control == null)
+			return MaximizedControl.NONE;
+		else if (control == formTop)
+			return MaximizedControl.TOP;
+		else if (control == formBottom)
+			return MaximizedControl.BOTTOM;
+		else
+			throw new IllegalStateException();
+	}
+	
+	public final void setMaximizedControl(@NotNull MaximizedControl maxControl) {
+		Util.checkNotNull(maxControl);
+		switch (maxControl) {
+		case TOP:
+			sash.setMaximizedControl(formTop);
+			break;
+		case BOTTOM:
+			sash.setMaximizedControl(formBottom);
+			break;
+		case NONE:
+			sash.setMaximizedControl(null);
+		}
+		updateLayout();
 	}
 	
 	public final void setTopText(@NotNull String text) {

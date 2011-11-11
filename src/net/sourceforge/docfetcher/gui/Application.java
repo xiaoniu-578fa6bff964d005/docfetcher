@@ -32,6 +32,7 @@ import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.gui.filter.ToolBarForm;
 import net.sourceforge.docfetcher.gui.filter.TwoFormExpander;
+import net.sourceforge.docfetcher.gui.filter.TwoFormExpander.MaximizedControl;
 import net.sourceforge.docfetcher.gui.pref.PrefDialog;
 import net.sourceforge.docfetcher.gui.preview.PreviewPanel;
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -472,6 +473,7 @@ public final class Application {
 							: Img.MAXIMIZE.get();
 						item.setImage(image);
 						comp.layout();
+						SettingsConf.Bool.FilesizeFilterMaximized.set(isVisible);
 					}
 				});
 				Util.addMouseHighlighter(item);
@@ -484,8 +486,9 @@ public final class Application {
 			}
 		};
 		filesizeForm.setText(Msg.min_max_filesize.get());
-
-		TwoFormExpander expander = new TwoFormExpander(comp) {
+		filesizeForm.setContentsVisible(SettingsConf.Bool.FilesizeFilterMaximized.get());
+		
+		final TwoFormExpander expander = new TwoFormExpander(comp) {
 			protected Control createFirstContents(Composite parent) {
 				// TODO websearch: Load parser states from file, save parser states to file?
 				List<Parser> parsers = ParseService.getParsers();
@@ -495,7 +498,6 @@ public final class Application {
 				fileTypePanel = new FileTypePanel(parent, map);
 				return fileTypePanel.getControl();
 			}
-
 			protected Control createSecondContents(Composite parent) {
 				indexPanel = new IndexPanel(parent, indexRegistry);
 				indexPanel.evtIndexingDialogMinimized.add(new Event.Listener<Rectangle>() {
@@ -505,11 +507,42 @@ public final class Application {
 				});
 				return indexPanel.getControl();
 			}
+			protected void onMaximizationChanged() {
+				// Save maximization states
+				MaximizedControl maxControl = getMaximizedControl();
+				boolean topMax = maxControl == MaximizedControl.TOP;
+				boolean bottomMax = maxControl == MaximizedControl.BOTTOM;
+				SettingsConf.Bool.TypesFilterMaximized.set(topMax);
+				SettingsConf.Bool.LocationFilterMaximized.set(bottomMax);
+			}
 		};
 		expander.setTopText(Msg.document_types.get());
 		expander.setBottomText(Msg.search_scope.get());
 		expander.setSashWidth(sashWidth);
-
+		
+		// Restore sash weights and maximization states
+		expander.setSashWeights(SettingsConf.IntArray.FilterSash.get());
+		if (SettingsConf.Bool.TypesFilterMaximized.get())
+			expander.setMaximizedControl(MaximizedControl.TOP);
+		if (SettingsConf.Bool.LocationFilterMaximized.get())
+			expander.setMaximizedControl(MaximizedControl.BOTTOM);
+		
+		// Save sash weights
+		expander.getFirstControl().addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				// Run in asyncExec to make sure both controls have been resized
+				Util.runAsyncExec(expander, new Runnable() {
+					public void run() {
+						MaximizedControl maxControl = expander.getMaximizedControl();
+						if (maxControl != MaximizedControl.NONE)
+							return;
+						int[] weights = expander.getSashWeights();
+						SettingsConf.IntArray.FilterSash.set(weights);
+					}
+				});
+			}
+		});
+		
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).left().top().right().applyTo(filesizeForm);
 		fdf.top(filesizeForm, 5).bottom().applyTo(expander);
