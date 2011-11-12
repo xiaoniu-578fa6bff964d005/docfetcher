@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.man;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Properties;
@@ -21,6 +20,7 @@ import java.util.Properties;
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.build.BuildMain;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 
@@ -76,16 +76,20 @@ public final class Manual {
 		File dstDir = new File("dist/help/" + dstDirName);
 		Files.deleteDirectoryContents(dstDir);
 		
+		// Recursively walk through man subdirectory and convert markdown to html
 		PegDownProcessor processor = new PegDownProcessor(Extensions.TABLES);
 		File propsFile = new File(srcDir, "/page.properties");
 		PageProperties props = new PageProperties(propsFile);
 		SubPageProperties.initPageTitles(props);
 		convert(processor, props, srcDir, dstDir, true);
 		
+		// Deploy files in the man/all directory
 		for (File file : Util.listFiles(new File(manDir + "/all"))) {
 			String name = file.getName();
 			String dstPath = dstDir.getPath() + "/DocFetcher_Manual_files/" + name;
-			Files.copy(file, new File(dstPath));
+			File dstFile = new File(dstPath);
+			Files.createParentDirs(dstFile);
+			Files.copy(file, dstFile);
 		}
 	}
 	
@@ -95,29 +99,29 @@ public final class Manual {
 								@NotNull File srcDir,
 								@NotNull File dstDir,
 								boolean isTopLevel) throws IOException {
-		for (File file : Util.listFiles(srcDir)) {
-			String name = file.getName();
-			if (file.isDirectory()) {
+		for (File mdFile : Util.listFiles(srcDir)) {
+			String name = mdFile.getName();
+			if (mdFile.isDirectory()) {
 				File dstSubDir = new File(dstDir, name);
 				dstSubDir.mkdirs();
-				convert(processor, props, file, dstSubDir, false);
+				convert(processor, props, mdFile, dstSubDir, false);
 			}
-			else if (file.isFile()) {
-				if (file.equals(props.propsFile))
+			else if (mdFile.isFile()) {
+				if (mdFile.equals(props.propsFile))
 					continue;
 				if (!name.endsWith(".markdown")) {
-					Files.copy(file, new File(dstDir, name));
+					Files.copy(mdFile, new File(dstDir, name));
 					continue;
 				}
 				Util.println("Converting: " + name);
-				String rawText = Files.toString(file, Charsets.UTF_8);
+				String rawText = CharsetDetectorHelper.toString(mdFile);
 				String htmlBody = processor.markdownToHtml(rawText);
 				String newFilename = Util.splitFilename(name)[0] + ".html";
-				File dstFile = new File(dstDir, newFilename);
+				File htmlFile = new File(dstDir, newFilename);
 				String html = isTopLevel
-					? convertMainPage(props, file, htmlBody)
-					: convertSubPage(props, file, htmlBody);
-				Files.write(html, dstFile, Charsets.UTF_8);
+					? convertMainPage(props, mdFile, htmlBody)
+					: convertSubPage(props, mdFile, htmlBody);
+				Files.write(html, htmlFile, Charsets.UTF_8);
 			}
 		}
 	}
@@ -129,10 +133,11 @@ public final class Manual {
 			throws IOException {
 		String path = file.getPath();
 		File templateFile = new File(manDir, "template-mainpage.html");
-		String template = Files.toString(templateFile, Charsets.UTF_8);
+		String template = CharsetDetectorHelper.toString(templateFile);
 
 		Pair[] pairs = new Pair[] {
 			props.docfetcherManual, props.author, props.mainFooter };
+		
 		for (Pair pair : pairs) {
 			String key = "${" + pair.key + "}";
 			template = UtilGlobal.replace(path, template, key, pair.value);
@@ -152,7 +157,7 @@ public final class Manual {
 			throws IOException {
 		String path = file.getPath();
 		File templateFile = new File(manDir, "template-subpage.html");
-		String template = Files.toString(templateFile, Charsets.UTF_8);
+		String template = CharsetDetectorHelper.toString(templateFile);
 
 		Pair[] pairs = new Pair[] {
 			props.docfetcherManual, props.author, props.backToMainPage };
@@ -187,7 +192,7 @@ public final class Manual {
 	
 	private static final class PageProperties {
 		private final File propsFile;
-		private final Properties props = new Properties();
+		private final Properties props;
 		
 		public final Pair author;
 		public final Pair docfetcherManual;
@@ -196,8 +201,7 @@ public final class Manual {
 
 		public PageProperties(@NotNull File propsFile) throws IOException {
 			this.propsFile = propsFile;
-			String propsFileContents = Files.toString(propsFile, Charsets.UTF_8);
-			props.load(new StringReader(propsFileContents));
+			props = CharsetDetectorHelper.load(propsFile);
 			
 			author = getPair("author");
 			docfetcherManual = getPair("docfetcher_manual");

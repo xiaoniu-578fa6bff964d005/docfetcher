@@ -11,25 +11,18 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
 import net.sourceforge.docfetcher.enums.Msg;
-import net.sourceforge.docfetcher.util.annotations.Nullable;
-
-import org.mozilla.universalchardet.UniversalDetector;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 
 /**
  * @author Tran Nam Quang
  */
 public final class TextParser extends StreamParser {
 	
-	@Nullable private UniversalDetector charsetDetector;
 	private final Collection<String> types = MediaType.Col.text("plain");
 	
 	TextParser() {
@@ -39,23 +32,7 @@ public final class TextParser extends StreamParser {
 	protected ParseResult parse(InputStream in,
 	                            ParseContext context) throws ParseException {
 		try {
-			byte[] bytes = ByteStreams.toByteArray(in);
-			
-			if (charsetDetector == null)
-				charsetDetector = new UniversalDetector(null);
-			byte[] buf = new byte[4096];
-			ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
-			
-			int nread;
-		    while ((nread = byteIn.read(buf)) > 0 && !charsetDetector.isDone())
-				charsetDetector.handleData(buf, 0, nread);
-		    charsetDetector.dataEnd();
-		    String charsetName = charsetDetector.getDetectedCharset();
-		    charsetDetector.reset();
-			
-			String contents = charsetName == null ? new String(
-				bytes, Charsets.ISO_8859_1) : new String(bytes, charsetName);
-			
+			String contents = CharsetDetectorHelper.toString(in);
 			return new ParseResult(contents);
 		}
 		catch (IOException e) {

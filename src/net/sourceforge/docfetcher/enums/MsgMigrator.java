@@ -11,20 +11,17 @@
 
 package net.sourceforge.docfetcher.enums;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.Util;
-
-import org.mozilla.universalchardet.UniversalDetector;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -42,7 +39,7 @@ public final class MsgMigrator {
 		File oldTransDir = new File("dev/old-translations-from-1.0.3");
 		final String enPropName = "Resource.properties";
 		
-		Properties oldEnProp = load(new File(oldTransDir, enPropName));
+		Properties oldEnProp = UtilGlobal.load(new File(oldTransDir, enPropName));
 		List<File> oldPropFiles = Arrays.asList(Util.listFiles(oldTransDir, new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return !name.equals(enPropName);
@@ -54,7 +51,7 @@ public final class MsgMigrator {
 		List<Properties> oldProps = Lists.transform(oldPropFiles, new Function<File, Properties>() {
 			public Properties apply(File file) {
 				try {
-					Properties prop = load(file);
+					Properties prop = UtilGlobal.load(file);
 					propToFileMap.put(prop, file);
 					return prop;
 				}
@@ -109,25 +106,4 @@ public final class MsgMigrator {
 		}
 	}
 	
-	public static Properties load(File propsFile) throws IOException {
-		byte[] bytes = Files.toByteArray(propsFile);
-		UniversalDetector charsetDetector = new UniversalDetector(null);
-		byte[] buf = new byte[4096];
-		ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
-		
-		int nread;
-	    while ((nread = byteIn.read(buf)) > 0 && !charsetDetector.isDone())
-			charsetDetector.handleData(buf, 0, nread);
-	    charsetDetector.dataEnd();
-	    String charsetName = charsetDetector.getDetectedCharset();
-	    charsetDetector.reset();
-		
-		String contents = charsetName == null ? new String(
-			bytes, Charsets.ISO_8859_1) : new String(bytes, charsetName);
-		
-		Properties props = new Properties();
-		props.load(new StringReader(contents));
-		return props;
-	}
-
 }
