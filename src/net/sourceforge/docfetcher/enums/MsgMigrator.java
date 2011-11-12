@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import net.sourceforge.docfetcher.UtilGlobal;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.Util;
 
@@ -39,7 +39,7 @@ public final class MsgMigrator {
 		File oldTransDir = new File("dev/old-translations-from-1.0.3");
 		final String enPropName = "Resource.properties";
 		
-		Properties oldEnProp = UtilGlobal.load(new File(oldTransDir, enPropName));
+		Properties oldEnProp = CharsetDetectorHelper.load(new File(oldTransDir, enPropName));
 		List<File> oldPropFiles = Arrays.asList(Util.listFiles(oldTransDir, new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return !name.equals(enPropName);
@@ -51,7 +51,7 @@ public final class MsgMigrator {
 		List<Properties> oldProps = Lists.transform(oldPropFiles, new Function<File, Properties>() {
 			public Properties apply(File file) {
 				try {
-					Properties prop = UtilGlobal.load(file);
+					Properties prop = CharsetDetectorHelper.load(file);
 					propToFileMap.put(prop, file);
 					return prop;
 				}
