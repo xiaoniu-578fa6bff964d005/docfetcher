@@ -71,12 +71,12 @@ public final class Path implements Serializable {
 	@NotNull
 	private static String normalizePath(@NotNull String path) {
 		path = Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
-		return normalizeUnicode(path);
+		return normalizeUnicode(path, true);
 	}
 	
 	@NotNull
-	private static String normalizeUnicode(@NotNull String str) {
-	    Normalizer.Form form = Normalizer.Form.NFD;
+	private static String normalizeUnicode(@NotNull String str, boolean composed) {
+	    Normalizer.Form form = composed ? Normalizer.Form.NFC : Normalizer.Form.NFD;
 	    if (!Normalizer.isNormalized(str, form))
 			return Normalizer.normalize(str, form);
 	    return str;
@@ -104,12 +104,17 @@ public final class Path implements Serializable {
 	@NotNull
 	public File getCanonicalFile() {
 		if (canonicalFile == null) {
+			/*
+			 * On Mac OS X, return a file with decomposed path. On all other
+			 * platforms, return a file with composed path.
+			 */
+			String path1 = normalizeUnicode(path, !Util.IS_MAC_OS_X);
 			try {
-				canonicalFile = new File(path).getCanonicalFile();
+				canonicalFile = new File(path1).getCanonicalFile();
 			}
 			catch (IOException e) {
 				Util.printErr(e);
-				canonicalFile = new File(path).getAbsoluteFile();
+				canonicalFile = new File(path1).getAbsoluteFile();
 			}
 		}
 		return canonicalFile;
