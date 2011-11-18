@@ -45,7 +45,7 @@ public enum TestFiles {
 	index_update_html_in_7z ("index-update-html-in-7z"),
 	index_update_rename_in_7z ("index-update-rename-in-7z"),
 	index_update_html_in_html ("index-update-html-in-html"),
-	umlauts ("umlauts-äöüß/archive-äöüß.rar/archive-äöüß.7z/archive-äöüß.zip/file-äöüß.txt"),
+	umlauts ("umlauts.7z/umlauts-äöüß/archive-äöüß.rar/archive-äöüß.7z/archive-äöüß.zip/file-äöüß.txt"),
 	
 	encrypted_7z ("7z-encrypted-(password='docfetcher').7z"),
 	encrypted_7z_filenames ("7z-encrypted-including-filenames-(password='docfetcher').7z"),
