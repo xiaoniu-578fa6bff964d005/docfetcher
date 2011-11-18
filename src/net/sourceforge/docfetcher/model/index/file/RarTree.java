@@ -88,6 +88,11 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 			Closeables.closeQuietly(archive);
 			throw new IOException(e);
 		}
+		catch (RuntimeException e) {
+			// J7Zip threw a NullPointerException, as reported in #3437670.
+			Closeables.closeQuietly(archive);
+			throw new IOException(e);
+		}
 	}
 	
 	private static final class RarEntryReader implements ArchiveEntryReader<FileHeader> {
