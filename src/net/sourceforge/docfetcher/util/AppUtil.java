@@ -449,9 +449,9 @@ public final class AppUtil {
 
 		// Prepend useful program info to the stacktrace
 		StringBuilder sb = new StringBuilder();
-		sb.append("program.name=" + Const.PROGRAM_NAME.value + "\n");
-		sb.append("program.version=" + Const.PROGRAM_VERSION.value + "\n");
-		sb.append("program.build=" + Const.PROGRAM_BUILD_DATE.value + "\n");
+		sb.append("program.name=" + Const.PROGRAM_NAME.value + Util.LS);
+		sb.append("program.version=" + Const.PROGRAM_VERSION.value + Util.LS);
+		sb.append("program.build=" + Const.PROGRAM_BUILD_DATE.value + Util.LS);
 		String[] keys = {
 				"java.runtime.name",
 				"java.runtime.version",
@@ -463,7 +463,7 @@ public final class AppUtil {
 				"user.language"
 		};
 		for (String key : keys)
-			sb.append(key + "=" + System.getProperty(key) + "\n");
+			sb.append(key + "=" + System.getProperty(key) + Util.LS);
 
 		// Get stacktrace as string
 		StringWriter writer = new StringWriter();
@@ -477,7 +477,8 @@ public final class AppUtil {
 		final File traceFile = new File(getAppDataDir(), traceFilename);
 		try {
 			Files.write(trace, traceFile, Charsets.UTF_8);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace(); // We'll give up here
 		}
 
@@ -492,7 +493,15 @@ public final class AppUtil {
 				window.setText(msg);
 				Image icon = display.getSystemImage(SWT.ICON_WARNING);
 				window.setTitleImage(icon);
-				window.setStackTrace(trace);
+				
+				/*
+				 * It appears that when you paste a stracktrace with Windows
+				 * newlines into the text field of a SourceForge.net bug report,
+				 * the newlines will end up being duplicated. The workaround is
+				 * to use Linux newlines in the stacktrace window.
+				 */
+				window.setStackTrace(Util.ensureLinuxLineSep(trace));
+				
 				window.open();
 			}
 		});
