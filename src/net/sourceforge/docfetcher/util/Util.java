@@ -936,8 +936,17 @@ public final class Util {
 	 * false.
 	 */
 	public static void checkThat(boolean condition) {
-		if (! condition)
+		if (!condition)
 			throw new IllegalArgumentException();
+	}
+
+	/**
+	 * Throws an <code>IllegalArgumentException</code> with the given error
+	 * message if the given condition is false.
+	 */
+	public static void checkThat(boolean condition, @NotNull String message) {
+		if (!condition)
+			throw new IllegalArgumentException(message);
 	}
 	
 	/**

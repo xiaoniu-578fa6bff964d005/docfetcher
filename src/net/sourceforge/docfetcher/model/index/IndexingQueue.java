@@ -267,7 +267,8 @@ public final class IndexingQueue {
 		File taskIndexDir = task.getLuceneIndex().getIndexDirPath().getCanonicalFile();
 		File taskParentIndexDir = Util.getParentFile(taskIndexDir);
 		File indexParentDir = indexRegistry.getIndexParentDir();
-		Util.checkThat(sameFiles(taskParentIndexDir, indexParentDir));
+		String msg = taskParentIndexDir.getPath() + " != " + indexParentDir.getPath();
+		Util.checkThat(sameFiles(taskParentIndexDir, indexParentDir), msg);
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
 
