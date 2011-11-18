@@ -149,6 +149,16 @@ abstract class MSOfficeParser extends FileParser {
 		catch (IOException e) {
 			throw new ParseException(e);
 		}
+		catch (RuntimeException e) {
+			/*
+			 * As seen in numerous bug reports (3439858, 3439576, 3439057,
+			 * 3438353, 3437768, 3437667), Apache POI seems to throw a lot of
+			 * runtime exceptions, taking down the entire program with it. To
+			 * avoid crashing, we'll intercept all runtime exceptions and turn
+			 * them into regular indexing errors.
+			 */
+			throw new ParseException(e);
+		}
 		finally {
 			Closeables.closeQuietly(in);
 		}
