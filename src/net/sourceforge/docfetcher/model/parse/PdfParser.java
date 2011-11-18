@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
+import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -79,11 +80,8 @@ public final class PdfParser extends StreamParser {
 					.addMiscMetadata(pdInfo.getKeywords());
 		}
 		catch (IOException e) {
-			/*
-			 * TODO post-release-1.1: write unit test to see what happens when
-			 * the PDF is encrypted with a non-empty password. -> show
-			 * translated error message: Msg.doc_pw_protected.get()
-			 */
+			if (e.getCause() instanceof CryptographyException)
+				throw new ParseException(Msg.doc_pw_protected.get());
 			throw new ParseException(e);
 		}
 		finally {
