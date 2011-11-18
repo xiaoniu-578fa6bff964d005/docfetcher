@@ -6,7 +6,7 @@
 ; When building a new release, remember to update the version number in the next
 ; command.
 
-!define VERSION 1.1-beta1
+!define VERSION 1.1-beta2
 !define PORTABLE_PATH build\DocFetcher-${VERSION}
 
 RequestExecutionLevel admin ; without this, the startmenu links won't be removed on Windows Vista/7

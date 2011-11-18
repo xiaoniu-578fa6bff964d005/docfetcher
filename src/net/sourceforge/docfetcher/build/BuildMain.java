@@ -42,7 +42,7 @@ import com.google.common.base.Strings;
 public final class BuildMain {
 	
 	public static final String appName = "DocFetcher";
-	public static final String version = "1.1-beta1";
+	public static final String version = "1.1-beta2";
 	
 	private static final String packageId = Main.class.getPackage().getName();
 	private static final String packagePath = packageId.replace(".", "/");
@@ -204,10 +204,11 @@ public final class BuildMain {
 		 */
 		U.write("", releaseDir + "/indexes/.indexes.txt");
 		
-		U.copyTextFile(
-			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
-		U.copyBinaryFile(
-			"dist/ChangeLog.html", releaseDir + "/misc/ChangeLog.html");
+		// TODO
+//		U.copyTextFile(
+//			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
+//		U.copyBinaryFile(
+//			"dist/ChangeLog.html", releaseDir + "/misc/ChangeLog.html");
 	}
 	
 	private static void deployInfoPlist(File dstDir) throws Exception {
