@@ -11,7 +11,6 @@
 
 package net.sourceforge.docfetcher.model.index.file;
 
-import java.io.CharConversionException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,20 +60,24 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 	
 	private void runWithoutHtmlPairing() {
 		for (File fileOrDir : Util.listFiles(parentDir)) {
-			if (isStopped()) return;
+			if (isStopped())
+				return;
+			
+			boolean isFile;
 			try {
 				if (Util.isSymLink(fileOrDir))
 					continue;
 				if (skip(fileOrDir))
 					continue;
+				if (Util.isJunctionOrSymlink(fileOrDir))
+					continue;
+				isFile = fileOrDir.isFile();
 			}
-			catch (AssertionError e) {
-				handleCharConversionException(e, fileOrDir);
+			catch (RuntimeException e) {
+				handleFileException(e, fileOrDir);
 				continue;
 			}
-			if (Util.isJunctionOrSymlink(fileOrDir))
-				continue;
-			boolean isFile = fileOrDir.isFile();
+			
 			if (isFile) {
 				if (isHtmlFile(fileOrDir))
 					handleHtmlPair(fileOrDir, null);
@@ -97,19 +100,22 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		// Note: The file filter should be applied *after* the HTML pairing.
 		
 		for (final File fileOrDir : filesOrDirs) {
-			if (isStopped()) return;
-			if (Util.isSymLink(fileOrDir))
-				continue;
-			if (Util.isJunctionOrSymlink(fileOrDir))
-				continue;
+			if (isStopped())
+				return;
+			
 			boolean isFile;
 			try {
+				if (Util.isSymLink(fileOrDir))
+					continue;
+				if (Util.isJunctionOrSymlink(fileOrDir))
+					continue;
 				isFile = fileOrDir.isFile();
 			}
-			catch (AssertionError e) {
-				handleCharConversionException(e, fileOrDir);
+			catch (RuntimeException e) {
+				handleFileException(e, fileOrDir);
 				continue;
 			}
+			
 			if (isFile) {
 				if (isHtmlFile(fileOrDir))
 					htmlFiles.add(fileOrDir);
@@ -156,16 +162,16 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		return Util.hasExtension(file.getName(), htmlExtensions);
 	}
 	
-	private void handleCharConversionException(	@NotNull AssertionError e,
-												@NotNull final File file) {
+	private void handleFileException(	@NotNull Throwable e,
+										@NotNull final File file) {
 		/*
-		 * TrueZIP crashes with a CharConversionException while traversing
-		 * certain zip files containing Chinese encodings.
+		 * TrueZIP can throw various runtime exceptions, e.g. a
+		 * CharConversionException while traversing zip files containing Chinese
+		 * encodings. There was also a tar-related crash, as reported in
+		 * #3436750.
 		 */
-		if (!(e.getCause() instanceof CharConversionException))
-			throw e;
 		if (reporter == null) {
-			Util.printErr(e.getCause().getMessage());
+			Util.printErr(Util.getLowestMessage(e));
 			return;
 		}
 		String filename = file.getName();
