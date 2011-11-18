@@ -37,10 +37,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_6_1.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.5.0.jar" sourcepath="lib/pdfbox/pdfbox-1.5.0-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
@@ -73,5 +69,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/pegdown/asm-all-3.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_8_1_1.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.6.0.jar" sourcepath="lib/pdfbox/pdfbox-1.6.0-src-stripped.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
