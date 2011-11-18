@@ -485,7 +485,7 @@ public final class FileFactory {
 						&& config.isArchive(currentPath)) { // Partial match
 					File innerArchiveFile;
 					try {
-						innerArchiveFile = unpackRarEntry(config, archive, fh, entryPath);
+						innerArchiveFile = unpackRarEntry(config, archive, fh, currentPath);
 					}
 					finally {
 						archiveResource.dispose();

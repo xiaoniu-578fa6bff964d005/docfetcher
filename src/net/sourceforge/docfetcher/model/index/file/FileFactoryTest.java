@@ -122,5 +122,17 @@ public final class FileFactoryTest {
 		IndexingConfig config = new IndexingConfig();
 		fileFactory.createFile(config, new Path(TestFiles.sfx_rar.getPath() + "/test.txt"));
 	}
+	
+	@Test
+	public void testUmlauts() throws Exception {
+		HotColdFileCache unpackCache = new HotColdFileCache(20);
+		FileFactory fileFactory = new FileFactory(unpackCache);
+		IndexingConfig config = new IndexingConfig();
+		
+		String path = TestFiles.umlauts.getPath();
+		FileResource fileResource = fileFactory.createFile(config, new Path(path));
+		assertTrue(fileResource.getFile().isFile());
+		fileResource.dispose();
+	}
 
 }
