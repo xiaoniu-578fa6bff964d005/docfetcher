@@ -34,6 +34,7 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.FileIconCache;
@@ -201,11 +202,19 @@ public final class ResultPanel {
 		
 		viewer.addColumn(new VariableHeaderColumn<ResultDocument>(Msg.last_modified.get(), Msg.send_date.get()) {
 			protected String getLabel(ResultDocument element) {
-				return dateFormat.format(getDate(element));
+				Date date = getDate(element);
+				return date == null ? "" : dateFormat.format(date);
 			}
 			protected int compare(ResultDocument e1, ResultDocument e2) {
-				return getDate(e1).compareTo(getDate(e2));
+				Date date1 = getDate(e1);
+				Date date2 = getDate(e2);
+				if (date1 == null) // Place null dates before non-null dates
+					return date2 == null ? 0 : -1;
+				else if (date2 == null)
+					return 1;
+				return date1.compareTo(date2);
 			}
+			@Nullable
 			private Date getDate(ResultDocument element) {
 				if (element.isEmail())
 					return element.getDate();

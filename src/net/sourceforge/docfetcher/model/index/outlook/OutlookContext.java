@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -95,7 +96,6 @@ final class OutlookContext {
 		String body = email.getBody();
 		String sender = getSender(email);
 		String recipients = Util.join(", ", getRecipients(email));
-		long date = email.getMessageDeliveryTime().getTime();
 		long size = body.length(); // assume every char takes up one byte
 		
 		luceneDoc.add(Fields.UID.create(doc.getUniqueId()));
@@ -103,9 +103,18 @@ final class OutlookContext {
 		luceneDoc.add(Fields.TYPE.create("outlook")); //$NON-NLS-1$
 		luceneDoc.add(Fields.SENDER.create(sender));
 		luceneDoc.add(Fields.RECIPIENTS.create(recipients));
-		luceneDoc.add(Fields.DATE.create(String.valueOf(date)));
 		luceneDoc.add(Fields.SIZE.create(size));
 		luceneDoc.add(Fields.PARSER.create(Fields.EMAIL_PARSER));
+
+		/*
+		 * The date returned by getMessageDeliveryTime can be null. See bug
+		 * #3440130.
+		 */
+		Date date = email.getMessageDeliveryTime();
+		if (date != null) {
+			String timestamp = String.valueOf(date.getTime());
+			luceneDoc.add(Fields.DATE.create(timestamp));
+		}
 		
 		StringBuilder contents = new StringBuilder();
 		contents.append(subject).append(" ");

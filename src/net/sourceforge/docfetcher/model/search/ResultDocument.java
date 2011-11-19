@@ -33,6 +33,7 @@ import net.sourceforge.docfetcher.model.parse.TextParser;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 
 import org.apache.lucene.document.Document;
@@ -186,11 +187,11 @@ public final class ResultDocument {
 		return new Date(Long.valueOf(lastModified));
 	}
 	
-	@NotNull
+	@Nullable
 	public Date getDate() {
 		onlyEmails();
 		String sendDate = luceneDoc.get(Fields.DATE.key());
-		return new Date(Long.valueOf(sendDate));
+		return sendDate == null ? null : new Date(Long.valueOf(sendDate));
 	}
 	
 	public boolean isEmail() {

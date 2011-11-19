@@ -59,7 +59,7 @@ public enum Fields {
 	SUBJECT (Store.YES, Index.ANALYZED),
 	SENDER (Store.YES, Index.ANALYZED),
 	RECIPIENTS (Store.YES, Index.ANALYZED), // TODO post-release-1.1: show this field on results panel in "email mode"
-	DATE (Store.YES, Index.NO),
+	DATE (Store.YES, Index.NO), // this field is optional
 	;
 	
 	public static final String EMAIL_PARSER = "EmailParser";
