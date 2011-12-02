@@ -71,7 +71,17 @@ public final class PdfParser extends StreamParser {
 				}
 			};
 			stripper.setForceParsing(true);
-			stripper.writeText(pdfDoc, writer);
+			
+			try {
+				stripper.writeText(pdfDoc, writer);
+			}
+			catch (RuntimeException e) {
+				/*
+				 * PDFTextStripper.writeText can throw various
+				 * RuntimeExceptions, see bugs #3446010, #3448272, #3444887.
+				 */
+				throw new ParseException(e);
+			}
 
 			return new ParseResult(writer.getBuffer()).setTitle(
 				pdInfo.getTitle())
