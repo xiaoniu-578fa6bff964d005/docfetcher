@@ -53,6 +53,13 @@ final class RtfParser extends StreamParser {
 				.addMiscMetadata(metadata.get(Metadata.COMPANY))
 				.addMiscMetadata(metadata.get(Metadata.MANAGER));
 		}
+		catch (AssertionError e) {
+			/*
+			 * With the RTF parser in Tika 0.10, calling TextExtractor.extract
+			 * results in an AssertionError. See bug #3443948.
+			 */
+			throw new ParseException(e);
+		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
