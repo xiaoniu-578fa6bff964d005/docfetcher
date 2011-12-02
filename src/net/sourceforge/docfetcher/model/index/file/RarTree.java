@@ -176,10 +176,20 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 						archive.extractFile(fh, out);
 						Closeables.closeQuietly(out);
 						indexFileMap.put(i, file);
-					} else if (isSolid) {
+					}
+					else if (isSolid) {
 						archive.extractFile(fh, nullOut);
 					}
-				} catch (Exception e) {
+				}
+				catch (OutOfMemoryError e) {
+					/*
+					 * Calling extractFile can throw an OutOfMemoryError. See
+					 * bug #3443490.
+					 */
+					if (treeNode != null) // Ignore errors for entries written to NullOutputStream
+						failReporter.fail(ErrorType.OUT_OF_MEMORY, treeNode, e);
+				}
+				catch (Exception e) {
 					if (treeNode != null) // Ignore errors for entries written to NullOutputStream
 						failReporter.fail(ErrorType.ARCHIVE_ENTRY, treeNode, e);
 				}
