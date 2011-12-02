@@ -699,9 +699,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			if (mainFile == null) {
 				/*
 				 * FIXME For unknown reasons, the file returned by the archive
-				 * tree can be null at this point. See bug #3442047. Since the
-				 * cause is unknown, we'll just print a warning here and move
-				 * on.
+				 * tree can be null at this point. See bugs #3442047, #3443630,
+				 * #3443676. Since the cause is unknown, but likely inside our
+				 * own code, we'll print a warning here and move on.
 				 */
 				String path = doc.getPath().getCanonicalPath();
 				Util.printErr("Warning: SolidArchiveTree returned null for this document: " + path);
