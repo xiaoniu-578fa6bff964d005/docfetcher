@@ -113,7 +113,12 @@ public final class Path implements Serializable {
 				canonicalFile = new File(path1).getCanonicalFile();
 			}
 			catch (IOException e) {
-				Util.printErr(e);
+				/*
+				 * We'll only print an error message here instead of the full
+				 * stacktrace. Doing the latter seemed to have caused a
+				 * StackOverflowError, as was reported in #3441649.
+				 */
+				Util.printErr(e.getMessage());
 				canonicalFile = new File(path1).getAbsoluteFile();
 			}
 		}
