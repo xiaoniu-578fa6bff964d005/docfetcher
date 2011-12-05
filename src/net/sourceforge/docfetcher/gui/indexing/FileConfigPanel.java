@@ -146,7 +146,14 @@ final class FileConfigPanel extends ConfigPanel {
 			return false;
 		
 		Collection<String> zipExtensions = extGroupWrapper.getZipExtensions();
-		if (!confirmExtensionOverride(zipExtensions, Msg.confirm_zip_ext))
+		for (String zipExt : zipExtensions) {
+			if (zipExt.matches("\\d.*")) {
+				AppUtil.showError(Msg.zip_ext_digits.format(zipExt), true, true);
+				return false;
+			}
+		}
+		
+		if (!confirmExtensionOverride(zipExtensions, Msg.confirm_zip_ext, "7z", "rar"))
 			return false;
 		
 		IndexingConfig config = index.getConfig();
@@ -166,12 +173,23 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	// given message must have one %s placeholder for inserting the overriding file extensions
 	private boolean confirmExtensionOverride(	@NotNull Collection<String> extensions,
-												@NotNull Msg msg) {
+												@NotNull Msg msg,
+												@NotNull String... extraBuiltInExts) {
 		LazyList<String> overridingExtensions = new LazyList<String>();
-		for (String extension : extensions)
+		for (String extension : extensions) {
 			if (ParseService.isBuiltInExtension(index.getConfig(), extension))
 				if (!overridingExtensions.contains(extension))
 					overridingExtensions.add(extension);
+			
+			extension = extension.toLowerCase();
+			for (String extraExt : extraBuiltInExts) {
+				if (extension.equals(extraExt)) {
+					if (!overridingExtensions.contains(extension))
+						overridingExtensions.add(extension);
+					break;
+				}
+			}
+		}
 		
 		if (!overridingExtensions.isEmpty()) {
 			String message = msg.format(Util.join(", ", overridingExtensions));

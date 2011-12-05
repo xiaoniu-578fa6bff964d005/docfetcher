@@ -91,7 +91,7 @@ public enum Msg {
 		"Error message shown on startup if some of the program's image " +
 		"files are missing. The missing files will be listed below this message."),
 	entries_missing (
-		"The following entries in '{0}' are missing or have invalid values:",
+		"The following entries in {0} are missing or have invalid values:",
 		"Error message shown on startup if some entries in a properties file " +
 		"are mssing or invalid. The name of the properties file will be inserted into " +
 		"the {0} slot. The missing entries will be listed after this message."),
@@ -433,11 +433,19 @@ public enum Msg {
 		"extension that would override the built-in support for certain document formats " +
 		"such as *.doc or *.odt. The user's plain text extensions will be " +
 		"inserted into the {0} slot."),
+	zip_ext_digits (
+		"Zip extensions starting with digits (e.g. {0}) are currently not " +
+		"supported.",
+		"This error message is shown when the user has entered custom zip " +
+		"extensions that start with a digit, e.g. 7z or 001. The first one of " +
+		"these extensions will be inserted into the {0} slot."),
 	confirm_zip_ext (
 		"You've entered the following zip extensions: {0}. This will override " +
 		"DocFetcher's built-in support for files with these extensions, and " +
-		"the files will instead be treated as zip archives. Do you still want " +
-		"to continue?",
+		"DocFetcher will instead try to process them as zip archives.\n\nThis is " +
+		"probably not what you want because the built-in support will generally " +
+		"give better results. Also, note that 7z, rar and tar.* are NOT zip archives. " +
+		"Do you still want to continue?",
 		//
 		"This warning message is shown when the user has entered custom zip " +
 		"extensions that would override the built-in support for certain " +
@@ -471,7 +479,7 @@ public enum Msg {
 	out_of_memory_instructions ("DocFetcher has run out of memory. " +
 		"Please see the relevant <a href=\"{0}\">manual page</a> for further instructions."), // {0} slot
 	out_of_memory_instructions_brief ("Out of memory. See the manual for instructions on how to raise the memory limit."),
-	not_enough_diskspace ("Not enough diskspace on '{0}' to unpack archive entries. Available: {1} MB. Needed: {2} MB."),
+	not_enough_diskspace ("Not enough diskspace on {0} to unpack archive entries. Available: {1} MB. Needed: {2} MB."),
 	archive_encrypted ("Archive is encrypted."),
 	archive_entry_encrypted ("Archive entry is encrypted."),
 	not_an_archive ("Not an archive."),
@@ -481,7 +489,7 @@ public enum Msg {
 	total_elapsed_time ("Total elapsed time: {0}"),
 	copy ("Copy\tCtrl+C"),
 	install_watch_failed (
-	"Failed to install watch on folder '{0}'.\n\nInternal error message:\n{1}"),
+	"Failed to install watch on folder {0}.\n\nInternal error message:\n{1}"),
 	
 	// Preview panel
 	loading ("Loading...",
@@ -665,7 +673,8 @@ public enum Msg {
 	 * with the given argument(s).
 	 */
 	public String format(Object... args) {
-		return MessageFormat.format(value, args);
+		String val = value.replace("'", "''"); // See bug #4293229 in Java bug database
+		return MessageFormat.format(val, args);
 	}
 	
 	public static void setCheckEnabled(boolean checkEnabled) {
