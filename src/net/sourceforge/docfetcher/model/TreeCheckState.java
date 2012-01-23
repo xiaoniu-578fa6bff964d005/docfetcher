@@ -82,6 +82,17 @@ public final class TreeCheckState {
 		}
 		
 		public boolean equals(Object obj) {
+			/*
+			 * This equals method is called either as a result of adding
+			 * FolderWrapper instances to the checked set, or as a result of
+			 * determining whether the checked set "contains" a particular
+			 * PathWrapper.
+			 */
+			if (obj instanceof FolderWrapper) {
+				FolderWrapper other = (FolderWrapper) obj;
+				return folder.equals(other.folder);
+			}
+			
 			String targetPath = ((PathWrapper) obj).path.getPath();
 			if (targetPath.length() != getPathLength(folder))
 				return false;
@@ -109,7 +120,7 @@ public final class TreeCheckState {
 		
 		/*
 		 * TODO post-release-1.1: Compute and store the path length as an int
-		 * field in Folder during indexing, instead computing it here.
+		 * field in Folder during indexing, instead of computing it here.
 		 */
 		private int getPathLength(@NotNull Folder<?, ?> folder) {
 			int count = 0;
