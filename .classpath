@@ -49,12 +49,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.2.jar" sourcepath="lib/commons-compress/commons-compress-1.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-file-7.3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-tar-7.3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.3.3.jar" sourcepath="lib/truezip/truezip-driver-zip-7.3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.3.3.jar" sourcepath="lib/truezip/truezip-file-7.3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.3.3.jar" sourcepath="lib/truezip/truezip-kernel-7.3.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.3.3.jar" sourcepath="lib/truezip/truezip-swing-7.3.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/xmlbeans-2.3.0.jar"/>
@@ -73,5 +67,11 @@
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_8_1_1.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.6.0.jar" sourcepath="lib/pdfbox/pdfbox-1.6.0-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-file-7.4.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-tar-7.4.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-zip-7.4.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.4.3.jar" sourcepath="lib/truezip/truezip-file-7.4.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.4.3.jar" sourcepath="lib/truezip/truezip-kernel-7.4.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.4.3.jar" sourcepath="lib/truezip/truezip-swing-7.4.3-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
