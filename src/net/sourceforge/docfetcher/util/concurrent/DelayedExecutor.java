@@ -33,11 +33,15 @@ public final class DelayedExecutor {
 		this.delay = delay;
 	}
 	
-	// Discards the previously scheduled runnable if the time passed since the
-	// last scheduling is less than the delay
-	// If the given Runnable throws an Exception, the latter will be propagated
-	// to the default exception handler. The executor will then continue to operate
-	// normally.
+	/**
+	 * Schedules the given runnable for execution. Any previously scheduled
+	 * runnables will be discarded if the amount of time passed since they were
+	 * scheduled is less than the delay set for the receiver.
+	 * <p>
+	 * If the given runnable throws an exception, the exception will be
+	 * propagated to the default exception handler. The executor will then
+	 * continue to operate normally.
+	 */
 	public void schedule(@NotNull Runnable runnable) {
 		Util.checkNotNull(runnable);
 		synchronized (lock) {
