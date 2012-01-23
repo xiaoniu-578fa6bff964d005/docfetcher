@@ -11,6 +11,10 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
@@ -115,12 +119,18 @@ public final class SearchBar {
 //					}
 //				}).create();
 		
-		tif.image(Img.HIDE.get()).toolTip(Msg.to_systray.get())
-				.listener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						evtHideInSystemTray.fire(null);
-					}
-				}).create();
+		/*
+		 * On Ubuntu Unity, disable hiding in system tray. See bug #3457028 and
+		 * follow-up bug #3457035.
+		 */
+		if (!isUbuntuUnity()) {
+			tif.image(Img.HIDE.get()).toolTip(Msg.to_systray.get())
+			.listener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					evtHideInSystemTray.fire(null);
+				}
+			}).create();
+		}
 		
 		// Make the search box smaller when there's not enough space left
 		comp.addControlListener(new ControlAdapter() {
@@ -149,6 +159,46 @@ public final class SearchBar {
 				setBounds(toolBar, toolBarX, toolBarSize.x, caHeight, toolBarSize.y);
 			}
 		});
+	}
+	
+	private static boolean isUbuntuUnity() {
+		if (!Util.IS_LINUX)
+			return false;
+		try {
+			String output = getProcessOutput("lsb_release -irs").trim();
+			String[] lines = output.split("\n");
+			if (lines.length != 2)
+				return false;
+			if (!lines[0].trim().toLowerCase().equals("ubuntu"))
+				return false;
+			
+			// See: http://askubuntu.com/questions/70296/is-there-an-environment-variable-that-is-set-for-unity
+			if (lines[1].trim().equals("11.04"))
+				return "gnome".equals(System.getenv("DESKTOP_SESSION"))
+						&& "gnome".equals(System.getenv("GDMSESSION"));
+			return "Unity".equals(System.getenv("XDG_CURRENT_DESKTOP"));
+		}
+		catch (IOException e) {
+			return false;
+		}
+	}
+	
+	private static String getProcessOutput(String command) throws IOException {
+		Process p = Runtime.getRuntime().exec(command);
+		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		boolean firstLine = true;
+		while (true) {
+			String line = in.readLine();
+			if (line == null)
+				break;
+			if (firstLine)
+				firstLine = false;
+			else
+				sb.append("\n");
+			sb.append(line);
+		}
+		return sb.toString();
 	}
 	
 	private void setBounds(	@NotNull Control control,
