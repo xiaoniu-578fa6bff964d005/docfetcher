@@ -30,6 +30,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -161,6 +162,15 @@ final class DelayedOverlay {
 	@NotThreadSafe
 	private void doShow() {
 		if (shell != null)
+			return;
+
+		/*
+		 * If the control isn't visible or does not fill any area, don't show
+		 * the overlay. The second case happens if the control is part of sash
+		 * form and minimized.
+		 */
+		Point size = control.getSize();
+		if (!control.isVisible() || size.x * size.y == 0)
 			return;
 		
 		/*
