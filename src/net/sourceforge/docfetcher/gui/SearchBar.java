@@ -183,7 +183,9 @@ public final class SearchBar {
 		}
 	}
 	
-	private static String getProcessOutput(String command) throws IOException {
+	@NotNull
+	private static String getProcessOutput(@NotNull String command)
+			throws IOException {
 		Process p = Runtime.getRuntime().exec(command);
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		StringBuilder sb = new StringBuilder();
@@ -195,7 +197,7 @@ public final class SearchBar {
 			if (firstLine)
 				firstLine = false;
 			else
-				sb.append("\n");
+				sb.append(Util.LS);
 			sb.append(line);
 		}
 		return sb.toString();

@@ -73,8 +73,8 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				isFile = fileOrDir.isFile();
 			}
-			catch (RuntimeException e) {
-				handleFileException(e, fileOrDir);
+			catch (Throwable t) {
+				handleFileException(t, fileOrDir);
 				continue;
 			}
 			
@@ -111,8 +111,8 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				isFile = fileOrDir.isFile();
 			}
-			catch (RuntimeException e) {
-				handleFileException(e, fileOrDir);
+			catch (Throwable t) {
+				handleFileException(t, fileOrDir);
 				continue;
 			}
 			
@@ -162,7 +162,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		return Util.hasExtension(file.getName(), htmlExtensions);
 	}
 	
-	private void handleFileException(	@NotNull Throwable e,
+	private void handleFileException(	@NotNull Throwable t,
 										@NotNull final File file) {
 		/*
 		 * TrueZIP can throw various runtime exceptions, e.g. a
@@ -171,7 +171,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 		 * #3436750.
 		 */
 		if (reporter == null) {
-			Util.printErr(Util.getLowestMessage(e));
+			Util.printErr(Util.getLowestMessage(t));
 			return;
 		}
 		String filename = file.getName();
@@ -181,7 +181,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 				return config.getStorablePath(file);
 			}
 		};
-		reporter.fail(new IndexingError(ErrorType.ENCODING, treeNode, e.getCause()));
+		reporter.fail(new IndexingError(ErrorType.ENCODING, treeNode, t.getCause()));
 	}
 	
 	// guaranteed not to be an HTML file

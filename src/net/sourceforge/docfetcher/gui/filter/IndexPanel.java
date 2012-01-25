@@ -122,7 +122,7 @@ public final class IndexPanel {
 		viewer = new SimpleTreeViewer<ViewNode>(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI) {
 			protected Iterable<ViewNode> getChildren(ViewNode element) {
 				return element.getChildren();
-			};
+			}
 
 			protected String getLabel(ViewNode element) {
 				return element.getDisplayName();
