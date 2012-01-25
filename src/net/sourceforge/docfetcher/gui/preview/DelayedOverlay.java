@@ -163,6 +163,16 @@ final class DelayedOverlay {
 		if (shell != null)
 			return;
 		
+		/*
+		 * If the user immediately opens a file on the result table without
+		 * waiting for the preview to load, the launched external viewer will
+		 * have the focus. In that case, the loading screen should not be
+		 * opened, otherwise it could move the program back to the foreground,
+		 * thereby stealing the focus from the external viewer.
+		 */
+		if (control.getShell() != control.getDisplay().getActiveShell())
+			return;
+		
 		shell = new Shell(control.getShell(), SWT.NO_TRIM);
 		shell.setLayout(Util.createFillLayout(5));
 		shell.setBackground(bgColor);
