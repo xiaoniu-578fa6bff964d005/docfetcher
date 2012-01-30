@@ -236,8 +236,13 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		
 		// Handle missing mails and folders
 		for (MailDocument mail : unseenMails.values()) {
-			folder.removeDocument(mail);
+			/*
+			 * Bug #3475969: The UID must be retrieved *before* detaching the
+			 * document from its parent, as constructing the UID requires
+			 * accessing the parent.
+			 */
 			context.deleteFromIndex(mail.getUniqueId());
+			folder.removeDocument(mail);
 		}
 		for (MailFolder subFolder : unseenSubFolders.values())
 			folder.removeSubFolder(subFolder);
