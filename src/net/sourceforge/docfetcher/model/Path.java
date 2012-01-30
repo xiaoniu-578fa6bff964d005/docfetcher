@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.Normalizer;
 
+import org.aspectj.lang.annotation.SuppressAjWarnings;
+
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -65,7 +67,22 @@ public final class Path implements Serializable {
 		Util.checkNotNull(path);
 		this.path = normalizePath(path);
 		this.canonicalFile = getCanonicalFile();
-		this.name = canonicalFile.getName();
+		
+		/*
+		 * If the file is a root, such as '/' or 'C:', then File.getName() will
+		 * return an empty string. In that case, use toString() instead, which
+		 * will return '/' and 'C:', respectively. We don't want an empty string
+		 * as name because it will be used for display on the GUI.
+		 */
+		this.name = getDisplayName(canonicalFile);
+	}
+	
+	@NotNull
+	@SuppressAjWarnings
+	private static String getDisplayName(@NotNull File canonicalFile) {
+		return canonicalFile.getParent() == null
+			? canonicalFile.toString()
+			: canonicalFile.getName();
 	}
 	
 	@NotNull
