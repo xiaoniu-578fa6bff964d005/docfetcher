@@ -70,6 +70,12 @@ privileged aspect CodeConventions {
 	&& !withincode(@SuppressAjWarnings * *(..)):
 		"Use Util.getAbsPath*(...) instead.";
 	
+	declare warning: call(* File.getCanonical*())
+	&& !withincode(@SuppressAjWarnings * *(..)):
+		"On Windows, if this method is called on a root *without* trailing" +
+		"slashes, e.g. 'C:', it will return the current working directory. " +
+		"Use Util.getCanonical*() instead.";
+	
 	declare warning: call(* Files.createTempDir())
 	&& !withincode(@SuppressAjWarnings * *(..)):
 		"Use Util.createTempDir() instead.";

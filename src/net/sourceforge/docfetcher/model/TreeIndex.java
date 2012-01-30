@@ -72,12 +72,7 @@ public abstract class TreeIndex <
 		};
 		
 		// Create root folder
-		try {
-			rootFile = rootFile.getCanonicalFile();
-		}
-		catch (Exception e) {
-			rootFile = rootFile.getAbsoluteFile();
-		}
+		rootFile = Util.getCanonicalFile(rootFile);
 		Path newPath = config.getStorablePath(rootFile);
 		rootFolder = createRootFolder(newPath);
 		Util.checkNotNull(rootFolder);

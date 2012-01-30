@@ -75,4 +75,38 @@ public class UtilTest {
 		assertTrue(file.getName().startsWith("1__"));
 	}
 	
+	@Test
+	public void testIsDriveLetter() {
+		class Sample {
+			private final String input;
+			private final boolean expectedOutput;
+			private Sample(String input, boolean expectedOutput) {
+				this.input = input;
+				this.expectedOutput = expectedOutput;
+			}
+		}
+		Sample[] samples = {
+			new Sample("C:", true),
+			new Sample("G:\\", true),
+			new Sample("x:\\\\", true),
+			new Sample("f:\\Foo\\", false),
+			new Sample("c:\\\\Foo", false),
+			new Sample("c://", true),
+			new Sample("c://Foo", false),
+			new Sample("c:\\/", true),
+		};
+		for (Sample sample : samples) {
+			boolean output = Util.isWindowsDevice(sample.input);
+			assertEquals(sample.expectedOutput, output);
+		}
+	}
+	
+	@Test
+	public void testGetCanonicalFile() {
+		if (Util.IS_WINDOWS) {
+			File file = Util.getCanonicalFile("C:\\//\\");
+			assertEquals("C:", file.getPath());
+		}
+	}
+	
 }

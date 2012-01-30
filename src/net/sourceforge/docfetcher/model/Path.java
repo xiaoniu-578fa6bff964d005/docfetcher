@@ -13,16 +13,15 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.Normalizer;
-
-import org.aspectj.lang.annotation.SuppressAjWarnings;
 
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
+
+import org.aspectj.lang.annotation.SuppressAjWarnings;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
@@ -126,18 +125,7 @@ public final class Path implements Serializable {
 			 * platforms, return a file with composed path.
 			 */
 			String path1 = normalizeUnicode(path, !Util.IS_MAC_OS_X);
-			try {
-				canonicalFile = new File(path1).getCanonicalFile();
-			}
-			catch (IOException e) {
-				/*
-				 * We'll only print an error message here instead of the full
-				 * stacktrace. Doing the latter seemed to have caused a
-				 * StackOverflowError, as was reported in #3441649.
-				 */
-				Util.printErr(e.getMessage());
-				canonicalFile = new File(path1).getAbsoluteFile();
-			}
+			canonicalFile = Util.getCanonicalFile(path1);
 		}
 		return canonicalFile;
 	}

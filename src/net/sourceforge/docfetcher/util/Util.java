@@ -642,6 +642,34 @@ public final class Util {
 		return new File(path).getAbsolutePath();
 	}
 	
+	@NotNull
+	@SuppressAjWarnings
+	public static File getCanonicalFile(@NotNull String path) {
+		return getCanonicalFile(new File(path));
+	}
+	
+	@NotNull
+	@SuppressAjWarnings
+	public static File getCanonicalFile(@NotNull File file) {
+		return new File(getCanonicalPath(file));
+	}
+	
+	@NotNull
+	@SuppressAjWarnings
+	public static String getCanonicalPath(@NotNull File file) {
+		if (IS_WINDOWS && isWindowsDevice(file.getPath())) {
+			String driveLetter = getDriveLetter(file.getPath());
+			assert driveLetter != null;
+			return driveLetter + ":\\"; // the trailing slash is important here
+		}
+		try {
+			return file.getCanonicalPath();
+		}
+		catch (IOException e) {
+			return file.getAbsolutePath();
+		}
+	}
+	
 	/**
 	 * Returns all files and directories directly underneath the given
 	 * directory. This works like {@link File#listFiles()}, except that when
@@ -727,7 +755,7 @@ public final class Util {
 				lib = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
 			}
 		}
-		return lib.GetFileAttributesW(new WString(file.getCanonicalPath()));
+		return lib.GetFileAttributesW(new WString(getCanonicalPath(file)));
 	}
 
 	/**
@@ -917,6 +945,7 @@ public final class Util {
 	}
 	
 	private static Pattern drivePattern = Pattern.compile("([a-zA-Z]):.*");
+	private static Pattern driveOnlyPattern = Pattern.compile("(?:[a-zA-Z]):(?:\\\\|/)*");
 	
 	/**
 	 * Returns the drive letter at the beginning of the given Windows path, or
@@ -929,8 +958,12 @@ public final class Util {
 		Util.checkNotNull(path);
 		Matcher m = Util.drivePattern.matcher(path);
 		if (m.matches())
-			return m.group(1);
+			return m.group(1).toUpperCase();
 		return null;
+	}
+	
+	public static boolean isWindowsDevice(@NotNull String path) {
+		return driveOnlyPattern.matcher(path).matches();
 	}
 	
 	public static void assertSwtThread() {

@@ -12,7 +12,6 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -97,14 +96,9 @@ final class RegexTestPanel extends Composite {
 		String path = fileBox.getText().trim();
 		if (path.isEmpty())
 			return;
-		try {
-			File file = new File(path).getCanonicalFile();
-			Path newPath = IndexingConfig.getStorablePath(file, storeRelativePaths);
-			fileBox.setText(newPath.getPath());
-		}
-		catch (IOException e) {
-			fileBox.setText("");
-		}
+		File file = Util.getCanonicalFile(path);
+		Path newPath = IndexingConfig.getStorablePath(file, storeRelativePaths);
+		fileBox.setText(newPath.getPath());
 	}
 	
 	private void updateLabel() {
