@@ -49,6 +49,7 @@ public abstract class TreeIndex <
 	
 	private final IndexingConfig config;
 	private final F rootFolder;
+	private final long created;
 	@Nullable private final Path fileIndexDirPath;
 	@Nullable private transient RAMDirectory ramIndexDir;
 	
@@ -82,15 +83,19 @@ public abstract class TreeIndex <
 		Util.checkNotNull(rootFolder);
 		
 		// Create index directory or RAM directory
+		created = Util.getTimestamp();
 		if (indexParentDir == null) {
 			fileIndexDirPath = null;
 			ramIndexDir = new RAMDirectory();
 		}
 		else {
-			long id = Util.getTimestamp();
-			String indexDirName = getIndexDirName(rootFile) + "_" + id;
+			String indexDirName = getIndexDirName(rootFile) + "_" + created;
 			fileIndexDirPath = new Path(new File(indexParentDir, indexDirName).getPath());
 		}
+	}
+	
+	public final long getCreated() {
+		return created;
 	}
 	
 	@NotNull

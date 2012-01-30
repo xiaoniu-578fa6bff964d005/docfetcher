@@ -54,6 +54,7 @@ import org.apache.lucene.util.Version;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
+import com.google.common.primitives.Longs;
 
 /**
  * @author Tran Nam Quang
@@ -492,8 +493,17 @@ public final class IndexRegistry {
 		private static final IndexComparator instance = new IndexComparator();
 
 		public int compare(LuceneIndex o1, LuceneIndex o2) {
-			return AlphanumComparator.ignoreCaseInstance.compare(
+			int cmp = AlphanumComparator.ignoreCaseInstance.compare(
 				o1.getDisplayName(), o2.getDisplayName());
+			if (cmp != 0)
+				return cmp;
+			/*
+			 * Bug #3458940: If two LuceneIndex instances have the same name, do
+			 * not return 0. Otherwise it would be impossible to hold two
+			 * LuceneIndex instances with identical name as keys in a TreeMap,
+			 * or as values in a TreeSet.
+			 */
+			return Longs.compare(o1.getCreated(), o2.getCreated());
 		}
 	}
 	

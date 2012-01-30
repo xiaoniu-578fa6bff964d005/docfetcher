@@ -83,4 +83,6 @@ public interface LuceneIndex extends ViewNode, Serializable {
 	
 	public boolean hasErrorsDeep();
 	
+	public long getCreated();
+	
 }
