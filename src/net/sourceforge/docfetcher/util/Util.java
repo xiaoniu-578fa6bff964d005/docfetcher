@@ -599,7 +599,14 @@ public final class Util {
 	@NotNull
 	@SuppressAjWarnings
 	public static String getAbsPath(@NotNull File file) {
-		return file.getAbsolutePath().replace('\\', '/');
+		/*
+		 * We'll replace "//" with "/" here due to a bug in the
+		 * File.getAbsolutePath method: On Windows, if the given file has the
+		 * path "SOME_PATH" and the current working directory is the root of a
+		 * device, e.g. "C:\", then getAbsolutePath will return "C:\\SOME_PATH"
+		 * rather than the more sensible value "C:\SOME_PATH".
+		 */
+		return file.getAbsolutePath().replace('\\', '/').replace("//", "/");
 	}
 	
 	/**
