@@ -138,7 +138,7 @@ abstract class ConfigPanel {
 		
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.margin(0).top().bottom().minWidth(Util.BTW).applyTo(helpBt);
+		fdf.margin(0).top().bottom().left().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt).applyTo(resetBt);
 		fdf.unleft().right().applyTo(runBt);
 		

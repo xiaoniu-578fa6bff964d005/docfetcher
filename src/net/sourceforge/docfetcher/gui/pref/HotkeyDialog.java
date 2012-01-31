@@ -75,7 +75,7 @@ final class HotkeyDialog {
 		
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top(0, 10).left(0, 10).right(100, -10).applyTo(keyLabel);
-		fdf.top(keyLabel, 10).left(0, 10).right(100, -10).applyTo(hotkeyBox);
+		fdf.top(keyLabel, 10).applyTo(hotkeyBox);
 		fdf.reset().minWidth(Util.BTW).bottom().right().applyTo(okCancelBts[1]);
 		fdf.right(okCancelBts[1]).applyTo(okCancelBts[0]);
 		fdf.right(okCancelBts[0]).applyTo(restoreBt);

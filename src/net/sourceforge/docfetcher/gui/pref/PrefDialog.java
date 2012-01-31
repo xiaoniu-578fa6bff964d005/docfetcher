@@ -162,7 +162,7 @@ public final class PrefDialog {
 		
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
-		fdf.margin(0).top().bottom().minWidth(Util.BTW).applyTo(helpBt);
+		fdf.margin(0).top().bottom().left().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt, 5).applyTo(resetBt);
 		fdf.unleft().right().applyTo(okCancelBts[1]);
 		fdf.right(okCancelBts[1], -5).applyTo(okCancelBts[0]);
