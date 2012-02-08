@@ -47,7 +47,8 @@ public enum TestFiles {
 	index_update_html_in_html ("index-update-html-in-html"),
 	umlauts ("umlauts.7z/umlauts-%s/archive-%s.rar/archive-%s.7z/archive-%s.zip/file-%s.txt"
 			.replaceAll("%s", "\u00E4\u00F6\u00FC\u00DF")),
-	
+	fake_zip_file_inside_solid ("fake-zip-file-inside-solid.7z"),
+			
 	encrypted_7z ("7z-encrypted-(password='docfetcher').7z"),
 	encrypted_7z_filenames ("7z-encrypted-including-filenames-(password='docfetcher').7z"),
 	

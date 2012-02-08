@@ -325,4 +325,12 @@ public final class FileIndexTest {
 		System.setErr(stdErr);
 	}
 	
+	// This test should not crash. See bug #3465544.
+	@Test
+	public void testFakeZipInsideSolid() {
+		File archive = TestFiles.fake_zip_file_inside_solid.get();
+		FileIndex index = new FileIndex(null, archive);
+		index.update(null, null);
+	}
+	
 }

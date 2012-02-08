@@ -788,6 +788,17 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		}
 
 		SolidArchiveFactory factory = config.getSolidArchiveFactory(archiveName);
+		
+		/*
+		 * Bug #3465544: The returned factory is null if the given file is not
+		 * an actual archive, but has a name that suggests it's a zip archive.
+		 */
+		if (factory == null) {
+			archive.removeChildren();
+			context.fail(ErrorType.NOT_AN_ARCHIVE, archive, null);
+			return;
+		}
+		
 		SolidArchiveContext subContext = new SolidArchiveContext(
 			context, archive.getPath(), true);
 		try {
