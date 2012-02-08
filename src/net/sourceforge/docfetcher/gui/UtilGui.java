@@ -81,8 +81,12 @@ public final class UtilGui {
 	
 	public static void showOutOfMemoryMessage(	@NotNull final Control control,
 												@NotNull CheckedOutOfMemoryError e) {
-		Util.printErr(e.getOutOfMemoryError());
-		
+		showOutOfMemoryMessage(control, e.getOutOfMemoryError());
+	}
+	
+	public static void showOutOfMemoryMessage(	@NotNull final Control control,
+												@NotNull OutOfMemoryError e) {
+		Util.printErr(e);
 		Util.runSwtSafe(control, new Runnable() {
 			public void run() {
 				String url = ManualLocator.getManualSubpageUrl("Memory_Limit.html");

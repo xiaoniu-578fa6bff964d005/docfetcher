@@ -182,7 +182,10 @@ public final class Application {
 		// Set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			public void uncaughtException(Thread t, final Throwable e) {
-				AppUtil.showStackTrace(e);
+				if (e instanceof OutOfMemoryError)
+					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) e);
+				else
+					AppUtil.showStackTrace(e);
 			}
 		});
 
@@ -241,7 +244,10 @@ public final class Application {
 					display.sleep();
 			}
 			catch (Throwable t) {
-				AppUtil.showStackTrace(t);
+				if (t instanceof OutOfMemoryError)
+					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) t);
+				else
+					AppUtil.showStackTrace(t);
 				continue;
 			}
 		}
