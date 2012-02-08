@@ -20,4 +20,7 @@ JRE
 ==============================
 Min JRE version: 1.6.0
 Max heap size: 256, 512, 768, 1024
-JVM options: -Djava.library.path="lib"
+JVM options:
+	-Djava.library.path="lib"
+	-enableassertions
+	-Xss2m
