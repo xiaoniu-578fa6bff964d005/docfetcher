@@ -796,6 +796,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		if (factory == null) {
 			archive.removeChildren();
 			context.fail(ErrorType.NOT_AN_ARCHIVE, archive, null);
+			unpackedFile.delete();
 			return;
 		}
 		
@@ -816,6 +817,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		catch (ArchiveEncryptedException e) {
 			archive.removeChildren();
 			context.fail(ErrorType.ARCHIVE_ENCRYPTED, archive, e);
+		}
+		finally {
+			unpackedFile.delete();
 		}
 	}
 
