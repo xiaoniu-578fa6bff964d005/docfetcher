@@ -100,7 +100,7 @@ public final class Application {
 	private static SearchBar searchBar;
 	private static ResultPanel resultPanel;
 	private static PreviewPanel previewPanel;
-	private static StatusBarPart indexingStatus;
+	private static volatile StatusBarPart indexingStatus;
 	private static SystemTrayHider systemTrayHider;
 	private static StatusBar statusBar;
 
@@ -336,6 +336,14 @@ public final class Application {
 		 */
 		queue.evtQueueEmpty.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
+				/*
+				 * Bug #3485598: The indexing status widget can be null at this
+				 * point. Possible explanation: An indexing update was issued by
+				 * the DocFetcher daemon and finished before the GUI was fully
+				 * initialized.
+				 */
+				if (indexingStatus == null)
+					return;
 				Util.runAsyncExec(indexingStatus.getControl(), new Runnable() {
 					public void run() {
 						indexingStatus.setVisible(false);
