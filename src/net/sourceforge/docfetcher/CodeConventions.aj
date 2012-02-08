@@ -35,11 +35,13 @@ import de.schlichtherle.truezip.file.TFile;
 privileged aspect CodeConventions {
 	
 	declare warning: call(* Throwable.printStackTrace*(..))
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& !within(net.contentobjects.jnotify..*):
 		"Use AppUtil.showStackTrace*(..) instead.";
 	
 	declare warning: call(* PrintStream.print*(..))
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& !within(net.contentobjects.jnotify..*):
 		"Don't forget to remove System.out.print*() calls after usage.";
 	
 	declare warning: call(LoopTimer+.new(..)):
@@ -50,7 +52,8 @@ privileged aspect CodeConventions {
 		"Boolean getter methods should start with 'is'.";
 	
 	declare warning: (call(* File.list(..)) || call(* File.listFiles(..)))
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& !within(net.contentobjects.jnotify..*):
 		"Use the null-safe Util.listFiles(..) methods instead.";
 	
 	declare warning: (call(* File.getParent()) || call(* File.getParentFile()))
@@ -67,11 +70,13 @@ privileged aspect CodeConventions {
 		"Use Util.createTempFile(..) instead.";
 	
 	declare warning: call(* File.getAbsolutePath())
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& !within(net.contentobjects.jnotify..*):
 		"Use Util.getAbsPath*(...) instead.";
 	
 	declare warning: call(* File.getCanonical*())
-	&& !withincode(@SuppressAjWarnings * *(..)):
+	&& !withincode(@SuppressAjWarnings * *(..))
+	&& !within(net.contentobjects.jnotify..*):
 		"On Windows, if this method is called on a root *without* trailing" +
 		"slashes, e.g. 'C:', it will return the current working directory. " +
 		"Use Util.getCanonical*() instead.";

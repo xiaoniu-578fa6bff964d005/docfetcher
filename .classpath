@@ -43,11 +43,6 @@
 	<classpathentry kind="lib" path="lib/lucene/lucene-misc-3.0.3.jar" sourcepath="lib/lucene/lucene-misc-3.0.3-src.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.0.3.jar" sourcepath="lib/lucene/lucene-queries-3.0.3-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
-	<classpathentry kind="lib" path="lib/jnotify/jnotify-0.93.jar" sourcepath="lib/jnotify/jnotify-0.93-src.zip">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/jnotify"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.2.jar" sourcepath="lib/commons-compress/commons-compress-1.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/stax-api-1.0.1.jar"/>
