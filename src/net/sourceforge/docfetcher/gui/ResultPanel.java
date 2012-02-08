@@ -43,12 +43,16 @@ import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer;
 import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import com.google.common.primitives.Longs;
@@ -297,6 +301,30 @@ public final class ResultPanel {
 				
 				// Existing archive entry -> return the archive
 				return leftFile;
+			}
+		});
+		
+		menuManager.addSeparator();
+		
+		menuManager.add(new MenuAction(Msg.copy.get()) {
+			public boolean isEnabled() {
+				return !viewer.getSelection().isEmpty();
+			}
+			public void run() {
+				StringBuilder sb = new StringBuilder();
+				boolean first = true;
+				for (ResultDocument doc : getSelection()) {
+					if (first)
+						first = false;
+					else
+						sb.append(Util.LS);
+					sb.append(doc.getPath().getCanonicalPath());
+				}
+				Display display = viewer.getControl().getDisplay();
+				Clipboard clipboard = new Clipboard(display);
+				Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+				clipboard.setContents(new Object[] {sb.toString()}, types);
+				clipboard.dispose();
 			}
 		});
 	}

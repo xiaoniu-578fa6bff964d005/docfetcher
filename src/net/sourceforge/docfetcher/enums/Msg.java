@@ -489,7 +489,7 @@ public enum Msg {
 	document ("Document"),
 	error_message ("Error Message"),
 	total_elapsed_time ("Total elapsed time: {0}"),
-	copy ("Copy\tCtrl+C"),
+	copy ("Copy\tCtrl+C"), // Also used on result pane
 	install_watch_failed (
 	"Failed to install watch on folder {0}.\n\nInternal error message:\n{1}"),
 	
