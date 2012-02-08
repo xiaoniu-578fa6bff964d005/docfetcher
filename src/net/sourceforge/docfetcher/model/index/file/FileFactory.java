@@ -593,6 +593,8 @@ public final class FileFactory {
 					archiveResource.dispose();
 				}
 				File innerArchiveFile = archive.getFile(treeNode);
+				if (innerArchiveFile == null)
+					throw new IOException(); // Unpacking failed for some reason
 				FileResource innerArchive = unpackCache.putIfAbsent(cacheKey, innerArchiveFile);
 				return unpackFromArchive(
 					config, cacheKey, innerArchive, remainingPath[0]);

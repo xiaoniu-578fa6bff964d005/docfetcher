@@ -442,7 +442,8 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		return archiveFolder;
 	}
 	
-	// Only the path of the given object is used to retrieve the file
+	// Only the path of the given object is used to retrieve the file.
+	// The returned file is null if the unpacking failed for some reason, e.g. corrupted data.
 	@Nullable
 	public final File getFile(@NotNull TreeNode treeNode) {
 		EntryData entryData = entryDataMap.getValue(treeNode.getPath());

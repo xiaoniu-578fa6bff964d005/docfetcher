@@ -698,13 +698,10 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			
 			if (mainFile == null) {
 				/*
-				 * FIXME For unknown reasons, the file returned by the archive
-				 * tree can be null at this point. See bugs #3442047, #3443630,
-				 * #3443676. Since the cause is unknown, but likely inside our
-				 * own code, we'll print a warning here and move on.
+				 * We reach this point if the unpacking of the archive entry
+				 * failed for some reason. The error should have already been
+				 * reported during the unpacking.
 				 */
-				String path = doc.getPath().getCanonicalPath();
-				Util.printErr("Warning: SolidArchiveTree returned null for this document: " + path);
 				continue;
 			}
 
@@ -723,7 +720,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				new FileFolderVisitor<Exception>(htmlFolder) {
 					protected void visitDocument(	FileFolder parent,
 													FileDocument fileDocument) {
-						archiveTree.getFile(fileDocument).delete();
+						File file = archiveTree.getFile(fileDocument);
+						if (file != null)
+							file.delete();
 					}
 				}.runSilently();
 				continue;
@@ -734,6 +733,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				public void visitDocument(	FileFolder parent,
 											FileDocument fileDocument) {
 					File file = archiveTree.getFile(fileDocument);
+					if (file == null)
+						return;
 					try {
 						subContext.indexAndDeleteFile(fileDocument, file, true);
 					}
@@ -763,7 +764,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 												@NotNull FileFolder archive)
 			throws IndexingException {
 		File unpackedFile = archiveTree.getFile(archive);
-		assert unpackedFile != null;
+		
+		if (unpackedFile == null)
+			return;
 
 		// Wrapping the unpacked archive in a TrueZIP file is necessary for zip
 		// recursion
