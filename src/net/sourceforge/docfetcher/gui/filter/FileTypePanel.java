@@ -11,13 +11,19 @@
 
 package net.sourceforge.docfetcher.gui.filter;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
+import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
+import net.sourceforge.docfetcher.util.gui.MenuAction;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -72,8 +78,44 @@ public final class FileTypePanel {
 		// Handle check state changes
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (!Util.contains(e.detail, SWT.CHECK))
-					return;
+				if (Util.contains(e.detail, SWT.CHECK))
+					evtCheckStatesChanged.fire(null);
+			}
+		});
+		
+		initContextMenu();
+	}
+
+	private void initContextMenu() {
+		ContextMenuManager contextMenu = new ContextMenuManager(table);
+		contextMenu.add(new MenuAction(Msg.check_only_selected.get()) {
+			public void run() {
+				List<TableItem> selected = Arrays.asList(table.getSelection());
+				for (TableItem item : table.getItems())
+					item.setChecked(selected.contains(item));
+				evtCheckStatesChanged.fire(null);
+			}
+		});
+		contextMenu.addSeparator();
+		contextMenu.add(new MenuAction(Msg.check_all.get()) {
+			public void run() {
+				for (TableItem item : table.getItems())
+					item.setChecked(true);
+				evtCheckStatesChanged.fire(null);
+			}
+		});
+		contextMenu.add(new MenuAction(Msg.uncheck_all.get()) {
+			public void run() {
+				for (TableItem item : table.getItems())
+					item.setChecked(false);
+				evtCheckStatesChanged.fire(null);
+			}
+		});
+		contextMenu.addSeparator();
+		contextMenu.add(new MenuAction(Msg.invert_check_states.get()) {
+			public void run() {
+				for (TableItem item : table.getItems())
+					item.setChecked(!item.getChecked());
 				evtCheckStatesChanged.fire(null);
 			}
 		});

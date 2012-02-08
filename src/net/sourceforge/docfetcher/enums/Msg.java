@@ -109,6 +109,12 @@ public enum Msg {
 		"Label for the control on the left of the GUI that allows the user " +
 		"to filter the search results by location, and to perform various " +
 		"index-related operations, such as creating new indexes."),
+	check_only_selected (
+		"Check Only Selected",
+		"Context menu entry for marking only the selected checkbox item as checked."),
+	invert_check_states (
+		"Invert Check States",
+		"Context menu entry for inverting the check states of a list of checkboxes."),
 	
 	// File types
 	filetype_abi ("AbiWord (abw, abw.gz, zabw)", Comments.filetype),
@@ -174,13 +180,9 @@ public enum Msg {
 		"This confirmation message is shown when the user is about to remove " +
 		"all orphaned indexes."),
 	check_all ("Check All",
-		Comments.searchScopeEntry +
-		" It allows the user to mark the checkboxes of all folders and " +
-		"subfolders in the 'Search Scope' control."),
+		"Context menu entry for marking all checkboxes in a list."),
 	uncheck_all ("Uncheck All",
-		Comments.searchScopeEntry +
-		" It allows the user to unmark the checkboxes of all folders and " +
-		"subfolders in the 'Search Scope' control."),
+		"Context menu entry for unmarking all checkboxes in a list."),
 	check_single (
 		"Toggle Individual Check State",
 		Comments.searchScopeEntry +
