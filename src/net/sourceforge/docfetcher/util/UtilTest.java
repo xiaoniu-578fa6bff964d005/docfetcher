@@ -105,7 +105,7 @@ public class UtilTest {
 	public void testGetCanonicalFile() {
 		if (Util.IS_WINDOWS) {
 			File file = Util.getCanonicalFile("C:\\//\\");
-			assertEquals("C:", file.getPath());
+			assertEquals("C:\\", file.getPath());
 		}
 	}
 	
