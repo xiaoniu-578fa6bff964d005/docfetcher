@@ -398,8 +398,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		// Store the unpacked entries
 		for (TreeNode entry : unpackEntries) {
 			EntryData entryData = entryDataMap.getValue(entry.getPath());
-			entryData.file = indexFileMap.get(entryData.index);
-			assert entryData.file != null : entry.getPath().getPath();
+			entryData.file = indexFileMap.get(entryData.index); // file may be null
 			
 			// Store unpacked entries underneath HTML folders
 			if (!hasHtmlFolder(entry))
@@ -409,8 +408,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				                             	FileDocument fileDocument) {
 					Path path = fileDocument.getPath();
 					EntryData entryData = entryDataMap.getValue(path);
-					entryData.file = indexFileMap.get(entryData.index);
-					assert entryData.file != null;
+					entryData.file = indexFileMap.get(entryData.index); // file may be null
 				}
 			}.runSilently();
 		}
