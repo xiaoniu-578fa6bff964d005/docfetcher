@@ -62,7 +62,9 @@ abstract class LuceneDocWriter {
 			luceneDoc.add(Fields.TYPE.create(extension));
 			luceneDoc.add(Fields.PARSER.create(parseResult.getParserName()));
 			String title = parseResult.getTitle();
-			if (title != null)
+			if (title == null || title.trim().isEmpty())
+				luceneDoc.add(Fields.TITLE.create(Util.splitFilename(filename)[0]));
+			else
 				luceneDoc.add(Fields.TITLE.create(title));
 			luceneDoc.add(Fields.SIZE.create(file.length()));
 			luceneDoc.add(Fields.LAST_MODIFIED.create(String.valueOf(doc.getLastModified())));

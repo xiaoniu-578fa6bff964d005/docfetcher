@@ -106,7 +106,7 @@ public final class ResultDocument {
 		String title = luceneDoc.get(Fields.TITLE.key());
 		if (title == null)
 			title = luceneDoc.get(Fields.SUBJECT.key());
-		if (title != null)
+		if (title != null && !title.trim().isEmpty())
 			return title;
 		return Util.splitFilename(getFilename())[0];
 	}
