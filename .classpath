@@ -6,8 +6,6 @@
 	<classpathentry kind="lib" path="lib/guava/guava-src-r07.zip"/>
 	<classpathentry kind="lib" path="lib/J7zip/J7zip_4.43_alpha2.jar" sourcepath="lib/J7zip/J7zip_4.43_alpha2_src.zip"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.8.2.jar" sourcepath="lib/junit/junit-4.8.2-src.jar"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.0.3.jar" sourcepath="lib/lucene/lucene-3.0.3-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.0.3.jar" sourcepath="lib/lucene/lucene-3.0.3-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/junrar/java-unrar-0.3.jar" sourcepath="lib/junrar/java-unrar-0.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/javolution/javolution-5.5.1.jar" sourcepath="lib/javolution/javolution-5.5.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec/commons-codec-1.4.jar" sourcepath="lib/commons-codec/commons-codec-1.4-sources.jar"/>
@@ -17,8 +15,6 @@
 	<classpathentry kind="lib" path="lib/slf4j/slf4j-nop-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/jna/jna-3.2.7.jar" sourcepath="lib/jna/jna-3.2.7-src.zip"/>
 	<classpathentry kind="lib" path="lib/jna/jna-platform-3.2.7.jar" sourcepath="lib/jna/jna-3.2.7-src.zip"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-fast-vector-highlighter-3.0.3.jar" sourcepath="lib/lucene/lucene-fast-vector-highlighter-3.0.3-src.zip"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-memory-3.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/ant/ant-1.8.2.jar" sourcepath="lib/ant/ant-1.8.2-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/juniversalchardet/juniversalchardet-1.0.3.jar" sourcepath="lib/juniversalchardet/juniversalchardet-1.0.3-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/odf-utils/odf-utils-20051129.jar"/>
@@ -39,8 +35,6 @@
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-misc-3.0.3.jar" sourcepath="lib/lucene/lucene-misc-3.0.3-src.zip"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.0.3.jar" sourcepath="lib/lucene/lucene-queries-3.0.3-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.2.jar" sourcepath="lib/commons-compress/commons-compress-1.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
@@ -68,5 +62,9 @@
 	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.4.3.jar" sourcepath="lib/truezip/truezip-kernel-7.4.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.4.3.jar" sourcepath="lib/truezip/truezip-swing-7.4.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java-libpst/java-libpst.0.7.jar" sourcepath="lib/java-libpst/java-libpst-0.7.src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-memory-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
