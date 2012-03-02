@@ -206,7 +206,17 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 						mail.setLastModified(newLastModified);
 						context.index(mail, pstMail, false);
 					}
-					pstMail = (PSTMessage) pstFolder.getNextChild();
+					try {
+						pstMail = (PSTMessage) pstFolder.getNextChild();
+					}
+					catch (IndexOutOfBoundsException e) {
+						/*
+						 * Temporary fix for bug #3489947. Affects java-libpst
+						 * v0.5 and probably also v0.7.
+						 */
+						Util.printErr(e.getMessage());
+						pstMail = null;
+					}
 				}
 			} catch (IOException e) {
 				throw new IndexingException(e);
