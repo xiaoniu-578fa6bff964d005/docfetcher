@@ -267,8 +267,9 @@ public final class IndexingQueue {
 		File taskIndexDir = task.getLuceneIndex().getIndexDirPath().getCanonicalFile();
 		File taskParentIndexDir = Util.getParentFile(taskIndexDir);
 		File indexParentDir = indexRegistry.getIndexParentDir();
-		String msg = taskParentIndexDir.getPath() + " != " + indexParentDir.getPath();
-		Util.checkThat(sameFiles(taskParentIndexDir, indexParentDir), msg);
+		String absPath1 = Util.getAbsPath(taskParentIndexDir);
+		String absPath2 = Util.getAbsPath(indexParentDir);
+		Util.checkThat(absPath1.equals(absPath2), absPath1 + " != " + absPath2);
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
 
@@ -415,11 +416,6 @@ public final class IndexingQueue {
 		return null;
 	}
 	
-	@NotThreadSafe
-	private static boolean sameFiles(@NotNull File f1, @NotNull File f2) {
-		return Util.getAbsPath(f1).equals(Util.getAbsPath(f2));
-	}
-
 	@NotThreadSafe
 	static boolean sameTarget(@NotNull Task task1, @NotNull Task task2) {
 		File target1 = task1.getLuceneIndex().getCanonicalRootFile();
