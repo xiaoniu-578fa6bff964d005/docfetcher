@@ -11,19 +11,26 @@
 
 RequestExecutionLevel admin ; without this, the startmenu links won't be removed on Windows Vista/7
 SetCompress force
-SetCompressor /SOLID lzma
+SetCompressor /FINAL /SOLID lzma
+SetCompressorDictSize 32
+
 Name "DocFetcher ${VERSION}"
 XPStyle on
 OutFile build\docfetcher_${VERSION}_win32_setup.exe
 InstallDir $PROGRAMFILES\DocFetcher
 Page directory
 Page instfiles
+Page custom finalPage
 UninstPage uninstConfirm
 UninstPage instfiles
+
+ShowInstDetails show
+ShowUninstDetails show
 AutoCloseWindow true
 
 !addplugindir dev
 !include "FileFunc.nsh"
+!include "nsDialogs.nsh"
 !insertmacro GetTime
 
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\Afrikaans.nlf"
@@ -85,7 +92,10 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\Uzbek.nlf"
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\Welsh.nlf"
 
 Function .onInit
-	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher" "UninstallString"
+    ; Processes::KillProcess "docfetcher-daemon-win"
+    ; Processes::KillProcess "DocFetcher.exe"
+
+    ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher" "UninstallString"
 	StrCmp $R0 "" done
 	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
 	"DocFetcher is already installed. $\n$\nClick 'OK' to remove the \
@@ -101,6 +111,45 @@ Function .onInit
 			RMDIR $INSTDIR
 		no_remove_uninstaller:
 	done:
+FunctionEnd
+
+Var CHECKBOX
+Var boolCHECKBOX
+Var Image
+Var ImageHandle
+
+;--------------------------------
+; The final install page that asks to run the application
+Function finalPage
+	nsDialogs::Create 1018
+	Pop $0
+	${NSD_CreateLabel} 75u 30u 80% 8u "DocFetcher was succesfully installed on your computer."
+	Pop $0
+	${NSD_CreateCheckbox} 80u 50u 50% 8u "Run DocFetcher v${VERSION}"
+	Pop $CHECKBOX
+    SendMessage $CHECKBOX ${BM_SETCHECK} ${BST_CHECKED} 0
+    GetFunctionAddress $1 OnCheckbox
+	nsDialogs::OnClick $CHECKBOX $1
+
+    ; Add an image
+    ${NSD_CreateBitmap} 0 0 100% 40% ""
+    Pop $Image
+    ${NSD_SetImage} $Image "$INSTDIR\icons\setup.bmp" $ImageHandle
+	nsDialogs::Show
+    ${NSD_freeImage} $ImageHandle
+FunctionEnd
+Function OnCheckbox
+    SendMessage $CHECKBOX ${BM_GETSTATE} 0 0 $1
+    ${If} $1 != 8
+        StrCpy $boolCHECKBOX "True"
+    ${Else}
+        StrCpy $boolCHECKBOX "False"
+    ${EndIf}
+FunctionEnd
+Function .onInstSuccess
+	${If} $boolCHECKBOX != "False"
+        Exec "$INSTDIR\DocFetcher.exe"
+    ${EndIf}
 FunctionEnd
 
 Section "DocFetcher"
@@ -123,6 +172,7 @@ Section "DocFetcher"
     SetOutPath $INSTDIR\img
     File /r ${PORTABLE_PATH}\img\*.*
 
+    Delete "$INSTDIR\lib\net.sourceforge.docfetcher_*.*"
     SetOutPath $INSTDIR\lib
     File /r /x *.so /x *.dylib /x *linux* /x *macosx* /x *docfetcher*.jar ${PORTABLE_PATH}\lib\*.*
 	File build\tmp\net.sourceforge.docfetcher*.jar
