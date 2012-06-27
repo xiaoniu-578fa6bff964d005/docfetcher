@@ -56,53 +56,53 @@ public abstract class Folder
 			this.folder = folder;
 		}
 	}
-	
+
 	/*
 	 * TODO post-release-1.1: Rethink the synchronization used here. Maybe use
 	 * a global static lock for all instances of TreeNode, Folder, Document, etc.?
 	 */
-	
+
 	// Making these events non-static would lead to trouble with serialization
 	public static final Event<FolderEvent> evtFolderAdded = new Event<FolderEvent>();
 	public static final Event<FolderEvent> evtFolderRemoved = new Event<FolderEvent>();
-	
+
 	/*
 	 * The children of instances of this class are stored as maps for the
 	 * following reasons:
-	 * 
+	 *
 	 * (1) Running an index update involves computing a tree diff, which
 	 * requires quick access to the children using a string-valued identifier
 	 * (e.g. filename).
-	 * 
+	 *
 	 * (2) It prevents insertion of duplicate identifiers. (However, using a map
 	 * doesn't prevent the situation that a document and a subfolder are stored
 	 * with the same identifier, since documents and subfolders are stored in
 	 * different maps.)
-	 * 
+	 *
 	 * These maps are set to null when they're empty in order to avoid wasting
 	 * RAM when the tree is very large and has many empty leaf nodes.
 	 */
 	@Nullable private HashMap<String, D> documents;
-	@Nullable private HashMap<String, F> subFolders;
-	
+	@Nullable public HashMap<String, F> subFolders;
+
 	/*
 	 * If this is a root folder, then it has a non-null path and a null parent.
 	 * For non-root folders, it's the exact opposite, i.e. they have a null path
 	 * and a non-null parent. HTML folders and SolidArchiveTree roots are
 	 * treated as root folders.
 	 */
-	@Nullable private F parent;
-	@Nullable private Path path;
+	@Nullable public F parent;
+	@Nullable public Path path;
 	private int pathHashCode;
-	
+
 	/**
 	 * The last time this object was modified. Null if the object has no last
 	 * modified field (e.g. regular folder).
 	 */
 	@Nullable private Long lastModified;
-	
-	private boolean isChecked = true;
-	
+
+	public boolean isChecked = true;
+
 	@SuppressWarnings("unchecked")
 	protected Folder(	@NotNull F parent,
 						@NotNull String name,
@@ -114,15 +114,15 @@ public abstract class Folder
 		parent.putSubFolder((F) this);
 		updatePathHashCode();
 	}
-	
+
 	protected Folder(@NotNull Path path, @Nullable Long lastModified) {
 		super(path.getName());
 		this.path = path;
 		this.lastModified = lastModified;
 		updatePathHashCode();
 	}
-	
-	private void updatePathHashCode() {
+
+	public void updatePathHashCode() {
 		if (path != null) {
 			pathHashCode = path.getPath().hashCode();
 		}
@@ -132,16 +132,16 @@ public abstract class Folder
 			pathHashCode = thisPath.hashCode();
 		}
 	}
-	
+
 	synchronized int getPathHashCode() {
 		return pathHashCode;
 	}
-	
+
 	@Nullable
 	public synchronized final F getParent() {
 		return parent;
 	}
-	
+
 	@Nullable
 	@RecursiveMethod
 	@SuppressWarnings("unchecked")
@@ -154,11 +154,11 @@ public abstract class Folder
 	@NotNull
 	public synchronized final Path getPath() {
 		assert (parent == null) == (path != null);
-		
+
 		// Just return the path if this instance is a root
 		if (path != null)
 			return path;
-		
+
 		// Create a list of nodes from the root down to this instance
 		LinkedList<F> list = new LinkedList<F>();
 		list.add((F) this);
@@ -167,7 +167,7 @@ public abstract class Folder
 			list.addFirst(current);
 			current = current.parent;
 		}
-		
+
 		// Construct path for this instance
 		StringBuilder sb = new StringBuilder();
 		sb.append(list.removeFirst().path.getPath()); // root path
@@ -175,26 +175,26 @@ public abstract class Folder
 			sb.append("/");
 			sb.append(node.getName());
 		}
-		
+
 		return new Path(sb.toString());
 	}
-	
+
 	synchronized final void setPath(@NotNull Path path) {
 		Util.checkNotNull(path);
 		this.path = path;
 		parent = null;
 		updatePathHashCode();
 	}
-	
+
 	@Nullable
 	public synchronized final Long getLastModified() {
 		return lastModified;
 	}
-	
+
 	public synchronized final void setLastModified(@Nullable Long lastModified) {
 		this.lastModified = lastModified;
 	}
-	
+
 	// will replace document with identical name;
 	// will detach document from previous parent if there is one
 	@SuppressWarnings("unchecked")
@@ -206,7 +206,7 @@ public abstract class Folder
 			doc.parent.removeDocument(doc);
 		doc.parent = (F) this;
 	}
-	
+
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
 	public final void putSubFolder(@NotNull F subFolder) {
@@ -222,7 +222,7 @@ public abstract class Folder
 		}
 		evtFolderAdded.fire(new FolderEvent(this, subFolder));
 	}
-	
+
 	/**
 	 * Removes the given document from the receiver. Does nothing if the given
 	 * document is null.
@@ -235,7 +235,7 @@ public abstract class Folder
 		if (documents.isEmpty())
 			documents = null;
 	}
-	
+
 	public final void removeChildren() {
 		Collection<F> toNotify = subFolders == null
 			? Collections.<F>emptyList()
@@ -258,7 +258,7 @@ public abstract class Folder
 		for (F subFolder : toNotify)
 			evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
-	
+
 	/**
 	 * Removes the given subfolder from the receiver. Does nothing if the given
 	 * subfolder is null. After it is removed, it will still have a valid path
@@ -286,7 +286,7 @@ public abstract class Folder
 		}
 		evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
-	
+
 	public synchronized final void removeDocuments(@NotNull Predicate<D> predicate) {
 		if (documents == null) return;
 		Iterator<D> docIt = documents.values().iterator();
@@ -300,7 +300,7 @@ public abstract class Folder
 		if (documents.isEmpty())
 			documents = null;
 	}
-	
+
 	/**
 	 * Removes all subfolders from the receiver that satisfy the given
 	 * predicate. The removed subfolders will still have valid paths that can be
@@ -326,30 +326,30 @@ public abstract class Folder
 		for (F subFolder : toNotify)
 			evtFolderRemoved.fire(new FolderEvent(this, subFolder));
 	}
-	
+
 	@Nullable
 	public synchronized final D getDocument(String name) {
 		if (documents == null) return null;
 		return documents.get(name);
 	}
-	
+
 	public synchronized final int getDocumentCount() {
 		if (documents == null) return 0;
 		return documents.size();
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final List<D> getDocuments() {
 		return UtilModel.nullSafeImmutableList(documents);
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final Map<String, D> getDocumentMap() {
 		return UtilModel.nullSafeImmutableMap(documents);
 	}
-	
+
 	@MutableCopy
 	@NotNull
 	@SuppressWarnings("unchecked")
@@ -362,32 +362,32 @@ public abstract class Folder
 		}.runSilently();
 		return docsDeep;
 	}
-	
+
 	@Nullable
 	public synchronized final F getSubFolder(String name) {
 		if (subFolders == null)
 			return null;
 		return subFolders.get(name);
 	}
-	
+
 	public synchronized final int getSubFolderCount() {
 		if (subFolders == null)
 			return 0;
 		return subFolders.size();
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final List<F> getSubFolders() {
 		return UtilModel.nullSafeImmutableList(subFolders);
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final Map<String, F> getSubFolderMap() {
 		return UtilModel.nullSafeImmutableMap(subFolders);
 	}
-	
+
 	public synchronized final int getChildCount() {
 		int count = 0;
 		if (documents != null)
@@ -396,22 +396,22 @@ public abstract class Folder
 			count += subFolders.size();
 		return count;
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final Iterable<ViewNode> getChildren() {
 		Collection<F> col = getSubFolders(); // returns a copy
 		return UtilGlobal.<ViewNode>convert(col);
 	}
-	
+
 	public synchronized final boolean isChecked() {
 		return isChecked;
 	}
-	
+
 	public synchronized final void setChecked(boolean isChecked) {
 		this.isChecked = isChecked;
 	}
-	
+
 	@NotNull
 	@SuppressWarnings("unchecked")
 	public synchronized final TreeCheckState getTreeCheckState() {
@@ -424,11 +424,11 @@ public abstract class Folder
 		}.runSilently();
 		return state;
 	}
-	
+
 	public final boolean isIndex() {
 		return false;
 	}
-	
+
 	@ImmutableCopy
 	@NotNull
 	public synchronized final List<String> getDocumentIds() {
@@ -461,14 +461,14 @@ public abstract class Folder
 			return this;
 		return findTreeNodeUnchecked(targetPath);
 	}
-	
+
 	/**
 	 * Recursive helper method for {@link #findTreeNode(String)}.
 	 */
 	@Nullable
 	@RecursiveMethod
 	@ThreadSafe
-	private synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
+	public synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
 		/*
 		 * TODO post-release-1.1: since getPath() constructs the returned path
 		 * dynamically, this search algorithm is somewhat inefficient. Maybe
@@ -492,7 +492,7 @@ public abstract class Folder
 		}
 		return null;
 	}
-	
+
 	public synchronized final boolean hasErrorsDeep() {
 		if (hasErrors())
 			return true;
@@ -506,5 +506,5 @@ public abstract class Folder
 					return true;
 		return false;
 	}
-	
+
 }
