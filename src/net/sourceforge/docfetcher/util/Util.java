@@ -1606,11 +1606,12 @@ public final class Util {
 	 * Launches the given filepath and select the file
 	 * explorer.exe /select,F:\docfetcher\DocFetcher\aspectjtools.jar
 	 * returning whether the file was uccessfully launched
+     * This process is not working properly in Win7 64bit
 	 */
 	public static boolean winOpenDir(String fileName) {
         if (IS_WINDOWS) {
             try {
-                Runtime.getRuntime().exec("explorer /select,  " + fileName);
+                Runtime.getRuntime().exec("explorer /select, " + fileName);
                 return true;
             } catch (Exception e) {
                 return false;

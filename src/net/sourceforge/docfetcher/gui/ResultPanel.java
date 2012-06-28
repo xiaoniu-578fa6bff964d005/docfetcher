@@ -271,12 +271,7 @@ public final class ResultPanel {
 						launcher.addMissing(path.getCanonicalPath());
 					}
 				}
-				boolean launchSucess = false;
-				// if (viewer.getSelection().size()==1)
-					// launchSucess = Util.winOpenDir(path);
-				// else
-					launchSucess = launcher.launch();
-				if (launchSucess && SettingsConf.Bool.HideOnOpen.get())
+				if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
 					evtHideInSystemTray.fire(null);				
 			}
 			@NotNull
