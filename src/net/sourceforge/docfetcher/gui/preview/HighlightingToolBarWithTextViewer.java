@@ -71,13 +71,9 @@ class HighlightingToolBarWithTextViewer {
 				this.isDownBt = isDownBt;
 			}
 			public void widgetSelected(SelectionEvent e) {
-				Integer newOcc = textViewer.goTo(isDownBt);
-				if (newOcc != null) {
-					currentOcc = newOcc;
-					updateCounter();
-				}
+				moveSelection(this.isDownBt);
 			}
-		}
+		}                
 		
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		tif.enabled(false);
@@ -116,7 +112,15 @@ class HighlightingToolBarWithTextViewer {
 		createToolItems(tif);
 	}
 	
-	protected void createToolItems(@NotNull ToolItemFactory tif) {}
+    public final void moveSelection(boolean isDownBt) {
+        Integer newOcc = textViewer.goTo(isDownBt);
+        if (newOcc != null) {
+            currentOcc = newOcc;
+            updateCounter();
+        }
+    }
+    
+    protected void createToolItems(@NotNull ToolItemFactory tif) {}
 	
 	@NotNull
 	public final Composite getToolBar() {
@@ -168,6 +172,8 @@ class HighlightingToolBarWithTextViewer {
 			upBt.setEnabled(true);
 			downBt.setEnabled(true);
 			highlightBt.setEnabled(true);
+            if (SettingsConf.Bool.AutoScrollToNextOccurrence.get()) 
+                moveSelection(true);
 		}
 	}
 	
