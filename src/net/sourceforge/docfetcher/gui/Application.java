@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Tran Nam Quang - initial API and implementation
+ *	Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
 package net.sourceforge.docfetcher.gui;
@@ -81,16 +81,16 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
 public final class Application {
-	
+
 	// TODO post-release-1.1: review visibility of all DocFetcher classes
 
 	/** The widths of the sashes in pixels */
 	private static final int sashWidth = 5;
-	
+
 	private static volatile IndexRegistry indexRegistry;
 	private static volatile FolderWatcher folderWatcher;
 	@Nullable private static HotkeyHandler hotkeyHandler;
-	
+
 	private static FilesizePanel filesizePanel;
 	private static FileTypePanel fileTypePanel;
 	private static IndexPanel indexPanel;
@@ -103,6 +103,7 @@ public final class Application {
 	private static volatile StatusBarPart indexingStatus;
 	private static SystemTrayHider systemTrayHider;
 	private static StatusBar statusBar;
+	private static boolean systemTrayShutdown = false;
 
 	private Application() {
 		throw new UnsupportedOperationException();
@@ -145,27 +146,27 @@ public final class Application {
 		AppUtil.Messages.cancel.set(Msg.cancel.get());
 		Msg.setCheckEnabled(true);
 		AppUtil.Messages.checkInitialized();
-		
+
 		if (!AppUtil.checkSingleInstance()) return;
 
 		// Load program configuration and preferences
 		loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
-		
+
 		// Determine shell title
 		String shellTitle;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
 			shellTitle = SystemConf.Str.ProgramName.get();
 		else
 			shellTitle = ProgramConf.Str.AppName.get();
-		
+
 		// Load index registry; create display and shell
 		Display.setAppName(shellTitle); // must be called *before* the display is created
 		Display display = new Display();
 		AppUtil.setDisplay(display);
 		loadIndexRegistry(display);
 		shell = new Shell(display);
-		
+
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
 			display, AppUtil.getImageDir());
@@ -193,14 +194,14 @@ public final class Application {
 		SettingsConf.Bool.MainShellMaximized.bindMaximized(shell);
 		shell.setLayout(new FormLayout());
 		shell.setText(shellTitle);
-		
+
 		initCocoaMenu(display);
 		initSystemTrayHider();
 		initThreePanelForm();
 		initStatusBar();
 		initHotkey();
 		initGlobalKeys(display);
-		
+
 		new SearchQueue(
 			searchBar, filesizePanel, fileTypePanel, indexPanel, resultPanel,
 			statusBar);
@@ -211,7 +212,7 @@ public final class Application {
 
 		// Move focus to search text field
 		searchBar.setFocus();
-		
+
 		// Try to show the manual in the embedded browser
 		boolean showManualHint = true;
 		if (SettingsConf.Bool.ShowManualOnStartup.get()
@@ -230,13 +231,13 @@ public final class Application {
 			String msg = Msg.press_f1_for_help.get();
 			statusBar.getLeftPart().setContents(Img.HELP.get(), msg);
 		}
-		
+
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(final ShellEvent e) {
 				handleShellClosed(e);
 			}
 		});
-		
+
 		shell.open();
 		while (!shell.isDisposed()) {
 			try {
@@ -284,14 +285,14 @@ public final class Application {
 				// Disable global keys when the main shell is inactive
 				if (Display.getCurrent().getActiveShell() != shell)
 					return;
-				
+
 				e.doit = false;
 				int m = e.stateMask;
 				int k = e.keyCode;
-				
+
 				if (k == SWT.F1) {
 					showManual();
-					
+
 					// Clear "Press F1" help message from status bar
 					String msg = Msg.press_f1_for_help.get();
 					StatusBarPart statusBarPart = statusBar.getLeftPart();
@@ -310,7 +311,7 @@ public final class Application {
 
 	private static void loadIndexRegistry(@NotNull final Display display) {
 		Util.assertSwtThread();
-		
+
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
 			indexParentDir = new File("bin/indexes");
@@ -319,20 +320,20 @@ public final class Application {
 		else
 			indexParentDir = AppUtil.getAppDataDir();
 		indexParentDir.mkdirs();
-		
+
 		int cacheCapacity = ProgramConf.Int.UnpackCacheCapacity.get();
 		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
 		indexRegistry = new IndexRegistry(
 			indexParentDir, cacheCapacity, reporterCapacity);
 		final Daemon daemon = new Daemon(indexRegistry);
 		IndexingQueue queue = indexRegistry.getQueue();
-		
+
 		queue.evtWorkerThreadTerminated.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				daemon.writeIndexesToFile();
 			}
 		});
-		
+
 		/*
 		 * Remove indexing hint from the status bar when the task
 		 * queue has been emptied. This covers those situations
@@ -357,7 +358,7 @@ public final class Application {
 				});
 			}
 		});
-		
+
 		new Thread(Application.class.getName() + " (load index registry)") {
 			public void run() {
 				try {
@@ -366,14 +367,14 @@ public final class Application {
 							return display.isDisposed();
 						}
 					});
-					
+
 					// Program may have been shut down while it was loading the indexes
 					if (display.isDisposed())
 						return;
-					
+
 					/*
 					 * Install folder watches on the user's document folders.
-					 * 
+					 *
 					 * This should be done *after* the index registry is loaded:
 					 * The index registry will try to install its own folder
 					 * watch during loading, and if we set up this folder
@@ -382,7 +383,7 @@ public final class Application {
 					 * registry.
 					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
-					
+
 					// Must be called *after* the indexes have been loaded
 					daemon.enqueueUpdateTasks();
 				}
@@ -399,7 +400,7 @@ public final class Application {
 	private static void loadProgramConf() {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();
-		
+
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			confFile = new File("dist/program.conf");
@@ -408,7 +409,7 @@ public final class Application {
 			File appDataDir = AppUtil.getAppDataDir();
 			confFile = new File(appDataDir, "conf/program.conf");
 		}
-		
+
 		try {
 			List<Loadable> notLoaded = ConfLoader.load(
 				confFile, ProgramConf.class, false);
@@ -451,7 +452,7 @@ public final class Application {
 	private static File loadSettingsConf() {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();
-		
+
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			confFile = new File("bin/settings.conf");
@@ -460,7 +461,7 @@ public final class Application {
 			File appDataDir = AppUtil.getAppDataDir();
 			confFile = new File(appDataDir, "conf/settings.conf");
 		}
-		
+
 		try {
 			ConfLoader.load(confFile, SettingsConf.class, true);
 		}
@@ -501,7 +502,7 @@ public final class Application {
 		};
 		filesizeForm.setText(Msg.min_max_filesize.get());
 		filesizeForm.setContentsVisible(SettingsConf.Bool.FilesizeFilterMaximized.get());
-		
+
 		final TwoFormExpander expander = new TwoFormExpander(comp) {
 			protected Control createFirstContents(Composite parent) {
 				// TODO websearch: Load parser states from file, save parser states to file?
@@ -533,14 +534,14 @@ public final class Application {
 		expander.setTopText(Msg.document_types.get());
 		expander.setBottomText(Msg.search_scope.get());
 		expander.setSashWidth(sashWidth);
-		
+
 		// Restore sash weights and maximization states
 		expander.setSashWeights(SettingsConf.IntArray.FilterSash.get());
 		if (SettingsConf.Bool.TypesFilterMaximized.get())
 			expander.setMaximizedControl(MaximizedControl.TOP);
 		if (SettingsConf.Bool.LocationFilterMaximized.get())
 			expander.setMaximizedControl(MaximizedControl.BOTTOM);
-		
+
 		// Save sash weights
 		expander.getFirstControl().addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
@@ -556,7 +557,7 @@ public final class Application {
 				});
 			}
 		});
-		
+
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).left().top().right().applyTo(filesizeForm);
 		fdf.top(filesizeForm, 5).bottom().applyTo(expander);
@@ -573,13 +574,13 @@ public final class Application {
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).top().left().right().applyTo(searchBar.getControl());
 		fdf.top(searchBar.getControl()).bottom().applyTo(resultPanel.getControl());
-		
+
 		searchBar.evtHideInSystemTray.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				systemTrayHider.hide();
 			}
 		});
-		
+
 		searchBar.evtOpenManual.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				showManual();
@@ -592,7 +593,7 @@ public final class Application {
 					previewPanel.setPreview(eventData.get(0));
 			}
 		});
-		
+
 		resultPanel.evtHideInSystemTray.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				systemTrayHider.hide();
@@ -601,7 +602,7 @@ public final class Application {
 
 		return comp;
 	}
-	
+
 	private static void moveIndexingDialogToStatusBar(@NotNull Rectangle src) {
 		indexingStatus.setVisible(true);
 		Rectangle dest = indexingStatus.getBounds();
@@ -609,15 +610,15 @@ public final class Application {
 		MovingBox movingBox = new MovingBox(shell, src, dest, 0.2, 40);
 		movingBox.start();
 	}
-	
+
 	/*
 	 * Sets up system tray hiding.
 	 */
 	private static void initSystemTrayHider() {
 		systemTrayHider = new SystemTrayHider(shell);
-		
+
 		final ResultDocument[] lastDoc = new ResultDocument[1];
-		
+
 		systemTrayHider.evtHiding.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				/*
@@ -631,7 +632,7 @@ public final class Application {
 				lastDoc[0] = previewPanel.clear();
 			}
 		});
-		
+
 		systemTrayHider.evtRestored.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				if (lastDoc[0] != null) {
@@ -641,9 +642,10 @@ public final class Application {
 				searchBar.setFocus();
 			}
 		});
-		
+
 		systemTrayHider.evtShutdown.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
+				systemTrayShutdown = true;
 				shell.close();
 			}
 		});
@@ -652,7 +654,7 @@ public final class Application {
 	private static void initCocoaMenu(@NotNull Display display) {
 		if (!Util.IS_MAC_OS_X)
 			return;
-		
+
 		CocoaUIEnhancer cocoaUIEnhancer = new CocoaUIEnhancer(ProgramConf.Str.AppName.get());
 		cocoaUIEnhancer.hookApplicationMenu(display, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
@@ -671,7 +673,7 @@ public final class Application {
 			}
 		});
 	}
-	
+
 	@NotNull
 	private static void initThreePanelForm() {
 		int filterPanelWidth = SettingsConf.Int.FilterPanelWidth.get();
@@ -695,23 +697,23 @@ public final class Application {
 
 		threePanelForm.setSashWidth(sashWidth);
 		threePanelForm.setSubSashWidth(sashWidth);
-		
+
 		// Restore visibility of filter panel and preview panel
 		threePanelForm.setFirstControlVisible(SettingsConf.Bool.ShowFilterPanel.get());
 		threePanelForm.setSecondSubControlVisible(SettingsConf.Bool.ShowPreviewPanel.get());
-		
+
 		// Restore orientation and weights of right sash
 		boolean isVertical = SettingsConf.Bool.ShowPreviewPanelAtBottom.get();
 		threePanelForm.setVertical(isVertical);
 		threePanelForm.setSubSashWeights(getRightSashWeights(isVertical));
-		
+
 		// Store visibility of filter panel
 		threePanelForm.evtFirstControlShown.add(new Event.Listener<Boolean>() {
 			public void update(Boolean eventData) {
 				SettingsConf.Bool.ShowFilterPanel.set(eventData);
 			}
 		});
-		
+
 		// Store width of filter panel
 		final Control leftControl = threePanelForm.getFirstControl();
 		leftControl.addControlListener(new ControlAdapter() {
@@ -722,9 +724,9 @@ public final class Application {
 				}
 			}
 		});
-		
+
 		final boolean[] ignoreControlResize = { false };
-		
+
 		// Store weights of right sash
 		Control topRightControl = threePanelForm.getFirstSubControl();
 		ControlListener rightControlListener = new ControlAdapter() {
@@ -740,14 +742,14 @@ public final class Application {
 		};
 		topRightControl.addControlListener(rightControlListener);
 		previewPanel.addControlListener(rightControlListener);
-		
+
 		// Store visibility of preview panel
 		threePanelForm.evtSecondSubControlShown.add(new Event.Listener<Boolean>() {
 			public void update(Boolean eventData) {
 				SettingsConf.Bool.ShowPreviewPanel.set(eventData);
 			}
 		});
-		
+
 		/*
 		 * Temporarily deactivate storing the sash weights during sash
 		 * orientation changes. Without this, we'd set the same sash weights for
@@ -758,7 +760,7 @@ public final class Application {
 				ignoreControlResize[0] = true;
 			}
 		});
-		
+
 		// Store orientation of right sash; update weights
 		threePanelForm.evtSubOrientationChanged.add(new Event.Listener<Boolean>() {
 			public void update(Boolean isVertical) {
@@ -768,14 +770,14 @@ public final class Application {
 			}
 		});
 	}
-	
+
 	@NotNull
 	private static int[] getRightSashWeights(boolean isVertical) {
 		return isVertical
 			? SettingsConf.IntArray.RightSashVertical.get()
 			: SettingsConf.IntArray.RightSashHorizontal.get();
 	}
-	
+
 	@NotNull
 	private static void initStatusBar() {
 		statusBar = new StatusBar(shell) {
@@ -783,19 +785,19 @@ public final class Application {
 				indexingStatus = new StatusBarPart(statusBar, true);
 				indexingStatus.setContents(Img.INDEXING.get(), Msg.indexing.get());
 				indexingStatus.setVisible(false);
-				
+
 				indexPanel.evtIndexingDialogOpened.add(new Event.Listener<Void>() {
 					public void update(Void eventData) {
 						indexingStatus.setVisible(false);
 					}
 				});
-				
+
 				indexingStatus.evtClicked.add(new Event.Listener<Void>() {
 					public void update(Void eventData) {
 						indexPanel.openIndexingDialog();
 					}
 				});
-				
+
 				StatusBarPart webInterfaceStatus = new StatusBarPart(statusBar, true);
 				webInterfaceStatus.setContents(Img.INDEXING.get(), Msg.web_interface.get());
 
@@ -806,43 +808,48 @@ public final class Application {
 			}
 		};
 	}
-	
+
 	private static void handleShellClosed(@NotNull ShellEvent e) {
-		e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
-			public CancelAction cancel() {
-				return confirmExit();
-			}
-		});
-		if (!e.doit)
-			return;
-		
-		// Clear search history
-		if (SettingsConf.Bool.ClearSearchHistoryOnExit.get())
-			SettingsConf.StrList.SearchHistory.set();
-		
-		/*
-		 * Note: The getSearcher() call below will block until the searcher is
-		 * available. If we run this inside the GUI thread, we won't let go of
-		 * the GUI lock, causing the program to deadlock when the user tries to
-		 * close the program before all indexes have been loaded.
-		 */
-		new Thread() {
-			public void run() {
-				/*
-				 * The folder watcher will be null if the program is shut down
-				 * while loading the indexes
-				 */
-				if (folderWatcher != null)
-					folderWatcher.shutdown();
-				
-				if (hotkeyHandler != null)
-					hotkeyHandler.shutdown();
-				
-				indexRegistry.getSearcher().shutdown();
-			}
-		}.start();
+		if (SettingsConf.Bool.CloseToTray.get() && !systemTrayShutdown) {
+			e.doit = false;
+			systemTrayHider.hide();
+		} else {
+			e.doit = indexRegistry.getQueue().shutdown(new CancelHandler() {
+				public CancelAction cancel() {
+					return confirmExit();
+				}
+			});
+			if (!e.doit)
+				return;
+
+			// Clear search history
+			if (SettingsConf.Bool.ClearSearchHistoryOnExit.get())
+				SettingsConf.StrList.SearchHistory.set();
+
+			/*
+			 * Note: The getSearcher() call below will block until the searcher is
+			 * available. If we run this inside the GUI thread, we won't let go of
+			 * the GUI lock, causing the program to deadlock when the user tries to
+			 * close the program before all indexes have been loaded.
+			 */
+			new Thread() {
+				public void run() {
+					/*
+					 * The folder watcher will be null if the program is shut down
+					 * while loading the indexes
+					 */
+					if (folderWatcher != null)
+						folderWatcher.shutdown();
+
+					if (hotkeyHandler != null)
+						hotkeyHandler.shutdown();
+
+					indexRegistry.getSearcher().shutdown();
+				}
+			}.start();
+		}
 	}
-	
+
 	private static void initHotkey() {
 		try {
 			hotkeyHandler = new HotkeyHandler();
@@ -854,7 +861,7 @@ public final class Application {
 			Util.printErr(e);
 			return;
 		}
-		
+
 		hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<Void> () {
 			public void update(Void eventData) {
 				Util.runSyncExec(shell, new Runnable() {
@@ -876,7 +883,7 @@ public final class Application {
 			public void update(int[] eventData) {
 				String key = UtilGui.toString(eventData);
 				AppUtil.showError(Msg.hotkey_in_use.format(key), false, true);
-				
+
 				/*
 				 * Don't open preferences dialog when the hotkey conflict occurs
 				 * at startup.
@@ -887,7 +894,7 @@ public final class Application {
 		});
 		hotkeyHandler.registerHotkey();
 	}
-	
+
 	@Nullable
 	private static CancelAction confirmExit() {
 		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);

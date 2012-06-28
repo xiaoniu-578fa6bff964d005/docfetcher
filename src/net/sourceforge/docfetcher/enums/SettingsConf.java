@@ -65,7 +65,7 @@ import com.google.common.primitives.Ints;
  * @author Tran Nam Quang
  */
 public final class SettingsConf {
-	
+
 	// TODO pre-release: remove unused entries
 
 	@Description("# Boolean entries. Allowed values: true, false")
@@ -76,19 +76,21 @@ public final class SettingsConf {
 		ClearSearchHistoryOnExit (false),
 		ResetLocationFilterOnExit (true),
 		HotkeyEnabled (true),
-		
+
 		ShowFilterPanel (true),
 		ShowPreviewPanel (true),
 		ShowPreviewPanelAtBottom (true),
-		
+
 		FilesizeFilterMaximized (true),
 		TypesFilterMaximized (false),
 		LocationFilterMaximized (false),
-		
+
 		MainShellMaximized (false),
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
 		ShowRelativePathsMessage (true),
+		AutoScrollToNextOccurrence (false),
+		CloseToTray (false),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();
@@ -186,7 +188,7 @@ public final class SettingsConf {
 	public static enum IntArray implements Storable {
 		PreviewHighlighting (255, 255, 0),
 		HotkeyToFront (SWT.CTRL, SWT.F8),
-		
+
 		FilterSash (1, 1),
 		RightSashHorizontal (1, 1),
 		RightSashVertical (1, 1),
@@ -328,7 +330,7 @@ public final class SettingsConf {
 				Util.checkThat(columnCount == defaultValue.length);
 				value = defaultValue;
 			}
-			
+
 			for (int i = 0; i < columnCount; i++) {
 				final TableColumn col = columns[i];
 				final int index = i;
@@ -340,7 +342,7 @@ public final class SettingsConf {
 					}
 				});
 			}
-			
+
 			// Update column widths if they have been changed in other tables
 			final Event.Listener<Table> changeListener = new Event.Listener<Table>() {
 				public void update(Table eventData) {
@@ -365,7 +367,7 @@ public final class SettingsConf {
 			return Ints.join(", ", value);
 		}
 	}
-	
+
 	@Description("# Column orderings.")
 	public static enum ColumnOrder implements Storable {
 		ResultPanelColumnOrder (),
@@ -383,14 +385,14 @@ public final class SettingsConf {
 		public String valueToString() {
 			return Ints.join(", ", value);
 		}
-		
+
 		public void bind(@NotNull final Table table) {
 			final TableColumn[] columns = table.getColumns();
 			int columnCount = columns.length;
 			Util.checkThat(columnCount > 0);
 			if (columnCount != value.length)
 				value = defaultValue;
-			
+
 			ControlListener columnListener = new ControlAdapter() {
 				public void controlMoved(ControlEvent e) {
 					value = table.getColumnOrder();
@@ -400,7 +402,7 @@ public final class SettingsConf {
 				column.setMoveable(true);
 				column.addControlListener(columnListener);
 			}
-			
+
 			if (table.getColumnCount() == value.length)
 				table.setColumnOrder(value);
 		}
@@ -418,7 +420,7 @@ public final class SettingsConf {
 		SashWeights(int... defaultValue) {
 			value = this.defaultValue = defaultValue;
 		}
-		
+
 		/**
 		 * Binds the enumeration's values to the weights of the given sash form,
 		 * i.e. the sash weights are initialized with the stored values and the
@@ -436,12 +438,12 @@ public final class SettingsConf {
 				value = defaultValue;
 			}
 			sash.setWeights(value);
-			
+
 			for (Control control : children) {
 				control.addControlListener(new ControlAdapter() {
 					public void controlResized(ControlEvent e) {
 						value = sash.getWeights();
-						
+
 						/*
 						 * The event must be fired with asyncExec, otherwise
 						 * we'll get some nasty visual artifacts.
@@ -454,7 +456,7 @@ public final class SettingsConf {
 					}
 				});
 			}
-			
+
 			// Update sash weights if they have been changed in other sash forms
 			final Event.Listener<SashForm> changeListener = new Event.Listener<SashForm>() {
 				public void update(SashForm eventData) {
@@ -495,7 +497,7 @@ public final class SettingsConf {
 				"\\s*(\\d+)\\s*," + // Font height with whitespace
 				"\\s*(\\d+)\\s*" // Font style with whitespace
 		);
-		
+
 		public final Event<Void> evtChanged = new Event<Void>();
 
 		public final FontData defaultValue;
@@ -546,7 +548,7 @@ public final class SettingsConf {
 	}
 
 	private SettingsConf () {}
-	
+
 	public static String loadHeaderComment() throws IOException {
 		URL url = SettingsConf.class.getResource("settings-conf-header.txt");
 		return Resources.toString(url, Charsets.UTF_8);

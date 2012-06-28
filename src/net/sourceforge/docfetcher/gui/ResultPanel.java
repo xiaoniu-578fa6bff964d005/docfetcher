@@ -261,8 +261,9 @@ public final class ResultPanel {
 			}
 			public void run() {
 				MultiFileLauncher launcher = new MultiFileLauncher();
+				Path path = null;
 				for (ResultDocument doc : viewer.getSelection()) {
-					Path path = doc.getPath();
+					path = doc.getPath();
 					try {
 						launcher.addFile(getParent(path));
 					}
@@ -270,9 +271,13 @@ public final class ResultPanel {
 						launcher.addMissing(path.getCanonicalPath());
 					}
 				}
-				if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
-					evtHideInSystemTray.fire(null);
-				
+				boolean launchSucess = false;
+				// if (viewer.getSelection().size()==1)
+					// launchSucess = Util.winOpenDir(path);
+				// else
+					launchSucess = launcher.launch();
+				if (launchSucess && SettingsConf.Bool.HideOnOpen.get())
+					evtHideInSystemTray.fire(null);				
 			}
 			@NotNull
 			private File getParent(@NotNull Path path)

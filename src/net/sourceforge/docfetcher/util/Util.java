@@ -80,7 +80,7 @@ import com.sun.jna.WString;
  * @author Tran Nam Quang
  */
 public final class Util {
-	
+
 	/*
 	 * TODO pre-release: consider structuring the methods in this class by putting them into
 	 * public static inner classes.
@@ -91,34 +91,34 @@ public final class Util {
 
 	/** Whether the platform is Linux. */
 	public static final boolean IS_LINUX;
-	
+
 	/** Whether the platform is Linux KDE. */
 	public static final boolean IS_LINUX_KDE;
-	
+
 	/** Whether the platform is Mac OS X. */
 	public static final boolean IS_MAC_OS_X;
-	
+
 	public static final boolean IS_64_BIT_JVM;
-	
+
 	/** The system's temporary directory. Does not contain backward slashes. */
 	public static final File TEMP_DIR = new File(System.getProperty("java.io.tmpdir"));
-	
+
 	/** The current directory. Does not contain backward slashes. */
 	public static final String USER_DIR_PATH = System.getProperty("user.dir").replace('\\', '/');
-	
+
 	/** The current directory. */
 	public static final File USER_DIR = new File(USER_DIR_PATH);
-	
+
 	/** The user's home directory. Does not contain backward slashes. */
 	public static final String USER_HOME_PATH = System.getProperty("user.home");
-	
+
 	static {
 		String osName = System.getProperty("os.name").toLowerCase();
 		IS_WINDOWS = osName.contains("windows");
 		IS_LINUX = osName.contains("linux");
 		IS_LINUX_KDE = IS_LINUX && System.getenv("KDE_FULL_SESSION") != null;
 		IS_MAC_OS_X = osName.equals("mac os x");
-		
+
 		String arch = System.getProperty("sun.arch.data.model");
 		if (arch == null)
 			arch = System.getProperty("os.arch").toLowerCase();
@@ -133,7 +133,7 @@ public final class Util {
 	 * '/'.
 	 */
 	public static final String FS = System.getProperty("file.separator");
-	
+
 	/**
 	 * Default minimum value for the width of a button.
 	 */
@@ -198,7 +198,7 @@ public final class Util {
 	 * elements of the collection, which are separated by the given separator
 	 * and where occurrences of the separator and backslashes are escaped
 	 * appropriately.
-	 * 
+	 *
 	 * @see Util#decodeStrings(String, char)
 	 */
 	@NotNull
@@ -225,7 +225,7 @@ public final class Util {
 	 * <p>
 	 * Special case: If the given string is an empty or a blank string, an empty
 	 * list is returned.
-	 * 
+	 *
 	 * @see Util#encodeStrings(String, char)
 	 */
 	@MutableCopy
@@ -253,7 +253,7 @@ public final class Util {
 		parts.add(sb.toString());
 		return parts;
 	}
-	
+
 	/**
 	 * Shortens the given string if its length exceeds a fixed limit.
 	 */
@@ -263,7 +263,7 @@ public final class Util {
 			return str.substring(0, 32) + "..."; //$NON-NLS-1$
 		return str;
 	}
-	
+
 	public static <T> boolean equals(@NotNull Collection<T> col, @NotNull T[] a) {
 		Util.checkNotNull(col, a);
 		if (col.size() != a.length)
@@ -276,11 +276,11 @@ public final class Util {
 		}
 		return true;
 	}
-	
+
 	public static String ensureLinuxLineSep(@NotNull String input) {
 		return input.replace("\r\n", "\n");
 	}
-	
+
 	public static String ensureWindowsLineSep(@NotNull String input) {
 		// Two replace passes are needed to avoid converting "\r\n" to "\r\r\n".
 		return input.replace("\r\n", "\n").replace("\n", "\r\n");
@@ -309,7 +309,7 @@ public final class Util {
 		}
 		shell.setLocation(shellPosX, shellPosY);
 	}
-	
+
 	/**
 	 * Packs the given shell and then centers it relative to its parent shell.
 	 * If there is no parent shell, the given shell is centered relative to the
@@ -332,7 +332,7 @@ public final class Util {
 		}
 		shell.setLocation(shellPosX, shellPosY);
 	}
-	
+
 	/**
 	 * Packs the given shell and then centers it relative to the given control.
 	 */
@@ -362,14 +362,14 @@ public final class Util {
 		int height = Math.max(prefSize.y, minHeight);
 		setCenteredBounds(shell, width, height);
 	}
-	
+
 	@NotNull
 	public static Button[] maybeSwapButtons(@NotNull Button b1,
 											@NotNull Button b2) {
 		boolean leftAlign = b1.getDisplay().getDismissalAlignment() == SWT.LEFT;
 		return new Button[] { leftAlign ? b1 : b2, leftAlign ? b2 : b1 };
 	}
-	
+
 	/**
 	 * Returns whether the first bit mask contains the second bit mask.
 	 * <p>
@@ -409,7 +409,7 @@ public final class Util {
 		layout.marginWidth = layout.marginHeight = margin;
 		return layout;
 	}
-	
+
 	@NotNull
 	public static Text createLabeledGridText(	@NotNull Composite parent,
 												@NotNull String labelText) {
@@ -420,7 +420,7 @@ public final class Util {
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
 	}
-	
+
 	@NotNull
 	public static StyledText createLabeledGridStyledText(	@NotNull Composite parent,
 															@NotNull String labelText) {
@@ -431,7 +431,7 @@ public final class Util {
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
 	}
-	
+
 	@NotNull
 	public static Button createCheckButton(	@NotNull Composite parent,
 											@NotNull String label) {
@@ -439,7 +439,7 @@ public final class Util {
 		bt.setText(label);
 		return bt;
 	}
-	
+
 	@NotNull
 	public static Button createPushButton(	@NotNull Composite parent,
 											@NotNull String label,
@@ -449,7 +449,7 @@ public final class Util {
 		bt.addSelectionListener(listener);
 		return bt;
 	}
-	
+
 	@NotNull
 	public static Button createPushButton(	@NotNull Composite parent,
 											@NotNull Image image,
@@ -463,7 +463,7 @@ public final class Util {
 		bt.addSelectionListener(listener);
 		return bt;
 	}
-	
+
 	/**
 	 * Returns a suitable text foreground color for the given background color.
 	 * The returned color is either black or white, depending on the perceived
@@ -481,11 +481,11 @@ public final class Util {
 	/**
 	 * Splits the given file path at any path separators, i.e. forward or
 	 * backward slashes. Example:
-	 * 
+	 *
 	 * <pre>
 	 * /path/to/file/ -> '', 'path', 'to', 'file'
 	 * </pre>
-	 * 
+	 *
 	 * Note that a leading path separator will produce an empty string at the
 	 * beginning of the returned list, while a (single) trailing path separator
 	 * won't.
@@ -506,7 +506,7 @@ public final class Util {
 			parts.add(path.substring(lastStart));
 		return parts;
 	}
-	
+
 	/**
 	 * A {@link com.google.common.base.CharMatcher CharMatcher} that matches
 	 * forward and backward slashes. See the {@code CharMatcher} Javadocs for
@@ -543,7 +543,7 @@ public final class Util {
 		}
 		return sb.toString().replace('\\', '/');
 	}
-	
+
 	/**
 	 * Same as {@link #joinPath(String...)}, but reads the parts from an
 	 * <tt>Iterable</tt>.
@@ -561,7 +561,7 @@ public final class Util {
 		}
 		return sb.toString().replace('\\', '/');
 	}
-	
+
 	@NotNull
 	public static String join(@NotNull String separator, @NotNull Object... parts) {
 		Util.checkNotNull(separator);
@@ -576,7 +576,7 @@ public final class Util {
 		}
 		return sb.toString();
 	}
-	
+
 	@NotNull
 	public static String join(@NotNull String separator, @NotNull Iterable<?> parts) {
 		Util.checkNotNull(separator);
@@ -591,7 +591,7 @@ public final class Util {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * For the given file, returns an absolute path in which all backward
 	 * slashes have been replaced by forward slashes.
@@ -608,7 +608,7 @@ public final class Util {
 		 */
 		return file.getAbsolutePath().replace('\\', '/').replace("//", "/");
 	}
-	
+
 	/**
 	 * For the given path string, returns an absolute path in which all backward
 	 * slashes have been replaced by forward slashes.
@@ -617,12 +617,12 @@ public final class Util {
 	public static String getAbsPath(@NotNull String path) {
 		return getAbsPath(new File(path));
 	}
-	
+
 	@NotNull
 	public static File getAbsFile(@NotNull File file) {
 		return new File(getAbsPath(file));
 	}
-	
+
 	/**
 	 * Equivalent to {@link java.io.File#getAbsolutePath()}.
 	 */
@@ -631,7 +631,7 @@ public final class Util {
 	public static String getSystemAbsPath(@NotNull File file) {
 		return file.getAbsolutePath();
 	}
-	
+
 	/**
 	 * Equivalent to {@link java.io.File#getAbsolutePath() new
 	 * java.io.File(path).getAbsolutePath()}.
@@ -641,19 +641,19 @@ public final class Util {
 	public static String getSystemAbsPath(@NotNull String path) {
 		return new File(path).getAbsolutePath();
 	}
-	
+
 	@NotNull
 	@SuppressAjWarnings
 	public static File getCanonicalFile(@NotNull String path) {
 		return getCanonicalFile(new File(path));
 	}
-	
+
 	@NotNull
 	@SuppressAjWarnings
 	public static File getCanonicalFile(@NotNull File file) {
 		return new File(getCanonicalPath(file));
 	}
-	
+
 	@NotNull
 	@SuppressAjWarnings
 	public static String getCanonicalPath(@NotNull File file) {
@@ -669,7 +669,7 @@ public final class Util {
 			return file.getAbsolutePath();
 		}
 	}
-	
+
 	/**
 	 * Returns all files and directories directly underneath the given
 	 * directory. This works like {@link File#listFiles()}, except that when
@@ -742,13 +742,13 @@ public final class Util {
 			return false;
 		}
 	}
-	
+
 	private interface Kernel32 extends Library {
 		public int GetFileAttributesW(WString fileName);
 	}
 
 	private static Kernel32 lib = null;
-	
+
 	private static int getWin32FileAttributes(File file) throws IOException {
 		if (lib == null) {
 			synchronized (Kernel32.class) {
@@ -778,7 +778,7 @@ public final class Util {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Returns the parent of the given file. Unlike the standard method
 	 * {@link File#getParentFile()}, this method will not return null if the
@@ -793,7 +793,7 @@ public final class Util {
 			parent = file.getAbsoluteFile().getParentFile();
 		return parent;
 	}
-	
+
 	/**
 	 * @see #getParentFile(File)
 	 */
@@ -825,7 +825,7 @@ public final class Util {
 	/**
 	 * Equivalent to {@link #splitFilename(String)
 	 * splitFilename(file.getName())}.
-	 * 
+	 *
 	 * @see Util#splitFilename(String)
 	 */
 	public static String[] splitFilename(@NotNull File file) {
@@ -848,7 +848,7 @@ public final class Util {
 	 * </ul>
 	 * <p>
 	 * Note: This method also accepts filepaths.
-	 * 
+	 *
 	 * @throws NullPointerException
 	 *             if the given filename is null.
 	 */
@@ -869,12 +869,12 @@ public final class Util {
 		}
 		return new String[] {filename.substring(0, index), ext};
 	}
-	
+
 	@NotNull
 	public static String getExtension(@NotNull String filename) {
 		return splitFilename(filename)[1];
 	}
-	
+
 	@NotNull
 	public static String getExtension(@NotNull File file) {
 		return splitFilename(file.getName())[1];
@@ -899,7 +899,7 @@ public final class Util {
 				return true;
 		return false;
 	}
-	
+
 	/**
 	 * @see #hasExtension(String, String...)
 	 */
@@ -911,7 +911,7 @@ public final class Util {
 				return true;
 		return false;
 	}
-	
+
 	/**
 	 * Returns the name of the given file. In contrast to the default
 	 * {@link File#getName()} method, this method will return a drive letter
@@ -924,14 +924,14 @@ public final class Util {
 											@NotNull String letterSuffix) {
 		Util.checkNotNull(file, letterSuffix);
 		String filename = file.getName();
-		
+
 		/*
 		 * Special case: If the file was created as 'new File("")', then its
 		 * filename will be an empty string.
 		 */
 		if (file.getAbsoluteFile().equals(USER_DIR))
 			return USER_DIR.getName();
-		
+
 		/*
 		 * Note: Do not use absolute files here, because this would turn "C:"
 		 * into the working directory! (Strange but true.)
@@ -943,10 +943,10 @@ public final class Util {
 		}
 		return filename;
 	}
-	
+
 	private static Pattern drivePattern = Pattern.compile("([a-zA-Z]):.*");
 	private static Pattern driveOnlyPattern = Pattern.compile("(?:[a-zA-Z]):(?:\\\\|/)*");
-	
+
 	/**
 	 * Returns the drive letter at the beginning of the given Windows path, or
 	 * null if the path doesn't start with a drive letter.
@@ -961,16 +961,16 @@ public final class Util {
 			return m.group(1).toUpperCase();
 		return null;
 	}
-	
+
 	public static boolean isWindowsDevice(@NotNull String path) {
 		return driveOnlyPattern.matcher(path).matches();
 	}
-	
+
 	public static void assertSwtThread() {
 		if (Display.getCurrent() == null)
 			throw new IllegalStateException();
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if the given condition is
 	 * false.
@@ -988,7 +988,7 @@ public final class Util {
 		if (!condition)
 			throw new IllegalArgumentException(message);
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if the provided argument
 	 * is null. If not, the argument is returned.
@@ -1008,7 +1008,7 @@ public final class Util {
 			throw new IllegalArgumentException();
 		return a;
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if any of the provided
 	 * arguments is null.
@@ -1017,7 +1017,7 @@ public final class Util {
 		if (a == null || b == null)
 			throw new IllegalArgumentException();
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if any of the provided
 	 * arguments is null.
@@ -1026,7 +1026,7 @@ public final class Util {
 		if (a == null || b == null || c == null)
 			throw new IllegalArgumentException();
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if any of the provided
 	 * arguments is null.
@@ -1035,7 +1035,7 @@ public final class Util {
 		if (a == null || b == null || c == null || d == null)
 			throw new IllegalArgumentException();
 	}
-	
+
 	/**
 	 * Throws an <code>IllegalArgumentException</code> if any of the provided
 	 * arguments is null.
@@ -1044,9 +1044,9 @@ public final class Util {
 		if (a == null || b == null || c == null || d == null || e == null)
 			throw new IllegalArgumentException();
 	}
-	
+
 	private static long lastTimeStamp = -1;
-	
+
 	/**
 	 * Returns a unique identifier based on {@link System#currentTimeMillis()}.
 	 * The returned ID is guaranteed to differ from all previous IDs obtained by
@@ -1105,7 +1105,7 @@ public final class Util {
 		if (size == 0) return null;
 		return list.get(size - 1);
 	}
-	
+
 	@MutableCopy
 	@NotNull
 	public static <T> List<T> createList(	int extraCapacity,
@@ -1116,11 +1116,11 @@ public final class Util {
 			newList.add(element);
 		return newList;
 	}
-	
+
 	/**
 	 * Creates a new list from the given collection and elements. The given
 	 * collection is added first to the returned list.
-	 * 
+	 *
 	 * @see #createListReverse(Collection, Object...)
 	 */
 	@MutableCopy
@@ -1134,11 +1134,11 @@ public final class Util {
 			newList.add(element);
 		return newList;
 	}
-	
+
 	/**
 	 * Creates a new list from the given collection and elements. The given
 	 * elements are added first to the returned list.
-	 * 
+	 *
 	 * @see #createList(Collection, Object...)
 	 */
 	@MutableCopy
@@ -1152,7 +1152,7 @@ public final class Util {
 		newList.addAll(col);
 		return newList;
 	}
-	
+
 	@NotNull
 	public static <T> List<T> createEmptyList(@NotNull Collection<?>... cols) {
 		int size = 0;
@@ -1160,7 +1160,7 @@ public final class Util {
 			size += cols[i].size();
 		return new ArrayList<T>(size);
 	}
-	
+
 	/**
 	 * Runs the given {@code Runnable} in a way that avoids throwing errors of
 	 * the type {@link SWT#ERROR_THREAD_INVALID_ACCESS}. This is useful for
@@ -1185,7 +1185,7 @@ public final class Util {
 			return runSyncExec(widget, runnable);
 		}
 	}
-	
+
 	/**
 	 * @see #runSwtSafe(Widget, Runnable)
 	 */
@@ -1201,7 +1201,7 @@ public final class Util {
 			return runSyncExec(display, runnable);
 		}
 	}
-	
+
 	/**
 	 * Runs the given {@code Runnable} via {@link Display#syncExec(Runnable)}.
 	 * This is useful for running GUI-accessing code from non-GUI threads.
@@ -1227,7 +1227,7 @@ public final class Util {
 		});
 		return wasRun[0];
 	}
-	
+
 	/**
 	 * @see #runSyncExec(Widget, Runnable)
 	 */
@@ -1289,10 +1289,10 @@ public final class Util {
 		 */
 		if (!IS_LINUX_KDE && Program.launch(filename))
 			return true;
-		
+
 		if (!IS_LINUX)
 			return false;
-		
+
 		try {
 			String[] cmd = {"xdg-open", filename};
 			Process process = Runtime.getRuntime().exec(cmd);
@@ -1303,7 +1303,7 @@ public final class Util {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * @see #launch(String)
 	 */
@@ -1311,22 +1311,22 @@ public final class Util {
 		Util.checkNotNull(fileOrDir);
 		return launch(getSystemAbsPath(fileOrDir));
 	}
-	
+
 	@NotNull
 	@SuppressAjWarnings
 	public static File createTempDir() throws IOException {
 		File dir = Files.createTempDir();
-		
+
 		/*
 		 * On Windows and Mac OS X, returning a canonical file avoids certain
 		 * symlink-related issues:
-		 * 
+		 *
 		 * On Windows 7, Files.createTempDir() might return a directory that
 		 * contains 8.3 filenames, for which the absolute and canonical paths
 		 * differ, so that the directory will be incorrectly treated as a
 		 * symlink. On Mac OS X, Files.createTempDir() will return an actual
 		 * symlink.
-		 * 
+		 *
 		 * In both cases, returning a file that is or appears to be a symlink
 		 * will lead to various problems, e.g. Files.deleteRecursively(File)
 		 * failing to delete the temporary directory.
@@ -1343,7 +1343,7 @@ public final class Util {
 			throws IOException {
 		return createTempFile(prefix, suffix, null);
 	}
-	
+
 	/**
 	 * Equivalent to {@link File#createTempFile(String, String, File)}, except:
 	 * <ul>
@@ -1353,7 +1353,7 @@ public final class Util {
 	 * Instead, the prefix will be right-padded with underscores to make it 3
 	 * characters long.
 	 * </ul>
-	 * 
+	 *
 	 * @see {@link File#createTempFile(String, String, File)}
 	 */
 	@SuppressAjWarnings
@@ -1365,7 +1365,7 @@ public final class Util {
 		if (prefixLength < 3)
 			prefix += Strings.repeat("_", 3 - prefixLength);
 		File file = File.createTempFile(prefix, suffix, directory);
-		
+
 		/*
 		 * On Mac OS X, File.createTempFile() will give us a symlink to a file,
 		 * which is not what we want, because our file walker will silently
@@ -1374,11 +1374,11 @@ public final class Util {
 		 */
 		if (Util.IS_MAC_OS_X)
 			file = file.getCanonicalFile();
-		
+
 		file.deleteOnExit();
 		return file;
 	}
-	
+
 	@NotNull
 	public static File createDerivedTempFile(	@NotNull String filename,
 												@NotNull File tempDir)
@@ -1405,7 +1405,7 @@ public final class Util {
 		}
 		System.out.println(sb.toString());
 	}
-	
+
 	/**
 	 * Equivalent to <code>System.err.println(String)</code>. This method can be
 	 * called instead to suppress AspectJ warnings.
@@ -1414,7 +1414,7 @@ public final class Util {
 	public static void printErr(@NotNull String message) {
 		System.err.println(message);
 	}
-	
+
 	/**
 	 * Equivalent to {@link Throwable#printStackTrace()}. This method can be
 	 * called instead to suppress AspectJ warnings.
@@ -1423,7 +1423,7 @@ public final class Util {
 	public static void printErr(@NotNull Throwable t) {
 		t.printStackTrace();
 	}
-	
+
 	@NotNull
 	public static String getLowestMessage(@Nullable Throwable throwable) {
 		if (throwable == null)
@@ -1445,7 +1445,7 @@ public final class Util {
 	 */
 	public static void selectAllOnFocus(@NotNull final Control text) {
 		Util.checkThat(text instanceof Combo || text instanceof Text);
-		
+
 		class SelectAllOnFocus extends MouseAdapter implements FocusListener {
 			private boolean focusGained = false;
 			public void focusGained(FocusEvent e) {
@@ -1462,14 +1462,14 @@ public final class Util {
 				focusGained = false;
 			}
 		}
-		
+
 		SelectAllOnFocus listener = new SelectAllOnFocus();
 		text.addFocusListener(listener);
 		text.addMouseListener(listener);
 	}
-	
+
 	@Nullable private static KeyListener selectAllKeyListener;
-	
+
 	public static void registerSelectAllKey(@NotNull final StyledText st) {
 		if (selectAllKeyListener == null) {
 			selectAllKeyListener = new KeyAdapter() {
@@ -1481,7 +1481,7 @@ public final class Util {
 		}
 		st.addKeyListener(selectAllKeyListener);
 	}
-	
+
 	/**
 	 * Selects all the text in the given combo.
 	 */
@@ -1496,7 +1496,7 @@ public final class Util {
 		if (value < minimum) return minimum;
 		return value;
 	}
-	
+
 	public static boolean isInterrupted() {
 		return Thread.currentThread().isInterrupted();
 	}
@@ -1543,13 +1543,13 @@ public final class Util {
 		Util.checkNotNull(files);
 		if (files.isEmpty())
 			return;
-		
+
 		Clipboard clipboard = new Clipboard(Display.getCurrent());
 		Transfer[] types = new Transfer[] {
 				TextTransfer.getInstance(),
 				FileTransfer.getInstance()
 		};
-		
+
 		StringBuilder sb = new StringBuilder();
 		String[] filePaths = new String[files.size()];
 		int i = 0;
@@ -1561,7 +1561,7 @@ public final class Util {
 			filePaths[i] = path;
 			i++;
 		}
-		
+
 		clipboard.setContents(new Object[] {sb.toString(), filePaths}, types);
 		clipboard.dispose();
 	}
@@ -1588,7 +1588,7 @@ public final class Util {
 	public static boolean isEnterKey(int keyCode){
 		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
 	}
-	
+
 	// Any of the given resources may be null
 	public static void disposeWith(	@NotNull Widget widget,
 									@NotNull final Resource... resources) {
@@ -1601,5 +1601,22 @@ public final class Util {
 			}
 		});
 	}
-	
+
+    /**
+	 * Launches the given filepath and select the file
+	 * explorer.exe /select,F:\docfetcher\DocFetcher\aspectjtools.jar
+	 * returning whether the file was uccessfully launched
+	 */
+	public static boolean winOpenDir(String fileName) {
+        if (IS_WINDOWS) {
+            try {
+                Runtime.getRuntime().exec("explorer /select,  " + fileName);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+	}
+
 }
