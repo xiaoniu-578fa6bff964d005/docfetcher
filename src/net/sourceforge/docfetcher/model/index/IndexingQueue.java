@@ -269,6 +269,10 @@ public final class IndexingQueue {
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		String absPath1 = Util.getAbsPath(taskParentIndexDir);
 		String absPath2 = Util.getAbsPath(indexParentDir);
+        if (Util.IS_WINDOWS) {
+            absPath1 = absPath1.toUpperCase();
+            absPath2 = absPath2.toUpperCase();
+        }   
 		Util.checkThat(absPath1.equals(absPath2), absPath1 + " != " + absPath2);
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
