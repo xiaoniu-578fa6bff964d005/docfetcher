@@ -151,7 +151,7 @@ FunctionEnd
 Function .onInstFailed
     DetailPrint " --- "
     DetailPrint " Make sure DocFetcher is not running and try installation again "
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Please restart your computer and try  the installation again." 
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Please restart your computer and try the installation again."
 FunctionEnd
 
 
@@ -160,7 +160,7 @@ Section "DocFetcher"
     killdaemon:
     Processes::FindProcess "docfetcher-daemon-windows"
 	StrCmp $R0 0 nodaemon
-    DetailPrint "Attempting to kill docfetcher-daemon..." 
+    DetailPrint "Attempting to kill docfetcher-daemon..."
     Processes::KillProcess "docfetcher-daemon-windows"
     Sleep 250
     Goto killdaemon
