@@ -73,7 +73,7 @@ class HighlightingToolBarWithTextViewer {
 			public void widgetSelected(SelectionEvent e) {
 				moveSelection(this.isDownBt);
 			}
-		}                
+		}
 		
 		ToolItemFactory tif = new ToolItemFactory(toolBar);
 		tif.enabled(false);
@@ -112,7 +112,7 @@ class HighlightingToolBarWithTextViewer {
 		createToolItems(tif);
 	}
 	
-    public final void moveSelection(boolean isDownBt) {
+    private void moveSelection(boolean isDownBt) {
         Integer newOcc = textViewer.goTo(isDownBt);
         if (newOcc != null) {
             currentOcc = newOcc;
@@ -163,7 +163,7 @@ class HighlightingToolBarWithTextViewer {
 		downBt.setEnabled(occCount > 0);
 		currentOcc = null;
 		highlightBt.setEnabled(occCount > 0);
-        if (SettingsConf.Bool.AutoScrollToNextOccurrence.get()) 
+        if (SettingsConf.Bool.AutoScrollToNextOccurrence.get())
             moveSelection(true);
 	}
 	

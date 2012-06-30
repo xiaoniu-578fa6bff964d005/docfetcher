@@ -261,9 +261,8 @@ public final class ResultPanel {
 			}
 			public void run() {
 				MultiFileLauncher launcher = new MultiFileLauncher();
-				Path path = null;
 				for (ResultDocument doc : viewer.getSelection()) {
-					path = doc.getPath();
+					Path path = doc.getPath();
 					try {
 						launcher.addFile(getParent(path));
 					}
@@ -272,7 +271,7 @@ public final class ResultPanel {
 					}
 				}
 				if (launcher.launch() && SettingsConf.Bool.HideOnOpen.get())
-					evtHideInSystemTray.fire(null);				
+					evtHideInSystemTray.fire(null);
 			}
 			@NotNull
 			private File getParent(@NotNull Path path)

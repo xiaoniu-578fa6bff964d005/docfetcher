@@ -1605,7 +1605,7 @@ public final class Util {
     /**
 	 * Launches the given filepath and select the file
 	 * explorer.exe /select,F:\docfetcher\DocFetcher\aspectjtools.jar
-	 * returning whether the file was uccessfully launched
+	 * returning whether the file was successfully launched
      * This process is not working properly in Win7 64bit
 	 */
 	public static boolean winOpenDir(String fileName) {
