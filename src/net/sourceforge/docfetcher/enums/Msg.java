@@ -546,6 +546,10 @@ public enum Msg {
 		Comments.prefOption + "Whether to concatenate two or more consecutive words in a " +
 		"query with OR instead of AND. Example: When the user submits the " +
 		"query 'dog cat', this would be treated as 'dog OR cat'."),
+	pref_scroll_to_first_match (
+		"Automatically scroll to first match in preview pane",
+		Comments.prefOption + "Whether to scroll to the first match in the " +
+		"preview pane when a new document is displayed in it."),
 	pref_hide_in_systray (
 		"Hide program in System Tray after opening files",
 		Comments.prefOption + "Whether the program should be minimized to the " +

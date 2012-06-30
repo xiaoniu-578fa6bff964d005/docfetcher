@@ -163,7 +163,7 @@ class HighlightingToolBarWithTextViewer {
 		downBt.setEnabled(occCount > 0);
 		currentOcc = null;
 		highlightBt.setEnabled(occCount > 0);
-        if (SettingsConf.Bool.AutoScrollToNextOccurrence.get())
+        if (SettingsConf.Bool.AutoScrollToFirstMatch.get())
             moveSelection(true);
 	}
 	

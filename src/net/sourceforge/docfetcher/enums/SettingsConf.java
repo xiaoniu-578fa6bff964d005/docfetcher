@@ -89,7 +89,7 @@ public final class SettingsConf {
 		PreferHtmlPreview (true),
 		HighlightingEnabled (true),
 		ShowRelativePathsMessage (true),
-		AutoScrollToNextOccurrence (false),
+		AutoScrollToFirstMatch (true),
 		CloseToTray (false),
 		;
 

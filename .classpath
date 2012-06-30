@@ -31,6 +31,12 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/jintellitype"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.5.5.jar" sourcepath="lib/truezip/truezip-driver-file-7.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.5.5.jar" sourcepath="lib/truezip/truezip-driver-tar-7.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.5.5.jar" sourcepath="lib/truezip/truezip-driver-zip-7.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.5.5.jar" sourcepath="lib/truezip/truezip-file-7.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.5.5.jar" sourcepath="lib/truezip/truezip-kernel-7.5.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.5.5.jar" sourcepath="lib/truezip/truezip-swing-7.5.5-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
@@ -55,12 +61,6 @@
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_8_1_1.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.6.0.jar" sourcepath="lib/pdfbox/pdfbox-1.6.0-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-file-7.4.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-tar-7.4.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.4.3.jar" sourcepath="lib/truezip/truezip-driver-zip-7.4.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.4.3.jar" sourcepath="lib/truezip/truezip-file-7.4.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.4.3.jar" sourcepath="lib/truezip/truezip-kernel-7.4.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.4.3.jar" sourcepath="lib/truezip/truezip-swing-7.4.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java-libpst/java-libpst.0.7.jar" sourcepath="lib/java-libpst/java-libpst-0.7.src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>

@@ -65,6 +65,10 @@ public final class PrefDialog {
 				SettingsConf.Bool.UseOrOperator),
 
 			new CheckOption(
+				Msg.pref_scroll_to_first_match.get(),
+				SettingsConf.Bool.AutoScrollToFirstMatch),
+
+			new CheckOption(
 				Msg.pref_hide_in_systray.get(),
 				SettingsConf.Bool.HideOnOpen),
 
