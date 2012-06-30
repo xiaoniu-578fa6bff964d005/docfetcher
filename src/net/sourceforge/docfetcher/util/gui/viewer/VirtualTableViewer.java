@@ -80,17 +80,19 @@ public abstract class VirtualTableViewer<E> {
 		
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				Util.checkThat(!columns.isEmpty());
-				TableItem item = (TableItem) event.item;
-				E element = elements.get(event.index);
-				for (int iCol = 0; iCol < columns.size(); iCol++) {
-					Column<E> column = columns.get(iCol);
-					item.setText(iCol, column.getLabel(element));
-					item.setImage(iCol, column.getImage(element));
-					item.setForeground(iCol, column.getForeground(element));
-					item.setBackground(iCol, column.getBackground(element));
-				}
-				item.setData(element);
+				if (event.index >= 0) {
+                    Util.checkThat(!columns.isEmpty());
+                    TableItem item = (TableItem) event.item;
+                    E element = elements.get(event.index);
+                    for (int iCol = 0; iCol < columns.size(); iCol++) {
+                        Column<E> column = columns.get(iCol);
+                        item.setText(iCol, column.getLabel(element));
+                        item.setImage(iCol, column.getImage(element));
+                        item.setForeground(iCol, column.getForeground(element));
+                        item.setBackground(iCol, column.getBackground(element));
+                    }
+                    item.setData(element);
+                }
 			}
 		});
 	}
