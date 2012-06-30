@@ -550,6 +550,10 @@ public enum Msg {
 		"Hide program in System Tray after opening files",
 		Comments.prefOption + "Whether the program should be minimized to the " +
 		"system tray after the user opens a file in the result pane."),
+	pref_close_to_systray (
+		"When closing program window, hide in System Tray instead of exiting",
+		Comments.prefOption + "Whether the program should hide in the " +
+		"system tray instead of terminating when the main window is closed."),
 	pref_clear_search_history_on_exit (
 		"Clear search history on exit",
 		Comments.prefOption + "Whether the search history (i.e. the list of " +

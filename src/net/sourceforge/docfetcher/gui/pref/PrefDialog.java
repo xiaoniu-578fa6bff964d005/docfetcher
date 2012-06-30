@@ -69,6 +69,10 @@ public final class PrefDialog {
 				SettingsConf.Bool.HideOnOpen),
 
 			new CheckOption(
+				Msg.pref_close_to_systray.get(),
+				SettingsConf.Bool.CloseToTray),
+
+			new CheckOption(
 				Msg.pref_clear_search_history_on_exit.get(),
 				SettingsConf.Bool.ClearSearchHistoryOnExit)
 
