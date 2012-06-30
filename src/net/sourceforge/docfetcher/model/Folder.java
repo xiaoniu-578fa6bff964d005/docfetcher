@@ -83,7 +83,7 @@ public abstract class Folder
 	 * RAM when the tree is very large and has many empty leaf nodes.
 	 */
 	@Nullable private HashMap<String, D> documents;
-	@Nullable public HashMap<String, F> subFolders;
+	@Nullable protected HashMap<String, F> subFolders;
 
 	/*
 	 * If this is a root folder, then it has a non-null path and a null parent.
@@ -91,8 +91,8 @@ public abstract class Folder
 	 * and a non-null parent. HTML folders and SolidArchiveTree roots are
 	 * treated as root folders.
 	 */
-	@Nullable public F parent;
-	@Nullable public Path path;
+	@Nullable protected F parent;
+	@Nullable protected Path path;
 	private int pathHashCode;
 
 	/**
@@ -101,7 +101,7 @@ public abstract class Folder
 	 */
 	@Nullable private Long lastModified;
 
-	public boolean isChecked = true;
+	protected boolean isChecked = true;
 
 	@SuppressWarnings("unchecked")
 	protected Folder(	@NotNull F parent,
@@ -122,7 +122,7 @@ public abstract class Folder
 		updatePathHashCode();
 	}
 
-	public void updatePathHashCode() {
+	protected void updatePathHashCode() {
 		if (path != null) {
 			pathHashCode = path.getPath().hashCode();
 		}
@@ -468,7 +468,7 @@ public abstract class Folder
 	@Nullable
 	@RecursiveMethod
 	@ThreadSafe
-	public synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
+	protected synchronized TreeNode findTreeNodeUnchecked(@NotNull Path targetPath) {
 		/*
 		 * TODO post-release-1.1: since getPath() constructs the returned path
 		 * dynamically, this search algorithm is somewhat inefficient. Maybe
