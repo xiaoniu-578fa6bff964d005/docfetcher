@@ -49,8 +49,16 @@ public final class PdfParser extends StreamParser {
 			 * number of parsed PDF files
 			 */
 			pdfDoc = PDDocument.load(in, true);
-			PDDocumentInformation pdInfo = pdfDoc.getDocumentInformation();
-			final int pageCount = pdfDoc.getNumberOfPages();
+			PDDocumentInformation pdInfo;
+			final int pageCount;
+			try {
+				pdInfo = pdfDoc.getDocumentInformation();
+				pageCount = pdfDoc.getNumberOfPages();
+			}
+			catch (ClassCastException e) {
+				// Bug #3529070 and #3528345
+				throw new ParseException(e);
+			}
 			StringWriter writer = new StringWriter();
 			
 			/*
