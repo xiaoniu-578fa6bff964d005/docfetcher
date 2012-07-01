@@ -119,7 +119,13 @@ abstract class MSOfficeParser extends FileParser {
 		InputStream in = null;
 		try {
 			in = new FileInputStream(file);
-			reader.read(in);
+			try {
+				reader.read(in);
+			}
+			catch (IllegalArgumentException e) {
+				// Bug #3537738: "IllegalArgumentException: name cannot be empty"
+				throw new ParseException(e);
+			}
 			
 			parseResult
 			.setTitle(listener.title)
