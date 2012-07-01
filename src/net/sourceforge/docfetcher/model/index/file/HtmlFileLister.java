@@ -127,11 +127,20 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 			}
 		}
 		
+		/*
+		 * Bug #3538230: We've already called isFile() and isDirectory() on all
+		 * found files and directories in the previous loop, but we must do it
+		 * again in the two following loops, because enough time may have passed
+		 * due to indexing to allow the user to delete any of the files and
+		 * directories from outside.
+		 */
+		
 		for (File dirCandidate : tempDirs) {
-			if (isStopped()) return;
+			if (isStopped())
+				return;
 			String dirBasename = HtmlUtil.getHtmlDirBasename(dirCandidate);
 			if (dirBasename == null) {
-				if (! skip(dirCandidate))
+				if (!skip(dirCandidate) && dirCandidate.isDirectory())
 					handleDir(dirCandidate);
 				continue;
 			}
@@ -139,21 +148,24 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 			for (Iterator<File> it = htmlFiles.iterator(); it.hasNext(); ) {
 				File htmlCandidate = it.next();
 				if (Util.splitFilename(htmlCandidate)[0].equals(dirBasename)) {
-					if (! skip(htmlCandidate))
+					if (!skip(htmlCandidate) && htmlCandidate.isFile()
+							&& dirCandidate.isDirectory())
 						handleHtmlPair(htmlCandidate, dirCandidate);
 					it.remove();
 					htmlPairFound = true;
 					break;
 				}
 			}
-			if (! htmlPairFound && ! skip(dirCandidate))
+			if (!htmlPairFound && !skip(dirCandidate)
+					&& dirCandidate.isDirectory())
 				handleDir(dirCandidate);
 		}
 		
 		// Visit unpaired html files
 		for (File htmlFile : htmlFiles) {
-			if (isStopped()) return;
-			if (! skip(htmlFile))
+			if (isStopped())
+				return;
+			if (!skip(htmlFile) && htmlFile.isFile())
 				handleHtmlPair(htmlFile, null);
 		}
 	}
