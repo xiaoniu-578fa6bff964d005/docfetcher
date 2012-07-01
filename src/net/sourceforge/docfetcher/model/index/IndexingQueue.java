@@ -270,9 +270,10 @@ public final class IndexingQueue {
 		String absPath1 = Util.getAbsPath(taskParentIndexDir);
 		String absPath2 = Util.getAbsPath(indexParentDir);
         if (Util.IS_WINDOWS) {
+        	// Bug #3536137: On Windows, filenames are case-insensitive
             absPath1 = absPath1.toUpperCase();
             absPath2 = absPath2.toUpperCase();
-        }   
+        }
 		Util.checkThat(absPath1.equals(absPath2), absPath1 + " != " + absPath2);
 		
 		LazyList<Task> removedTasks = new LazyList<Task>();
