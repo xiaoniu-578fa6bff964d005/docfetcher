@@ -34,6 +34,7 @@ import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
+import net.sourceforge.docfetcher.model.search.Searcher.CorruptedIndex;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.CallOnce;
@@ -43,6 +44,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
+import net.sourceforge.docfetcher.util.collect.LazyList;
 import net.sourceforge.docfetcher.util.concurrent.BlockingWrapper;
 import net.sourceforge.docfetcher.util.concurrent.DelayedExecutor;
 
@@ -299,7 +301,7 @@ public final class IndexRegistry {
 
 	@CallOnce
 	@ThreadSafe
-	public void load(@NotNull Cancelable cancelable) throws IOException {
+	public List<CorruptedIndex> load(@NotNull Cancelable cancelable) throws IOException {
 		/*
 		 * Note: To allow running this method in parallel with other operations,
 		 * it is important not to lock the entire method. Otherwise, if a client
@@ -324,7 +326,9 @@ public final class IndexRegistry {
 			loadIndex(serFile);
 		}
 		
-		searcher.set(new Searcher(this, fileFactory, outlookMailFactory));
+		LazyList<CorruptedIndex> corruptedIndexes = new LazyList<CorruptedIndex>();
+		searcher.set(new Searcher(
+			this, fileFactory, outlookMailFactory, corruptedIndexes));
 		
 		// Watch index directory for changes
 		try {
@@ -356,6 +360,8 @@ public final class IndexRegistry {
 		catch (JNotifyException e) {
 			Util.printErr(e);
 		}
+		
+		return corruptedIndexes;
 	}
 	
 	@ThreadSafe

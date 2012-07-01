@@ -45,6 +45,7 @@ import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
+import net.sourceforge.docfetcher.model.search.Searcher.CorruptedIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
@@ -57,6 +58,7 @@ import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -164,8 +166,8 @@ public final class Application {
 		Display.setAppName(shellTitle); // must be called *before* the display is created
 		Display display = new Display();
 		AppUtil.setDisplay(display);
-		loadIndexRegistry(display);
 		shell = new Shell(display);
+		loadIndexRegistry(shell);
 
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
@@ -309,8 +311,9 @@ public final class Application {
 		});
 	}
 
-	private static void loadIndexRegistry(@NotNull final Display display) {
+	private static void loadIndexRegistry(@NotNull final Shell mainShell) {
 		Util.assertSwtThread();
+		final Display display = mainShell.getDisplay();
 
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get())
@@ -362,7 +365,7 @@ public final class Application {
 		new Thread(Application.class.getName() + " (load index registry)") {
 			public void run() {
 				try {
-					indexRegistry.load(new Cancelable() {
+					List<CorruptedIndex> corrupted = indexRegistry.load(new Cancelable() {
 						public boolean isCanceled() {
 							return display.isDisposed();
 						}
@@ -371,7 +374,7 @@ public final class Application {
 					// Program may have been shut down while it was loading the indexes
 					if (display.isDisposed())
 						return;
-
+					
 					/*
 					 * Install folder watches on the user's document folders.
 					 *
@@ -386,6 +389,20 @@ public final class Application {
 
 					// Must be called *after* the indexes have been loaded
 					daemon.enqueueUpdateTasks();
+					
+					// Show error messages if some indexes couldn't be loaded
+					if (!corrupted.isEmpty()) {
+						StringBuilder msg = new StringBuilder(Msg.corrupted_indexes.get());
+						for (CorruptedIndex index : corrupted) {
+							msg.append("\n\n");
+							String indexName = index.index.getRootFolder().getDisplayName();
+							String errorMsg = index.ioException.getMessage();
+							msg.append(Msg.index.format(indexName));
+							msg.append("\n");
+							msg.append(Msg.error.format(errorMsg));
+						}
+						AppUtil.showError(msg.toString(), true, false);
+					}
 				}
 				catch (IOException e) {
 					if (display.isDisposed())

@@ -45,6 +45,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
+import net.sourceforge.docfetcher.util.collect.LazyList;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -64,7 +65,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.TermsFilter;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
 
 import com.google.common.io.Closeables;
 
@@ -84,7 +84,7 @@ public final class Searcher {
 	/**
 	 * A single page of results.
 	 */
-	public static class ResultPage {
+	public static final class ResultPage {
 		/** The result documents for this page. */
 		@ImmutableCopy
 		public final List<ResultDocument> resultDocuments;
@@ -109,6 +109,20 @@ public final class Searcher {
 		}
 	}
 	
+	/**
+	 * A corrupted index that couldn't be loaded during initialization.
+	 */
+	public static final class CorruptedIndex {
+		@NotNull public final LuceneIndex index;
+		@NotNull public final IOException ioException;
+		
+		public CorruptedIndex(	@NotNull LuceneIndex index,
+								@NotNull IOException ioException) {
+			this.index = Util.checkNotNull(index);
+			this.ioException = Util.checkNotNull(ioException);
+		}
+	}
+	
 	private static final int PAGE_SIZE = ProgramConf.Int.WebInterfacePageSize.get();
 	public static final int MAX_RESULTS = ProgramConf.Int.MaxResultsTotal.get();
 	
@@ -126,15 +140,20 @@ public final class Searcher {
 	
 	private final Lock readLock;
 	private final Lock writeLock;
-	
+
 	/**
 	 * This method should not be called by clients. Use
 	 * {@link IndexRegistry#getSearcher()} instead.
+	 * 
+	 * @param corruptedIndexes
+	 *            A list that will be filled by this constructor with indexes
+	 *            that couldn't be loaded.
 	 */
 	@VisibleForPackageGroup
 	public Searcher(@NotNull IndexRegistry indexRegistry,
 					@NotNull FileFactory fileFactory,
-					@NotNull OutlookMailFactory outlookMailFactory)
+					@NotNull OutlookMailFactory outlookMailFactory,
+					@NotNull final List<CorruptedIndex> corruptedIndexes)
 			throws IOException {
 		Util.checkNotNull(indexRegistry, fileFactory, outlookMailFactory);
 		this.indexRegistry = indexRegistry;
@@ -144,6 +163,7 @@ public final class Searcher {
 		readLock = indexRegistry.getReadLock();
 		writeLock = indexRegistry.getWriteLock();
 		
+		// Handler for index additions
 		addedListener = new Event.Listener<LuceneIndex>() {
 			public void update(LuceneIndex eventData) {
 				replaceLuceneSearcher();
@@ -157,15 +177,16 @@ public final class Searcher {
 		writeLock.lock();
 		try {
 			indexRegistry.addListeners(new ExistingIndexesHandler() {
+				// Handle existing indexes
 				public void handleExistingIndexes(List<LuceneIndex> indexes) {
 					try {
-						setLuceneSearcher(indexes);
+						corruptedIndexes.addAll(setLuceneSearcher(indexes));
 					}
 					catch (IOException e) {
 						ioException = e;
 					}
 				}
-			}, addedListener, null);
+			}, addedListener, null); // removedListener is null, see deletion thread below
 		}
 		finally {
 			writeLock.unlock();
@@ -174,6 +195,7 @@ public final class Searcher {
 		if (ioException != null)
 			throw ioException;
 		
+		// Handler for index removals
 		deletionThread = new Thread(Searcher.class.getName() + " (Approve pending deletions)") {
 			public void run() {
 				while (true) {
@@ -215,27 +237,23 @@ public final class Searcher {
 	// Caller must close returned searcher
 	@NotNull
 	@NotThreadSafe
-	private void setLuceneSearcher(@NotNull List<LuceneIndex> indexes)
+	private List<CorruptedIndex> setLuceneSearcher(@NotNull List<LuceneIndex> indexes)
 			throws IOException {
 		this.indexes = Util.checkNotNull(indexes);
-        List<Searchable> searchables = new ArrayList<Searchable>();
-        String errmsg = "Error loading index:";
+        Searchable[] searchables = new Searchable[indexes.size()];
+        LazyList<CorruptedIndex> corrupted = new LazyList<CorruptedIndex>();
 		for (int i = 0; i < indexes.size(); i++) {
-			Directory luceneDir = indexes.get(i).getLuceneDir();
-            try {			
-                Searchable iSearcher = new IndexSearcher(luceneDir);
-                searchables.add(iSearcher);
+			LuceneIndex index = indexes.get(i);
+            try {
+                searchables[i] = new IndexSearcher(index.getLuceneDir());
             }
             catch (IOException e) {
-                errmsg += " \n" + e.getMessage() + "\n\n";
-                // Do something with the invalid index
+                searchables[i] = new DummySearchable();
+                corrupted.add(new CorruptedIndex(index, e));
             }
         }
-		if (searchables.size() > 0)
-            luceneSearcher = new MultiSearcher(searchables.toArray(new Searchable[1]));
-        if (errmsg != "Error loading index:") 
-            // Show a message "bad index"
-            Util.printErr("** Warning: " + errmsg);
+        luceneSearcher = new MultiSearcher(searchables);
+        return corrupted;
 	}
 	
 	@ImmutableCopy

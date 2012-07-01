@@ -95,6 +95,14 @@ public enum Msg {
 		"Error message shown on startup if some entries in a properties file " +
 		"are mssing or invalid. The name of the properties file will be inserted into " +
 		"the {0} slot. The missing entries will be listed after this message."),
+	corrupted_indexes (
+		"The following indexes seem to be corrupted. Rebuilding them is recommended.",
+		"Error message shown on startup if one or more indexes couldn't be " +
+		"loaded from disk. A list of the affected indexes will be appended to " +
+		"this message."),
+	index (
+		"Index: {0}",
+		"The name of the index will be inserted into the {0} slot."),
 	
 	// Filter panel
 	min_max_filesize (
