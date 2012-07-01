@@ -88,7 +88,7 @@ public enum Fields {
 	
 	// The field is always indexed
 	@NotNull
-	public NumericField create(@NotNull long fieldValue) {
+	public NumericField create(long fieldValue) {
 		return new NumericField(key, store, true).setLongValue(fieldValue);
 	}
 	

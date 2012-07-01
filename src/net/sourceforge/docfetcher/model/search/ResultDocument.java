@@ -108,6 +108,8 @@ public final class ResultDocument {
 			title = luceneDoc.get(Fields.SUBJECT.key());
 		if (title != null && !title.trim().isEmpty())
 			return title;
+		if (isEmail) // Bug #3536283: Email subject may be empty
+			return "";
 		return Util.splitFilename(getFilename())[0];
 	}
 	

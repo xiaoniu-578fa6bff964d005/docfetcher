@@ -1044,6 +1044,15 @@ public final class Util {
 		if (a == null || b == null || c == null || d == null || e == null)
 			throw new IllegalArgumentException();
 	}
+	
+	/**
+	 * Returns the given string if it is not null, otherwise returns an empty
+	 * string.
+	 */
+	@NotNull
+	public static String notNull(@Nullable String string) {
+		return string == null ? "" : string;
+	}
 
 	private static long lastTimeStamp = -1;
 
