@@ -218,12 +218,24 @@ public final class Searcher {
 	private void setLuceneSearcher(@NotNull List<LuceneIndex> indexes)
 			throws IOException {
 		this.indexes = Util.checkNotNull(indexes);
-		Searchable[] searchables = new Searchable[indexes.size()];
-		for (int i = 0; i < searchables.length; i++) {
+        List<Searchable> searchables = new ArrayList<Searchable>();
+        String errmsg = "Error loading index:";
+		for (int i = 0; i < indexes.size(); i++) {
 			Directory luceneDir = indexes.get(i).getLuceneDir();
-			searchables[i] = new IndexSearcher(luceneDir);
-		}
-		luceneSearcher = new MultiSearcher(searchables);
+            try {			
+                Searchable iSearcher = new IndexSearcher(luceneDir);
+                searchables.add(iSearcher);
+            }
+            catch (IOException e) {
+                errmsg += " \n" + e.getMessage() + "\n\n";
+                // Do something with the invalid index
+            }
+        }
+		if (searchables.size() > 0)
+            luceneSearcher = new MultiSearcher(searchables.toArray(new Searchable[1]));
+        if (errmsg != "Error loading index:") 
+            // Show a message "bad index"
+            Util.printErr("** Warning: " + errmsg);
 	}
 	
 	@ImmutableCopy
