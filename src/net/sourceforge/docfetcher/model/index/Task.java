@@ -178,5 +178,10 @@ public final class Task {
 			queue.readLock.unlock();
 		}
 	}
+	
+	public String toString() {
+		return String.format("Task [%s %s] %s", indexAction.name(), state
+				.name(), index.getCanonicalRootFile().toString());
+	}
 
 }

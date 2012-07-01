@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
@@ -28,6 +27,7 @@ import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.Task.TaskState;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -143,7 +143,7 @@ public final class IndexingQueue {
 			writeLock.unlock();
 		}
 
-		assert isValidRegistryState(indexRegistry, task);
+		assertValidRegistryState(indexRegistry, task);
 
 		// Indexing
 		task.set(TaskState.INDEXING);
@@ -245,11 +245,27 @@ public final class IndexingQueue {
 	}
 
 	@ThreadSafe
-	private static boolean isValidRegistryState(@NotNull IndexRegistry indexRegistry,
-												@NotNull Task task) {
+	private void assertValidRegistryState(	@NotNull IndexRegistry indexRegistry,
+											@NotNull Task task) {
 		LuceneIndex luceneIndex = task.getLuceneIndex();
-		boolean registered = indexRegistry.getIndexes().contains(luceneIndex);
-		return registered == task.is(IndexAction.UPDATE);
+		List<LuceneIndex> indexes = indexRegistry.getIndexes();
+		boolean registered = indexes.contains(luceneIndex);
+		boolean isUpdate = task.is(IndexAction.UPDATE);
+		if (registered != isUpdate) {
+			StringBuilder msg = new StringBuilder();
+			msg.append(registered + " != " + isUpdate);
+			msg.append("\n  *Index: " + luceneIndex.getCanonicalRootFile());
+			for (LuceneIndex index : indexes)
+				msg.append("\n  Index: " + index.getCanonicalRootFile());
+			writeLock.lock();
+			try {
+				for (Task t : tasks)
+					msg.append("\n  " + t.toString());
+			} finally {
+				writeLock.unlock();
+			}
+			AppUtil.showStackTrace(new AssertionError(msg.toString()));
+		}
 	}
 
 	// Returns whether the task was added
