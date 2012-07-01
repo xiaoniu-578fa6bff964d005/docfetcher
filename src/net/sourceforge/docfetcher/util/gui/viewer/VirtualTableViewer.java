@@ -159,8 +159,15 @@ public abstract class VirtualTableViewer<E> {
 	public final List<E> getSelection() {
 		TableItem[] selection = table.getSelection();
 		List<E> selElements = new ArrayList<E>(selection.length);
-		for (TableItem item : selection)
-			selElements.add((E) item.getData());
+		for (TableItem item : selection) {
+			E element = (E) item.getData();
+			/*
+			 * Bug #3532164: Not sure why, but the item data can be null
+			 * sometimes. Possibly an SWT bug.
+			 */
+			if (element != null)
+				selElements.add(element);
+		}
 		return selElements;
 	}
 	
