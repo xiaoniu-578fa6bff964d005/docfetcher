@@ -167,6 +167,19 @@ public final class IndexPanel {
 			}
 		});
 
+		/*
+		 * In the following added/removed handlers, the GUI must be accessed via
+		 * asyncExec calls, not via syncExec, otherwise a deadlock will occur if
+		 * the following happens: (1) Create or rebuild an index. There must be
+		 * exactly one tab open. (2) During indexing, click on the close button
+		 * of the tab or indexing window. A confirmation dialog shows up, but
+		 * don't click on any of the dialog buttons. Instead, keep the dialog
+		 * open and wait until the indexing in the background has finished. (3)
+		 * Now click on the "Keep" button to signal you want to keep the created
+		 * index. This results in a deadlock: One thread holds the model lock
+		 * and tries to access the GUI via syncExec, while another thread runs
+		 * in the GUI thread and tries to obtain the model lock.
+		 */
 		indexRegistry.addListeners(new ExistingIndexesHandler() {
 			public void handleExistingIndexes(List<LuceneIndex> indexes) {
 				for (LuceneIndex index : indexes)
@@ -174,7 +187,7 @@ public final class IndexPanel {
 			}
 		}, new Event.Listener<LuceneIndex>() {
 			public void update(final LuceneIndex eventData) {
-				Util.runSwtSafe(tree, new Runnable() {
+				Util.runAsyncExec(tree, new Runnable() {
 					public void run() {
 						viewer.addRoot(eventData);
 					}
@@ -182,7 +195,7 @@ public final class IndexPanel {
 			}
 		}, new Event.Listener<List<LuceneIndex>>() {
 			public void update(final List<LuceneIndex> eventData) {
-				Util.runSwtSafe(tree, new Runnable() {
+				Util.runAsyncExec(tree, new Runnable() {
 					public void run() {
 						viewer.remove(UtilGlobal.<ViewNode> convert(eventData));
 					}
