@@ -42,7 +42,7 @@ import com.google.common.base.Strings;
 public final class BuildMain {
 	
 	public static final String appName = "DocFetcher";
-	public static final String version = "1.1-beta7";
+	public static final String version;
 	
 	private static final String packageId = Main.class.getPackage().getName();
 	private static final String packagePath = packageId.replace(".", "/");
@@ -50,6 +50,21 @@ public final class BuildMain {
 	
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
 	private static final String buildDate = dateFormat.format(new Date());
+	
+	static {
+		// Read version number from file 'current-version.txt'
+		String versionStr = "";
+		try {
+			versionStr = U.read("current-version.txt");
+		}
+		catch (Exception e) {
+			Util.printErr(e);
+			System.exit(0);
+		}
+		Util.checkThat(versionStr.trim().equals(versionStr));
+		Util.checkThat(versionStr.split("\r?\n").length == 1);
+		version = versionStr;
+	}
 	
 	public static void main(String[] args) throws Exception {
 		Util.println("Copying sources to build directory...");

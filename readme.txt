@@ -16,6 +16,7 @@
 - Requirements: Python and JDK 6.0+
 - current-version.txt:
 	- this file contains the version number used by all build scripts below
+	- this file must not contain any extra whitespace or newlines
 - build.py:
 	- the main build file that builds DocFetcher
 	- output is in the "build" folder

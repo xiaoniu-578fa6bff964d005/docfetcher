@@ -6,7 +6,6 @@
 # - mkfs.hfsplus must be installed
 # - the script build.py must be run first
 # - this script must be run as root
-# - the program version number must be specified as argument
 #
 # Output:
 # - build/DocFetcher-{version-number}.dmg
@@ -17,13 +16,7 @@ then
   exit 0
 fi
 
-if [ -n "$1" ] # version number
-then
-  version=$1
-else
-  echo "Must specify a version number."
-  exit
-fi
+version=`cat current-version.txt`
 
 du_output=`du -sk build/DocFetcher.app 2>&1`
 dir_size=`echo $du_output | cut -f1 -d" "`
