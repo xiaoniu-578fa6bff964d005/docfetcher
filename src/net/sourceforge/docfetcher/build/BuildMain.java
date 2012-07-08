@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.build.U.LineSep;
+import net.sourceforge.docfetcher.man.Manual;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 
@@ -96,6 +97,7 @@ public final class BuildMain {
 		File portableJar = recreateJarFile("portable_", true, LineSep.WINDOWS);
 		File macOsXJar = recreateJarFile("macosx_", false, LineSep.UNIX);
 		
+		rebuildManuals();
 		createPortableBuild(portableJar);
 		createMacOsXBuild(macOsXJar);
 		runTests();
@@ -144,6 +146,15 @@ public final class BuildMain {
 		
 		jar.execute();
 		return mainJarFile;
+	}
+	
+	// Must be run before updating the version numbers in the manual pages
+	private static void rebuildManuals() throws Exception {
+		for (File dir : Util.listFiles(new File(Manual.manDir))) {
+			if (!dir.isDirectory() || dir.getName().equals("all"))
+				continue;
+			Manual.main(new String[] { dir.getName() });
+		}
 	}
 
 	private static void createPortableBuild(File tmpMainJar) throws Exception {

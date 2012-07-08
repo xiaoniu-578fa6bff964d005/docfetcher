@@ -65,7 +65,7 @@ public final class Manual {
 	}
 	
 	private static final String packagePath = Manual.class.getPackage().getName().replace('.', '/');
-	private static final String manDir = String.format("src/%s", packagePath);
+	public static final String manDir = String.format("src/%s", packagePath);
 	
 	public static void main(String[] args) throws Exception {
 		Util.checkThat(args.length > 0);
