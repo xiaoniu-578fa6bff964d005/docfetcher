@@ -14,6 +14,8 @@
 #	Building DocFetcher from the console
 #===========================================================
 - Requirements: Python and JDK 6.0+
+- current-version.txt:
+	- this file contains the version number used by all build scripts below
 - build.py:
 	- the main build file that builds DocFetcher
 	- output is in the "build" folder
