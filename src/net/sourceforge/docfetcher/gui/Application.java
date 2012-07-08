@@ -251,7 +251,6 @@ public final class Application {
 					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) t);
 				else
 					AppUtil.showStackTrace(t);
-				continue;
 			}
 		}
 

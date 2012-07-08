@@ -261,18 +261,18 @@ final class HighlightingText {
 	 */
 	private void scrollToMiddle(int caretOffset) {
 		try {
-			int lineIndexNow = textViewer.getLineAtOffset(caretOffset);
-			int lineIndexTop = textViewer.getTopIndex();
-			int lineIndexBottom = textViewer.getLineIndex(textViewer.getClientArea().height);
-			double dist = lineIndexBottom - lineIndexTop;
-			int dist13 = (int) (dist / 3);
-			int dist23 = (int) (2 * dist / 3);
-			double lineIndexMiddleTop = lineIndexTop + dist / 3;
-			double lineIndexMiddleBottom = lineIndexBottom - dist / 3;
-			if (lineIndexNow < lineIndexMiddleTop)
-				textViewer.setTopIndex(lineIndexNow - dist13);
-			else if (lineIndexNow > lineIndexMiddleBottom)
-				textViewer.setTopIndex(lineIndexNow - dist23);
+			int linePixelNow = textViewer.getLineAtOffset(caretOffset) * textViewer.getLineHeight();
+			int linePixelTop = textViewer.getTopPixel();
+			int linePixelBottom = linePixelTop + textViewer.getClientArea().height;
+			int dist = linePixelBottom - linePixelTop;
+			int dist13 = (dist / 3);
+			int dist23 = (2 * dist / 3);
+			double lineIndexMiddleTop = linePixelTop + dist / 3;
+			double lineIndexMiddleBottom = linePixelBottom - dist / 3;
+			if (linePixelNow < lineIndexMiddleTop)
+				textViewer.setTopPixel(linePixelNow - dist13);
+			else if (linePixelNow > lineIndexMiddleBottom)
+				textViewer.setTopPixel(linePixelNow - dist23);
 		}
 		catch (Exception e) {
 			// textViewer.getLineAtOffset(..) can throw an IllegalArgumentException

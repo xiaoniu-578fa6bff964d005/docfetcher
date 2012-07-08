@@ -156,6 +156,7 @@ class HighlightingToolBarWithTextViewer {
 	}
 	
 	public final void setText(@NotNull HighlightedString string) {
+		textViewer.getControl().setRedraw(false);
 		textViewer.setText(string);
 		int occCount = string.getRangeCount();
 		counter.setText(String.valueOf(occCount));
@@ -165,6 +166,7 @@ class HighlightingToolBarWithTextViewer {
 		highlightBt.setEnabled(occCount > 0);
         if (SettingsConf.Bool.AutoScrollToFirstMatch.get())
             moveSelection(true);
+        textViewer.getControl().setRedraw(true);
 	}
 	
 	public final void appendText(@NotNull HighlightedString string) {

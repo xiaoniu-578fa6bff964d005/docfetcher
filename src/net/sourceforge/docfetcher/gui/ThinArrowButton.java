@@ -79,12 +79,13 @@ final class ThinArrowButton extends Canvas {
 					e.gc.setBackground(Col.WIDGET_FOREGROUND.get());
 					e.gc.setAntialias(SWT.ON);
 					e.gc.fillPolygon(coords);
-				} catch (SWTException ex) {
+				}
+				catch (SWTException ex) {
 					/*
-					 * FIXME This happens when no graphics library is found
-					 * (GDI+), probably on an older Windows 2000 OS. This is
-					 * only a temporary workaround. See bug #2943966.
+					 * This happens when no graphics library is found (GDI+),
+					 * probably on an older Windows 2000 OS. See bug #2943966.
 					 */
+					Util.printErr(ex);
 				}
 			}
 		});
