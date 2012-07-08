@@ -73,9 +73,9 @@ final class U {
 	}
 
 	static void copyFlatten(String srcPath,
-									String dstPath,
-									@Nullable String include,
-									@Nullable String exclude) {
+							String dstPath,
+							@Nullable String include,
+							@Nullable String exclude) {
 		new Copies().addDir(srcPath, include, exclude)
 				.setTodir(dstPath)
 				.flatten()

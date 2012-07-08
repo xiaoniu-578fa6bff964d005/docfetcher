@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.build.U.LineSep;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
@@ -42,7 +43,7 @@ import com.google.common.base.Strings;
 public final class BuildMain {
 	
 	public static final String appName = "DocFetcher";
-	public static final String version;
+	private static final String version;
 	
 	private static final String packageId = Main.class.getPackage().getName();
 	private static final String packagePath = packageId.replace(".", "/");
@@ -150,6 +151,7 @@ public final class BuildMain {
 		String releaseDir = U.format("build/%s-%s", appName, version);
 		U.copyDir("dist/img", releaseDir + "/img");
 		U.copyDir("dist/help", releaseDir + "/help");
+		updateManualVersionNumber(new File(releaseDir, "help"));
 		
 		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
 		U.copyFlatten("lib", releaseDir + "/lib", "**/*.jar", excludedLibs);
@@ -258,6 +260,7 @@ public final class BuildMain {
 		
 		U.copyDir("dist/img", resourcesDir + "/img");
 		U.copyDir("dist/help", resourcesDir + "/help");
+		updateManualVersionNumber(new File(resourcesDir, "help"));
 		U.copyBinaryFile(
 			"dist/DocFetcher.icns",
 			U.format("%s/%s.icns", resourcesDir, appName));
@@ -288,6 +291,16 @@ public final class BuildMain {
 		if (Util.IS_MAC_OS_X) {
 			String dmgPath = U.format("build/%s-%s.dmg", appName, version);
 			U.exec("hdiutil create -srcfolder %s %s", appDir, dmgPath);
+		}
+	}
+	
+	private static void updateManualVersionNumber(File helpDir) throws Exception {
+		for (File dir : Util.listFiles(helpDir)) {
+			File manFile = new File(dir, "DocFetcher_Manual.html");
+			String manPath = manFile.getPath();
+			String contents = U.read(manPath);
+			contents = UtilGlobal.replace(manPath, contents, "${version}", version);
+			U.write(contents, manPath);
 		}
 	}
 	

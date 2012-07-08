@@ -145,7 +145,6 @@ public final class Manual {
 		
 		return UtilGlobal.replace(path, template,
 			"${app_name}", BuildMain.appName,
-			"${version}", BuildMain.version,
 			"${contents}", htmlBody
 		);
 	}
