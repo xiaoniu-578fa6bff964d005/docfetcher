@@ -14,7 +14,7 @@ Another way of changing the memory limit is to copy the file `misc\DocFetcher.ba
 
 Linux
 -----
-The Linux launcher script will be in `/usr/share/docfetcher/` if you're using the non-portable version of DocFetcher. Open the launcher script `DocFetcher.sh` with a text editor, and in the last line, alter the expression `-Xmx256m` as needed, for example to `-Xmx512m`.
+Open the launcher script `DocFetcher/DocFetcher.sh` with a text editor, and in the last line, alter the expression `-Xmx256m` as needed, for example to `-Xmx512m`.
 
 Mac OS X
 --------
