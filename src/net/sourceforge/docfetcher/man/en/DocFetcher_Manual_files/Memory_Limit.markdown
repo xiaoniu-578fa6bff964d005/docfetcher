@@ -4,9 +4,11 @@ DocFetcher has a default memory limit of 256 MB, which is set on startup. The li
 
 Windows
 -------
-The Windows version of DocFetcher ships with ready-made alternative launchers that set different heap sizes. For example, the launcher `misc\DocFetcher-512.exe` will set a heap size of 512 MB. You can find these launchers in the `misc` folder inside the DocFetcher folder. If you're using the non-portable version of DocFetcher, the DocFetcher folder will be in `C:\Program Files\` or a similar location.
+The Windows version of DocFetcher ships with ready-made alternative launchers that set different heap sizes. Follow these steps to use them:
 
-Before you can use one of the alternative launchers, you'll have to copy it from the `misc` folder into the DocFetcher folder. It's not necessary to delete the default launcher or to rename the alternative launcher.
+* Open the DocFetcher folder. If you're using the portable version of DocFetcher, this is just the folder you downloaded. If you're using the non-portable version, the DocFetcher folder will be in `C:\Program Files\`, or `C:\Program Files (x86)`, or a similar location.
+* The alternative launchers are inside the `DocFetcher\misc` folder. They are named `DocFetcher-XXX.exe`, where `XXX` is the heap size set by the respective launcher. For example, the launcher `DocFetcher-512.exe` will set a heap size of 512 MB.
+* Before you can use any of these launchers, **you must first move or copy it into the DocFetcher folder**. It's not necessary to delete the default launcher or to rename the alternative launcher.
 
 Another way of changing the memory limit is to copy the file `misc\DocFetcher.bat` into the DocFetcher folder and alter the expression `-Xmx256m` in the last line of the file, for example to `-Xmx512m`.
 
