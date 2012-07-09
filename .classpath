@@ -41,9 +41,13 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/guava/guava-12.0.jar" sourcepath="lib/guava/guava-12.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk15on-147.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk15on-147.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/icu4j-49_1.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.7.0.jar" sourcepath="lib/pdfbox/pdfbox-1.7.0-src-stripped.zip"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
@@ -56,10 +60,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/pegdown/asm-all-3.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.6.0.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/icu4j-4_8_1_1.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.6.0.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.6.0.jar" sourcepath="lib/pdfbox/pdfbox-1.6.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/java-libpst/java-libpst.0.7.jar" sourcepath="lib/java-libpst/java-libpst-0.7.src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
