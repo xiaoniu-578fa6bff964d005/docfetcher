@@ -78,6 +78,10 @@ With that said, it should be noted that support for zip and 7z archives is best 
 
     sudo echo 32000 > /proc/sys/fs/inotify/max_user_watches
 
+To change the watch limit permanently, open the file `/etc/sysctl.conf` (as root) and add the following line:
+
+    fs.inotify.max_user_watches=32000
+
 **The DocFetcher daemon is innocent**: If you suspect that the DocFetcher daemon is slowing down your computer or causing crashes, you're probably wrong. As a matter of fact, the daemon is a very simple program with low memory footprint and CPU usage, and it doesn't do much besides watching folders. If you're still not convinced, just rename the daemon executables so they won't start automatically, or try the portable version of DocFetcher, where the daemon is deactivated by default.
 
 * * *
