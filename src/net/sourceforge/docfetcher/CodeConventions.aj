@@ -77,7 +77,7 @@ privileged aspect CodeConventions {
 	declare warning: call(* File.getCanonical*())
 	&& !withincode(@SuppressAjWarnings * *(..))
 	&& !within(net.contentobjects.jnotify..*):
-		"On Windows, if this method is called on a root *without* trailing" +
+		"On Windows, if this method is called on a root *without* trailing " +
 		"slashes, e.g. 'C:', it will return the current working directory. " +
 		"Use Util.getCanonical*() instead.";
 	

@@ -30,7 +30,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
 
 /**
  * @author Tran Nam Quang
@@ -72,7 +71,7 @@ public final class SolidArchiveTreeTest {
 				String innerPath = "test1/test2/test3/test.txt";
 				assertTrue(unpackedPath.equals(Util.joinPath(tempDirPath, innerPath)));
 				
-				Files.deleteRecursively(tempDir);
+				Util.deleteRecursively(tempDir);
 				assertFalse(unpackedFile.isFile());
 			}
 		} finally {

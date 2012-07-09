@@ -2,8 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="lib/guava/guava-r07.jar" sourcepath="lib/guava/guava-src-r07.zip"/>
-	<classpathentry kind="lib" path="lib/guava/guava-src-r07.zip"/>
 	<classpathentry kind="lib" path="lib/J7zip/J7zip_4.43_alpha2.jar" sourcepath="lib/J7zip/J7zip_4.43_alpha2_src.zip"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.8.2.jar" sourcepath="lib/junit/junit-4.8.2-src.jar"/>
 	<classpathentry kind="lib" path="lib/junrar/java-unrar-0.3.jar" sourcepath="lib/junrar/java-unrar-0.3-sources.jar"/>
@@ -42,6 +40,7 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/guava/guava-12.0.jar" sourcepath="lib/guava/guava-12.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>

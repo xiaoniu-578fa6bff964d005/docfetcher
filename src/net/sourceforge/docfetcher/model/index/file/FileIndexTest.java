@@ -135,12 +135,12 @@ public final class FileIndexTest {
 		}
 		
 		// Index update must detect change when HTML folder is deleted
-		Files.deleteRecursively(htmlDir);
+		Util.deleteRecursively(htmlDir);
 		reporter.extractCount = 0;
 		index.update(reporter, null);
 		assertEquals(1, reporter.extractCount);
 		
-		Files.deleteRecursively(tempDir);
+		Util.deleteRecursively(tempDir);
 	}
 	
 	@Test
@@ -175,12 +175,12 @@ public final class FileIndexTest {
 				index.update(reporter2, null);
 				assertEquals(modifiedFile.getName(), expectedCounts[i], reporter2.extractCount);
 				
-				Files.deleteDirectoryContents(tempDir);
+				Util.deleteContents(tempDir);
 				i++;
 			}
 		}
 		
-		Files.deleteRecursively(tempDir);
+		Util.deleteRecursively(tempDir);
 	}
 	
 	private static class CountingReporter extends IndexingReporter {
@@ -221,7 +221,7 @@ public final class FileIndexTest {
 		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
-		Files.deleteRecursively(tempDir);
+		Util.deleteRecursively(tempDir);
 	}
 	
 	/**
@@ -243,7 +243,7 @@ public final class FileIndexTest {
 		index.update(null, null);
 		UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		
-		Files.deleteRecursively(tempDir);
+		Util.deleteRecursively(tempDir);
 	}
 	
 	/**
@@ -275,7 +275,7 @@ public final class FileIndexTest {
 			UtilModel.assertDocCount(index.getLuceneDir(), 1);
 		}
 		
-		Files.deleteRecursively(tempDir);
+		Util.deleteRecursively(tempDir);
 	}
 	
 	/**

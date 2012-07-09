@@ -74,7 +74,7 @@ public final class Manual {
 		File srcDir = new File(manDir + "/" + langId);
 		String dstDirName = new Locale(langId).getDisplayName();
 		File dstDir = new File("dist/help/" + dstDirName);
-		Files.deleteDirectoryContents(dstDir);
+		Util.deleteContents(dstDir);
 		
 		// Recursively walk through man subdirectory and convert markdown to html
 		PegDownProcessor processor = new PegDownProcessor(Extensions.TABLES);

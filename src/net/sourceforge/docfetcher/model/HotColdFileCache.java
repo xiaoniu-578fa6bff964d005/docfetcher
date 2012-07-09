@@ -23,7 +23,6 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 import net.sourceforge.docfetcher.util.collect.SafeKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Files;
 
 /**
  * Cold items are eligible for deletion, depending on the cold cache size. Cold
@@ -167,7 +166,7 @@ public final class HotColdFileCache {
 		FileResource fileResource = get(key);
 		if (fileResource != null) {
 			try {
-				Files.deleteRecursively(deletable);
+				Util.deleteRecursively(deletable);
 			}
 			catch (IOException e) {
 				Util.printErr(e);
@@ -218,7 +217,7 @@ public final class HotColdFileCache {
 			assert fileResource.deletable != null;
 			try {
 				// This will delete both files and directories
-				Files.deleteRecursively(fileResource.deletable);
+				Util.deleteRecursively(fileResource.deletable);
 			}
 			catch (IOException e) {
 				Util.printErr(e);

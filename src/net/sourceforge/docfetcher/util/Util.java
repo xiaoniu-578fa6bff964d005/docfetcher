@@ -913,6 +913,37 @@ public final class Util {
 	}
 
 	/**
+	 * Deletes all the files within a directory. Does not delete the directory
+	 * itself.
+	 * <p>
+	 * If the file argument is a symbolic link or there is a symbolic link in
+	 * the path leading to the directory, this method will do nothing. Symbolic
+	 * links within the directory are not followed.
+	 */
+	public static void deleteContents(@NotNull File directory)
+			throws IOException {
+		checkThat(directory.isDirectory());
+		if (isSymLink(directory))
+			return;
+		for (File file : listFiles(directory))
+			deleteRecursively(file);
+	}
+
+	/**
+	 * Deletes a file or directory and all contents recursively.
+	 * <p>
+	 * If the file argument is a symbolic link the link will be deleted but not
+	 * the target of the link. If the argument is a directory, symbolic links
+	 * within the directory will not be followed.
+	 */
+	public static void deleteRecursively(@NotNull File file) throws IOException {
+		if (file.isDirectory())
+			deleteContents(file);
+		if (!file.delete())
+			throw new IOException("Failed to delete " + file);
+	}
+
+	/**
 	 * Returns the name of the given file. In contrast to the default
 	 * {@link File#getName()} method, this method will return a drive letter
 	 * instead of an empty string if the given file is a Windows root such as

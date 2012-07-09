@@ -27,8 +27,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
-import com.google.common.io.Files;
-
 @VisibleForPackageGroup
 @SuppressWarnings("serial")
 public abstract class TreeIndex <
@@ -170,9 +168,9 @@ public abstract class TreeIndex <
 			if (fileIndexDir.exists()) {
 				try {
 					if (removeTopLevel)
-						Files.deleteRecursively(fileIndexDir);
+						Util.deleteRecursively(fileIndexDir);
 					else
-						Files.deleteDirectoryContents(fileIndexDir);
+						Util.deleteContents(fileIndexDir);
 				}
 				catch (IOException e) {
 					Util.printErr(e);

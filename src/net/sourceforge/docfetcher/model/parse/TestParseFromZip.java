@@ -36,8 +36,6 @@ import org.apache.poi.poifs.eventfilesystem.POIFSReaderListener;
 import org.junit.Test;
 
 import com.google.common.io.Closeables;
-import com.google.common.io.Files;
-
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 
@@ -170,7 +168,7 @@ public final class TestParseFromZip {
 			 * can be deleted.
 			 */
 			TFile.umount(archive);
-			Files.deleteRecursively(dir);
+			Util.deleteRecursively(dir);
 		}
 		protected abstract void handleInputStream(InputStream in) throws Exception;
 	}

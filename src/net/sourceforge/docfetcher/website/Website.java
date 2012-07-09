@@ -44,7 +44,7 @@ public final class Website {
 			
 			File dstDir = new File("dist/website/" + srcDir.getName());
 			dstDir.mkdirs();
-			Files.deleteDirectoryContents(dstDir);
+			Util.deleteContents(dstDir);
 			
 			PegDownProcessor processor = new PegDownProcessor(Extensions.TABLES);
 			File propsFile = new File(srcDir, "/page.properties");
