@@ -38,6 +38,10 @@
 	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.5.5.jar" sourcepath="lib/truezip/truezip-kernel-7.5.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.5.5.jar" sourcepath="lib/truezip/truezip-swing-7.5.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.4.1.jar" sourcepath="lib/commons-compress/commons-compress-1.4.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-20120326.jar" sourcepath="lib/poi/poi-3.8-src-stripped.zip"/>
 	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk16-146.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk16-146.jar"/>
@@ -46,10 +50,6 @@
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/xmlbeans-2.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.8-beta4-20110826.jar" sourcepath="lib/poi/poi-3.8-beta4-20110826-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
 	<classpathentry kind="lib" path="lib/chm4j/chm4j.jar">
 		<attributes>
