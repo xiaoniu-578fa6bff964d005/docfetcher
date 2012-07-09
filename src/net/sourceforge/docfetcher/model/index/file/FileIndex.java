@@ -41,6 +41,7 @@ import com.google.common.io.Closeables;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 
 /**
@@ -390,7 +391,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 					// Without the following if-clause TrueZIP would throw an
 					// exception
 					if (tzFile.isArchive() && tzFile.getEnclArchive() == null)
-						TFile.umount(tzFile);
+						TVFS.umount(tzFile);
 				}
 				catch (FsSyncException e) {
 					stop(new IndexingException(e));

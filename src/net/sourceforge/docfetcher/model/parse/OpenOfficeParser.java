@@ -30,7 +30,6 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.sourceforge.docfetcher.enums.Msg;
-import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -160,7 +159,7 @@ abstract class OpenOfficeParser extends FileParser {
 			throw new ParseException(e);
 		}
 		finally {
-			closeQuietly(zipFile);
+			Closeables.closeQuietly(zipFile);
 		}
 	}
 
@@ -196,18 +195,7 @@ abstract class OpenOfficeParser extends FileParser {
 		}
 		finally {
 			Closeables.closeQuietly(reader);
-			closeQuietly(zipFile);
-		}
-	}
-	
-	private static void closeQuietly(@Nullable ZipFile zipFile) {
-		if (zipFile == null)
-			return;
-		try {
-			zipFile.close();
-		}
-		catch (IOException e) {
-			Util.printErr(e);
+			Closeables.closeQuietly(zipFile);
 		}
 	}
 

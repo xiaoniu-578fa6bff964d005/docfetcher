@@ -36,8 +36,10 @@ import org.apache.poi.poifs.eventfilesystem.POIFSReaderListener;
 import org.junit.Test;
 
 import com.google.common.io.Closeables;
+
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TVFS;
 
 /**
  * This unit test checks that all the libraries used for parsing files are
@@ -167,7 +169,7 @@ public final class TestParseFromZip {
 			 * On Windows 7, the archive must be unmounted before the directory
 			 * can be deleted.
 			 */
-			TFile.umount(archive);
+			TVFS.umount(archive);
 			Util.deleteRecursively(dir);
 		}
 		protected abstract void handleInputStream(InputStream in) throws Exception;

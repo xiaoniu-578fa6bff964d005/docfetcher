@@ -46,6 +46,7 @@ import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.exception.RarException;
 import de.innosystec.unrar.rarfile.FileHeader;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 
 /**
@@ -205,7 +206,7 @@ public final class FileFactory {
 						File innerArchiveFile;
 						try {
 							innerArchiveFile = maybeUnpackZipEntry(config, file);
-							TFile.umount(archiveFile);
+							TVFS.umount(archiveFile);
 						}
 						finally {
 							archiveResource.dispose();
@@ -273,7 +274,7 @@ public final class FileFactory {
 			protected void runFinally() {
 				try {
 					if (archiveFile.exists()) // Might have been deleted earlier
-						TFile.umount(archiveFile);
+						TVFS.umount(archiveFile);
 				}
 				catch (FsSyncException e) {
 					exception[0] = e;
