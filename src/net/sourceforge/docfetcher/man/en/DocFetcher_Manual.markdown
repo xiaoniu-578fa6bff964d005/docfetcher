@@ -100,4 +100,4 @@ Manual Subpages
 
 Further Information
 ===================
-For more information, have a look at our [wiki](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page), and the wiki's [Advanced Usage](http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Advanced_Usage) section in particular. If you have any questions, feel free to visit our [forum](http://sourceforge.net/projects/docfetcher/forums/forum/702424). Bug reports can be submitted on our [bug tracker](http://sourceforge.net/tracker/?group_id=197779&atid=962834).
+For more information, have a look at our [wiki](http://docfetcher.sourceforge.net/wiki/doku.php). If you have any questions, feel free to visit our [forum](http://sourceforge.net/projects/docfetcher/forums/forum/702424). Bug reports can be submitted on our [bug tracker](http://sourceforge.net/tracker/?group_id=197779&atid=962834).

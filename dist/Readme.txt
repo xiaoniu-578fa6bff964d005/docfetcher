@@ -25,4 +25,4 @@ You can look for more information and help in the following places:
 - Manual: Can be found in the "help" folder inside the DocFetcher folder.
 - Website: http://docfetcher.sourceforge.net
 - Forum: http://sourceforge.net/projects/docfetcher/forums/forum/702424
-- Wiki: http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Main_Page
+- Wiki: http://docfetcher.sourceforge.net/wiki/doku.php
