@@ -1,6 +1,9 @@
 Requirements
 ========================================
-A Java Runtime Environment (JRE), version 1.6.0 or higher, is required. To find out what JRE version you have, open a command prompt and type in "java -version". If Java 1.6.0 or higher is not available, you can obtain it in the following places:
+A Java Runtime Environment (JRE), version 1.6.0 or higher, is required. To find
+out what JRE version you have, open a command prompt and type in
+"java -version". If Java 1.6.0 or higher is not available, you can obtain it in
+the following places:
 - Windows: http://java.com
 - Linux: In the official software repository of your distribution.
 - Mac OS X: http://www.apple.com/support/
@@ -9,11 +12,17 @@ A Java Runtime Environment (JRE), version 1.6.0 or higher, is required. To find 
 How to start DocFetcher
 ========================================
 Windows:
-If DocFetcher was installed (i.e. non-portable), launch it via the DocFetcher shortcut in your start menu. If you're instead using the portable version of DocFetcher, double-click on DocFetcher.exe.
-Note that portable DocFetcher may not work properly if you extract it into a folder for which you don't have write permissions, e.g. into "C:\Program Files".
+If DocFetcher was installed (i.e. non-portable), launch it via the DocFetcher
+shortcut in your start menu. If you're instead using the portable version of
+DocFetcher, double-click on DocFetcher.exe.
+Note that portable DocFetcher may not work properly if you extract it into a
+folder for which you don't have write permissions, e.g. into "C:\Program Files".
 
 Linux:
-Launch the program via DocFetcher.sh. If nothing happens or a text editor shows up, make sure the executable flag has been set on the DocFetcher.sh file. If that doesn't work either, you might see a helpful error mesage if you start DocFetcher.sh from the terminal.
+Launch the program via DocFetcher.sh. If nothing happens or a text editor shows
+up, make sure the executable flag has been set on the DocFetcher.sh file. If
+that doesn't work either, you might see a helpful error mesage if you start
+DocFetcher.sh from the terminal.
 
 Mac OS X:
 Launch the program by double-clicking on the DocFetcher application bundle.
