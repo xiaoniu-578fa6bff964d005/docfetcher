@@ -6,8 +6,15 @@
 - Import the DocFetcher folder into your Eclipse workspace
 - In Eclipse, create a User Library named 'SWT' which points to the right SWT jar for your platform. The SWT jars can be found in lib/swt.
 - Main class: net.sourceforge.docfetcher.Application
-- Required VM argument (all platforms): -Djava.library.path="lib/jnotify"
-- Required VM argument on Mac OS X: -XstartOnFirstThread
+- Required VM arguments
+	Windows:
+		-Djava.library.path="lib/chm4j;lib/jnotify;lib/jintellitype"
+	Linux:
+		-Djava.library.path="lib/chm4j:lib/jnotify:lib/jxgrabkey"
+	Mac OS X:
+		-Djava.library.path="lib/jnotify"
+		-XstartOnFirstThread
+- Optional VM argument: -enableassertions
 
 
 #===========================================================
