@@ -232,11 +232,8 @@ public final class BuildMain {
 		 */
 		U.write("", releaseDir + "/indexes/.indexes.txt");
 		
-		// TODO
-//		U.copyTextFile(
-//			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
-//		U.copyBinaryFile(
-//			"dist/ChangeLog.html", releaseDir + "/misc/ChangeLog.html");
+		U.copyTextFile(
+			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
 	}
 	
 	private static void deployInfoPlist(File dstDir) throws Exception {

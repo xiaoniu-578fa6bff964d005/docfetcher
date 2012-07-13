@@ -13,7 +13,7 @@ If DocFetcher was installed (i.e. non-portable), launch it via the DocFetcher sh
 Note that portable DocFetcher may not work properly if you extract it into a folder for which you don't have write permissions, e.g. into "C:\Program Files".
 
 Linux:
-Launch the program via DocFetcher.sh. If nothing happens or a text editor shows up, make sure the executable flag has been set on the DocFetcher.sh file.
+Launch the program via DocFetcher.sh. If nothing happens or a text editor shows up, make sure the executable flag has been set on the DocFetcher.sh file. If that doesn't work either, you might see a helpful error mesage if you start DocFetcher.sh from the terminal.
 
 Mac OS X:
 Launch the program by double-clicking on the DocFetcher application bundle.
