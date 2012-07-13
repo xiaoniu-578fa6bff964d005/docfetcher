@@ -70,11 +70,13 @@ public final class PrefDialog {
 
 			new CheckOption(
 				Msg.pref_hide_in_systray.get(),
-				SettingsConf.Bool.HideOnOpen),
+				SettingsConf.Bool.HideOnOpen,
+				!Util.IS_UBUNTU_UNITY),
 
 			new CheckOption(
 				Msg.pref_close_to_systray.get(),
-				SettingsConf.Bool.CloseToTray),
+				SettingsConf.Bool.CloseToTray,
+				!Util.IS_UBUNTU_UNITY),
 
 			new CheckOption(
 				Msg.pref_clear_search_history_on_exit.get(),
@@ -97,10 +99,12 @@ public final class PrefDialog {
 			
 			new FontOption(
 				Msg.pref_font_fixed_width.get(),
-				UtilGui.getPreviewFontMono())
+				UtilGui.getPreviewFontMono()),
+		
+			new HotkeyOption(
+				Msg.pref_hotkey.get(),
+				!Util.IS_MAC_OS_X)
 		);
-		if (!Util.IS_MAC_OS_X)
-			fieldOptions.add(new HotkeyOption(Msg.pref_hotkey.get()));
 		
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
@@ -118,7 +122,8 @@ public final class PrefDialog {
 		comp.setLayout(Util.createGridLayout(2, false, 0, 5));
 		
 		for (PrefOption checkOption : checkOptions)
-			checkOption.createControls(comp);
+			if (checkOption.isEnabled())
+				checkOption.createControls(comp);
 		
 		Label spacing = new Label(comp, SWT.NONE);
 		GridData spacingGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
@@ -126,7 +131,8 @@ public final class PrefDialog {
 		spacing.setLayoutData(spacingGridData);
 		
 		for (PrefOption fieldOption : fieldOptions)
-			fieldOption.createControls(comp);
+			if (fieldOption.isEnabled())
+				fieldOption.createControls(comp);
 		
 		return comp;
 	}
@@ -200,15 +206,20 @@ public final class PrefDialog {
 
 	static abstract class PrefOption {
 		protected final String labelText;
+		private final boolean enabled;
 
-		public PrefOption(@NotNull String labelText) {
+		public PrefOption(@NotNull String labelText, boolean enabled) {
 			this.labelText = labelText;
+			this.enabled = enabled;
 		}
 		// Subclassers must set grid datas on the created controls, assuming
 		// a two-column grid layout
 		protected abstract void createControls(@NotNull Composite parent);
 		protected abstract void restoreDefault();
 		protected abstract void save();
+		public final boolean isEnabled() {
+			return enabled;
+		}
 	}
 
 }

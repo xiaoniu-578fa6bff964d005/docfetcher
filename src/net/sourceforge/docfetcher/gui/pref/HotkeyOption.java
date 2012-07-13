@@ -29,8 +29,8 @@ final class HotkeyOption extends PrefOption {
 	@NotNull private StyledLabel st;
 	@NotNull private int[] hotkey;
 
-	public HotkeyOption(@NotNull String labelText) {
-		super(labelText);
+	public HotkeyOption(@NotNull String labelText, boolean enabled) {
+		super(labelText, enabled);
 	}
 
 	public void createControls(@NotNull Composite parent) {

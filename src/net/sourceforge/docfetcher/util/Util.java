@@ -11,10 +11,12 @@
 
 package net.sourceforge.docfetcher.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -94,6 +96,9 @@ public final class Util {
 
 	/** Whether the platform is Linux KDE. */
 	public static final boolean IS_LINUX_KDE;
+	
+	/** Whether the operating system is Ubuntu and has the Unity desktop. */
+	public static final boolean IS_UBUNTU_UNITY;
 
 	/** Whether the platform is Mac OS X. */
 	public static final boolean IS_MAC_OS_X;
@@ -111,20 +116,7 @@ public final class Util {
 
 	/** The user's home directory. Does not contain backward slashes. */
 	public static final String USER_HOME_PATH = System.getProperty("user.home");
-
-	static {
-		String osName = System.getProperty("os.name").toLowerCase();
-		IS_WINDOWS = osName.contains("windows");
-		IS_LINUX = osName.contains("linux");
-		IS_LINUX_KDE = IS_LINUX && System.getenv("KDE_FULL_SESSION") != null;
-		IS_MAC_OS_X = osName.equals("mac os x");
-
-		String arch = System.getProperty("sun.arch.data.model");
-		if (arch == null)
-			arch = System.getProperty("os.arch").toLowerCase();
-		IS_64_BIT_JVM = arch.contains("64");
-	}
-
+	
 	/** Line separator character ('\r\n' on Windows, '\n' on Linux). */
 	public static final String LS = System.getProperty("line.separator");
 
@@ -139,7 +131,63 @@ public final class Util {
 	 */
 	public static final int BTW = 75;
 
+	static {
+		String osName = System.getProperty("os.name").toLowerCase();
+		IS_WINDOWS = osName.contains("windows");
+		IS_LINUX = osName.contains("linux");
+		IS_UBUNTU_UNITY = isUbuntuUnity(IS_LINUX);
+		IS_LINUX_KDE = IS_LINUX && System.getenv("KDE_FULL_SESSION") != null;
+		IS_MAC_OS_X = osName.equals("mac os x");
+
+		String arch = System.getProperty("sun.arch.data.model");
+		if (arch == null)
+			arch = System.getProperty("os.arch").toLowerCase();
+		IS_64_BIT_JVM = arch.contains("64");
+	}
+	
 	private Util() {}
+	
+	private static boolean isUbuntuUnity(boolean isLinux) {
+		if (!isLinux)
+			return false;
+		try {
+			String output = getProcessOutput("lsb_release -irs").trim();
+			String[] lines = output.split("\n");
+			if (lines.length != 2)
+				return false;
+			if (!lines[0].trim().toLowerCase().equals("ubuntu"))
+				return false;
+			
+			// See: http://askubuntu.com/questions/70296/is-there-an-environment-variable-that-is-set-for-unity
+			if (lines[1].trim().equals("11.04"))
+				return "gnome".equals(System.getenv("DESKTOP_SESSION"))
+						&& "gnome".equals(System.getenv("GDMSESSION"));
+			return "Unity".equals(System.getenv("XDG_CURRENT_DESKTOP"));
+		}
+		catch (IOException e) {
+			return false;
+		}
+	}
+	
+	@NotNull
+	private static String getProcessOutput(@NotNull String command)
+			throws IOException {
+		Process p = Runtime.getRuntime().exec(command);
+		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		boolean firstLine = true;
+		while (true) {
+			String line = in.readLine();
+			if (line == null)
+				break;
+			if (firstLine)
+				firstLine = false;
+			else
+				sb.append(Util.LS);
+			sb.append(line);
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * Splits the given string into an integer array. Any characters other than

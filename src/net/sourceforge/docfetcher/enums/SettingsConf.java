@@ -72,7 +72,7 @@ public final class SettingsConf {
 	public static enum Bool implements Storable {
 		ShowManualOnStartup (true),
 		UseOrOperator (true),
-		HideOnOpen (false),
+		HideOnOpen (false), // Default must be 'false' since system tray not supported on Ubuntu Unity
 		ClearSearchHistoryOnExit (false),
 		ResetLocationFilterOnExit (true),
 		HotkeyEnabled (true),
@@ -90,7 +90,7 @@ public final class SettingsConf {
 		HighlightingEnabled (true),
 		ShowRelativePathsMessage (true),
 		AutoScrollToFirstMatch (true),
-		CloseToTray (false),
+		CloseToTray (false), // Default must be 'false' since system tray not supported on Ubuntu Unity
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

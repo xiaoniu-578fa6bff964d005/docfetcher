@@ -30,9 +30,15 @@ final class CheckOption extends PrefOption {
 	@NotNull private Button bt;
 
 	public CheckOption(	@NotNull String labelText,
-						@NotNull SettingsConf.Bool enumOption) {
-		super(labelText);
+						@NotNull SettingsConf.Bool enumOption,
+						boolean enabled) {
+		super(labelText, enabled);
 		this.enumOption = enumOption;
+	}
+	
+	public CheckOption(	@NotNull String labelText,
+						@NotNull SettingsConf.Bool enumOption) {
+		this(labelText, enumOption, true);
 	}
 
 	public void createControls(@NotNull Composite parent) {
