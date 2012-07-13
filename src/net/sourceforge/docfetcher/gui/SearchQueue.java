@@ -301,7 +301,8 @@ public final class SearchQueue {
 		Util.runSyncExec(searchBar.getControl(), new Runnable() {
 			public void run() {
 				resultPanel.setResults(visibleResults, mode);
-				resultPanel.getControl().setFocus();
+				if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST))
+					resultPanel.getControl().setFocus();
 				updateResultStatus(); // Must be done *after* setting the results
 				searchBar.setEnabled(true);
 				
