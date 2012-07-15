@@ -505,6 +505,9 @@ public enum Msg {
 	loading ("Loading...",
 		"A generic loading message that is used at various places, e.g. when " +
 		"loading a file for display in the preview pane."),
+	page_num (
+		"Current Page Number / Total Number Of Pages",
+		"Page number field shown above the preview pane."),
 	occurrence_count (
 		"Number Of Occurrences",
 		"Number of textual matches (usually whole words) that are highlighted " +
@@ -520,11 +523,9 @@ public enum Msg {
 		"Label of a button for turning the match highlighting in the preview " +
 		"pane on and off."),
 	prev_page ("Previous Page",
-		"Built-in web browser: Go one page backwards in the history of " +
-		"visited pages."),
+		"Go one page backwards (either built-in web browser or document preview)."),
 	next_page ("Next Page",
-		"Built-in web browser: Go one page forwards in the history of " +
-		"visited pages."),
+		"Go one page forwards (either built-in web browser or document preview)."),
 	browser_stop (
 		"Stop Loading Current Page",
 		"Built-in web-browser: Stop loading the currently loaded page."),

@@ -78,8 +78,8 @@ final class TextPreview extends ToolBarForm {
 		toolBarWithTextViewer.setText(string);
 	}
 
-	public void appendText(@NotNull HighlightedString string) {
-		toolBarWithTextViewer.appendText(string);
+	public void appendPage(@NotNull HighlightedString string) {
+		toolBarWithTextViewer.appendPage(string);
 	}
 
 }

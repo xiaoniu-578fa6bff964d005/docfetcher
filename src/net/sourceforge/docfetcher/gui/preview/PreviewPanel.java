@@ -13,6 +13,11 @@ package net.sourceforge.docfetcher.gui.preview;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
@@ -290,7 +295,17 @@ public final class PreviewPanel extends Composite {
 	
 	// Returns true on success
 	@ThreadSafe
-	private boolean setTextSafely(	@NotNull final HighlightedString string,
+	private boolean setTextSafely(	@NotNull HighlightedString string,
+									boolean isPlainTextFile,
+									long requestCount,
+									boolean append) {
+		return setTextSafely(
+			Arrays.asList(string), isPlainTextFile, requestCount, append);
+	}
+	
+	// Returns true on success
+	@ThreadSafe
+	private boolean setTextSafely(	@NotNull final List<HighlightedString> strings,
 	                              	final boolean isPlainTextFile,
 									final long requestCount,
 									final boolean append) {
@@ -302,10 +317,18 @@ public final class PreviewPanel extends Composite {
 		return runSafely(requestCount, textPreview, new Runnable() {
 			public void run() {
 				textPreview.setUseMonoFont(isPlainTextFile);
-				if (append)
-					textPreview.appendText(string);
-				else
-					textPreview.setText(string);
+				if (append) {
+					for (HighlightedString string : strings)
+						textPreview.appendPage(string);
+				}
+				else {
+					if (!strings.isEmpty()) {
+						Iterator<HighlightedString> it = strings.iterator();
+						textPreview.setText(it.next());
+						while (it.hasNext())
+							textPreview.appendPage(it.next());
+					}
+				}
 			}
 		});
 	}
@@ -315,17 +338,17 @@ public final class PreviewPanel extends Composite {
 	private boolean runSafely(	final long requestCount,
 								@NotNull Widget widget,
 								@NotNull final Runnable runnable) {
-		final boolean[] success = { true };
-		Util.runSwtSafe(widget, new Runnable() {
+		final AtomicBoolean wasValid = new AtomicBoolean(true);
+		boolean wasRun = Util.runSwtSafe(widget, new Runnable() {
 			public void run() {
 				if (requestCount != PreviewPanel.this.requestCount) {
-					success[0] = false;
+					wasValid.set(false);
 					return;
 				}
 				runnable.run();
 			}
 		});
-		return success[0];
+		return wasRun && wasValid.get();
 	}
 	
 	private class EmailThread extends PreviewThread {
@@ -376,20 +399,20 @@ public final class PreviewPanel extends Composite {
 		protected void doRun(final Hider overlayHider) throws ParseException,
 				FileNotFoundException, CheckedOutOfMemoryError {
 			class Item {
-				@Nullable private final HighlightedString string;
+				private final List<HighlightedString> strings = new LinkedList<HighlightedString>();
 				private boolean isLastItem;
 				
 				public Item(@Nullable HighlightedString string,
 							boolean isLastItem) {
-					this.string = string;
+					if (string != null)
+						strings.add(string);
 					this.isLastItem = isLastItem;
 				}
 			}
 			
 			final MergingBlockingQueue<Item> queue = new MergingBlockingQueue<Item>() {
 				protected Item merge(Item item1, Item item2) {
-					if (item2.string != null)
-						item1.string.add(item2.string);
+					item1.strings.addAll(item2.strings);
 					item1.isLastItem = item1.isLastItem || item2.isLastItem;
 					return item1;
 				};
@@ -400,13 +423,13 @@ public final class PreviewPanel extends Composite {
 					while (true) {
 						try {
 							Item item = queue.take();
-							if (item.string != null)
-								if (!setTextSafely(item.string, false, startCount, true))
+							if (!item.strings.isEmpty())
+								if (!setTextSafely(item.strings, false, startCount, true))
 									isStopped = true;
 							overlayHider.hide(); // Hide overlay after first page
 							if (item.isLastItem)
 								return;
-							Thread.sleep(40);
+							Thread.sleep(1000);
 						}
 						catch (InterruptedException e) {
 							continue;

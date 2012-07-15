@@ -120,10 +120,6 @@ final class HighlightingText {
 		occCount = 0;
 	}
 	
-	public int getOccCount() {
-		return occCount;
-	}
-	
 	public void setUseMonoFont(boolean useMonoFont) {
 		if (useMonoFont) {
 			if (monoFont == null)
@@ -188,17 +184,43 @@ final class HighlightingText {
 			textViewer.setStyleRanges(new StyleRange[0]);
 		}
 	}
+
+	/**
+	 * Selects and scrolls to the nearest occurrence, if one exists, starting
+	 * from the current selection. If <tt>forward</tt> is true, this method goes
+	 * to the next occurrence, otherwise to the previous one.
+	 * <p>
+	 * This method returns the number of the occurrence that was scrolled to.
+	 * The number is 1-based and relative to the occurrences in the receiver. If
+	 * no occurrence was found, null is returned.
+	 */
+	@Nullable
+	public Integer goTo(boolean forward) {
+		Point sel = textViewer.getSelection();
+		int searchStart = forward ? sel.y : sel.x;
+		return goTo(forward, searchStart);
+	}
+	
+	/**
+	 * Selects and scrolls to the last occurrence, if one exists.
+	 * <p>
+	 * This method returns the number of the occurrence that was scrolled to.
+	 * The number is 1-based and relative to the occurrences in the receiver. If
+	 * no occurrence was found, null is returned.
+	 */
+	@Nullable
+	public Integer goToLast() {
+		return goTo(false, textViewer.getCharCount());
+	}
 	
 	@Nullable
-	public Integer goTo(boolean nextNotPrevious) {
-		Point sel = textViewer.getSelection();
-		int searchStart = nextNotPrevious ? sel.y : sel.x;
+	private Integer goTo(boolean forward, int searchStart) {
 		int tokenStart = -1;
 		int tokenEnd = -1;
 		int tokenIndex = 0;
 		
 		outer: {
-			if (nextNotPrevious) {
+			if (forward) {
 				for (int[] ranges : rangesList) {
 					for (int i = 0; i < ranges.length - 1; i += 2) {
 						tokenIndex++;
