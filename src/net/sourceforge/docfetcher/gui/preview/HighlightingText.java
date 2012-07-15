@@ -201,6 +201,32 @@ final class HighlightingText {
 		return goTo(forward, searchStart);
 	}
 	
+	// argument is one-based
+	public void goTo(int occ) {
+		int tokenStart = -1;
+		int tokenEnd = -1;
+		int tokenIndex = 0;
+		
+		outer: {
+			for (int[] ranges : rangesList) {
+				for (int i = 0; i < ranges.length - 1; i += 2) {
+					tokenIndex++;
+					if (tokenIndex == occ) {
+						tokenStart = ranges[i];
+						tokenEnd = tokenStart + ranges[i + 1];
+						break outer;
+					}
+				}
+			}
+		}
+		
+		if (tokenStart == -1)
+			return;
+		
+		textViewer.setSelection(tokenStart, tokenEnd);
+		scrollToMiddle((tokenStart + tokenEnd) / 2);
+	}
+	
 	/**
 	 * Selects and scrolls to the last occurrence, if one exists.
 	 * <p>

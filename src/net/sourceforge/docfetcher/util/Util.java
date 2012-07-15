@@ -239,6 +239,14 @@ public final class Util {
 		}
 		return defaultValue;
 	}
+	
+	public static int ensureRange(int min, int max, int value) {
+		if (value < min)
+			return min;
+		else if (value > max)
+			return max;
+		return value;
+	}
 
 	/**
 	 * Encodes the given collection of strings into a single string, using the
@@ -1532,7 +1540,7 @@ public final class Util {
 	 * widget.
 	 */
 	public static void selectAllOnFocus(@NotNull final Control text) {
-		Util.checkThat(text instanceof Combo || text instanceof Text);
+		Util.checkThat(text instanceof Combo || text instanceof Text || text instanceof StyledText);
 
 		class SelectAllOnFocus extends MouseAdapter implements FocusListener {
 			private boolean focusGained = false;
@@ -1547,6 +1555,8 @@ public final class Util {
 					selectAll((Combo) text);
 				else if (text instanceof Text)
 					((Text) text).selectAll();
+				else if (text instanceof StyledText)
+					((StyledText) text).selectAll();
 				focusGained = false;
 			}
 		}

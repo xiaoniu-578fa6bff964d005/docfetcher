@@ -70,7 +70,7 @@ class HighlightingToolBarWithTextViewer {
 		toolBarComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		toolBarComp.setLayout(Util.createGridLayout(4, false, margin, 0));
 		
-		pageNumField = new RangeField(toolBarComp, true);
+		pageNumField = new RangeField(toolBarComp);
 		GridData pageNumGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		pageNumGridData.minimumWidth = Util.BTW;
 		pageNumField.getControl().setLayoutData(pageNumGridData);
@@ -88,10 +88,7 @@ class HighlightingToolBarWithTextViewer {
 				.toolTip(Msg.prev_page.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						pageIndex = Math.max(0, pageIndex - 1);
-						currentOcc = null;
-						updatePage();
-						occField.setRange(currentOcc, occCount);
+						goToPage(pageIndex - 1);
 					}
 				}).create();
 
@@ -99,16 +96,13 @@ class HighlightingToolBarWithTextViewer {
 				.toolTip(Msg.next_page.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						pageIndex = Math.min(pages.size() - 1, pageIndex + 1);
-						currentOcc = null;
-						updatePage();
-						occField.setRange(currentOcc, occCount);
+						goToPage(pageIndex + 1);
 					}
 				}).create();
 		
 		new ToolItem(toolBar1, SWT.SEPARATOR);
 		
-		occField = new RangeField(toolBarComp, false);
+		occField = new RangeField(toolBarComp);
 		GridData occGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		occGridData.minimumWidth = Util.BTW;
 		occField.getControl().setLayoutData(occGridData);
@@ -162,6 +156,34 @@ class HighlightingToolBarWithTextViewer {
 		
 		highlightBt.setSelection(SettingsConf.Bool.HighlightingEnabled.get());
 		createToolItems(tif2);
+		
+		pageNumField.evtValueChanged.add(new Event.Listener<Integer>() {
+			public void update(Integer eventData) {
+				// Switch from one-based to zero-based page number
+				goToPage(eventData - 1);
+			}
+		});
+		
+		occField.evtValueChanged.add(new Event.Listener<Integer>() {
+			public void update(Integer eventData) {
+				int targetOcc = Util.ensureRange(1, occCount, eventData);
+				int sum = 0;
+				for (int i = 0; i < pages.size(); i++) {
+					int start = sum + 1;
+					int occCountOnPage = pages.get(i).getRangeCount();
+					int end = start + occCountOnPage;
+					if (start <= targetOcc && targetOcc < end) {
+						currentOcc = targetOcc;
+						occField.setRange(currentOcc, occCount);
+						pageIndex = i;
+						updatePage();
+						textViewer.goTo(targetOcc - sum);
+						break;
+					}
+					sum += occCountOnPage;
+				}
+			}
+		});
 	}
 	
     private void moveSelection(boolean isDownBt) {
@@ -244,6 +266,16 @@ class HighlightingToolBarWithTextViewer {
 		HighlightedString string = pages.get(pageIndex);
 		textViewer.setText(string);
 		updatePageToolbar();
+	}
+	
+	private void goToPage(int pageIndex) {
+		pageIndex = Util.ensureRange(0, pages.size() - 1, pageIndex);
+		if (this.pageIndex == pageIndex)
+			return;
+		this.pageIndex = pageIndex;
+		updatePage();
+		currentOcc = null;
+		occField.setRange(currentOcc, occCount);
 	}
 	
 	public void setUseMonoFont(boolean useMonoFont) {
