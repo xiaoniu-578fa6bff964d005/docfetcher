@@ -52,17 +52,44 @@ public final class HighlightService {
 	private HighlightService() {
 	}
 	
+	// The given text is trimmed
 	@NotNull
 	public static HighlightedString highlight(	@NotNull Query query,
 												boolean isPhraseQuery,
 												@NotNull String text)
 			throws CheckedOutOfMemoryError {
+		text = trimDocument(text);
 		List<Range> ranges;
 		if (isPhraseQuery)
 			ranges = highlightPhrases(query, text);
 		else
 			ranges = highlight(query, text);
 		return new HighlightedString(text, ranges);
+	}
+	
+	/**
+	 * Trims the given string as follows:
+	 * <ul>
+	 * <li>All trailing whitespace is removed.</li>
+	 * <li>All preceding empty lines are removed. This means that any leading
+	 * whitespace in the first non-empty line is preserved.</li>
+	 * </ul>
+	 */
+	@NotNull
+	private static String trimDocument(@NotNull String input) {
+		input = Util.trimRight(input);
+		Integer lineStart = 0;
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (c == '\r' || c == '\n') {
+				lineStart = i + 1;
+			} else if (!Character.isWhitespace(c)) {
+				if (lineStart != null)
+					return input.substring(lineStart);
+				return input.substring(i);
+			}
+		}
+		return "";
 	}
 	
 	@MutableCopy

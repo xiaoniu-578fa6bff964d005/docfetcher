@@ -319,6 +319,45 @@ public final class Util {
 			return str.substring(0, 32) + "..."; //$NON-NLS-1$
 		return str;
 	}
+	
+	/**
+	 * Removes any leading whitespace from the input string and returns the
+	 * resulting string.
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is null.
+	 * @see String#trim()
+	 */
+	@NotNull
+	public static String trimLeft(@NotNull String input) {
+		if (input == null)
+			throw new IllegalArgumentException();
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (! Character.isWhitespace(c))
+				return input.substring(i);
+		}
+		return "";
+	}
+
+	/**
+	 * Removes any trailing whitespace from the input string and returns the
+	 * resulting string.
+	 *
+	 * @throws IllegalArgumentException
+	 *             if the input string is null.
+	 * @see String#trim()
+	 */
+	@NotNull
+	public static String trimRight(@NotNull String input) {
+		final int len = input.length();
+		for (int i = len - 1; i >= 0; i--) {
+			char c = input.charAt(i);
+			if (! Character.isWhitespace(c))
+				return input.substring(0, i + 1);
+		}
+		return "";
+	}
 
 	public static <T> boolean equals(@NotNull Collection<T> col, @NotNull T[] a) {
 		Util.checkNotNull(col, a);
