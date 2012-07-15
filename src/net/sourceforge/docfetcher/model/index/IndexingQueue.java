@@ -27,7 +27,6 @@ import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.index.Task.TaskState;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookIndex;
-import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -178,8 +177,25 @@ public final class IndexingQueue {
 				assert !task.is(CancelAction.DISCARD);
 				if (task.getDeletion() == null
 						|| result != IndexingResult.SUCCESS_UNCHANGED) {
-					indexRegistry.save(luceneIndex);
-					indexRegistry.getSearcher().replaceLuceneSearcher();
+					/*
+					 * Bug #3519920: The index should not be saved here if it's
+					 * not in the registry anymore, otherwise the program will
+					 * crash when the following happes: (1) The index is
+					 * updated. (2) While the update is running, the user
+					 * requests a rebuild on the index. This causes the index to
+					 * be removed from the registry, and the update to be
+					 * cancelled. (3) The cancelling gets us to this point
+					 * prematurely. We erroneously save the index, which puts it
+					 * back into the registry. (4) Some time later, the rebuild
+					 * task is executed. It contains the assertion that the
+					 * rebuilt index isn't in the registry anymore. Since we
+					 * just put the index back in the registry, the assertion
+					 * fails and crashes the program.
+					 */
+					if (indexRegistry.getIndexes().contains(luceneIndex)) {
+						indexRegistry.save(luceneIndex);
+						indexRegistry.getSearcher().replaceLuceneSearcher();
+					}
 				}
 				else {
 					doDelete = true;
@@ -251,21 +267,7 @@ public final class IndexingQueue {
 		List<LuceneIndex> indexes = indexRegistry.getIndexes();
 		boolean registered = indexes.contains(luceneIndex);
 		boolean isUpdate = task.is(IndexAction.UPDATE);
-		if (registered != isUpdate) {
-			StringBuilder msg = new StringBuilder();
-			msg.append(registered + " != " + isUpdate);
-			msg.append("\n  *Index: " + luceneIndex.getCanonicalRootFile());
-			for (LuceneIndex index : indexes)
-				msg.append("\n  Index: " + index.getCanonicalRootFile());
-			writeLock.lock();
-			try {
-				for (Task t : tasks)
-					msg.append("\n  " + t.toString());
-			} finally {
-				writeLock.unlock();
-			}
-			AppUtil.showStackTrace(new AssertionError(msg.toString()));
-		}
+		assert registered == isUpdate;
 	}
 
 	// Returns whether the task was added
