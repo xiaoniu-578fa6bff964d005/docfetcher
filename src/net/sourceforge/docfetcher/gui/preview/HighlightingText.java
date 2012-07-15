@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 final class HighlightingText {
 	
+	private static final int margin = 10;
+	
 	@NotNull private StyledText textViewer;
 	@NotNull private StyleRange highlightStyle;
 	@NotNull private Color highlightColor;
@@ -51,8 +53,7 @@ final class HighlightingText {
 	public HighlightingText(@NotNull Composite parent) {
 		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
 		textViewer = new StyledText(parent, style);
-		int m = 10;
-		textViewer.setMargins(m, m, m, m);
+		textViewer.setMargins(margin, margin, margin, margin);
 		setHighlightColorAndStyle();
 		
 		// Update highlight color when preferences entry changes
@@ -309,12 +310,16 @@ final class HighlightingText {
 	 */
 	private void scrollToMiddle(int caretOffset) {
 		try {
-			int linePixelNow = textViewer.getLineAtOffset(caretOffset) * textViewer.getLineHeight();
+			/*
+			 * Note: Some lines may be wrapped, so it's possible that
+			 * linePixelNow != lineHeight * lineNumber.
+			 */
 			int linePixelTop = textViewer.getTopPixel();
+			int linePixelNow = textViewer.getLocationAtOffset(caretOffset).y + linePixelTop - margin;
 			int linePixelBottom = linePixelTop + textViewer.getClientArea().height;
 			int dist = linePixelBottom - linePixelTop;
-			int dist13 = (dist / 3);
-			int dist23 = (2 * dist / 3);
+			int dist13 = dist / 3;
+			int dist23 = 2 * dist / 3;
 			double lineIndexMiddleTop = linePixelTop + dist / 3;
 			double lineIndexMiddleBottom = linePixelBottom - dist / 3;
 			if (linePixelNow < lineIndexMiddleTop)
@@ -323,8 +328,7 @@ final class HighlightingText {
 				textViewer.setTopPixel(linePixelNow - dist23);
 		}
 		catch (Exception e) {
-			// textViewer.getLineAtOffset(..) can throw an IllegalArgumentException
-			// See bug #2778204
+			// Ignore invalid caret offset
 		}
 	}
 
