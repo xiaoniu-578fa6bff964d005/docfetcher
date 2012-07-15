@@ -23,7 +23,6 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
-import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
 import org.eclipse.swt.SWT;
@@ -33,7 +32,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -42,15 +41,15 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 class HighlightingToolBarWithTextViewer {
 	
-	private final Composite toolBarComp;
+	private final Composite barComp;
 	@NotNull private HighlightingText textViewer;
 	private final ToolItem highlightBt;
 	
-	private final Text pageNumField;
+	private final RangeField pageNumField;
 	private final ToolItem prevBt;
 	private final ToolItem nextBt;
 	
-	private final Text occField;
+	private final RangeField occField;
 	private final ToolItem upBt;
 	private final ToolItem downBt;
 	
@@ -60,17 +59,22 @@ class HighlightingToolBarWithTextViewer {
 	private final List<HighlightedString> pages = new ArrayList<HighlightedString>();
 	
 	public HighlightingToolBarWithTextViewer(@NotNull Composite toolBarParent) {
-		toolBarComp = new CustomBorderComposite(toolBarParent);
+		barComp = new CustomBorderComposite(toolBarParent);
 		int margin = Util.IS_WINDOWS ? 2 : 0;
+		barComp.setLayout(Util.createGridLayout(2, false, margin, 0));
+		
+		Label indentArea = new Label(barComp, SWT.NONE);
+		indentArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		Composite toolBarComp = new Composite(barComp, SWT.NONE);
+		toolBarComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		toolBarComp.setLayout(Util.createGridLayout(4, false, margin, 0));
 		
-		int textStyle = SWT.BORDER | SWT.SINGLE | SWT.CENTER | SWT.READ_ONLY;
-		pageNumField = new Text(toolBarComp, textStyle);
-		GridData pageNumGridData = new GridData(SWT.RIGHT, SWT.FILL, true, true);
+		pageNumField = new RangeField(toolBarComp, true);
+		GridData pageNumGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		pageNumGridData.minimumWidth = Util.BTW;
-		pageNumField.setLayoutData(pageNumGridData);
-		pageNumField.setBackground(Col.WIDGET_BACKGROUND.get());
-		pageNumField.setToolTipText(Msg.page_num.get());
+		pageNumField.getControl().setLayoutData(pageNumGridData);
+		pageNumField.getControl().setToolTipText(Msg.page_num.get());
 		
 		ToolBar toolBar1 = new ToolBar(toolBarComp, SWT.FLAT);
 		toolBar1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -87,7 +91,7 @@ class HighlightingToolBarWithTextViewer {
 						pageIndex = Math.max(0, pageIndex - 1);
 						currentOcc = null;
 						updatePage();
-						updateOccField();
+						occField.setRange(currentOcc, occCount);
 					}
 				}).create();
 
@@ -98,18 +102,17 @@ class HighlightingToolBarWithTextViewer {
 						pageIndex = Math.min(pages.size() - 1, pageIndex + 1);
 						currentOcc = null;
 						updatePage();
-						updateOccField();
+						occField.setRange(currentOcc, occCount);
 					}
 				}).create();
 		
 		new ToolItem(toolBar1, SWT.SEPARATOR);
 		
-		occField = new Text(toolBarComp, textStyle);
-		GridData counterGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
-		counterGridData.minimumWidth = Util.BTW;
-		occField.setLayoutData(counterGridData);
-		occField.setBackground(Col.WIDGET_BACKGROUND.get());
-		occField.setToolTipText(Msg.occurrence_count.get());
+		occField = new RangeField(toolBarComp, false);
+		GridData occGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		occGridData.minimumWidth = Util.BTW;
+		occField.getControl().setLayoutData(occGridData);
+		occField.getControl().setToolTipText(Msg.occurrence_count.get());
 		
 		ToolBar toolBar2 = new ToolBar(toolBarComp, SWT.FLAT);
 		toolBar2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -166,7 +169,7 @@ class HighlightingToolBarWithTextViewer {
         
         if (newOcc != null) { // Occurrence found on current page
             currentOcc = relativeToAbsoluteOccurrence(newOcc);
-            updateOccField();
+            occField.setRange(currentOcc, occCount);
         }
         else { // Go to nearest page containing an occurrence, if one exists
         	if (isDownBt) {
@@ -178,7 +181,7 @@ class HighlightingToolBarWithTextViewer {
         			updatePage();
         			Integer occ = textViewer.goTo(true);
         			currentOcc = relativeToAbsoluteOccurrence(occ);
-        			updateOccField();
+        			occField.setRange(currentOcc, occCount);
         			break;
         		}
         	} else {
@@ -190,7 +193,7 @@ class HighlightingToolBarWithTextViewer {
         			updatePage();
         			Integer occ = textViewer.goToLast();
         			currentOcc = relativeToAbsoluteOccurrence(occ);
-        			updateOccField();
+        			occField.setRange(currentOcc, occCount);
         			break;
         		}
         	}
@@ -208,7 +211,7 @@ class HighlightingToolBarWithTextViewer {
 	
 	@NotNull
 	public final Composite getToolBar() {
-		return toolBarComp;
+		return barComp;
 	}
 	
 	@NotNull
@@ -220,7 +223,7 @@ class HighlightingToolBarWithTextViewer {
 				Point sel = textViewer.getControl().getSelection();
 				if (sel.x == sel.y) {
 					currentOcc = null;
-					updateOccField();
+					occField.setRange(currentOcc, occCount);
 				}
 			}
 		});
@@ -228,18 +231,11 @@ class HighlightingToolBarWithTextViewer {
 		return textViewer.getControl();
 	}
 	
-	private void updateOccField() {
-		if (currentOcc != null)
-			occField.setText(currentOcc + "/" + occCount); //$NON-NLS-1$
-		else
-			occField.setText(String.valueOf(occCount));
-	}
-	
 	private void updatePageToolbar() {
 		if (pageIndex == null)
-			pageNumField.setText("");
+			pageNumField.clear();
 		else
-			pageNumField.setText((pageIndex + 1) + "/" + pages.size());
+			pageNumField.setRange(pageIndex + 1, pages.size());
 		prevBt.setEnabled(pageIndex != null && pageIndex > 0);
 		nextBt.setEnabled(pageIndex != null && pageIndex < pages.size() - 1);
 	}
@@ -265,7 +261,7 @@ class HighlightingToolBarWithTextViewer {
 		textViewer.setText(string);
 		
 		updatePageToolbar();
-		occField.setText(String.valueOf(occCount));
+		occField.setRange(currentOcc, occCount);
 		upBt.setEnabled(occCount > 0);
 		downBt.setEnabled(occCount > 0);
 		
@@ -284,7 +280,7 @@ class HighlightingToolBarWithTextViewer {
 		pages.add(string);
 		
 		updatePageToolbar();
-		updateOccField();
+		occField.setRange(currentOcc, occCount);
 		if (string.getRangeCount() > 0) {
 			upBt.setEnabled(true);
 			downBt.setEnabled(true);
@@ -300,7 +296,7 @@ class HighlightingToolBarWithTextViewer {
 		
 		textViewer.clear();
 		updatePageToolbar();
-		occField.setText("");
+		occField.clear();
 		upBt.setEnabled(false);
 		downBt.setEnabled(false);
 		highlightBt.setEnabled(false);
