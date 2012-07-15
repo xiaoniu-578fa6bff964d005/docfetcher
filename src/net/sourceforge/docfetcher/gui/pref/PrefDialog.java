@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui.pref;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
@@ -44,8 +45,8 @@ public final class PrefDialog {
 	
 	private final Shell shell;
 	@NotNull private Button okBt;
-	private final List<PrefOption> checkOptions;
-	private final List<PrefOption> fieldOptions;
+	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();
+	private final List<PrefOption> fieldOptions = new LinkedList<PrefOption>();
 	
 	public PrefDialog(@NotNull Shell parent) {
 		Util.checkNotNull(parent);
@@ -55,7 +56,7 @@ public final class PrefDialog {
 		shell.setImage(Img.PREFERENCES.get());
 		SettingsConf.ShellBounds.PreferencesDialog.bind(shell);
 		
-		checkOptions = Arrays.<PrefOption> asList(
+		checkOptions.addAll(Arrays.<PrefOption> asList(
 			new CheckOption(
 				Msg.pref_manual_on_startup.get(),
 				SettingsConf.Bool.ShowManualOnStartup),
@@ -66,18 +67,22 @@ public final class PrefDialog {
 
 			new CheckOption(
 				Msg.pref_scroll_to_first_match.get(),
-				SettingsConf.Bool.AutoScrollToFirstMatch),
+				SettingsConf.Bool.AutoScrollToFirstMatch)
+		));
+		
+		if (!Util.IS_UBUNTU_UNITY) {
+			checkOptions.addAll(Arrays.<PrefOption> asList(
+				new CheckOption(
+					Msg.pref_hide_in_systray.get(),
+					SettingsConf.Bool.HideOnOpen),
 
-			new CheckOption(
-				Msg.pref_hide_in_systray.get(),
-				SettingsConf.Bool.HideOnOpen,
-				!Util.IS_UBUNTU_UNITY),
-
-			new CheckOption(
-				Msg.pref_close_to_systray.get(),
-				SettingsConf.Bool.CloseToTray,
-				!Util.IS_UBUNTU_UNITY),
-
+				new CheckOption(
+					Msg.pref_close_to_systray.get(),
+					SettingsConf.Bool.CloseToTray)
+			));
+		}
+		
+		checkOptions.addAll(Arrays.<PrefOption> asList(
 			new CheckOption(
 				Msg.pref_clear_search_history_on_exit.get(),
 				SettingsConf.Bool.ClearSearchHistoryOnExit)
@@ -86,9 +91,9 @@ public final class PrefDialog {
 //			new CheckOption(
 //				"Reset location filter on exit",
 //				SettingsConf.Bool.ResetLocationFilterOnExit),
-		);
+		));
 		
-		fieldOptions = Util.createList(1,
+		fieldOptions.addAll(Arrays.asList(
 			new ColorOption(
 				Msg.pref_highlight_color.get(),
 				SettingsConf.IntArray.PreviewHighlighting),
@@ -99,12 +104,11 @@ public final class PrefDialog {
 			
 			new FontOption(
 				Msg.pref_font_fixed_width.get(),
-				UtilGui.getPreviewFontMono()),
+				UtilGui.getPreviewFontMono())
+		));
 		
-			new HotkeyOption(
-				Msg.pref_hotkey.get(),
-				!Util.IS_MAC_OS_X)
-		);
+		if (!Util.IS_MAC_OS_X)
+			fieldOptions.add(new HotkeyOption(Msg.pref_hotkey.get()));
 		
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
@@ -122,8 +126,7 @@ public final class PrefDialog {
 		comp.setLayout(Util.createGridLayout(2, false, 0, 5));
 		
 		for (PrefOption checkOption : checkOptions)
-			if (checkOption.isEnabled())
-				checkOption.createControls(comp);
+			checkOption.createControls(comp);
 		
 		Label spacing = new Label(comp, SWT.NONE);
 		GridData spacingGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
@@ -131,8 +134,7 @@ public final class PrefDialog {
 		spacing.setLayoutData(spacingGridData);
 		
 		for (PrefOption fieldOption : fieldOptions)
-			if (fieldOption.isEnabled())
-				fieldOption.createControls(comp);
+			fieldOption.createControls(comp);
 		
 		return comp;
 	}
@@ -206,20 +208,15 @@ public final class PrefDialog {
 
 	static abstract class PrefOption {
 		protected final String labelText;
-		private final boolean enabled;
 
-		public PrefOption(@NotNull String labelText, boolean enabled) {
+		public PrefOption(@NotNull String labelText) {
 			this.labelText = labelText;
-			this.enabled = enabled;
 		}
 		// Subclassers must set grid datas on the created controls, assuming
 		// a two-column grid layout
 		protected abstract void createControls(@NotNull Composite parent);
 		protected abstract void restoreDefault();
 		protected abstract void save();
-		public final boolean isEnabled() {
-			return enabled;
-		}
 	}
 
 }

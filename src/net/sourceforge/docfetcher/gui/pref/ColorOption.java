@@ -39,7 +39,7 @@ final class ColorOption extends PrefOption {
 	
 	public ColorOption(	@NotNull String labelText,
 						@NotNull SettingsConf.IntArray enumOption) {
-		super(labelText, true);
+		super(labelText);
 		this.enumOption = enumOption;
 	}
 	

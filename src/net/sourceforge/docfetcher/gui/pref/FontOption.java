@@ -39,7 +39,7 @@ final class FontOption extends PrefOption {
 	
 	public FontOption(	@NotNull String labelText,
 						@NotNull SettingsConf.FontDescription fontDescription) {
-		super(labelText, true);
+		super(labelText);
 		this.fontDescription = fontDescription;
 	}
 	
