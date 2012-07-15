@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.gui.pref;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -47,9 +49,11 @@ public final class PrefDialog {
 	@NotNull private Button okBt;
 	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();
 	private final List<PrefOption> fieldOptions = new LinkedList<PrefOption>();
+	private final File programConfFile;
 	
-	public PrefDialog(@NotNull Shell parent) {
+	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile) {
 		Util.checkNotNull(parent);
+		this.programConfFile = programConfFile;
 		shell = new Shell(parent, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM);
 		shell.setLayout(Util.createFillLayout(10));
 		shell.setText(Msg.preferences.get());
@@ -135,6 +139,19 @@ public final class PrefDialog {
 		
 		for (PrefOption fieldOption : fieldOptions)
 			fieldOption.createControls(comp);
+		
+		Label spacing2 = new Label(comp, SWT.NONE);
+		spacing2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		
+		Link link = new Link(comp, SWT.NONE);
+		link.setText("<a>Advanced Settings</a>");
+		link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		
+		link.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Util.launch(programConfFile);
+			}
+		});
 		
 		return comp;
 	}

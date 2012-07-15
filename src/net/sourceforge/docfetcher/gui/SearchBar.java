@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.gui;
 
+import java.io.File;
+
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
@@ -55,7 +57,7 @@ public final class SearchBar {
 	private final ToolBar toolBar;
 	private final MemoryList<String> searchHistory;
 	
-	public SearchBar(@NotNull Composite parent) {
+	public SearchBar(@NotNull Composite parent, @NotNull final File programConfFile) {
 		comp = new CustomBorderComposite(parent) {
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				return SearchBar.this.computeSize(wHint, hHint);
@@ -101,7 +103,7 @@ public final class SearchBar {
 		tif.image(Img.PREFERENCES.get()).toolTip(Msg.preferences.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						PrefDialog prefDialog = new PrefDialog(comp.getShell());
+						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile);
 						prefDialog.open();
 					}
 				}).create();

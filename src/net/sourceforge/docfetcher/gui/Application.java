@@ -92,6 +92,7 @@ public final class Application {
 	private static volatile IndexRegistry indexRegistry;
 	private static volatile FolderWatcher folderWatcher;
 	@Nullable private static HotkeyHandler hotkeyHandler;
+	private static File programConfFile;
 
 	private static FilesizePanel filesizePanel;
 	private static FileTypePanel fileTypePanel;
@@ -152,7 +153,7 @@ public final class Application {
 		if (!AppUtil.checkSingleInstance()) return;
 
 		// Load program configuration and preferences
-		loadProgramConf();
+		programConfFile = loadProgramConf();
 		File settingsConfFile = loadSettingsConf();
 
 		// Determine shell title
@@ -413,7 +414,7 @@ public final class Application {
 		}.start();
 	}
 
-	private static void loadProgramConf() {
+	private static File loadProgramConf() {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();
 
@@ -463,6 +464,7 @@ public final class Application {
 		catch (IOException e) {
 			AppUtil.showStackTraceInOwnDisplay(e);
 		}
+		return confFile;
 	}
 
 	private static File loadSettingsConf() {
@@ -583,7 +585,7 @@ public final class Application {
 
 	private static Control createRightTopPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		searchBar = new SearchBar(comp);
+		searchBar = new SearchBar(comp, programConfFile);
 		resultPanel = new ResultPanel(comp);
 
 		comp.setLayout(new FormLayout());
@@ -685,7 +687,7 @@ public final class Application {
 			}
 		}, new Runnable() {
 			public void run() {
-				new PrefDialog(shell).open();
+				new PrefDialog(shell, programConfFile).open();
 			}
 		});
 	}
@@ -905,7 +907,7 @@ public final class Application {
 				 * at startup.
 				 */
 				if (shell.isVisible())
-					new PrefDialog(shell).open();
+					new PrefDialog(shell, programConfFile).open();
 			}
 		});
 		hotkeyHandler.registerHotkey();
