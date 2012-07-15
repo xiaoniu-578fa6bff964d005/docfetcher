@@ -54,6 +54,7 @@ final class HighlightingText {
 		int style = SWT.FULL_SELECTION | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.BORDER;
 		textViewer = new StyledText(parent, style);
 		textViewer.setMargins(margin, margin, margin, margin);
+		textViewer.setContent(new AppendingStyledTextContent());
 		setHighlightColorAndStyle();
 		
 		// Update highlight color when preferences entry changes
