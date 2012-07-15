@@ -146,7 +146,7 @@ public final class PreviewPanel extends Composite {
 		requestCount++;
 		setError(null, requestCount);
 		
-		clearPreviews(true, true, false);
+		clearPreviews(true, false, true, false);
 		htmlPreview.setFile(file, false);
 		return true;
 	}
@@ -161,25 +161,25 @@ public final class PreviewPanel extends Composite {
 			if (emailPreview == null)
 				emailPreview = new EmailPreview(stackComp);
 			moveToTop(emailPreview);
-			clearPreviews(true, false, true);
+			clearPreviews(true, false, false, true);
 			new EmailThread(doc, requestCount).start();
 		}
 		else if (doc.isPdfFile()) {
 			moveToTop(textPreview);
-			clearPreviews(true, true, true);
+			clearPreviews(true, true, true, true);
 			new PdfThread(doc, requestCount).start();
 		}
 		else if (doc.isHtmlFile()
 				&& SettingsConf.Bool.PreferHtmlPreview.get()
 				&& createAndShowHtmlPreview()) {
-			clearPreviews(true, true, false);
+			clearPreviews(true, false, true, false);
 			new HtmlThread(doc, requestCount).start();
 		}
 		else {
 			boolean htmlEnabled = doc.isHtmlFile() && !browserCreationFailed;
 			textPreview.setHtmlButtonEnabled(htmlEnabled);
 			moveToTop(textPreview);
-			clearPreviews(false, true, true);
+			clearPreviews(false, false, true, true);
 			new TextThread(doc, requestCount).start();
 		}
 	}
@@ -219,16 +219,16 @@ public final class PreviewPanel extends Composite {
 		disposeLastResources();
 		requestCount++;
 		setError(null, requestCount);
-		clearPreviews(true, true, true);
+		clearPreviews(true, false, true, true);
 		ResultDocument ret = lastDoc;
 		lastDoc = null;
 		return ret;
 	}
 	
 	@NotThreadSafe
-	private void clearPreviews(boolean text, boolean email, boolean html) {
+	private void clearPreviews(boolean text, boolean showPageToolBar, boolean email, boolean html) {
 		if (text)
-			textPreview.clear();
+			textPreview.clear(showPageToolBar);
 		if (email && emailPreview != null)
 			emailPreview.clear();
 		if (html && htmlPreview != null)

@@ -61,8 +61,8 @@ final class TextPreview extends ToolBarForm {
 		return toolBarWithTextViewer.createTextViewer(parent);
 	}
 	
-	public void clear() {
-		toolBarWithTextViewer.clear();
+	public void clear(boolean showPageToolBar) {
+		toolBarWithTextViewer.clear(showPageToolBar);
 		htmlBt.setEnabled(false);
 	}
 	

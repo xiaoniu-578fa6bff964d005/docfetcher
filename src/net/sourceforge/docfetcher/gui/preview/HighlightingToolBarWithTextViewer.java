@@ -46,6 +46,7 @@ class HighlightingToolBarWithTextViewer {
 	private final ToolItem highlightBt;
 	
 	private final RangeField pageNumField;
+	private final ToolBar pageToolbar;
 	private final ToolItem prevBt;
 	private final ToolItem nextBt;
 	
@@ -76,12 +77,12 @@ class HighlightingToolBarWithTextViewer {
 		pageNumField.getControl().setLayoutData(pageNumGridData);
 		pageNumField.getControl().setToolTipText(Msg.page_num.get());
 		
-		ToolBar toolBar1 = new ToolBar(toolBarComp, SWT.FLAT);
-		toolBar1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+		pageToolbar = new ToolBar(toolBarComp, SWT.FLAT);
+		pageToolbar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		
-		new ToolItem(toolBar1, SWT.SEPARATOR);
+		new ToolItem(pageToolbar, SWT.SEPARATOR);
 		
-		ToolItemFactory tif1 = new ToolItemFactory(toolBar1);
+		ToolItemFactory tif1 = new ToolItemFactory(pageToolbar);
 		tif1.enabled(false);
 		
 		prevBt = tif1.image(Img.ARROW_LEFT.get())
@@ -100,7 +101,7 @@ class HighlightingToolBarWithTextViewer {
 					}
 				}).create();
 		
-		new ToolItem(toolBar1, SWT.SEPARATOR);
+		new ToolItem(pageToolbar, SWT.SEPARATOR);
 		
 		occField = new RangeField(toolBarComp);
 		GridData occGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -253,7 +254,11 @@ class HighlightingToolBarWithTextViewer {
 		return textViewer.getControl();
 	}
 	
-	private void updatePageToolbar() {
+	private void updatePageToolbar(boolean visible) {
+		pageNumField.getControl().setVisible(visible);
+		pageToolbar.setVisible(visible);
+		if (visible == false)
+			return;
 		if (pageIndex == null)
 			pageNumField.clear();
 		else
@@ -265,7 +270,7 @@ class HighlightingToolBarWithTextViewer {
 	private void updatePage() {
 		HighlightedString string = pages.get(pageIndex);
 		textViewer.setText(string);
-		updatePageToolbar();
+		updatePageToolbar(true);
 	}
 	
 	private void goToPage(int pageIndex) {
@@ -292,7 +297,7 @@ class HighlightingToolBarWithTextViewer {
 		textViewer.getControl().setRedraw(false);
 		textViewer.setText(string);
 		
-		updatePageToolbar();
+		updatePageToolbar(false);
 		occField.setRange(currentOcc, occCount);
 		upBt.setEnabled(occCount > 0);
 		downBt.setEnabled(occCount > 0);
@@ -311,7 +316,7 @@ class HighlightingToolBarWithTextViewer {
 		}
 		pages.add(string);
 		
-		updatePageToolbar();
+		updatePageToolbar(true);
 		occField.setRange(currentOcc, occCount);
 		if (string.getRangeCount() > 0) {
 			upBt.setEnabled(true);
@@ -320,14 +325,14 @@ class HighlightingToolBarWithTextViewer {
 		}
 	}
 	
-	public final void clear() {
+	public final void clear(boolean showPageToolbar) {
 		currentOcc = null;
 		occCount = 0;
 		pageIndex = null;
 		pages.clear();
 		
 		textViewer.clear();
-		updatePageToolbar();
+		updatePageToolbar(showPageToolbar);
 		occField.clear();
 		upBt.setEnabled(false);
 		downBt.setEnabled(false);

@@ -202,7 +202,7 @@ final class EmailPreview extends Composite {
 		for (StyledText st : allFields)
 			st.setText("");
 		toField.setToolTipText("");
-		toolBarWithTextViewer.clear();
+		toolBarWithTextViewer.clear(false);
 	}
 
 }
