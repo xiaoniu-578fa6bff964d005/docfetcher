@@ -503,9 +503,9 @@ public enum Msg {
 	total_elapsed_time ("Total elapsed time: {0}"),
 	copy ("Copy\tCtrl+C"), // Also used on result pane
 	install_watch_failed (
-		"Failed to install watch on folder {0}.\n\n" +
-		"Internal error message:\n{1}\n\n" +
-		"Please see the <a href=\"{2}\">manual</a> for a possible workaround."),
+		"Failed to install a watch on folder {0}.\n\n" +
+		"Please see the <a href=\"{1}\">manual</a> for a possible workaround.\n\n" +
+		"Internal error message:\n{2}"),
 	
 	// Preview panel
 	loading ("Loading...",
