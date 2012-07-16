@@ -38,7 +38,8 @@ final class AppendingContext extends FileContext {
 				context.getReporter(),
 				context.getOriginalPath(),
 				context.getStopper(),
-				context.getFileCount()
+				context.getFileCount(),
+				context.getIndexParentDir()
 		);
 		this.outerContext = context;
 	}

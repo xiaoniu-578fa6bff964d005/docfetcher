@@ -167,7 +167,7 @@ class HighlightingToolBarWithTextViewer {
 		
 		occField.evtValueChanged.add(new Event.Listener<Integer>() {
 			public void update(Integer eventData) {
-				int targetOcc = Util.ensureRange(1, occCount, eventData);
+				int targetOcc = Util.clamp(eventData, 1, occCount);
 				int sum = 0;
 				for (int i = 0; i < pages.size(); i++) {
 					int start = sum + 1;
@@ -274,7 +274,7 @@ class HighlightingToolBarWithTextViewer {
 	}
 	
 	private void goToPage(int pageIndex) {
-		pageIndex = Util.ensureRange(0, pages.size() - 1, pageIndex);
+		pageIndex = Util.clamp(pageIndex, 0, pages.size() - 1);
 		if (this.pageIndex == pageIndex)
 			return;
 		this.pageIndex = pageIndex;

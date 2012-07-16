@@ -316,6 +316,16 @@ public final class FolderWatcher {
 			if (isDeleted)
 				assert !isFile;
 			
+			/*
+			 * Ignore file events originating from the index directory -- the
+			 * user may have indexed the DocFetcher folder. If we don't ignore
+			 * these events, we may get stuck in an infinite loop of running
+			 * index updates and reacting to changes in the index directory
+			 * caused by our own index updates.
+			 */
+			if (Util.contains(indexRegistry.getIndexParentDir(), target))
+				return false;
+			
 			// Accept if target is an archive root or a PST file
 			if (target.equals(watchedIndex.getCanonicalRootFile()))
 				return true;

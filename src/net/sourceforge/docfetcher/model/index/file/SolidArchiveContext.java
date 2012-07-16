@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.model.index.file;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,15 +52,17 @@ final class SolidArchiveContext extends FileContext implements FailReporter {
 	                              	@Nullable Path originalPath,
 	                              	@NotNull Cancelable cancelable,
 	                              	@NotNull MutableInt fileCount,
-	                              	boolean isTempArchive) {
+	                              	boolean isTempArchive,
+	                              	@Nullable File indexParentDir) {
 		super(config, zipDetector, writer, reporter, originalPath, cancelable,
-			fileCount);
+			fileCount, indexParentDir);
 		this.isTempArchive = isTempArchive;
 	}
 	
 	protected SolidArchiveContext(	@NotNull FileContext superContext,
 									@NotNull Path originalPath,
-									boolean isTempArchive) {
+									boolean isTempArchive,
+									@Nullable File indexParentDir) {
 		this(
 				superContext.getConfig(),
 				superContext.getZipDetector(),
@@ -68,7 +71,8 @@ final class SolidArchiveContext extends FileContext implements FailReporter {
 				originalPath,
 				superContext.getStopper(),
 				superContext.getFileCount(),
-				isTempArchive
+				isTempArchive,
+				indexParentDir
 		);
 	}
 	

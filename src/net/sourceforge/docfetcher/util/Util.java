@@ -239,14 +239,6 @@ public final class Util {
 		}
 		return defaultValue;
 	}
-	
-	public static int ensureRange(int min, int max, int value) {
-		if (value < min)
-			return min;
-		else if (value > max)
-			return max;
-		return value;
-	}
 
 	/**
 	 * Encodes the given collection of strings into a single string, using the
@@ -763,6 +755,13 @@ public final class Util {
 		catch (IOException e) {
 			return file.getAbsolutePath();
 		}
+	}
+	
+	public static boolean isCanonicallyEqual(	@Nullable File file1,
+												@Nullable File file2) {
+		if (file1 == null || file2 == null)
+			return false;
+		return getCanonicalFile(file1).equals(getCanonicalFile(file2));
 	}
 
 	/**

@@ -48,6 +48,7 @@ class FileContext {
 	@Nullable private final Path originalPath;
 	private final Cancelable cancelable;
 	private final MutableInt fileCount;
+	@Nullable private final File indexParentDir; // null if index only exists in RAM
 
 	protected FileContext(	@NotNull IndexingConfig config,
 							@NotNull TArchiveDetector zipDetector,
@@ -55,7 +56,8 @@ class FileContext {
 							@Nullable IndexingReporter reporter,
 							@Nullable Path originalPath,
 							@NotNull Cancelable cancelable,
-							@NotNull MutableInt fileCount) {
+							@NotNull MutableInt fileCount,
+							@Nullable File indexParentDir) {
 		Util.checkNotNull(config, zipDetector, writer, cancelable, fileCount);
 		this.config = config;
 		this.zipDetector = zipDetector;
@@ -63,6 +65,7 @@ class FileContext {
 		this.originalPath = originalPath;
 		this.cancelable = cancelable;
 		this.fileCount = fileCount;
+		this.indexParentDir = indexParentDir;
 		setReporter(reporter);
 	}
 	
@@ -75,7 +78,8 @@ class FileContext {
 				superContext.reporter,
 				originalPath,
 				superContext.cancelable,
-				superContext.fileCount
+				superContext.fileCount,
+				superContext.indexParentDir
 		);
 	}
 	
@@ -123,6 +127,11 @@ class FileContext {
 	@NotNull
 	protected final MutableInt getFileCount() {
 		return fileCount;
+	}
+	
+	@Nullable
+	protected final File getIndexParentDir() {
+		return indexParentDir;
 	}
 	
 	// returns success

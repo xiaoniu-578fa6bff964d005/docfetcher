@@ -50,12 +50,14 @@ public abstract class TreeIndex <
 	private final long created;
 	@Nullable private final Path fileIndexDirPath;
 	@Nullable private transient RAMDirectory ramIndexDir;
+	@Nullable private transient File indexParentDir;
 	
 	// if indexDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir
 	protected TreeIndex(@Nullable File indexParentDir,
 	                    @NotNull File rootFile) {
 		Util.checkNotNull(rootFile);
+		this.indexParentDir = indexParentDir;
 		
 		// Create config
 		this.config = new IndexingConfig() {
@@ -110,6 +112,15 @@ public abstract class TreeIndex <
 	@Nullable
 	public final Path getIndexDirPath() {
 		return fileIndexDirPath;
+	}
+	
+	@Nullable
+	protected final File getIndexParentDir() {
+		if (fileIndexDirPath == null)
+			return null;
+		if (indexParentDir == null)
+			indexParentDir = Util.getParentFile(fileIndexDirPath.getCanonicalFile());
+		return indexParentDir;
 	}
 	
 	@NotNull

@@ -153,7 +153,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				writer = new SimpleDocWriter(getLuceneDir());
 				FileContext context = new FileContext(
 					config, zipDetector, writer, reporter, null, cancelable,
-					new MutableInt(0));
+					new MutableInt(0), getIndexParentDir());
 				visitDirOrZip(context, rootFolder, rootFile);
 			}
 			else {
@@ -180,7 +180,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				writer = new SimpleDocWriter(getLuceneDir());
 				SolidArchiveContext context = new SolidArchiveContext(
 					config, zipDetector, writer, reporter, null, cancelable,
-					new MutableInt(0), false);
+					new MutableInt(0), false, getIndexParentDir());
 				SolidArchiveTree<?> archiveTree = factory.createSolidArchiveTree(
 					context, rootFile);
 				visitSolidArchive(context, rootFolder, archiveTree);
@@ -253,6 +253,13 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			throws IndexingException {
 		assert dirOrZip.isDirectory();
 		assert !folder.hasErrors();
+		
+		/*
+		 * The user may have indexed the DocFetcher folder; do not descend into
+		 * the index directory.
+		 */
+		if (Util.isCanonicallyEqual(context.getIndexParentDir(), dirOrZip))
+			return;
 		
 		final Map<String, FileDocument> unseenDocs = Maps.newHashMap(folder.getDocumentMap());
 		final Map<String, FileFolder> unseenSubFolders = Maps.newHashMap(folder.getSubFolderMap());
@@ -464,7 +471,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				context.getConfig(), archiveFile);
 			boolean isTempArchive = unpackedArchiveFile != null;
 			SolidArchiveContext subContext = new SolidArchiveContext(
-				context, archiveFolder.getPath(), isTempArchive);
+				context, archiveFolder.getPath(), isTempArchive, context.getIndexParentDir());
 			SolidArchiveTree<?> archiveTree = factory.createSolidArchiveTree(
 				subContext, isTempArchive ? unpackedArchiveFile : archiveFile);
 			visitSolidArchive(subContext, archiveFolder, archiveTree);
@@ -805,7 +812,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		}
 		
 		SolidArchiveContext subContext = new SolidArchiveContext(
-			context, archive.getPath(), true);
+			context, archive.getPath(), true, context.getIndexParentDir());
 		try {
 			SolidArchiveTree<?> subTree = factory.createSolidArchiveTree(
 				subContext, unpackedFile);
