@@ -35,6 +35,7 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
+import net.sourceforge.docfetcher.util.collect.LazyList;
 import net.sourceforge.docfetcher.util.collect.SafeKeyMap;
 
 import com.google.common.base.Predicate;
@@ -161,6 +162,13 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			archiveFile, archivePath.getPath());
 		ArchiveEntryReader<E> entryReader = getArchiveEntryReader();
 		
+		/*
+		 * Errors on filtered tree nodes should not be reported, since the
+		 * filtering may detach tree nodes from their parents, which leads to
+		 * NullPointerExceptions when the parents are accessed.
+		 */
+		final LazyList<TreeNode> archiveEncryptedErrors = new LazyList<TreeNode>();
+		
 		// Build tree structure from flat list of paths
 		for (int i = 0; archiveIt.hasNext(); i++) {
 			E entry = archiveIt.next();
@@ -193,7 +201,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					long unpackedSize = entryReader.getUnpackedSize(entry);
 					boolean isEncrypted = entryReader.isEncrypted(entry);
 					if (isEncrypted)
-						failReporter.fail(ErrorType.ARCHIVE_ENTRY_ENCRYPTED, childNode, null);
+						archiveEncryptedErrors.add(childNode);
 					
 					EntryData entryData = new EntryData(
 						i, unpackedSize, innerPath, isEncrypted);
@@ -219,6 +227,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 					case EXCLUDE:
 						if (patternAction.matches(name, path, true)) {
 							entryDataMap.removeKey(path);
+							archiveEncryptedErrors.remove(candidate);
 							return true;
 						}
 						break;
@@ -237,6 +246,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				
 				if (!ParseService.canParseByName(config, name)) {
 					entryDataMap.removeKey(path);
+					archiveEncryptedErrors.remove(candidate);
 					return true;
 				}
 				return false;
@@ -250,8 +260,10 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				for (PatternAction patternAction : config.getPatternActions()) {
 					if (patternAction.getAction() == MatchAction.EXCLUDE) {
 						if (patternAction.matches(name, path, isArchive)) {
-							if (isArchive)
+							if (isArchive) {
 								entryDataMap.removeKey(path);
+								archiveEncryptedErrors.remove(candidate);
+							}
 							return true;
 						}
 					}
@@ -259,6 +271,10 @@ abstract class SolidArchiveTree<E> implements Closeable {
 				return false;
 			}
 		});
+		
+		// Report unfiltered errors
+		for (TreeNode treeNode : archiveEncryptedErrors)
+			failReporter.fail(ErrorType.ARCHIVE_ENTRY_ENCRYPTED, treeNode, null);
 	}
 	
 	// Implementor is expected to close any open resources in case of failure
