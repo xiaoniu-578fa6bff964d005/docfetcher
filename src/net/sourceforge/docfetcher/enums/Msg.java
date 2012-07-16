@@ -298,6 +298,10 @@ public enum Msg {
 		"For example, if one index represented the folder 'C:\\mydocs\\folder' " +
 		"and another index represented the folder C:\\mydocs, the two indexes " +
 		"would overlap."),
+	overlap_with_index_dir (
+		"Cannot index the index folder itself, or any files or folders beneath it.",
+		"This error message is shown when the user attempts to index the index " +
+		"folder itself, or any files or folders beneath it."),
 	
 	// Indexing dialog: Queue
 	indexing_queue (

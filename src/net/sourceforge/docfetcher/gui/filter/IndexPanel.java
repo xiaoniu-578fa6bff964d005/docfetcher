@@ -552,6 +552,9 @@ public final class IndexPanel {
 			protected String getDenyMessage(String newValue) {
 				File indexParentDir = indexRegistry.getIndexParentDir();
 				File targetFile = new File(newValue);
+				String overlapMsg = checkIndexDirOverlap(indexParentDir, targetFile);
+				if (overlapMsg != null)
+					return overlapMsg;
 				FileIndex index = new FileIndex(indexParentDir, targetFile);
 				Rejection rejection = indexRegistry.getQueue().addTask(
 					index, IndexAction.CREATE);
@@ -602,6 +605,9 @@ public final class IndexPanel {
 			protected String getDenyMessage(String newValue) {
 				File indexParentDir = indexRegistry.getIndexParentDir();
 				File pstFile = new File(newValue);
+				String overlapMsg = checkIndexDirOverlap(indexParentDir, pstFile);
+				if (overlapMsg != null)
+					return overlapMsg;
 				OutlookIndex index = new OutlookIndex(indexParentDir, pstFile);
 				Rejection rejection = indexRegistry.getQueue().addTask(
 					index, IndexAction.CREATE);
@@ -661,6 +667,12 @@ public final class IndexPanel {
 		File indexParentDir = indexRegistry.getIndexParentDir();
 		File file = files.get(0); // Ignore all but the first file
 		
+		String overlapMsg = checkIndexDirOverlap(indexParentDir, file);
+		if (overlapMsg != null) {
+			AppUtil.showError(overlapMsg, true, true);
+			return;
+		}
+		
 		LuceneIndex index;
 		if (Util.hasExtension(file.getName(), "pst"))
 			index = new OutlookIndex(indexParentDir, file);
@@ -690,6 +702,15 @@ public final class IndexPanel {
 			return Msg.overlaps_not_allowed.get();
 		default: return "";
 		}
+	}
+	
+	@Nullable
+	private static String checkIndexDirOverlap(	@NotNull File indexParentDir,
+												@NotNull File targetFile) {
+		if (Util.isCanonicallyEqual(indexParentDir, targetFile)
+				|| Util.contains(indexParentDir, targetFile))
+			return Msg.overlap_with_index_dir.get();
+		return null;
 	}
 
 }
