@@ -150,8 +150,26 @@ public final class Application {
 		AppUtil.Messages.cancel.set(Msg.cancel.get());
 		Msg.setCheckEnabled(true);
 		AppUtil.Messages.checkInitialized();
+		
+		/*
+		 * Set the path from which to load the native SWT libraries. This must
+		 * be done before doing the single instance check, because that's where
+		 * we're going to use SWT for the first time, by opening a message
+		 * dialog.
+		 * 
+		 * If we don't set the path, SWT will extract its native libraries into
+		 * ${user.home}/.swt. This is unsuitable especially for the portable
+		 * version of DocFetcher, which should not leave any files in the
+		 * system.
+		 */
+		String swtLibSuffix = AppUtil.isPortable() ? "lib/swt" : "swt";
+		File swtLibDir = new File(AppUtil.getAppDataDir(), swtLibSuffix);
+		swtLibDir.mkdirs(); // SWT won't recognize the path if it doesn't exist
+		System.setProperty("swt.library.path", Util.getAbsPath(swtLibDir));
 
-		if (!AppUtil.checkSingleInstance()) return;
+		// Check single instance
+		if (!AppUtil.checkSingleInstance())
+			return;
 
 		// Load program configuration and preferences
 		programConfFile = loadProgramConf();
