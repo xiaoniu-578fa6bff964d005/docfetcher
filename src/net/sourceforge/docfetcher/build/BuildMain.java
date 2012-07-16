@@ -80,7 +80,7 @@ public final class BuildMain {
 			"**/license_patterns.txt");
 		U.copyBinaryFile("dist/" + eplFilename, "build/tmp/licenses/docfetcher/"
 				+ eplFilename);
-		U.zipDir("build/tmp/licenses", "build/tmp/licenses.zip");
+		U.zipDirContents("build/tmp/licenses", "build/tmp/licenses.zip");
 		
 		Util.println("Compiling sources...");
 		Javac javac = new Javac();
@@ -234,6 +234,17 @@ public final class BuildMain {
 		
 		U.copyTextFile(
 			"dist/Readme.txt", releaseDir + "/Readme.txt", LineSep.WINDOWS);
+		
+		// Wrap the portable build in a zip archive for deployment
+		if (Util.IS_LINUX || Util.IS_MAC_OS_X) {
+			String cmd = "zip -r -q %s-%s-portable.zip %s-%s";
+			U.execInDir(new File("build"), cmd, appName.toLowerCase(), version, appName, version);
+		}
+		else {
+			String zipPath = U.format("build/%s-%s-portable.zip", appName.toLowerCase(), version);
+			U.zipDir(releaseDir, zipPath);
+			Util.println("** Warning: Could not preserve executable flags in archive: " + zipPath);
+		}
 	}
 	
 	private static void deployInfoPlist(File dstDir) throws Exception {

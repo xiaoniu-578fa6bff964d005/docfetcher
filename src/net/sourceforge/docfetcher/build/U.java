@@ -15,12 +15,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Zip;
-
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Zip;
+import org.apache.tools.ant.types.FileSet;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -56,7 +57,13 @@ final class U {
 	}
 
 	static void exec(String format, Object... args) throws Exception {
-		Runtime.getRuntime().exec(format(format, args)).waitFor();
+		String cmd = format(format, args);
+		Runtime.getRuntime().exec(cmd).waitFor();
+	}
+	
+	static void execInDir(File dir, String format, Object... args) throws Exception {
+		String cmd = format(format, args);
+		Runtime.getRuntime().exec(cmd, null, dir).waitFor();
 	}
 
 	static void copyDir(String srcPath, String dstPath) {
@@ -119,7 +126,8 @@ final class U {
 		Files.write(contents, dstFile, Charsets.UTF_8);
 	}
 
-	static void zipDir(String srcPath, String dstPath) throws Exception {
+	// does not preserve executable flag
+	static void zipDirContents(String srcPath, String dstPath) throws Exception {
 		// Tried this with TrueZIP 7.0 and got corrupted zip files
 		Zip zip = new Zip();
 		zip.setProject(new Project());
@@ -129,6 +137,23 @@ final class U {
 		zip.execute();
 	}
 	
+	// does not preserve executable flag
+	static void zipDir(String srcPath, String dstPath) throws Exception {
+		// Tried this with TrueZIP 7.0 and got corrupted zip files
+		Zip zip = new Zip();
+		zip.setProject(new Project());
+		zip.setLevel(9);
+		
+		File srcFile = new File(srcPath);
+		String srcParent = Util.getParentFile(srcFile).getPath();
+		String include = srcFile.getName() + "/**";
+		FileSet fileset = new FileSets().setDir(srcParent).include(include).get();
+		
+		zip.addFileset(fileset);
+		zip.setDestFile(new File(dstPath));
+		zip.execute();
+	}
+		
 	public enum LineSep {
 		UNIX,
 		WINDOWS,
