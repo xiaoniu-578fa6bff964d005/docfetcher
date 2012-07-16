@@ -8,3 +8,10 @@
 **/*-src.jar
 **/swt*.jar
 **/junit*.jar
+
+# The following jars are excluded because they are only needed for parsing
+# markdown during development and deployment:
+
+**/asm-*.jar
+**/parboiled-*.jar
+**/pegdown-*.jar
