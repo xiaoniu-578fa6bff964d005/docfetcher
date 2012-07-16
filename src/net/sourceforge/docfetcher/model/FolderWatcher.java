@@ -19,6 +19,7 @@ import java.util.concurrent.locks.Lock;
 
 import net.contentobjects.jnotify.JNotify;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.PatternAction;
@@ -27,7 +28,6 @@ import net.sourceforge.docfetcher.model.index.file.FileDocument;
 import net.sourceforge.docfetcher.model.index.file.FileFolder;
 import net.sourceforge.docfetcher.model.index.file.FileIndex;
 import net.sourceforge.docfetcher.model.parse.ParseService;
-import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -41,6 +41,8 @@ import com.google.common.collect.Maps;
  * @author Tran Nam Quang
  */
 public final class FolderWatcher {
+	
+	public final Event<String> evtWatchLimitError = new Event<String>();
 	
 	/**
 	 * The watch queue is a collection of indexes to be processed by the worker
@@ -239,9 +241,10 @@ public final class FolderWatcher {
 					watchIdMap.put(index, id);
 				}
 				catch (Exception e) {
+					String url = ManualLocator.getManualSubpageUrl("Watch_Limit.html");
 					String msg = Msg.install_watch_failed.format(
-						index.getDisplayName(), e.getMessage());
-					AppUtil.showError(msg, true, false);
+						index.getDisplayName(), e.getMessage(), url);
+					evtWatchLimitError.fire(msg);
 				}
 			}
 			// Remove watch

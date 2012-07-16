@@ -42,6 +42,7 @@ public final class Manual {
 		Regular_Expressions ("regular_expressions", "Advanced_Usage"),
 		Release_Notification ("release_notification", "Advanced_Usage"),
 		
+		Watch_Limit ("watch_limit", "Subpages"),
 		Memory_Limit ("memory_limit", "Caveats"),
 		Preferences ("preferences", "Subpages"),
 		;

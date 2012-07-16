@@ -74,14 +74,6 @@ Caveats and Common Gotchas
 **Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well, but not executable rar archives. DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
 With that said, it should be noted that support for zip and 7z archives is best in terms of robustness and speed. On the other hand, indexing of tar.gz, tar.bz2 and similar formats tends to be less efficient. This is due to the fact that these formats don't have an internal "summary" of the archive contents, which forces DocFetcher to unpack the entire archive rather than only individual archive entries. Bottom line: If you have the choice, compress your files either as zip or 7z archives for maximum compatibility with DocFetcher.
 
-**Folder watch limit (Linux-only)**: On Linux, processes can by default watch at most 8192 folders. You might reach this limit if you index a very deep hierarchy of folders. If that happens, DocFetcher will probably print a warning message like "No space left on device" on the console. You can work around this by raising the watch limit. For example, this command will raise the watch limit to 32000:
-
-    sudo echo 32000 > /proc/sys/fs/inotify/max_user_watches
-
-To change the watch limit permanently, open the file `/etc/sysctl.conf` (as root) and add the following line:
-
-    fs.inotify.max_user_watches=32000
-
 **The DocFetcher daemon is innocent**: If you suspect that the DocFetcher daemon is slowing down your computer or causing crashes, you're probably wrong. As a matter of fact, the daemon is a very simple program with low memory footprint and CPU usage, and it doesn't do much besides watching folders. If you're still not convinced, just rename the daemon executables so they won't start automatically, or try the portable version of DocFetcher, where the daemon is deactivated by default.
 
 * * *
@@ -96,6 +88,7 @@ Manual Subpages
 * [Regular expressions](DocFetcher_Manual_files/Regular_Expressions.html)
 * [Release notification](DocFetcher_Manual_files/Release_Notification.html)
 * [How to raise the memory limit](DocFetcher_Manual_files/Memory_Limit.html)
+* [How to raise the folder watch limit (Linux)](DocFetcher_Manual_files/Watch_Limit.html)
 * [Preferences](DocFetcher_Manual_files/Preferences.html)
 
 Further Information

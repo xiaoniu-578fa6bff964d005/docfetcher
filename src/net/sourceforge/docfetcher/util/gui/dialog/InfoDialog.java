@@ -61,10 +61,10 @@ public class InfoDialog {
 		});
 		
 		shell.setLayout(Util.createGridLayout(2, false, 10, 15));
-		icon.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		icon.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
 		
 		GridData labelGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		labelGridData.widthHint = 250;
+		labelGridData.widthHint = 300;
 		label.setLayoutData(labelGridData);
 		
 		GridData btGridData = new GridData(SWT.CENTER, SWT.FILL, true, false, 2, 1);

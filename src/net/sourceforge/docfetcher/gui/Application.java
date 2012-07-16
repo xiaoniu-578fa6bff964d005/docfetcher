@@ -57,6 +57,7 @@ import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
+import net.sourceforge.docfetcher.util.gui.dialog.InfoDialog;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
@@ -386,6 +387,21 @@ public final class Application {
 					 * registry.
 					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
+					
+					// Show error message when watch limit is reached
+					folderWatcher.evtWatchLimitError.add(new Event.Listener<String>() {
+						public void update(final String eventData) {
+							Util.runAsyncExec(mainShell, new Runnable() {
+								public void run() {
+									InfoDialog dialog = new InfoDialog(mainShell);
+									dialog.setTitle(Msg.system_error.get());
+									dialog.setImage(SWT.ICON_ERROR);
+									dialog.setText(eventData);
+									dialog.open();
+								}
+							});
+						}
+					});
 
 					// Must be called *after* the indexes have been loaded
 					daemon.enqueueUpdateTasks();
