@@ -100,14 +100,7 @@ public final class SearchQueue {
 		
 		thread = new Thread(SearchQueue.class.getName()) {
 			public void run() {
-				while (true) {
-					try {
-						threadLoop();
-					}
-					catch (InterruptedException e) {
-						break;
-					}
-				}
+				while (threadLoop());
 			}
 		};
 		thread.start();
@@ -191,7 +184,7 @@ public final class SearchQueue {
 		});
 	}
 	
-	private void threadLoop() throws InterruptedException {
+	private boolean threadLoop() {
 		final EnumSet<GuiEvent> queueCopy;
 		final String query;
 		final Set<String> listDocIds;
@@ -208,6 +201,9 @@ public final class SearchQueue {
 			this.query = null;
 			this.listDocIds = null;
 		}
+		catch (InterruptedException e) {
+			return false;
+		}
 		finally {
 			lock.unlock();
 		}
@@ -218,6 +214,25 @@ public final class SearchQueue {
 		if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST)) {
 			try {
 				Searcher searcher = indexRegistry.getSearcher(); // might block
+				
+				/*
+				 * Bug #3538102: The returned searcher is null if
+				 * IndexRegistry.getSearcher() was blocking and the thread is
+				 * interrupted. This can happen as follows: (1) The user has a
+				 * lot of indexes and/or the indexes are very large, so that
+				 * loading them on startup takes a long time. (2) During
+				 * startup, when the indexes are loaded, the user enters
+				 * something into the search field and presses Enter. (3)
+				 * DocFetcher blocks because it can't start searching until all
+				 * indexes have been loaded. Seeing that the program has
+				 * apparently frozen, the user closes the program. This
+				 * interrupts the searcher thread, causing the
+				 * IndexRegistry.getSearcher() method to unblock and return
+				 * null.
+				 */
+				if (searcher == null)
+					return false;
+				
 				if (query != null)
 					results = searcher.search(query);
 				else if (listDocIds != null)
@@ -259,7 +274,7 @@ public final class SearchQueue {
 		 * settings before having run any searches.
 		 */
 		if (results == null)
-			return;
+			return true;
 		
 		Long[] minMax = filesizePanel.getValuesInKB();
 		final List<ResultDocument> visibleResults = new ArrayList<ResultDocument>();
@@ -310,6 +325,8 @@ public final class SearchQueue {
 					searchBar.addToSearchHistory(query);
 			}
 		});
+		
+		return true;
 	}
 
 	private void updateParserFilter() {
