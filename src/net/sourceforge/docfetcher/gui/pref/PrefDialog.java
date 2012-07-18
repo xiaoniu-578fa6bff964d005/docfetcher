@@ -50,10 +50,12 @@ public final class PrefDialog {
 	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();
 	private final List<PrefOption> fieldOptions = new LinkedList<PrefOption>();
 	private final File programConfFile;
+	private final Runnable saveSettings;
 	
-	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile) {
+	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile, @NotNull Runnable saveSettings) {
 		Util.checkNotNull(parent);
 		this.programConfFile = programConfFile;
+		this.saveSettings = saveSettings;
 		shell = new Shell(parent, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM);
 		shell.setLayout(Util.createFillLayout(10));
 		shell.setText(Msg.preferences.get());
@@ -73,28 +75,28 @@ public final class PrefDialog {
 				Msg.pref_scroll_to_first_match.get(),
 				SettingsConf.Bool.AutoScrollToFirstMatch)
 		));
-		
+
 		if (!Util.IS_UBUNTU_UNITY) {
 			checkOptions.addAll(Arrays.<PrefOption> asList(
-				new CheckOption(
-					Msg.pref_hide_in_systray.get(),
-					SettingsConf.Bool.HideOnOpen),
+			new CheckOption(
+				Msg.pref_hide_in_systray.get(),
+				SettingsConf.Bool.HideOnOpen),
 
-				new CheckOption(
-					Msg.pref_close_to_systray.get(),
+			new CheckOption(
+				Msg.pref_close_to_systray.get(),
 					SettingsConf.Bool.CloseToTray)
 			));
 		}
-		
+
 		checkOptions.addAll(Arrays.<PrefOption> asList(
 			new CheckOption(
 				Msg.pref_clear_search_history_on_exit.get(),
 				SettingsConf.Bool.ClearSearchHistoryOnExit)
 
 			// TODO post-release-1.1: Implement this; requires saving and restoring the tree expansion state
-//			new CheckOption(
-//				"Reset location filter on exit",
-//				SettingsConf.Bool.ResetLocationFilterOnExit),
+			//	new CheckOption(
+			//		"Reset location filter on exit",
+			//		SettingsConf.Bool.ResetLocationFilterOnExit),
 		));
 		
 		fieldOptions.addAll(Arrays.asList(
@@ -181,6 +183,7 @@ public final class PrefDialog {
 					checkOption.save();
 				for (PrefOption fieldOption : fieldOptions)
 					fieldOption.save();
+				saveSettings.run();
 				shell.close();
 			}
 		});
@@ -203,13 +206,13 @@ public final class PrefDialog {
 		return comp;
 	}
 
-	public void open() {
+	public void open( ) {
 		okBt.setFocus();
 		shell.open();
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch())
 				shell.getDisplay().sleep();
-		}
+		}		
 	}
 	
 	@NotNull

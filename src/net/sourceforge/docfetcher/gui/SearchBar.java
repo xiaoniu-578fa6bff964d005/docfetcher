@@ -57,7 +57,7 @@ public final class SearchBar {
 	private final ToolBar toolBar;
 	private final MemoryList<String> searchHistory;
 	
-	public SearchBar(@NotNull Composite parent, @NotNull final File programConfFile) {
+	public SearchBar(@NotNull Composite parent, @NotNull final File programConfFile, final Runnable saveSettings ) {
 		comp = new CustomBorderComposite(parent) {
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				return SearchBar.this.computeSize(wHint, hHint);
@@ -103,7 +103,7 @@ public final class SearchBar {
 		tif.image(Img.PREFERENCES.get()).toolTip(Msg.preferences.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile);
+						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile, saveSettings);
 						prefDialog.open();
 					}
 				}).create();

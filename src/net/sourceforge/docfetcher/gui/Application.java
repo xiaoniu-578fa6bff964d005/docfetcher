@@ -108,6 +108,7 @@ public final class Application {
 	private static SystemTrayHider systemTrayHider;
 	private static StatusBar statusBar;
 	private static boolean systemTrayShutdown = false;
+	private static File settingsConfFile;
 
 	private Application() {
 		throw new UnsupportedOperationException();
@@ -150,7 +151,7 @@ public final class Application {
 		AppUtil.Messages.cancel.set(Msg.cancel.get());
 		Msg.setCheckEnabled(true);
 		AppUtil.Messages.checkInitialized();
-		
+
 		/*
 		 * Set the path from which to load the native SWT libraries. This must
 		 * be done before doing the single instance check, because that's where
@@ -173,7 +174,7 @@ public final class Application {
 
 		// Load program configuration and preferences
 		programConfFile = loadProgramConf();
-		File settingsConfFile = loadSettingsConf();
+		settingsConfFile = loadSettingsConf();
 
 		// Determine shell title
 		String shellTitle;
@@ -279,7 +280,10 @@ public final class Application {
 		 * able to see that the display was disposed.
 		 */
 		display.dispose();
-
+		saveSettingsConfFile();
+	}
+	
+	public static void saveSettingsConfFile() {
 		/*
 		 * Try to save the settings. This may not be possible, for example when
 		 * the user has burned the program onto a CD-ROM.
@@ -293,6 +297,14 @@ public final class Application {
 				AppUtil.showStackTraceInOwnDisplay(e);
 			}
 		}
+	}
+	
+	private static Runnable runnableSaveSettings() {
+		return  new Runnable() {
+			public void run() { 
+				saveSettingsConfFile(); 
+			}
+		};
 	}
 
 	private static void initGlobalKeys(@NotNull Display display) {
@@ -405,7 +417,7 @@ public final class Application {
 					 * registry.
 					 */
 					folderWatcher = new FolderWatcher(indexRegistry);
-					
+
 					// Show error message when watch limit is reached
 					folderWatcher.evtWatchLimitError.add(new Event.Listener<String>() {
 						public void update(final String eventData) {
@@ -619,7 +631,7 @@ public final class Application {
 
 	private static Control createRightTopPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		searchBar = new SearchBar(comp, programConfFile);
+		searchBar = new SearchBar(comp, programConfFile, runnableSaveSettings());
 		resultPanel = new ResultPanel(comp);
 
 		comp.setLayout(new FormLayout());
@@ -721,7 +733,7 @@ public final class Application {
 			}
 		}, new Runnable() {
 			public void run() {
-				new PrefDialog(shell, programConfFile).open();
+				new PrefDialog(shell, programConfFile, runnableSaveSettings()).open();
 			}
 		});
 	}
@@ -941,12 +953,12 @@ public final class Application {
 				 * at startup.
 				 */
 				if (shell.isVisible())
-					new PrefDialog(shell, programConfFile).open();
+					new PrefDialog(shell, programConfFile, runnableSaveSettings()).open();
 			}
 		});
 		hotkeyHandler.registerHotkey();
 	}
-
+	
 	@Nullable
 	private static CancelAction confirmExit() {
 		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);
