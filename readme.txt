@@ -5,7 +5,7 @@
 - Install AJDT plugin (needed for some AspectJ code portions)
 - Import the DocFetcher folder into your Eclipse workspace
 - In Eclipse, create a User Library named 'SWT' which points to the right SWT jar for your platform. The SWT jars can be found in lib/swt.
-- Main class: net.sourceforge.docfetcher.Application
+- Main class: net.sourceforge.docfetcher.gui.Application
 - Required VM arguments
 	Windows:
 		-Djava.library.path="lib/chm4j;lib/jnotify;lib/jintellitype"
