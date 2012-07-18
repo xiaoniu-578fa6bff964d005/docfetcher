@@ -18,10 +18,14 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
+import net.sourceforge.docfetcher.enums.SettingsConf;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -254,25 +258,31 @@ public final class AppUtil {
 		File lockfile = new File(Util.TEMP_DIR, lockname);
 		
 		if (lockfile.exists()) {
-			// Show message, ask whether to launch new instance or to abort
-			Display display = new Display();
-			Shell shell = new Shell(display);
-			MessageBox msgBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
-			msgBox.setText(Messages.confirm_operation.value);
-			msgBox.setMessage(Messages.program_running_launch_another.format(Const.PROGRAM_NAME.value));
-			int ans = msgBox.open();
-			display.dispose();
-			if(ans != SWT.OK)
+			if (SettingsConf.Bool.AllowOnlyOneInstance.get()) {
+				sendCtrlF8();
 				return false;
-			/*
-			 * If the user clicks OK, we'll take over the lockfile we found and
-			 * delete it on exit. That means: (1) If there's another instance
-			 * running, we'll wrongfully "steal" the lockfile from it. (2) If
-			 * there's no other instance running (probably because it crashed or
-			 * was killed by the user), we'll rightfully take over an orphaned
-			 * lockfile. This behavior is okay, assuming the second case is more
-			 * likely.
-			 */
+			} else {
+				// Show message, ask whether to launch new instance or to abort
+				Display display = new Display();
+				Shell shell = new Shell(display);
+				MessageBox msgBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
+				msgBox.setText(Messages.confirm_operation.value);
+				msgBox.setMessage(Messages.program_running_launch_another.format(Const.PROGRAM_NAME.value));
+				int ans = msgBox.open();
+				display.dispose();
+				if(ans != SWT.OK)
+					sendCtrlF8();
+					return false;
+				/*
+				 * If the user clicks OK, we'll take over the lockfile we found and
+				 * delete it on exit. That means: (1) If there's another instance
+				 * running, we'll wrongfully "steal" the lockfile from it. (2) If
+				 * there's no other instance running (probably because it crashed or
+				 * was killed by the user), we'll rightfully take over an orphaned
+				 * lockfile. This behavior is okay, assuming the second case is more
+				 * likely.
+				 */
+			 }
 		} else {
 			try {
 				lockfile.createNewFile();
@@ -281,6 +291,19 @@ public final class AppUtil {
 		}
 		lockfile.deleteOnExit();
 		return true;
+	}
+	
+	public static void sendCtrlF8() {
+		try {
+			Robot robot = new Robot();
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_F8);
+			robot.delay(500);
+			robot.keyRelease(KeyEvent.VK_F8);
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static String encodeBase64(String input) {
