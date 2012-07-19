@@ -256,10 +256,10 @@ public final class AppUtil {
 		// Usual filename length limit is 255 characters
 		lockname = lockname.substring(0, Math.min(lockname.length(), 250));
 		File lockfile = new File(Util.TEMP_DIR, lockname);
-		
+				
 		if (lockfile.exists()) {
 			if (SettingsConf.Bool.AllowOnlyOneInstance.get()) {
-				sendCtrlF8();
+				sendHotkeyToFront();
 				return false;
 			} else {
 				// Show message, ask whether to launch new instance or to abort
@@ -271,7 +271,7 @@ public final class AppUtil {
 				int ans = msgBox.open();
 				display.dispose();
 				if(ans != SWT.OK)
-					sendCtrlF8();
+					sendHotkeyToFront();
 					return false;
 				/*
 				 * If the user clicks OK, we'll take over the lockfile we found and
@@ -293,8 +293,10 @@ public final class AppUtil {
 		return true;
 	}
 	
-	public static void sendCtrlF8() {
+	public static void sendHotkeyToFront() {
 		try {
+			int one = SettingsConf.IntArray.HotkeyToFront.get()[0];
+			int two = SettingsConf.IntArray.HotkeyToFront.get()[1];
 			Robot robot = new Robot();
 			robot.keyPress(KeyEvent.VK_CONTROL);
 			robot.keyPress(KeyEvent.VK_F8);
@@ -302,7 +304,7 @@ public final class AppUtil {
 			robot.keyRelease(KeyEvent.VK_F8);
 			robot.keyRelease(KeyEvent.VK_CONTROL);
 		} catch (AWTException e) {
-			e.printStackTrace();
+			AppUtil.showStackTrace(e);
 		}
 	}
 	
