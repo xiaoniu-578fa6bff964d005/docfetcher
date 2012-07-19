@@ -75,7 +75,7 @@ Var boolCHECKBOX
 Var Image
 Var ImageHandle
 
-;--------------------------------
+; --------------------------------
 ; The final install page that asks to run the application
 Function finalPage
 	IfRebootFlag 0 noreboot
@@ -137,12 +137,12 @@ Section "DocFetcher"
 	; Copy files
 	SetOutPath $INSTDIR
 	File ${PORTABLE_PATH}\*.exe
-	; File ${PORTABLE_PATH}\*.txt
+	File ${PORTABLE_PATH}\*.txt
 
 	SetOutPath $INSTDIR\misc
 	File ${PORTABLE_PATH}\misc\*.bat
 	File ${PORTABLE_PATH}\misc\*.exe
-	; File ${PORTABLE_PATH}\misc\ChangeLog.html
+	File ${PORTABLE_PATH}\misc\ChangeLog.html
 	File ${PORTABLE_PATH}\misc\licenses.zip
 
 	SetOutPath $INSTDIR\help
@@ -182,7 +182,7 @@ Section "DocFetcher"
 	CreateDirectory $SMPROGRAMS\DocFetcher
 	CreateShortCut $SMPROGRAMS\DocFetcher\DocFetcher.lnk $INSTDIR\DocFetcher.exe
 	CreateShortCut "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk" $INSTDIR\uninstaller.exe
-	; CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
+	CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
 	; CreateShortCut $SMPROGRAMS\DocFetcher\ChangeLog.lnk $INSTDIR\misc\ChangeLog.html
 
 	; Launch daemon
@@ -220,7 +220,7 @@ Section "un.Uninstall"
 	; Remove start menu entries
 	Delete /REBOOTOK $SMPROGRAMS\DocFetcher\DocFetcher.lnk
 	Delete /REBOOTOK "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk"
-	; Delete $SMPROGRAMS\DocFetcher\Readme.lnk
+	Delete $SMPROGRAMS\DocFetcher\Readme.lnk
 	; Delete $SMPROGRAMS\DocFetcher\ChangeLog.lnk
 	RMDir $SMPROGRAMS\DocFetcher
 SectionEnd
