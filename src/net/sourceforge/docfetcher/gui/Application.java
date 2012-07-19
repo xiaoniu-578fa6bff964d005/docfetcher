@@ -168,13 +168,13 @@ public final class Application {
 		swtLibDir.mkdirs(); // SWT won't recognize the path if it doesn't exist
 		System.setProperty("swt.library.path", Util.getAbsPath(swtLibDir));
 
-		// Check single instance
-		if (!AppUtil.checkSingleInstance())
-			return;
-
 		// Load program configuration and preferences
 		programConfFile = loadProgramConf();
 		settingsConfFile = loadSettingsConf();
+		
+		// Check single instance
+		if (!AppUtil.checkSingleInstance())
+			return;
 
 		// Determine shell title
 		String shellTitle;
