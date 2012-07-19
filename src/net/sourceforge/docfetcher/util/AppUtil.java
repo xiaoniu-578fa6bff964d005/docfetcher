@@ -270,9 +270,10 @@ public final class AppUtil {
 				msgBox.setMessage(Messages.program_running_launch_another.format(Const.PROGRAM_NAME.value));
 				int ans = msgBox.open();
 				display.dispose();
-				if(ans != SWT.OK)
+				if(ans != SWT.OK) {
 					sendHotkeyToFront();
 					return false;
+				}
 				/*
 				 * If the user clicks OK, we'll take over the lockfile we found and
 				 * delete it on exit. That means: (1) If there's another instance
