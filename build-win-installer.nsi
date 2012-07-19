@@ -142,7 +142,7 @@ Section "DocFetcher"
 	SetOutPath $INSTDIR\misc
 	File ${PORTABLE_PATH}\misc\*.bat
 	File ${PORTABLE_PATH}\misc\*.exe
-	File ${PORTABLE_PATH}\misc\ChangeLog.html
+	; File ${PORTABLE_PATH}\misc\ChangeLog.html
 	File ${PORTABLE_PATH}\misc\licenses.zip
 
 	SetOutPath $INSTDIR\help
