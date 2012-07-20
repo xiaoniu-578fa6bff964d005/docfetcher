@@ -11,7 +11,7 @@ import org.eclipse.swt.SWT;
  *			KeyCodeTranslator.translateSWTModifiers(SWT.CTRL),
  *			KeyCodeTranslator.translateSWTKey(SWT.F8));
  */
-final class KeyCodeTranslator {
+public final class KeyCodeTranslator {
 	
 	private KeyCodeTranslator() {
 	}

@@ -20,11 +20,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.awt.AWTException;
 import java.awt.Robot;
-import java.awt.event.KeyEvent;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
+import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 
 import org.apache.commons.codec.binary.Base64;
@@ -297,13 +297,15 @@ public final class AppUtil {
 	public static void sendHotkeyToFront() {
 		try {
 			int one = SettingsConf.IntArray.HotkeyToFront.get()[0];
+			one = KeyCodeTranslator.translateSWTKey(one);			
 			int two = SettingsConf.IntArray.HotkeyToFront.get()[1];
+			two = KeyCodeTranslator.translateSWTKey(two);
 			Robot robot = new Robot();
-			robot.keyPress(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_F8);
+			robot.keyPress(one);
+			robot.keyPress(two);
 			robot.delay(500);
-			robot.keyRelease(KeyEvent.VK_F8);
-			robot.keyRelease(KeyEvent.VK_CONTROL);
+			robot.keyRelease(two);
+			robot.keyRelease(one);
 		} catch (AWTException e) {
 			AppUtil.showStackTrace(e);
 		}
