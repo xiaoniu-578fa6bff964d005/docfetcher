@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Reader;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +50,15 @@ import net.sourceforge.docfetcher.util.concurrent.BlockingWrapper;
 import net.sourceforge.docfetcher.util.concurrent.DelayedExecutor;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LowerCaseFilter;
+import org.apache.lucene.analysis.ReusableAnalyzerBase;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.util.Version;
 
@@ -512,5 +521,22 @@ public final class IndexRegistry {
 			return Longs.compare(o1.getCreated(), o2.getCreated());
 		}
 	}
-	
+
+	public class SourceCodeAnalyzer extends ReusableAnalyzerBase {
+		private Version matchVersion;
+
+		public SourceCodeAnalyzer(Version matchVersion) {
+			this.matchVersion = matchVersion;	
+		}
+
+		@Override
+		protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+			final Tokenizer source = new WhitespaceTokenizer(matchVersion, reader);
+			TokenStream sink = new StandardFilter(matchVersion, source);
+		    sink = new LowerCaseFilter(matchVersion, sink);
+		    sink = new StopFilter(matchVersion, sink,
+                    StopAnalyzer.ENGLISH_STOP_WORDS_SET, false);
+			return new TokenStreamComponents(source, sink);
+		}
+	}
 }
