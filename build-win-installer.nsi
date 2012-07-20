@@ -136,6 +136,7 @@ Section "DocFetcher"
 
 	; Copy files
 	SetOutPath $INSTDIR
+	File /r "templates"
 	File ${PORTABLE_PATH}\*.exe
 	File ${PORTABLE_PATH}\*.txt
 

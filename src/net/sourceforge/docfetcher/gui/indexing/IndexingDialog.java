@@ -96,6 +96,7 @@ public final class IndexingDialog implements Dialog {
 		shell.setText(Msg.indexing_queue.get());
 		shell.setImage(Img.INDEXING_DIALOG.get());
 		shell.setLayout(Util.createFillLayout(5));
+		shell.setMinimumSize(455, 560);
 		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
 		
 		// Create tabfolder

@@ -58,6 +58,7 @@ public enum Img implements FilenameProvider {
 	ARROW_RIGHT ("arrow_right.gif"),
 	ARROW_UP ("arrow_up.gif"),
 	ARROW_DOWN ("arrow_down.gif"),
+	STAR ("star.gif"),
 	STOP ("stop.gif"),
 	REFRESH ("refresh.gif"),
 	WINDOW ("program.gif"),

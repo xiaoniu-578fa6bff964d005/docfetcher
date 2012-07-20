@@ -12,7 +12,15 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -42,6 +50,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
@@ -91,7 +101,7 @@ final class PatternTable extends Composite {
 		
 		GridData tableGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		int factor = ProgramConf.Int.PatternTableHeight.get() + 1; // +1 for column header
-		tableGridData.minimumHeight = table.getItemHeight() * factor + 5;
+		tableGridData.minimumHeight = Math.max(table.getItemHeight() * factor + 5, 120);
 		table.setLayoutData(tableGridData);
 		
 		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 2));
@@ -234,8 +244,40 @@ final class PatternTable extends Composite {
 					tableViewer.move(sel.get(0), false);
 			}
 		});
-		
+		final List<String> listFiles = getTemplates("templates");
+		if (listFiles.size() > 0)
+			Util.createPushButton(
+				comp, Img.STAR.get(), Msg.add_pattern_from_template.get(), new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					showTemplateMenu(listFiles, "templates");
+				}
+			});
 		return comp;
+	}
+	
+	private void showTemplateMenu(List<String> listFiles, String dirPath) {
+		Menu myMenu = new Menu(this);
+		for (int i = 0; i < listFiles.size(); i++) {
+			MenuItem testItem = new MenuItem(myMenu, SWT.PUSH);			
+			testItem.setText(listFiles.get(i).replaceAll(".xml", ""));
+			final String fileName = (new File(dirPath, listFiles.get(i))).getPath();
+			testItem.addSelectionListener(new SelectionAdapter() {
+			    @Override
+			    public void widgetSelected(SelectionEvent e) {
+			    	loadFromFile(fileName, false);
+			    }
+			});    	
+	    }		
+		myMenu.setVisible(true);        		
+	}
+	
+	private List<String> getTemplates(String dirPath) {
+		List<String> listFiles = new ArrayList<String>();
+		for (File file : Util.listFiles(new File(dirPath))) {
+			if (file.getName().endsWith(".xml"))
+				listFiles.add(file.getName());
+		}
+		return listFiles;
 	}
 	
 	public void setStoreRelativePaths(boolean storeRelativePaths) {
@@ -256,6 +298,51 @@ final class PatternTable extends Composite {
 		for (PatternAction patternAction : index.getConfig().getPatternActions())
 			tableViewer.add(patternAction);
 		updateRegexTestPanel();
+	}
+	
+	
+	public void loadFromFile(@NotNull String pathname, boolean doRemoveAll) {
+		try {
+			File fXmlFile = new File(pathname);
+			if (fXmlFile.exists()) {
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+				Document doc = dBuilder.parse(fXmlFile);
+				doc.getDocumentElement().normalize();
+				
+				if (doRemoveAll) tableViewer.removeAll();
+				NodeList nList = doc.getElementsByTagName("pattern");
+				for (int temp = 0; temp < nList.getLength(); temp++) {
+					Node nNode = nList.item(temp);
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						PatternAction myPattern = new PatternAction(getTagValue("regex", eElement));
+						String strElem = getTagValue("target", eElement).toUpperCase();
+						if (strElem.equals("FILENAME")) {
+							myPattern.setTarget(MatchTarget.FILENAME);
+						} else if (strElem.equals("PATH")) {
+							myPattern.setTarget(MatchTarget.PATH);
+						}
+						strElem = getTagValue("action", eElement).toUpperCase();
+						if (strElem.equals("EXCLUDE")) {
+							myPattern.setAction(MatchAction.EXCLUDE);
+						} else if (strElem.equals("DETECT_MIME")) {
+							myPattern.setAction(MatchAction.DETECT_MIME);
+						}
+						tableViewer.add(myPattern);					
+					}
+				}			
+				updateRegexTestPanel();
+			}
+		} catch (Exception e) {
+			AppUtil.showStackTrace(e);
+		}
+	}
+	
+	private static String getTagValue(String sTag, Element eElement) {
+		NodeList nlList = eElement.getElementsByTagName(sTag).item(0).getChildNodes();	
+		Node nValue = (Node) nlList.item(0);
+		return nValue.getNodeValue();
 	}
 	
 }

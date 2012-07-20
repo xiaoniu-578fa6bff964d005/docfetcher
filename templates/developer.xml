@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<regexPatterns>
+	<pattern>
+		<regex>.*\.svn.*</regex>
+		<target>PATH</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.dll</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.exe</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.gif</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.jpg</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.scc</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.svn-base</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+</regexPatterns>
+
+

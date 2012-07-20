@@ -478,6 +478,7 @@ public enum Msg {
 	remove_sel_pattern ("Remove Selected Pattern"),
 	increase_pattern_priority ("Increase Priority Of Selected Pattern"),
 	decrease_pattern_priority ("Decrease Priority Of Selected Pattern"),
+	add_pattern_from_template ("Add regex from a template"),
 	sel_regex_matches_file_yes ("Selected regex matches following file: Yes."),
 	sel_regex_matches_file_no ("Selected regex matches following file: No."),
 	sel_regex_malformed ("Selected regex is malformed."),
