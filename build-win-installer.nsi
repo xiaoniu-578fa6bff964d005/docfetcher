@@ -143,7 +143,6 @@ Section "DocFetcher"
 	SetOutPath $INSTDIR\misc
 	File ${PORTABLE_PATH}\misc\*.bat
 	File ${PORTABLE_PATH}\misc\*.exe
-	; File ${PORTABLE_PATH}\misc\ChangeLog.html
 	File ${PORTABLE_PATH}\misc\licenses.zip
 
 	SetOutPath $INSTDIR\help
@@ -184,7 +183,6 @@ Section "DocFetcher"
 	CreateShortCut $SMPROGRAMS\DocFetcher\DocFetcher.lnk $INSTDIR\DocFetcher.exe
 	CreateShortCut "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk" $INSTDIR\uninstaller.exe
 	CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
-	; CreateShortCut $SMPROGRAMS\DocFetcher\ChangeLog.lnk $INSTDIR\misc\ChangeLog.html
 
 	; Launch daemon
 	Exec '"$INSTDIR\docfetcher-daemon-windows.exe"'
@@ -222,6 +220,5 @@ Section "un.Uninstall"
 	Delete /REBOOTOK $SMPROGRAMS\DocFetcher\DocFetcher.lnk
 	Delete /REBOOTOK "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk"
 	Delete $SMPROGRAMS\DocFetcher\Readme.lnk
-	; Delete $SMPROGRAMS\DocFetcher\ChangeLog.lnk
 	RMDir $SMPROGRAMS\DocFetcher
 SectionEnd
