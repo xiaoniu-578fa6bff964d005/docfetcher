@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="lib/jnotify"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/J7zip/J7zip_4.43_alpha2.jar" sourcepath="lib/J7zip/J7zip_4.43_alpha2_src.zip"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.8.2.jar" sourcepath="lib/junit/junit-4.8.2-src.jar"/>
