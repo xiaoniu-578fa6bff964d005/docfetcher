@@ -157,7 +157,7 @@ public final class Application {
 		 * be done before doing the single instance check, because that's where
 		 * we're going to use SWT for the first time, by opening a message
 		 * dialog.
-		 * 
+		 *
 		 * If we don't set the path, SWT will extract its native libraries into
 		 * ${user.home}/.swt. This is unsuitable especially for the portable
 		 * version of DocFetcher, which should not leave any files in the
@@ -171,7 +171,7 @@ public final class Application {
 		// Load program configuration and preferences
 		programConfFile = loadProgramConf();
 		settingsConfFile = loadSettingsConf();
-		
+
 		// Check single instance
 		if (!AppUtil.checkSingleInstance())
 			return;
@@ -282,7 +282,7 @@ public final class Application {
 		display.dispose();
 		saveSettingsConfFile();
 	}
-	
+
 	public static void saveSettingsConfFile() {
 		/*
 		 * Try to save the settings. This may not be possible, for example when
@@ -297,14 +297,6 @@ public final class Application {
 				AppUtil.showStackTraceInOwnDisplay(e);
 			}
 		}
-	}
-	
-	private static Runnable runnableSaveSettings() {
-		return  new Runnable() {
-			public void run() { 
-				saveSettingsConfFile(); 
-			}
-		};
 	}
 
 	private static void initGlobalKeys(@NotNull Display display) {
@@ -405,7 +397,7 @@ public final class Application {
 					// Program may have been shut down while it was loading the indexes
 					if (display.isDisposed())
 						return;
-					
+
 					/*
 					 * Install folder watches on the user's document folders.
 					 *
@@ -435,7 +427,7 @@ public final class Application {
 
 					// Must be called *after* the indexes have been loaded
 					daemon.enqueueUpdateTasks();
-					
+
 					// Show error messages if some indexes couldn't be loaded
 					if (!corrupted.isEmpty()) {
 						StringBuilder msg = new StringBuilder(Msg.corrupted_indexes.get());
@@ -631,7 +623,12 @@ public final class Application {
 
 	private static Control createRightTopPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		searchBar = new SearchBar(comp, programConfFile, runnableSaveSettings());
+		searchBar = new SearchBar(comp, programConfFile);
+		searchBar.evtOKClicked.add(new Event.Listener<String> () {
+		    public void update(String eventData) {
+		    	saveSettingsConfFile();
+		    }
+		}); 
 		resultPanel = new ResultPanel(comp);
 
 		comp.setLayout(new FormLayout());
@@ -733,7 +730,13 @@ public final class Application {
 			}
 		}, new Runnable() {
 			public void run() {
-				new PrefDialog(shell, programConfFile, runnableSaveSettings()).open();
+				PrefDialog prefDialog = new PrefDialog(shell, programConfFile);
+				prefDialog.evtOKClicked.add(new Event.Listener<String> () {
+				    public void update(String eventData) {
+				    	saveSettingsConfFile();
+				    }
+				});
+				prefDialog.open();
 			}
 		});
 	}
@@ -952,13 +955,20 @@ public final class Application {
 				 * Don't open preferences dialog when the hotkey conflict occurs
 				 * at startup.
 				 */
-				if (shell.isVisible())
-					new PrefDialog(shell, programConfFile, runnableSaveSettings()).open();
+				if (shell.isVisible()){					
+					PrefDialog prefDialog = new PrefDialog(shell, programConfFile);
+					prefDialog.evtOKClicked.add(new Event.Listener<String> () {
+					    public void update(String eventData) {
+					    	saveSettingsConfFile();
+					    }
+					});
+					prefDialog.open();
+				}
 			}
 		});
 		hotkeyHandler.registerHotkey();
 	}
-	
+
 	@Nullable
 	private static CancelAction confirmExit() {
 		MultipleChoiceDialog<CancelAction> dialog = new MultipleChoiceDialog<CancelAction>(shell);

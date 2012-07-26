@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.gui.UtilGui;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
@@ -44,24 +45,23 @@ import org.eclipse.swt.widgets.Shell;
  */
 @VisibleForPackageGroup
 public final class PrefDialog {
-	
+
 	private final Shell shell;
 	@NotNull private Button okBt;
 	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();
 	private final List<PrefOption> fieldOptions = new LinkedList<PrefOption>();
 	private final File programConfFile;
-	private final Runnable saveSettings;
-	
-	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile, @NotNull Runnable saveSettings) {
+	public final Event<String> evtOKClicked = new Event<String> ();
+
+	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile) {
 		Util.checkNotNull(parent);
 		this.programConfFile = programConfFile;
-		this.saveSettings = saveSettings;
 		shell = new Shell(parent, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM);
 		shell.setLayout(Util.createFillLayout(10));
 		shell.setText(Msg.preferences.get());
 		shell.setImage(Img.PREFERENCES.get());
 		SettingsConf.ShellBounds.PreferencesDialog.bind(shell);
-		
+
 		checkOptions.addAll(Arrays.<PrefOption> asList(
 			new CheckOption(
 				Msg.pref_manual_on_startup.get(),
@@ -98,24 +98,24 @@ public final class PrefDialog {
 			//		"Reset location filter on exit",
 			//		SettingsConf.Bool.ResetLocationFilterOnExit),
 		));
-		
+
 		fieldOptions.addAll(Arrays.asList(
 			new ColorOption(
 				Msg.pref_highlight_color.get(),
 				SettingsConf.IntArray.PreviewHighlighting),
-				
+
 			new FontOption(
 				Msg.pref_font_normal.get(),
 				UtilGui.getPreviewFontNormal()),
-			
+
 			new FontOption(
 				Msg.pref_font_fixed_width.get(),
 				UtilGui.getPreviewFontMono())
 		));
-		
+
 		if (!Util.IS_MAC_OS_X)
 			fieldOptions.add(new HotkeyOption(Msg.pref_hotkey.get()));
-		
+
 		new ConfigComposite(shell, SWT.H_SCROLL | SWT.V_SCROLL) {
 			protected Control createContents(Composite parent) {
 				return PrefDialog.this.createContents(parent);
@@ -125,49 +125,49 @@ public final class PrefDialog {
 			}
 		};
 	}
-	
+
 	@NotNull
 	private Control createContents(@NotNull Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(Util.createGridLayout(2, false, 0, 5));
-		
+
 		for (PrefOption checkOption : checkOptions)
 			checkOption.createControls(comp);
-		
+
 		Label spacing = new Label(comp, SWT.NONE);
 		GridData spacingGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
 		spacingGridData.heightHint = 3;
 		spacing.setLayoutData(spacingGridData);
-		
+
 		for (PrefOption fieldOption : fieldOptions)
 			fieldOption.createControls(comp);
-		
+
 		Label spacing2 = new Label(comp, SWT.NONE);
 		spacing2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		
+
 		Link link = new Link(comp, SWT.NONE);
 		link.setText("<a>Advanced Settings</a>");
 		link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		
+
 		link.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Util.launch(programConfFile);
 			}
 		});
-		
+
 		return comp;
 	}
-	
+
 	@NotNull
 	private Control createButtonArea(@NotNull Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		
+
 		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Util.launch(ManualLocator.getManualSubpageFile("Preferences.html"));
 			}
 		});
-		
+
 		Button resetBt = Util.createPushButton(comp, Msg.restore_defaults.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PrefOption checkOption : checkOptions)
@@ -176,33 +176,33 @@ public final class PrefDialog {
 					fieldOption.restoreDefault();
 			}
 		});
-		
+
 		okBt = Util.createPushButton(comp, Msg.ok.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				for (PrefOption checkOption : checkOptions)
 					checkOption.save();
 				for (PrefOption fieldOption : fieldOptions)
 					fieldOption.save();
-				saveSettings.run();
+				evtOKClicked.fire(null);
 				shell.close();
 			}
 		});
-		
+
 		Button cancelBt = Util.createPushButton(comp, Msg.cancel.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
 			}
 		});
-		
+
 		Button[] okCancelBts = Util.maybeSwapButtons(okBt, cancelBt);
-		
+
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(0).top().bottom().left().minWidth(Util.BTW).applyTo(helpBt);
 		fdf.left(helpBt, 5).applyTo(resetBt);
 		fdf.unleft().right().applyTo(okCancelBts[1]);
 		fdf.right(okCancelBts[1], -5).applyTo(okCancelBts[0]);
-		
+
 		return comp;
 	}
 
@@ -212,9 +212,9 @@ public final class PrefDialog {
 		while (!shell.isDisposed()) {
 			if (!shell.getDisplay().readAndDispatch())
 				shell.getDisplay().sleep();
-		}		
+		}
 	}
-	
+
 	@NotNull
 	static StyledLabel createLabeledStyledLabel(@NotNull Composite parent,
 												@NotNull String labelText) {
