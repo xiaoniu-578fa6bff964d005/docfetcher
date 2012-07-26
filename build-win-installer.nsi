@@ -136,7 +136,6 @@ Section "DocFetcher"
 
 	; Copy files
 	SetOutPath $INSTDIR
-	File /r "templates"
 	File ${PORTABLE_PATH}\*.exe
 	File ${PORTABLE_PATH}\*.txt
 
@@ -151,6 +150,9 @@ Section "DocFetcher"
 	SetOutPath $INSTDIR\img
 	File /r ${PORTABLE_PATH}\img\*.*
 
+	SetOutPath $INSTDIR\templates
+	File /r ${PORTABLE_PATH}\templates\*.xml
+	
 	Delete /REBOOTOK "$INSTDIR\lib\net.sourceforge.docfetcher_*.*"
 	SetOutPath $INSTDIR\lib
 	File /r /x *.so /x *.dylib /x *linux* /x *macosx* /x *docfetcher*.jar ${PORTABLE_PATH}\lib\*.*
