@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<regexPatterns>
+	<pattern>
+		<regex>.*\.doc</regex>
+		<target>FILENAME</target>
+		<action>DETECT_MIME</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.docx</regex>
+		<target>FILENAME</target>
+		<action>DETECT_MIME</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.rtf</regex>
+		<target>FILENAME</target>
+		<action>DETECT_MIME</action>
+	</pattern>
+	<pattern>
+		<regex>.*\.txt</regex>
+		<target>FILENAME</target>
+		<action>DETECT_MIME</action>
+	</pattern>
+	<pattern>
+		<regex>.*</regex>
+		<target>FILENAME</target>
+		<action>EXCLUDE</action>
+	</pattern>
+</regexPatterns>
+
+
