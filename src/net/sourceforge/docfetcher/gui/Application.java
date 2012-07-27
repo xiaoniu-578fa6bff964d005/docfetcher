@@ -624,8 +624,8 @@ public final class Application {
 	private static Control createRightTopPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		searchBar = new SearchBar(comp, programConfFile);
-		searchBar.evtOKClicked.add(new Event.Listener<String> () {
-		    public void update(String eventData) {
+		searchBar.evtOKClicked.add(new Event.Listener<Void> () {
+		    public void update(Void eventData) {
 		    	saveSettingsConfFile();
 		    }
 		}); 
@@ -731,8 +731,8 @@ public final class Application {
 		}, new Runnable() {
 			public void run() {
 				PrefDialog prefDialog = new PrefDialog(shell, programConfFile);
-				prefDialog.evtOKClicked.add(new Event.Listener<String> () {
-				    public void update(String eventData) {
+				prefDialog.evtOKClicked.add(new Event.Listener<Void> () {
+				    public void update(Void eventData) {
 				    	saveSettingsConfFile();
 				    }
 				});
@@ -957,8 +957,8 @@ public final class Application {
 				 */
 				if (shell.isVisible()){					
 					PrefDialog prefDialog = new PrefDialog(shell, programConfFile);
-					prefDialog.evtOKClicked.add(new Event.Listener<String> () {
-					    public void update(String eventData) {
+					prefDialog.evtOKClicked.add(new Event.Listener<Void> () {
+					    public void update(Void eventData) {
 					    	saveSettingsConfFile();
 					    }
 					});

@@ -105,8 +105,8 @@ public final class SearchBar {
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile);						
-						prefDialog.evtOKClicked.add(new Event.Listener<String> () {
-						    public void update(String eventData) {
+						prefDialog.evtOKClicked.add(new Event.Listener<Void> () {
+						    public void update(Void eventData) {
 						    	evtOKClicked.fire(null);
 						    }
 						});
