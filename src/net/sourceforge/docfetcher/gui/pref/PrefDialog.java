@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 @VisibleForPackageGroup
 public final class PrefDialog {
 
-	public final Event<String> evtOKClicked = new Event<String> ();
+	public final Event<Void> evtOKClicked = new Event<Void> ();
 	private final Shell shell;
 	@NotNull private Button okBt;
 	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();

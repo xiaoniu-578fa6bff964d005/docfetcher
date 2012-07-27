@@ -50,7 +50,7 @@ public final class SearchBar {
 	public final Event<String> evtSearch = new Event<String>();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	public final Event<Void> evtOpenManual = new Event<Void>();
-	public final Event<String> evtOKClicked = new Event<String> ();
+	public final Event<Void> evtOKClicked = new Event<Void> ();
 
 	private final Composite comp;
 	private final Combo searchBox;
