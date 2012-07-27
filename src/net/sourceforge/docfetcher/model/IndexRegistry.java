@@ -35,7 +35,9 @@ import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
+import net.sourceforge.docfetcher.model.search.SourceCodeTokenFilter;
 import net.sourceforge.docfetcher.model.search.Searcher.CorruptedIndex;
+import net.sourceforge.docfetcher.model.search.SourceCodeTokenizer;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.CallOnce;
@@ -52,11 +54,9 @@ import net.sourceforge.docfetcher.util.concurrent.DelayedExecutor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.ReusableAnalyzerBase;
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.search.BooleanQuery;
@@ -79,14 +79,15 @@ public final class IndexRegistry {
 
 	/*
 	 * TODO websearch: code convention: Don't access Version elsewhere, don't instantiate
-	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsehwere.
+	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsewhere.
 	 */
 	@VisibleForPackageGroup
 	public static final Version LUCENE_VERSION = Version.LUCENE_30;
 
 	@VisibleForPackageGroup
+	public static final Analyzer scAnalyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
 	public static final Analyzer analyzer = new StandardAnalyzer(
-		LUCENE_VERSION, Collections.EMPTY_SET);
+			LUCENE_VERSION, Collections.EMPTY_SET);
 
 	private static final String SER_FILENAME = "tree-index.ser";
 
@@ -109,7 +110,7 @@ public final class IndexRegistry {
 	 * that the corresponding index hasn't been saved yet.
 	 */
 	private final Map<LuceneIndex, Long> indexes = Maps.newTreeMap(IndexComparator.instance); // guarded by read-write lock
-	
+
 	/*
 	 * This read-write lock is used for the index registry, the indexing queue,
 	 * the searcher and the folder watcher. With the exception of the searcher,
@@ -120,7 +121,7 @@ public final class IndexRegistry {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 	private final Lock readLock = lock.readLock();
 	private final Lock writeLock = lock.writeLock();
-	
+
 	private final File indexParentDir;
 	private final IndexingQueue queue;
 	private final HotColdFileCache unpackCache;
@@ -136,26 +137,26 @@ public final class IndexRegistry {
 		this.unpackCache = new HotColdFileCache(cacheSize);
 		this.fileFactory = new FileFactory(unpackCache);
 		this.outlookMailFactory = new OutlookMailFactory(unpackCache);
-		
+
 		/*
 		 * Giving out a reference to the IndexRegistry before it is fully
 		 * constructed might be a little dangerous :-/
 		 */
 		this.queue = new IndexingQueue(this, reporterCapacity);
 	}
-	
+
 	@NotNull
 	@ThreadSafe
 	public File getIndexParentDir() {
 		return indexParentDir;
 	}
-	
+
 	@NotNull
 	@ThreadSafe
 	public IndexingQueue getQueue() {
 		return queue;
 	}
-	
+
 	// Will block until the searcher is available (i.e. after load(...) has finished)
 	// do not call this from the GUI thread, otherwise the application might hang
 	// May return null if the calling thread was interrupted
@@ -168,14 +169,14 @@ public final class IndexRegistry {
 		 */
 		return searcher.get();
 	}
-	
+
 	// Should not be used by clients
 	@NotNull
 	@ThreadSafe
 	public Lock getReadLock() {
 		return readLock;
 	}
-	
+
 	// Should not be used by clients
 	@NotNull
 	@ThreadSafe
@@ -188,7 +189,7 @@ public final class IndexRegistry {
 	public void addIndex(@NotNull LuceneIndex index) {
 		addIndex(index, null);
 	}
-	
+
 	@ThreadSafe
 	private void addIndex(	@NotNull LuceneIndex index,
 							@Nullable Long lastModified) {
@@ -205,20 +206,20 @@ public final class IndexRegistry {
 		}
 		evtAdded.fire(index);
 	}
-	
+
 	@ThreadSafe
 	public void removeIndexes(	@NotNull Collection<LuceneIndex> indexesToRemove,
 								boolean deleteFiles) {
 		Util.checkNotNull(indexesToRemove);
 		if (indexesToRemove.isEmpty())
 			return; // Avoid firing event when given collection is empty
-		
+
 		int size = indexesToRemove.size();
 		List<LuceneIndex> removed = new ArrayList<LuceneIndex>(size);
 		List<PendingDeletion> deletions = deleteFiles
 			? new ArrayList<PendingDeletion>(size)
 			: null;
-		
+
 		writeLock.lock();
 		try {
 			for (LuceneIndex index : indexesToRemove) {
@@ -242,7 +243,7 @@ public final class IndexRegistry {
 		finally {
 			writeLock.unlock();
 		}
-		
+
 		evtRemoved.fire(removed);
 	}
 
@@ -272,13 +273,13 @@ public final class IndexRegistry {
 		}
 		handler.handleExistingIndexes(indexesCopy);
 	}
-	
+
 	@ThreadSafe
 	public void removeListeners(@Nullable Event.Listener<LuceneIndex> addedListener,
 								@Nullable Event.Listener<List<LuceneIndex>> removedListener) {
 		if (addedListener == null && removedListener == null)
 			return;
-		
+
 		/*
 		 * The event class is thread-safe; the lock is only used to make this an
 		 * atomic operation.
@@ -318,12 +319,12 @@ public final class IndexRegistry {
 		 * running, the former would block until the latter has finished,
 		 * resulting in a serialization of both operations.
 		 */
-		
+
 		// Ensure this method can only called once
 		Util.checkThat(searcher.isNull());
-		
+
 		indexParentDir.mkdirs(); // Needed for the folder watching
-		
+
 		for (File indexDir : Util.listFiles(indexParentDir)) {
 			if (cancelable.isCanceled())
 				break;
@@ -334,15 +335,15 @@ public final class IndexRegistry {
 				continue;
 			loadIndex(serFile);
 		}
-		
+
 		LazyList<CorruptedIndex> corruptedIndexes = new LazyList<CorruptedIndex>();
 		searcher.set(new Searcher(
 			this, fileFactory, outlookMailFactory, corruptedIndexes));
-		
+
 		// Watch index directory for changes
 		try {
 			final DelayedExecutor executor = new DelayedExecutor(1000);
-			
+
 			final int watchId = new SimpleJNotifyListener() {
 				protected void handleEvent(File targetFile, EventType eventType) {
 					if (!targetFile.getName().equals(SER_FILENAME))
@@ -354,7 +355,7 @@ public final class IndexRegistry {
 					});
 				}
 			}.addWatch(indexParentDir);
-			
+
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				public void run() {
 					try {
@@ -369,10 +370,10 @@ public final class IndexRegistry {
 		catch (JNotifyException e) {
 			Util.printErr(e);
 		}
-		
+
 		return corruptedIndexes;
 	}
-	
+
 	@ThreadSafe
 	private void loadIndex(@NotNull File serFile) {
 		ObjectInputStream in = null;
@@ -396,30 +397,30 @@ public final class IndexRegistry {
 			Closeables.closeQuietly(in);
 		}
 	}
-	
+
 	private void reload() {
 		writeLock.lock();
 		try {
 			Map<File, LuceneIndex> indexDirMap = Maps.newHashMap();
 			for (LuceneIndex index : indexes.keySet())
 				indexDirMap.put(index.getIndexDirPath().getCanonicalFile(), index);
-			
+
 			/*
 			 * The code below is pretty inefficient if many indexes are added,
 			 * modified and/or removed. However, we can assume that these operations
 			 * are usually performed one index at a time, so the inefficiency
 			 * doesn't really matter.
 			 */
-			
+
 			for (File indexDir : Util.listFiles(indexParentDir)) {
 				if (!indexDir.isDirectory())
 					continue;
 				File serFile = new File(indexDir, SER_FILENAME);
 				if (!serFile.isFile())
 					continue;
-				
+
 				LuceneIndex index = indexDirMap.remove(Util.getAbsFile(indexDir));
-				
+
 				// New index found
 				if (index == null) {
 					loadIndex(serFile);
@@ -439,7 +440,7 @@ public final class IndexRegistry {
 					}
 				}
 			}
-			
+
 			// Handle missing indexes
 			removeIndexes(indexDirMap.values(), false);
 		}
@@ -447,7 +448,7 @@ public final class IndexRegistry {
 			writeLock.unlock();
 		}
 	}
-	
+
 	@VisibleForPackageGroup
 	public void save(@NotNull LuceneIndex index) {
 		Util.checkNotNull(index);
@@ -456,14 +457,14 @@ public final class IndexRegistry {
 			File indexDir = index.getIndexDirPath().getCanonicalFile();
 			indexDir.mkdirs();
 			File serFile = new File(indexDir, SER_FILENAME);
-			
+
 			/*
 			 * DocFetcher might have been burned onto a CD-ROM; if so, then just
 			 * ignore it.
 			 */
 			if (serFile.exists() && !serFile.canWrite())
 				return;
-			
+
 			ObjectOutputStream out = null;
 			try {
 				serFile.createNewFile();
@@ -483,7 +484,7 @@ public final class IndexRegistry {
 			finally {
 				Closeables.closeQuietly(out);
 			}
-			
+
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());
 		}
@@ -491,13 +492,13 @@ public final class IndexRegistry {
 			writeLock.unlock();
 		}
 	}
-	
+
 	@NotNull
 	@ThreadSafe
 	public TreeCheckState getTreeCheckState() {
 		// Make local copy of indexes for thread-safety
 		List<LuceneIndex> localIndexes = getIndexes();
-		
+
 		TreeCheckState totalState = new TreeCheckState();
 		for (LuceneIndex index : localIndexes)
 			totalState.add(index.getTreeCheckState());
@@ -522,21 +523,22 @@ public final class IndexRegistry {
 		}
 	}
 
-	public class SourceCodeAnalyzer extends ReusableAnalyzerBase {
+	private static class SourceCodeAnalyzer extends ReusableAnalyzerBase {
 		private Version matchVersion;
 
 		public SourceCodeAnalyzer(Version matchVersion) {
-			this.matchVersion = matchVersion;	
+			this.matchVersion = matchVersion;
 		}
 
 		@Override
 		protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-			final Tokenizer source = new WhitespaceTokenizer(matchVersion, reader);
+			final Tokenizer source = new SourceCodeTokenizer(matchVersion, reader);
 			TokenStream sink = new StandardFilter(matchVersion, source);
-		    sink = new LowerCaseFilter(matchVersion, sink);
-		    sink = new StopFilter(matchVersion, sink,
-                    StopAnalyzer.ENGLISH_STOP_WORDS_SET, false);
+			sink = new LowerCaseFilter(matchVersion, sink);
+		    sink = new StopFilter(matchVersion, sink, Collections.EMPTY_SET, false);
+		    //sink = new SourceCodeTokenFilter(matchVersion, sink);
 			return new TokenStreamComponents(source, sink);
 		}
 	}
+
 }
