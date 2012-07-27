@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
@@ -85,9 +86,7 @@ public final class IndexRegistry {
 	public static final Version LUCENE_VERSION = Version.LUCENE_30;
 
 	@VisibleForPackageGroup
-	public static final Analyzer scAnalyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
-	public static final Analyzer analyzer = new StandardAnalyzer(
-			LUCENE_VERSION, Collections.EMPTY_SET);
+	public static final Analyzer analyzer = localAnalyzer();
 
 	private static final String SER_FILENAME = "tree-index.ser";
 
@@ -128,6 +127,13 @@ public final class IndexRegistry {
 	private final FileFactory fileFactory;
 	private final OutlookMailFactory outlookMailFactory;
 	private final BlockingWrapper<Searcher> searcher = new BlockingWrapper<Searcher>();
+
+	private static Analyzer localAnalyzer() {
+		if (ProgramConf.Int.LuceneAnalyzer.get() == 1)
+			return new SourceCodeAnalyzer(LUCENE_VERSION);
+		else
+			return new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);
+	}
 
 	public IndexRegistry(	@NotNull File indexParentDir,
 							int cacheSize,

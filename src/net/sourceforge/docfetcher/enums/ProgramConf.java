@@ -36,11 +36,11 @@ import org.aspectj.lang.annotation.SuppressAjWarnings;
  * New enums (not enum <em>members</em>) must implement the
  * <code>Pref.Loadable</code> interface; everything else is handled
  * automatically via reflection.
- * 
+ *
  * @author Tran Nam Quang
  */
 public final class ProgramConf {
-	
+
 	// TODO pre-release: remove unused entries
 	// TODO pre-release: reset entries whose values where changed for development purposes (e.g. fix window sizes)
 
@@ -72,12 +72,13 @@ public final class ProgramConf {
 		WebInterfacePageSize (50, 1),
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),
+		LuceneAnalyzer (0, 0),
 		;
 
 		private int value;
 		private final int min;
 		private final int max;
-		
+
 		Int(int value, int min, int max) {
 			this.value = value;
 			this.min = min;
@@ -86,7 +87,7 @@ public final class ProgramConf {
 		Int(int value, int min) {
 			this(value, min, Integer.MAX_VALUE);
 		}
-		
+
 		public int get() {
 			return value;
 		}
