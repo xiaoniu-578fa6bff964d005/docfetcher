@@ -46,12 +46,12 @@ import org.eclipse.swt.widgets.Shell;
 @VisibleForPackageGroup
 public final class PrefDialog {
 
+	public final Event<String> evtOKClicked = new Event<String> ();
 	private final Shell shell;
 	@NotNull private Button okBt;
 	private final List<PrefOption> checkOptions = new LinkedList<PrefOption>();
 	private final List<PrefOption> fieldOptions = new LinkedList<PrefOption>();
-	private final File programConfFile;
-	public final Event<String> evtOKClicked = new Event<String> ();
+	private final File programConfFile;	
 
 	public PrefDialog(@NotNull Shell parent, @NotNull File programConfFile) {
 		Util.checkNotNull(parent);
