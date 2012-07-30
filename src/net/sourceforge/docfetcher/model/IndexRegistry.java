@@ -129,7 +129,7 @@ public final class IndexRegistry {
 	private final BlockingWrapper<Searcher> searcher = new BlockingWrapper<Searcher>();
 
 	private static Analyzer localAnalyzer() {
-		if (ProgramConf.Int.LuceneAnalyzer.get() == 1)
+		if (ProgramConf.Int.Analyzer.get() == 1)
 			return new SourceCodeAnalyzer(LUCENE_VERSION);
 		else
 			return new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);

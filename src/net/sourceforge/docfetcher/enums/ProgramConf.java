@@ -72,7 +72,7 @@ public final class ProgramConf {
 		WebInterfacePageSize (50, 1),
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),
-		LuceneAnalyzer (0, 0),
+		Analyzer (0, 0),
 		;
 
 		private int value;
