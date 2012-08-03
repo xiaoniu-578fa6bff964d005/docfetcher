@@ -26,6 +26,6 @@ public final class SourceCodeTokenizer extends CharTokenizer {
 	 */
 	@Override
 	protected boolean isTokenChar(int c) {
-		return !(Character.isWhitespace(c) || (c=='.') || (c=='='));
+		return !(Character.isWhitespace(c) || (c=='.') || (c=='=') || (c=='"') || (c=='<') || (c=='>'));
 	}
 }
