@@ -475,29 +475,15 @@ public final class Application {
 					entryNames.add("  " + entry.name());
 				String msg = Msg.entries_missing.format(confFile.getName());
 				msg += "\n" + Joiner.on("\n").join(entryNames);
-				AppUtil.showErrorOnStart(msg, false);
+				msg += "\n\n" + Msg.entries_missing_regenerate.get();
+				int style = SWT.YES | SWT.NO | SWT.ICON_WARNING;
+				if (AppUtil.showErrorOnStart(msg, style) == SWT.YES) {
+					regenerateConfFile(confFile);
+				}
 			}
 		}
 		catch (FileNotFoundException e) {
-			/*
-			 * Restore conf file if missing. In case of the non-portable
-			 * version, the conf file will be missing the first time the program
-			 * is started.
-			 */
-			InputStream in = Main.class.getResourceAsStream(confFile.getName());
-			try {
-				ConfLoader.load(in, ProgramConf.class);
-				URL url = Resources.getResource(Main.class, confFile.getName());
-				Util.getParentFile(confFile).mkdirs();
-				Files.copy(
-					Resources.newInputStreamSupplier(url), confFile);
-			}
-			catch (Exception e1) {
-				AppUtil.showStackTraceInOwnDisplay(e1);
-			}
-			finally {
-				Closeables.closeQuietly(in);
-			}
+			regenerateConfFile(confFile);
 		}
 		catch (IOException e) {
 			AppUtil.showStackTraceInOwnDisplay(e);
@@ -505,6 +491,28 @@ public final class Application {
 		return confFile;
 	}
 
+	private static void regenerateConfFile(File confFile) {
+		/*
+		 * Restore conf file if missing. In case of the non-portable
+		 * version, the conf file will be missing the first time the program
+		 * is started.
+		 */
+		InputStream in = Main.class.getResourceAsStream(confFile.getName());
+		try {
+			ConfLoader.load(in, ProgramConf.class);
+			URL url = Resources.getResource(Main.class, confFile.getName());
+			Util.getParentFile(confFile).mkdirs();
+			Files.copy(
+				Resources.newInputStreamSupplier(url), confFile);
+		}
+		catch (Exception e1) {
+			AppUtil.showStackTraceInOwnDisplay(e1);
+		}
+		finally {
+			Closeables.closeQuietly(in);
+		}
+	}
+	
 	private static File loadSettingsConf() {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();

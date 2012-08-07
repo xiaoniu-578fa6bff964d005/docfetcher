@@ -95,6 +95,9 @@ public enum Msg {
 		"Error message shown on startup if some entries in a properties file " +
 		"are mssing or invalid. The name of the properties file will be inserted into " +
 		"the {0} slot. The missing entries will be listed after this message."),
+	entries_missing_regenerate (
+		"Would you like to regenerate the file?",
+		"Question in Error message if entries are missing in a properties file " ),
 	corrupted_indexes (
 		"The following indexes seem to be corrupted. Rebuilding them is recommended.",
 		"Error message shown on startup if one or more indexes couldn't be " +

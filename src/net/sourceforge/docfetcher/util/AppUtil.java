@@ -344,19 +344,24 @@ public final class AppUtil {
 	 * {@link #showErrorMsg} should be used instead.
 	 */
 	public static void showErrorOnStart(String message, boolean isSevere) {
+		int style = SWT.OK | (isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING);
+		showErrorOnStart(message, style);
+	}
+	
+	public static int showErrorOnStart(String message, int style) {
 		checkConstInitialized();
 		ensureNoDisplay();
 		
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		int style = SWT.OK | (isSevere ? SWT.ICON_ERROR : SWT.ICON_WARNING);
 		MessageBox msgBox = new MessageBox(shell, style);
 		msgBox.setText(Messages.system_error.value);
 		msgBox.setMessage(message);
-		msgBox.open();
+		int buttonID = msgBox.open();
 		shell.dispose();
 		display.dispose();
-	}
+		return buttonID;
+	}	
 
 	/**
 	 * Shows the given message in a confirmation message box and returns the
