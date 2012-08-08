@@ -170,8 +170,9 @@ final class OutlookContext {
 	 * Must be static in order to avoid attempting to serialize the surrounding
 	 * OutlookContext instance.
 	 */
-	@SuppressWarnings("serial")
 	private static class AttachNode extends TreeNode implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
 		private final Path path;
 		
 		public AttachNode(Path path) {

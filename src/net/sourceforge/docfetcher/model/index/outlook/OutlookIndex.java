@@ -41,7 +41,6 @@ import com.pff.PSTMessage;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 	
 	/*
@@ -54,6 +53,8 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 	 * the worst that could happen is to get some garbage out of the PST file,
 	 * as a result of Outlook writing to it concurrently.
 	 */
+	
+	private static final long serialVersionUID = 1L;
 	
 	private MailFolder simplifiedRootFolder;
 	

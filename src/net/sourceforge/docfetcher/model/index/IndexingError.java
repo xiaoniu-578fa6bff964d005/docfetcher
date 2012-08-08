@@ -23,7 +23,6 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 @VisibleForPackageGroup
 public final class IndexingError implements Serializable {
 	
@@ -61,6 +60,8 @@ public final class IndexingError implements Serializable {
 			return Util.getLowestMessage(t);
 		}
 	}
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final ErrorType errorType;
 	private final TreeNode treeNode;

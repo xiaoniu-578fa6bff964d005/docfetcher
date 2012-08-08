@@ -28,8 +28,9 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
-@SuppressWarnings("serial")
 public final class IndexingException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final IOException cause;
 	

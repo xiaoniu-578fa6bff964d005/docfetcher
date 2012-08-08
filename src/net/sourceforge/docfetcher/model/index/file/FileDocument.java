@@ -28,9 +28,10 @@ import com.google.common.collect.Maps;
 
 import de.schlichtherle.truezip.file.TFile;
 
-@SuppressWarnings("serial")
 @VisibleForPackageGroup
 public final class FileDocument extends Document<FileDocument, FileFolder> {
+	
+	private static final long serialVersionUID = 1L;
 	
 	@Nullable private FileFolder htmlFolder;
 	

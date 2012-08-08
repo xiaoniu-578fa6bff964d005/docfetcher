@@ -39,7 +39,6 @@ import com.google.common.collect.Maps;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
-@SuppressWarnings("serial")
 public abstract class Folder
 	<D extends Document<D, F>, F extends Folder<D, F>>
 		extends TreeNode implements ViewNode {
@@ -61,6 +60,8 @@ public abstract class Folder
 	 * TODO post-release-1.1: Rethink the synchronization used here. Maybe use
 	 * a global static lock for all instances of TreeNode, Folder, Document, etc.?
 	 */
+	
+	private static final long serialVersionUID = 1L;
 
 	// Making these events non-static would lead to trouble with serialization
 	public static final Event<FolderEvent> evtFolderAdded = new Event<FolderEvent>();

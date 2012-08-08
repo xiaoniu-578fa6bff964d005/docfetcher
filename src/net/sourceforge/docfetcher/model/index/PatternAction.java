@@ -24,7 +24,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public final class PatternAction implements Serializable {
 	
 	public enum MatchTarget {
@@ -43,6 +42,8 @@ public final class PatternAction implements Serializable {
 			this.displayName = displayName;
 		}
 	}
+	
+	private static final long serialVersionUID = 1L;
 	
 	@NotNull private String regex;
 	@Nullable private transient Pattern pattern;

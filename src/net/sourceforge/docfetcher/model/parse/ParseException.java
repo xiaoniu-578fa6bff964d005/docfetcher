@@ -16,8 +16,9 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public final class ParseException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public ParseException(@NotNull Throwable cause) {
 		super(cause);

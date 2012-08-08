@@ -187,8 +187,9 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 			return;
 		}
 		String filename = file.getName();
-		@SuppressWarnings("serial")
 		TreeNode treeNode = new TreeNode(filename) {
+			private static final long serialVersionUID = 1L;
+			
 			public Path getPath() {
 				return config.getStorablePath(file);
 			}
