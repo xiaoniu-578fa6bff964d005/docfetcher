@@ -177,6 +177,11 @@ public abstract class VirtualTableViewer<E> {
 			verticalBar.setSelection(0);
 	}
 	
+	public final void scrollToBottom() {
+		TableItem lastItem = table.getItem(table.getItemCount() - 1);
+		table.showItem(lastItem);
+	}
+	
 	// when sorting is enabled, override the compare method on all sortable columns
 	public void setSortingEnabled(boolean sortingEnabled) {
 		this.sortingEnabled = sortingEnabled;
