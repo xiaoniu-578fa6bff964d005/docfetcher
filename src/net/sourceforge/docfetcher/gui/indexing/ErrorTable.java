@@ -11,7 +11,6 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -184,12 +183,20 @@ final class ErrorTable {
 		List<IndexingError> sel = tv.getSelection();
 		if (sel.isEmpty())
 			sel = errors;
+
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (IndexingError error : sel) {
+			File file = error.getTreeNode().getPath().getCanonicalFile();
+			if (!first)
+				sb.append(Util.LS).append(Util.LS);
+			sb.append(error.getLocalizedMessage());
+			sb.append(Util.LS);
+			sb.append(file.getPath());
+			first = false;
+		}
 		
-		List<File> files = new ArrayList<File>(sel.size());
-		for (IndexingError error : sel)
-			files.add(error.getTreeNode().getPath().getCanonicalFile());
-		
-		Util.setClipboard(files);
+		Util.setClipboard(sb.toString());
 	}
 
 	private void launchSelection() {

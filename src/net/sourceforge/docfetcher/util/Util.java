@@ -1669,6 +1669,14 @@ public final class Util {
 			clipboard.dispose();
 		}
 	}
+	
+	public static void setClipboard(@NotNull String text) {
+		Util.checkNotNull(text);
+		Clipboard clipboard = new Clipboard(Display.getCurrent());
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		clipboard.setContents(new Object[] {text}, types);
+		clipboard.dispose();
+	}
 
 	/**
 	 * Replaces the contents of the given clipboard with the given text and
