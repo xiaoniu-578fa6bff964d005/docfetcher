@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.Fields;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -106,20 +107,6 @@ public final class Searcher {
 			this.pageIndex = pageIndex;
 			this.pageCount = pageCount;
 			this.hitCount = hitCount;
-		}
-	}
-	
-	/**
-	 * A corrupted index that couldn't be loaded during initialization.
-	 */
-	public static final class CorruptedIndex {
-		@NotNull public final LuceneIndex index;
-		@NotNull public final IOException ioException;
-		
-		public CorruptedIndex(	@NotNull LuceneIndex index,
-								@NotNull IOException ioException) {
-			this.index = Util.checkNotNull(index);
-			this.ioException = Util.checkNotNull(ioException);
 		}
 	}
 	

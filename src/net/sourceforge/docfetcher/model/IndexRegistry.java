@@ -32,12 +32,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
-import net.sourceforge.docfetcher.model.search.SourceCodeTokenFilter;
-import net.sourceforge.docfetcher.model.search.Searcher.CorruptedIndex;
 import net.sourceforge.docfetcher.model.search.SourceCodeTokenizer;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
@@ -317,7 +316,7 @@ public final class IndexRegistry {
 
 	@CallOnce
 	@ThreadSafe
-	public List<CorruptedIndex> load(@NotNull Cancelable cancelable) throws IOException {
+	public IndexLoadingProblems load(@NotNull Cancelable cancelable) throws IOException {
 		/*
 		 * Note: To allow running this method in parallel with other operations,
 		 * it is important not to lock the entire method. Otherwise, if a client
@@ -330,21 +329,50 @@ public final class IndexRegistry {
 		Util.checkThat(searcher.isNull());
 
 		indexParentDir.mkdirs(); // Needed for the folder watching
-
-		for (File indexDir : Util.listFiles(indexParentDir)) {
+		IndexLoadingProblems loadingProblems = new IndexLoadingProblems();
+		
+		for (File file : Util.listFiles(indexParentDir)) {
 			if (cancelable.isCanceled())
 				break;
-			if (!indexDir.isDirectory())
-				continue;
-			File serFile = new File(indexDir, SER_FILENAME);
-			if (!serFile.isFile())
-				continue;
-			loadIndex(serFile);
+			if (file.isDirectory()) {
+				File serFile = new File(file, SER_FILENAME);
+				if (serFile.isFile()) {
+					/*
+					 * Try to load the tree-index.ser. If this fails, we're
+					 * probably dealing with a tree-index.ser from DocFetcher
+					 * 1.1 beta 1 through DocFetcher 1.1 beta 6, because the
+					 * serialization version UID was changed after 1.1 beta 6.
+					 */
+					if (!loadIndex(serFile))
+						loadingProblems.addObsoleteFile(file);
+				}
+				else if (!serFile.exists()) {
+					/*
+					 * If no tree-index.ser exists and the containing folder has
+					 * a name that ends with a timestamp, it's probably an index
+					 * folder from DocFetcher 1.0.3 or earlier.
+					 */
+					if (file.getName().matches(".*?_\\d+"))
+						loadingProblems.addObsoleteFile(file);
+				}
+				// Ignore if tree-index.ser is a directory
+			}
+			else if (file.isFile()) {
+				/*
+				 * ScopeRegistry.ser files were used in DocFetcher 1.0.3 and
+				 * earlier.
+				 */
+				if (file.getName().equals("ScopeRegistry.ser"))
+					loadingProblems.addObsoleteFile(file);
+			}
 		}
 
 		LazyList<CorruptedIndex> corruptedIndexes = new LazyList<CorruptedIndex>();
 		searcher.set(new Searcher(
 			this, fileFactory, outlookMailFactory, corruptedIndexes));
+		
+		for (CorruptedIndex index : corruptedIndexes)
+			loadingProblems.addCorruptedIndex(index);
 
 		// Watch index directory for changes
 		try {
@@ -377,11 +405,15 @@ public final class IndexRegistry {
 			Util.printErr(e);
 		}
 
-		return corruptedIndexes;
+		return loadingProblems;
 	}
 
+	/**
+	 * Load the given tree index file. Returns whether the file was successfully
+	 * loaded.
+	 */
 	@ThreadSafe
-	private void loadIndex(@NotNull File serFile) {
+	private boolean loadIndex(@NotNull File serFile) {
 		ObjectInputStream in = null;
 		try {
 			FileInputStream fin = new FileInputStream(serFile);
@@ -395,9 +427,10 @@ public final class IndexRegistry {
 				lock.release();
 			}
 			addIndex(index, serFile.lastModified());
+			return true;
 		}
 		catch (Exception e) {
-			Util.printErr(e); // The average user doesn't need to know
+			return false;
 		}
 		finally {
 			Closeables.closeQuietly(in);
