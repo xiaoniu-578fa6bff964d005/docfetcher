@@ -22,6 +22,7 @@ import java.util.Set;
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.MultiFileLauncher;
 import net.sourceforge.docfetcher.gui.indexing.IndexingDialog;
@@ -210,47 +211,47 @@ public final class IndexPanel {
 	private void initContextMenu() {
 		ContextMenuManager menuManager = new ContextMenuManager(tree);
 		
-		Menu indexSubMenu = menuManager.addSubmenu(new MenuAction(
-			Msg.create_index_from.get()));
-		
-		menuManager.add(indexSubMenu, new MenuAction(
-			Img.FOLDER.get(), Msg.folder.get()) {
-			public void run() {
-				createFileTaskFromDialog(
-					tree.getShell(), indexRegistry, dialogFactory, true);
-			}
-		});
-		
-		menuManager.addSeparator(indexSubMenu);
-		
-		menuManager.add(indexSubMenu, new MenuAction(
-			Img.PACKAGE.get(), Msg.archive.get()) {
-			public void run() {
-				createFileTaskFromDialog(
-					tree.getShell(), indexRegistry, dialogFactory, false);
-			}
-		});
-		
-		menuManager.add(indexSubMenu, new MenuAction(
-			Img.EMAIL.get(), Msg.outlook_pst.get()) {
-			public void run() {
-				createOutlookTaskFromDialog(
-					tree.getShell(), indexRegistry, dialogFactory);
-			}
-		});
-		
-		String clipboardLabel = Util.IS_MAC_OS_X
+		if (ProgramConf.Bool.AllowIndexCreation.get()) {
+			Menu indexSubMenu = menuManager.addSubmenu(new MenuAction(
+				Msg.create_index_from.get()));
+
+			menuManager.add(indexSubMenu, new MenuAction(
+				Img.FOLDER.get(), Msg.folder.get()) {
+				public void run() {
+					createFileTaskFromDialog(
+						tree.getShell(), indexRegistry, dialogFactory, true);
+				}
+			});
+
+			menuManager.addSeparator(indexSubMenu);
+
+			menuManager.add(indexSubMenu, new MenuAction(
+				Img.PACKAGE.get(), Msg.archive.get()) {
+				public void run() {
+					createFileTaskFromDialog(
+						tree.getShell(), indexRegistry, dialogFactory, false);
+				}
+			});
+
+			menuManager.add(indexSubMenu, new MenuAction(
+				Img.EMAIL.get(), Msg.outlook_pst.get()) {
+				public void run() {
+					createOutlookTaskFromDialog(
+						tree.getShell(), indexRegistry, dialogFactory);
+				}
+			});
+
+			String clipboardLabel = Util.IS_MAC_OS_X
 			? Msg.clipboard_macosx.get()
-			: Msg.clipboard.get();
-		menuManager.add(indexSubMenu, new MenuAction(
-			Img.CLIPBOARD.get(), clipboardLabel) {
-			public void run() {
-				createTaskFromClipboard(
-					tree.getShell(), indexRegistry, dialogFactory);
-			}
-		});
-		
-		menuManager.addSeparator();
+				: Msg.clipboard.get();
+			menuManager.add(indexSubMenu, new MenuAction(
+				Img.CLIPBOARD.get(), clipboardLabel) {
+				public void run() {
+					createTaskFromClipboard(
+						tree.getShell(), indexRegistry, dialogFactory);
+				}
+			});
+		}
 		
 		class UpdateOrRebuildAction extends MenuAction {
 			private final boolean isUpdate;
@@ -264,12 +265,12 @@ public final class IndexPanel {
 			public void run() {
 				IndexingQueue queue = indexRegistry.getQueue();
 				IndexAction action = isUpdate
-					? IndexAction.UPDATE
+				? IndexAction.UPDATE
 					: IndexAction.REBUILD;
 				List<LuceneIndex> sel = getSelectedIndexes();
 				if (!isUpdate)
 					indexRegistry.removeIndexes(sel, false);
-				
+
 				/*
 				 * The indexing dialog must be opened *before* adding the tasks
 				 * to the queue. Otherwise, it may happen that the tasks are
@@ -277,7 +278,7 @@ public final class IndexPanel {
 				 * dialog will be empty and won't close automatically.
 				 */
 				dialogFactory.open();
-				
+
 				for (LuceneIndex index : sel) {
 					Rejection rejection = queue.addTask(index, action);
 					if (action == IndexAction.REBUILD)
@@ -285,45 +286,54 @@ public final class IndexPanel {
 				}
 			}
 		}
-		updateIndexAction = new UpdateOrRebuildAction(Msg.update_index.get(), true);
-		menuManager.add(updateIndexAction);
-		menuManager.add(new UpdateOrRebuildAction(Msg.rebuild_index.get(), false));
+
+		if (ProgramConf.Bool.AllowIndexUpdate.get() || ProgramConf.Bool.AllowIndexRebuild.get()) {
+			menuManager.addSeparatorIfNonEmpty();
+			
+			updateIndexAction = new UpdateOrRebuildAction(Msg.update_index.get(), true);
+			if (ProgramConf.Bool.AllowIndexUpdate.get())
+				menuManager.add(updateIndexAction);
+			if (ProgramConf.Bool.AllowIndexRebuild.get())
+				menuManager.add(new UpdateOrRebuildAction(Msg.rebuild_index.get(), false));
+		}
 		
-		menuManager.addSeparator();
+		if (ProgramConf.Bool.AllowIndexDeletion.get()) {
+			menuManager.addSeparatorIfNonEmpty();
+
+			removeIndexAction = new MenuAction(Msg.remove_index.get()) {
+				public boolean isEnabled() {
+					return isOnlyIndexesSelected();
+				}
+				public void run() {
+					List<LuceneIndex> selectedIndexes = getSelectedIndexes();
+					assert !selectedIndexes.isEmpty();
+					if (AppUtil.showConfirmation(Msg.remove_sel_indexes.get(), false))
+						indexRegistry.removeIndexes(selectedIndexes, true);
+				}
+			};
+			menuManager.add(removeIndexAction);
+
+			menuManager.add(new MenuAction(Msg.remove_orphaned_indexes.get()) {
+				public boolean isEnabled() {
+					return tree.getItemCount() > 0;
+				}
+				public void run() {
+					List<LuceneIndex> indexes = indexRegistry.getIndexes();
+					List<LuceneIndex> toRemove = new ArrayList<LuceneIndex>(indexes.size());
+					for (LuceneIndex index : indexes)
+						if (!index.getCanonicalRootFile().exists())
+							toRemove.add(index);
+					if (toRemove.isEmpty())
+						return;
+					// TODO post-release-1.1: Also display the indexes to be removed?
+					String msg = Msg.remove_orphaned_indexes_msg.get();
+					if (AppUtil.showConfirmation(msg, false))
+						indexRegistry.removeIndexes(toRemove, true);
+				}
+			});
+		}
 		
-		removeIndexAction = new MenuAction(Msg.remove_index.get()) {
-			public boolean isEnabled() {
-				return isOnlyIndexesSelected();
-			}
-			public void run() {
-				List<LuceneIndex> selectedIndexes = getSelectedIndexes();
-				assert !selectedIndexes.isEmpty();
-				if (AppUtil.showConfirmation(Msg.remove_sel_indexes.get(), false))
-					indexRegistry.removeIndexes(selectedIndexes, true);
-			}
-		};
-		menuManager.add(removeIndexAction);
-		
-		menuManager.add(new MenuAction(Msg.remove_orphaned_indexes.get()) {
-			public boolean isEnabled() {
-				return tree.getItemCount() > 0;
-			}
-			public void run() {
-				List<LuceneIndex> indexes = indexRegistry.getIndexes();
-				List<LuceneIndex> toRemove = new ArrayList<LuceneIndex>(indexes.size());
-				for (LuceneIndex index : indexes)
-					if (!index.getCanonicalRootFile().exists())
-						toRemove.add(index);
-				if (toRemove.isEmpty())
-					return;
-				// TODO post-release-1.1: Also display the indexes to be removed?
-				String msg = Msg.remove_orphaned_indexes_msg.get();
-				if (AppUtil.showConfirmation(msg, false))
-					indexRegistry.removeIndexes(toRemove, true);
-			}
-		});
-		
-		menuManager.addSeparator();
+		menuManager.addSeparatorIfNonEmpty();
 		
 		class CheckAllAction extends MenuAction {
 			private final boolean checkAll;
@@ -448,15 +458,18 @@ public final class IndexPanel {
 		tree.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.F5) {
-					if (updateIndexAction.isEnabled())
+					if (updateIndexAction.isEnabled()
+							&& ProgramConf.Bool.AllowIndexUpdate.get())
 						updateIndexAction.run();
 				}
 				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'v') {
-					createTaskFromClipboard(
-						tree.getShell(), indexRegistry, dialogFactory);
+					if (ProgramConf.Bool.AllowIndexCreation.get())
+						createTaskFromClipboard(
+							tree.getShell(), indexRegistry, dialogFactory);
 				}
 				else if (e.keyCode == SWT.DEL) {
-					if (removeIndexAction.isEnabled())
+					if (removeIndexAction.isEnabled()
+							&& ProgramConf.Bool.AllowIndexDeletion.get())
 						removeIndexAction.run();
 				}
 			}

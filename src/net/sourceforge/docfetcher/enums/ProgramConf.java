@@ -49,6 +49,10 @@ public final class ProgramConf {
 		CurvyTabs (false),
 		ColoredTabs (false),
 		DryRun (false),
+		AllowIndexCreation (true),
+		AllowIndexUpdate (true),
+		AllowIndexRebuild (true),
+		AllowIndexDeletion (true),
 		;
 
 		private boolean value;

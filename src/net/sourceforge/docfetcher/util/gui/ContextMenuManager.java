@@ -146,6 +146,15 @@ public final class ContextMenuManager {
 		new MenuItem(menu, SWT.SEPARATOR);
 	}
 	
+	public void addSeparatorIfNonEmpty() {
+		int count = menu.getItemCount();
+		if (count == 0)
+			return;
+		MenuItem lastItem = menu.getItem(count - 1);
+		if ((lastItem.getStyle() & SWT.SEPARATOR) == 0)
+			new MenuItem(menu, SWT.SEPARATOR);
+	}
+	
 	public void addSeparator(@NotNull Menu submenu) {
 		new MenuItem(submenu, SWT.SEPARATOR);
 	}
