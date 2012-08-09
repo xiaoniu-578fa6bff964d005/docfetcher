@@ -11,7 +11,7 @@
 package net.sourceforge.docfetcher.gui.indexing;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Msg;
@@ -21,10 +21,11 @@ import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
 import net.sourceforge.docfetcher.util.gui.MenuAction;
-import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer;
-import net.sourceforge.docfetcher.util.gui.viewer.SimpleTableViewer.Column;
+import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer;
+import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -38,16 +39,30 @@ import org.eclipse.swt.widgets.Composite;
  */
 final class ErrorTable {
 	
-	private final SimpleTableViewer<IndexingError> tv;
+	private final VirtualTableViewer<IndexingError> tv;
+	private final List<IndexingError> errors = new LinkedList<IndexingError>();
 	
 	public ErrorTable(@NotNull Composite parent) {
 		int style = SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER;
-		tv = new SimpleTableViewer<IndexingError>(parent, style);
+		
+		tv = new VirtualTableViewer<IndexingError>(parent, style) {
+			@SuppressWarnings("unchecked")
+			protected List<IndexingError> getElements(Object rootElement) {
+				return (List<IndexingError>) rootElement;
+			}
+		};
+		
+		tv.setSortingEnabled(true);
 		tv.getControl().setLinesVisible(true);
 		
 		tv.addColumn(new Column<IndexingError>(Msg.document.get()) {
 			protected String getLabel(IndexingError element) {
 				return element.getTreeNode().getDisplayName();
+			}
+			protected int compare(IndexingError e1, IndexingError e2) {
+				String l1 = getLabel(e1);
+				String l2 = getLabel(e2);
+				return AlphanumComparator.ignoreCaseInstance.compare(l1, l2);
 			}
 		});
 		
@@ -55,11 +70,21 @@ final class ErrorTable {
 			protected String getLabel(IndexingError element) {
 				return element.getLocalizedMessage();
 			}
+			protected int compare(IndexingError e1, IndexingError e2) {
+				String l1 = getLabel(e1);
+				String l2 = getLabel(e2);
+				return AlphanumComparator.ignoreCaseInstance.compare(l1, l2);
+			}
 		});
 		
 		tv.addColumn(new Column<IndexingError>(Msg.path.get()) {
 			protected String getLabel(IndexingError element) {
 				return element.getTreeNode().getPath().getCanonicalPath();
+			}
+			protected int compare(IndexingError e1, IndexingError e2) {
+				File f1 = e1.getTreeNode().getPath().getCanonicalFile();
+				File f2 = e2.getTreeNode().getPath().getCanonicalFile();
+				return f1.compareTo(f2);
 			}
 		});
 		
@@ -95,8 +120,9 @@ final class ErrorTable {
 		Util.checkNotNull(error);
 		Util.runAsyncExec(tv.getControl(), new Runnable() {
 			public void run() {
-				tv.add(error);
-				tv.showElement(error);
+				errors.add(error);
+				tv.setRoot(errors);
+				tv.scrollToBottom();
 			}
 		});
 	}
@@ -137,7 +163,7 @@ final class ErrorTable {
 		
 		menuManager.add(new MenuAction(Msg.copy.get()) {
 			public boolean isEnabled() {
-				return tv.getItemCount() > 0;
+				return !errors.isEmpty();
 			}
 			public void run() {
 				copySelectedErrorsToClipboard();
@@ -151,18 +177,26 @@ final class ErrorTable {
 	 * there are no errors, this method does nothing.
 	 */
 	private void copySelectedErrorsToClipboard() {
-		if (tv.getItemCount() == 0)
+		if (errors.isEmpty())
 			return;
 		
-		List<IndexingError> errors = tv.getSelection();
-		if (errors.isEmpty())
-			tv.getElements();
+		List<IndexingError> sel = tv.getSelection();
+		if (sel.isEmpty())
+			sel = errors;
+
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (IndexingError error : sel) {
+			File file = error.getTreeNode().getPath().getCanonicalFile();
+			if (!first)
+				sb.append(Util.LS).append(Util.LS);
+			sb.append(error.getLocalizedMessage());
+			sb.append(Util.LS);
+			sb.append(file.getPath());
+			first = false;
+		}
 		
-		List<File> files = new ArrayList<File>(errors.size());
-		for (IndexingError error : errors)
-			files.add(error.getTreeNode().getPath().getCanonicalFile());
-		
-		Util.setClipboard(files);
+		Util.setClipboard(sb.toString());
 	}
 
 	private void launchSelection() {

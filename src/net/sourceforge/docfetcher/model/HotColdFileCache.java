@@ -202,8 +202,9 @@ public final class HotColdFileCache {
 	}
 	
 	// A simple LRU cache
-	@SuppressWarnings("serial")
 	private static final class ColdCache extends LinkedHashMap<String, TemporaryFileResource> {
+		private static final long serialVersionUID = 1L;
+		
 		@VisibleForTesting final int capacity;
 		
 		public ColdCache(int capacity) {

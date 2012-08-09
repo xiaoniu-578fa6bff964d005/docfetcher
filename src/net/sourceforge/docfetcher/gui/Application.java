@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Main;
@@ -38,6 +40,8 @@ import net.sourceforge.docfetcher.gui.preview.PreviewPanel;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.Daemon;
 import net.sourceforge.docfetcher.model.FolderWatcher;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
@@ -45,7 +49,6 @@ import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
-import net.sourceforge.docfetcher.model.search.Searcher.CorruptedIndex;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
@@ -53,11 +56,13 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
 import net.sourceforge.docfetcher.util.gui.dialog.InfoDialog;
+import net.sourceforge.docfetcher.util.gui.dialog.ListConfirmDialog;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.eclipse.swt.SWT;
@@ -388,7 +393,7 @@ public final class Application {
 		new Thread(Application.class.getName() + " (load index registry)") {
 			public void run() {
 				try {
-					List<CorruptedIndex> corrupted = indexRegistry.load(new Cancelable() {
+					final IndexLoadingProblems loadingProblems = indexRegistry.load(new Cancelable() {
 						public boolean isCanceled() {
 							return display.isDisposed();
 						}
@@ -427,11 +432,24 @@ public final class Application {
 
 					// Must be called *after* the indexes have been loaded
 					daemon.enqueueUpdateTasks();
+					
+					// Confirm deletion of obsolete files inside the index
+					// folder
+					if (!loadingProblems.getObsoleteFiles().isEmpty()) {
+						Util.runAsyncExec(mainShell, new Runnable() {
+							public void run() {
+								reportObsoleteIndexFiles(
+									mainShell,
+									indexRegistry.getIndexParentDir(),
+									loadingProblems.getObsoleteFiles());
+							}
+						});
+					}
 
 					// Show error messages if some indexes couldn't be loaded
-					if (!corrupted.isEmpty()) {
+					if (!loadingProblems.getCorruptedIndexes().isEmpty()) {
 						StringBuilder msg = new StringBuilder(Msg.corrupted_indexes.get());
-						for (CorruptedIndex index : corrupted) {
+						for (CorruptedIndex index : loadingProblems.getCorruptedIndexes()) {
 							msg.append("\n\n");
 							String indexName = index.index.getRootFolder().getDisplayName();
 							String errorMsg = index.ioException.getMessage();
@@ -450,6 +468,50 @@ public final class Application {
 				}
 			}
 		}.start();
+	}
+	
+	private static void reportObsoleteIndexFiles(	@NotNull Shell mainShell,
+	                                             	@NotNull File indexDir,
+													@NotNull List<File> filesToDelete) {
+		ListConfirmDialog dialog = new ListConfirmDialog(mainShell, SWT.ICON_INFORMATION);
+		dialog.setTitle(Msg.confirm_operation.get());
+		dialog.setText(Msg.delete_obsolete_index_files.format(indexDir.getPath()));
+		dialog.setButtonLabels(Msg.delete_bt.get(), Msg.keep.get());
+		
+		filesToDelete = new ArrayList<File>(filesToDelete);
+		Collections.sort(filesToDelete, new Comparator<File>() {
+			public int compare(File o1, File o2) {
+				boolean d1 = o1.isDirectory();
+				boolean d2 = o2.isDirectory();
+				if (d1 && !d2)
+					return -1;
+				if (!d1 && d2)
+					return 1;
+				return AlphanumComparator.ignoreCaseInstance.compare(o1.getName(), o2.getName());
+			}
+		});
+		
+		for (File file : filesToDelete) {
+			Image img = (file.isDirectory() ? Img.FOLDER : Img.FILE).get();
+			dialog.addItem(img, file.getName());
+		}
+		
+		dialog.evtLinkClicked.add(new Event.Listener<String>() {
+			public void update(String eventData) {
+				Util.launch(eventData);
+			}
+		});
+		
+		if (dialog.open()) {
+			for (File file : filesToDelete) {
+				try {
+					Util.deleteRecursively(file);
+				}
+				catch (IOException e) {
+					Util.printErr(e);
+				}
+			}
+		}
 	}
 
 	private static File loadProgramConf() {
@@ -636,7 +698,7 @@ public final class Application {
 		    public void update(Void eventData) {
 		    	saveSettingsConfFile();
 		    }
-		}); 
+		});
 		resultPanel = new ResultPanel(comp);
 
 		comp.setLayout(new FormLayout());
@@ -963,7 +1025,7 @@ public final class Application {
 				 * Don't open preferences dialog when the hotkey conflict occurs
 				 * at startup.
 				 */
-				if (shell.isVisible()){					
+				if (shell.isVisible()) {
 					PrefDialog prefDialog = new PrefDialog(shell, programConfFile);
 					prefDialog.evtOKClicked.add(new Event.Listener<Void> () {
 					    public void update(Void eventData) {

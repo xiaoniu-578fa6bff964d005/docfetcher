@@ -29,7 +29,6 @@ import com.google.common.base.Predicate;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public final class Path implements Serializable {
 	
 	public static final class PathParts {
@@ -57,6 +56,8 @@ public final class Path implements Serializable {
 			return path.getCanonicalFile().isFile();
 		}
 	}
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final String name;
 	private final String path;

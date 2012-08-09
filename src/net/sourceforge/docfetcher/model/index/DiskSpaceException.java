@@ -17,8 +17,9 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
-@SuppressWarnings("serial")
 public final class DiskSpaceException extends Exception {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public DiskSpaceException(String message) {
 		super(message);

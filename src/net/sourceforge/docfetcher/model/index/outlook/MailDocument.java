@@ -18,8 +18,9 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 final class MailDocument extends Document<MailDocument, MailFolder> {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public MailDocument(@NotNull MailFolder parent,
 	                    @NotNull String name,

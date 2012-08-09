@@ -21,9 +21,10 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 @VisibleForPackageGroup
 public class FileFolder extends Folder<FileDocument, FileFolder> {
+	
+	private static final long serialVersionUID = 1L;
 
 	public static class FileFolderVisitor <T extends Throwable>
 			extends FolderVisitor<FileDocument, FileFolder, T> {

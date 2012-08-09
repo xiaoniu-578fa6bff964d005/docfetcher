@@ -28,8 +28,9 @@ import com.google.common.collect.ImmutableList;
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
-@SuppressWarnings("serial")
 public abstract class TreeNode implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final String name;
 	

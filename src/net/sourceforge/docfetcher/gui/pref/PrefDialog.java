@@ -18,6 +18,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.gui.UtilGui;
@@ -146,15 +147,17 @@ public final class PrefDialog {
 		Label spacing2 = new Label(comp, SWT.NONE);
 		spacing2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 
-		Link link = new Link(comp, SWT.NONE);
-		link.setText("<a>Advanced Settings</a>");
-		link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		if (ProgramConf.Bool.ShowAdvancedSettingsLink.get()) {
+			Link link = new Link(comp, SWT.NONE);
+			link.setText("<a>Advanced Settings</a>");
+			link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-		link.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Util.launch(programConfFile);
-			}
-		});
+			link.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					Util.launch(programConfFile);
+				}
+			});
+		}
 
 		return comp;
 	}

@@ -47,7 +47,6 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 /**
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 
 	/*
@@ -69,6 +68,8 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 	 * meantime, there's no point in trying to parse it again because we know
 	 * we'd fail.
 	 */
+	
+	private static final long serialVersionUID = 1L;
 
 	// if indexParentDir is null, all content is written to a RAM index, which
 	// can be retrieved via getLuceneDir

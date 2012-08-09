@@ -97,7 +97,7 @@ public enum Msg {
 		"the {0} slot. The missing entries will be listed after this message."),
 	entries_missing_regenerate (
 		"Would you like to regenerate the file?",
-		"Question in Error message if entries are missing in a properties file " ),
+		"Question in an error message that is shown when entries are missing in a properties file."),
 	corrupted_indexes (
 		"The following indexes seem to be corrupted. Rebuilding them is recommended.",
 		"Error message shown on startup if one or more indexes couldn't be " +
@@ -106,6 +106,15 @@ public enum Msg {
 	index (
 		"Index: {0}",
 		"The name of the index will be inserted into the {0} slot."),
+	delete_obsolete_index_files (
+		"The following index files are incompatible with this program version. " +
+		"Do you want to delete these files? - <a href=\"{0}\">Open index folder</a>.",
+		"This message is shown during startup when incompatible files inside " +
+		"the index folder have been found. The {0} slot will be filled with " +
+		"the path to the index folder."),
+	delete_bt (
+		"&Delete",
+		"Label for a 'delete' button."),
 	
 	// Filter panel
 	min_max_filesize (

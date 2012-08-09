@@ -28,7 +28,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
 @VisibleForPackageGroup
-@SuppressWarnings("serial")
 public abstract class TreeIndex <
 	D extends Document<D, F>,
 	F extends Folder<D, F>> implements LuceneIndex {
@@ -44,6 +43,8 @@ public abstract class TreeIndex <
 	 * java.io.File objects to avoid certain portability issues caused by
 	 * non-normalized file paths.
 	 */
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final IndexingConfig config;
 	private final F rootFolder;

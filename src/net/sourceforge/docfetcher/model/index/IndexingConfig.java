@@ -47,8 +47,9 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
  * 
  * @author Tran Nam Quang
  */
-@SuppressWarnings("serial")
 public class IndexingConfig implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private static final List<String> defaultZipExtensions = Arrays.asList("zip", "jar");
 	private static final List<String> defaultTextExtensions = Arrays.asList("txt", "java", "cpp", "py");
