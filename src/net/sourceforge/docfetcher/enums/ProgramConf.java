@@ -53,6 +53,7 @@ public final class ProgramConf {
 		AllowIndexUpdate (true),
 		AllowIndexRebuild (true),
 		AllowIndexDeletion (true),
+		ShowAdvancedSettingsLink (true),
 		;
 
 		private boolean value;
