@@ -6,6 +6,11 @@
 		<action>EXCLUDE</action>
 	</pattern>
 	<pattern>
+		<regex>.*\.git.*</regex>
+		<target>PATH</target>
+		<action>EXCLUDE</action>
+	</pattern>
+	<pattern>
 		<regex>.*\.dll</regex>
 		<target>FILENAME</target>
 		<action>EXCLUDE</action>
