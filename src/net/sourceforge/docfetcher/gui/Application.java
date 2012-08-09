@@ -436,7 +436,7 @@ public final class Application {
 					// Confirm deletion of obsolete files inside the index
 					// folder
 					if (!loadingProblems.getObsoleteFiles().isEmpty()) {
-						Util.runAsyncExec(mainShell, new Runnable() {
+						Util.runSyncExec(mainShell, new Runnable() {
 							public void run() {
 								reportObsoleteIndexFiles(
 									mainShell,
