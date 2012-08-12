@@ -30,7 +30,7 @@ All downloads below support both 32-bit and 64-bit operating systems.
 <td>Windows&nbsp;XP/Vista/7</td>
 </tr>
 <tr>
-<td align="left">TODO portable <br/> Unpack the archive into a folder of your choice, then launch DocFetcher with the respective launcher for your platform. Make sure you have write permissions for the destination folder (i.e. don't unpack into a folder like "C:\Program&nbsp;Files").
+<td align="left">TODO portable <br/> This is the portable version that runs on all supported platforms. Installation: Unpack the archive into a folder of your choice, then launch DocFetcher with the respective launcher for your platform. Make sure you have write permissions for the destination folder (i.e. don't unpack into a folder like "C:\Program&nbsp;Files").
 </td>
 <td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 and newer</td>
 </tr>
