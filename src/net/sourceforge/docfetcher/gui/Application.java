@@ -146,6 +146,7 @@ public final class Application {
 		AppUtil.Const.IS_PORTABLE.set(SystemConf.Bool.IsPortable.get());
 		AppUtil.Const.IS_DEVELOPMENT_VERSION.set(SystemConf.Bool.IsDevelopmentVersion.get());
 
+		Msg.loadFromDisk();
 		Msg.setCheckEnabled(false);
 		AppUtil.Messages.system_error.set(Msg.system_error.get());
 		AppUtil.Messages.confirm_operation.set(Msg.confirm_operation.get());

@@ -11,8 +11,11 @@
 
 package net.sourceforge.docfetcher.enums;
 
+import java.io.File;
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
+import net.sourceforge.docfetcher.util.ClassPathHack;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -672,7 +675,7 @@ public enum Msg {
 	;
 	
 	private static boolean checkEnabled = true;
-	private final String value;
+	private String value;
 	private final String comment;
 	
 	Msg(@NotNull String defaultValue) {
@@ -707,6 +710,24 @@ public enum Msg {
 	
 	public static void setCheckEnabled(boolean checkEnabled) {
 		Msg.checkEnabled = checkEnabled;
+	}
+	
+	public static void loadFromDisk() {
+		try {
+			final File langDir;
+			if (SystemConf.Bool.IsDevelopmentVersion.get())
+				langDir = new File("dist/lang");
+			else
+				langDir = new File("lang");
+			ClassPathHack.addFile(langDir);
+			
+			ResourceBundle bundle = ResourceBundle.getBundle("Resource");
+			for (Msg msg : Msg.values())
+				if (bundle.containsKey(msg.name()))
+					msg.value = bundle.getString(msg.name());
+		} catch (Exception e) {
+			Util.printErr(e);
+		}
 	}
 	
 	private static final class Comments {
