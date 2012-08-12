@@ -149,6 +149,9 @@ Section "DocFetcher"
 
 	SetOutPath $INSTDIR\img
 	File /r ${PORTABLE_PATH}\img\*.*
+	
+	SetOutPath $INSTDIR\lang
+	File /r ${PORTABLE_PATH}\lang\*.*
 
 	SetOutPath $INSTDIR\templates
 	File /r ${PORTABLE_PATH}\templates\*.xml

@@ -163,6 +163,7 @@ public final class BuildMain {
 		U.copyDir("dist/img", releaseDir + "/img");
 		U.copyDir("dist/help", releaseDir + "/help");
 		U.copyDir("dist/templates", releaseDir + "/templates");
+		U.copyDir("dist/lang", releaseDir + "/lang");
 		updateManualVersionNumber(new File(releaseDir, "help"));
 
 		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
@@ -280,6 +281,7 @@ public final class BuildMain {
 
 		U.copyDir("dist/img", resourcesDir + "/img");
 		U.copyDir("dist/help", resourcesDir + "/help");
+		U.copyDir("dist/lang", resourcesDir + "/lang");
 		updateManualVersionNumber(new File(resourcesDir, "help"));
 		U.copyBinaryFile(
 			"dist/DocFetcher.icns",
