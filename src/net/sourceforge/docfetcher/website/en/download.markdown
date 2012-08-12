@@ -9,7 +9,7 @@ the following places:
 
 * Windows: [http://java.com](http://java.com)
 * Linux: In the official software repository of your distribution.
-* Mac OS X: [http://www.apple.com/support/](http://www.apple.com/support/)
+* Mac OS&nbsp;X: [http://www.apple.com/support/](http://www.apple.com/support/)
 
 Latest Release: DocFetcher 1.1
 ==============================
@@ -32,11 +32,11 @@ All downloads below support both 32-bit and 64-bit operating systems.
 <tr>
 <td align="left">TODO portable <br/> Unpack the archive into a folder of your choice, then launch DocFetcher with the respective launcher for your platform. Make sure you have write permissions for the destination folder (i.e. don't unpack into a folder like "C:\Program&nbsp;Files").
 </td>
-<td>Windows&nbsp;XP/Vista/7, Linux, Mac OS&nbsp;X</td>
+<td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 and newer</td>
 </tr>
 <tr>
 <td align="left">TODO mac <br/> Launch DocFetcher by double-clicking on the application bundle.</td>
-<td>Mac OS&nbsp;X</td>
+<td>Mac OS&nbsp;X 10.5 and newer</td>
 </tr>
 </table>
 

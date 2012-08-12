@@ -16,10 +16,10 @@ Linux
 -----
 Open the launcher script `DocFetcher/DocFetcher.sh` with a text editor, and in the last line, alter the expression `-Xmx256m` as needed, for example to `-Xmx512m`.
 
-Mac OS X
---------
+Mac OS&nbsp;X
+-------------
 Both in the non-portable and the portable version, DocFetcher is launched via an application bundle. In the non-portable version, the application bundle is just what you got out of the downloaded disk image. In the portable version, the application bundle can be found in the DocFetcher folder.
 
-In both cases, the application bundle is actually a folder with the extension `.app`. There should be a context menu entry in Finder to open this folder. If your Mac OS X language is English, this menu entry will be named `Show Package Contents`.
+In both cases, the application bundle is actually a folder with the extension `.app`. There should be a context menu entry in Finder to open this folder. If your Mac OS&nbsp;X language is English, this menu entry will be named `Show Package Contents`.
 
 Inside the folder, you will find this launcher script: `Contents/MacOS/DocFetcher`. Open it with a text editor, and in the last line, alter the expression `-Xmx256m` as needed, for example to `-Xmx512m`.

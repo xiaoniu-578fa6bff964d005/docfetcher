@@ -5,7 +5,7 @@ Basic usage
 -----------
 The portable version of DocFetcher essentially allows you to carry around (and even redistribute) a fully indexed and fully searchable document repository. If you don't have the portable version yet, you can download it from the [project website](http://docfetcher.sourceforge.net/download.html).
 
-The portable version does not require any installation; just extract the contents of the archive into a folder of your choice. You can then start DocFetcher via the appropriate launcher for your operating system: `DocFetcher.exe` on Windows, `DocFetcher.sh` on Linux and the `DocFetcher` application bundle on Mac OS X. The only requirement is that a Java runtime, version 1.6 or newer, must be installed on the machine.
+The portable version does not require any installation; just extract the contents of the archive into a folder of your choice. You can then start DocFetcher via the appropriate launcher for your operating system: `DocFetcher.exe` on Windows, `DocFetcher.sh` on Linux and the `DocFetcher` application bundle on Mac OS&nbsp;X. The only requirement is that a Java runtime, version 1.6 or newer, must be installed on the machine.
 
 <u>Relative paths</u>: An important thing to pay attention to is that all indexes must be created with the *relative paths* setting turned on. Without this, DocFetcher will store *absolute* references to your files, so you will only be able to move DocFetcher and its indexes around, but not your files &mdash; at least not without breaking references. Here's an example to illustrate this:
 

@@ -1,7 +1,7 @@
 Introduction
 ============
 
-DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository.
+DocFetcher is an Open Source desktop search application: It allows you to search the contents of files on your computer. - You can think of it as Google for your local files.
 
 **Index-based search**: Since searching in the documents directly would be impractically slow for a larger number of documents, DocFetcher requires that you create *indexes* for the folders you want to search in. These indexes allow DocFetcher to quickly look up files by keyword, similar to how you would use the index in the back of a book. Creating an index might take some time, depending on the number and sizes of the indexed files. However, this needs to be done only once for each folder; afterwards you can search in the indexed folders as many times as you want.
 
@@ -25,7 +25,7 @@ One shortcut you might find useful: Press `Ctrl+F` or `Alt+F` to move the focus 
 **Index updates**: If files in the indexed folders are added, removed or modified, the corresponding indexes have to be updated, otherwise your search results might be out of date. Fortunately, updating an index is virtually always much faster than creating it from scratch, since only the changes have to be processed. Also, DocFetcher can update its indexes automatically in two ways:
 
 1. ***DocFetcher itself***: If DocFetcher is running and the *folder watching* for the modified folder is enabled, DocFetcher detects the changes and updates its indexes immediately.
-2. ***DocFetcher daemon***: If DocFetcher isn't running, the changes are recorded by a small daemon program that runs in the background; the affected indexes will then be updated the next time DocFetcher starts. (Note: The daemon is currently not available on Mac OS X, unfortunately.)
+2. ***DocFetcher daemon***: If DocFetcher isn't running, the changes are recorded by a small daemon program that runs in the background; the affected indexes will then be updated the next time DocFetcher starts. (Note: The daemon is currently not available on Mac OS&nbsp;X, unfortunately.)
 
 Some caveats: If you are using the portable version of DocFetcher and want the daemon to be run, you must install it manually by adding the daemon executable to your operating system's list of startup programs. Also, neither DocFetcher nor the daemon can detect changes on network shares.<!-- this line should end with two spaces -->  
 So, in those cases where the indexes can't be updated automatically, you'll have to do it yourself: In the `Search Scope` area, select one or more indexes to be updated, then either click on `Update Index` in the `Search Scope` context menu, or press the `F5` key.
@@ -69,7 +69,7 @@ Caveats and Common Gotchas
 
 **Unicode support**: DocFetcher has full Unicode support for all document formats except CHM files. In case of plain text files, DocFetcher has to use [certain heuristics](http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html) to guess the correct encoding, since plain text files don't contain any explicit encoding information.
 
-**CHM files**: CHM files are not supported on Mac OS X and 64-bit Java. This means on Windows and Linux you might have to replace your 64-bit Java runtime with its 32-bit counterpart to get support for CHM files.
+**CHM files**: CHM files are not supported on Mac OS&nbsp;X and 64-bit Java. This means on Windows and Linux you might have to replace your 64-bit Java runtime with its 32-bit counterpart to get support for CHM files.
 
 **Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well, but not executable rar archives. DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
 With that said, it should be noted that support for zip and 7z archives is best in terms of robustness and speed. On the other hand, indexing of tar.gz, tar.bz2 and similar formats tends to be less efficient. This is due to the fact that these formats don't have an internal "summary" of the archive contents, which forces DocFetcher to unpack the entire archive rather than only individual archive entries. Bottom line: If you have the choice, compress your files either as zip or 7z archives for maximum compatibility with DocFetcher.
