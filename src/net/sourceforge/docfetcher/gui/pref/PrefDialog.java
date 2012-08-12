@@ -149,7 +149,7 @@ public final class PrefDialog {
 
 		if (ProgramConf.Bool.ShowAdvancedSettingsLink.get()) {
 			Link link = new Link(comp, SWT.NONE);
-			link.setText("<a>Advanced Settings</a>");
+			link.setText("<a>" + Msg.advanced_settings_link.get() + "</a>");
 			link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
 			link.addSelectionListener(new SelectionAdapter() {

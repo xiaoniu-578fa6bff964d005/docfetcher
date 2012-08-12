@@ -622,6 +622,9 @@ public enum Msg {
 	keybox_msg (
 		"Please enter a key:",
 		"The message displayed on the 'Enter Key' dialog."),
+	advanced_settings_link (
+		"Advanced Settings",
+		"Hyperlink on preferences dialog to configuration file containing advanced settings."),
 	
 	// Hotkeys
 	f1 ("F1"),
