@@ -54,19 +54,19 @@ DocFetcher has also received favorable user ratings on [its SourceForge.net page
 
 Comparison To Other Desktop Search Applications
 ===============================================
-The DocFetcher project was started in order to address certain problems that were and still seem to be common among desktop search applications. More specifically, the field of desktop search seems to be roughly divided into the following two camps: On one side bloated commercial programs that massively slow down your computer, and on the other side free, but bug-ridden and barely usable programs that probably have been abandoned a long time ago. So here's what DocFetcher has to offer:
+In comparison to other desktop search applications, here's where DocFetcher stands out:
 
 **Crap-free**: We strive to keep DocFetcher's user interface clutter- and crap-free. No advertisement or "would you like to register...?" popups. No useless stuff is installed in your web browser, registry or anywhere else in your system.
 
 **Privacy**: DocFetcher does not collect your private data. Ever. Anyone in doubt about this can check the publicly accessible [source code](http://docfetcher.sourceforge.net/wiki/doku.php?id=source_code).
 
-**Free forever**: Since DocFetcher is Open Source, you don't have to worry about the program ever becoming obsolete and unsupported, because the source code will always be there for the taking &mdash; as long as the internet itself is still up and running. Speaking of support, have you gotten the news that Google Desktop, one of DocFetcher's major commercial competitors, was discontinued in 2011? Well...
+**Free forever**: Since DocFetcher is Open Source, you don't have to worry about the program ever becoming obsolete and unsupported, because the source code will always be there for the taking. Speaking of support, have you gotten the news that Google Desktop, one of DocFetcher's major commercial competitors, was discontinued in 2011? Well...
 
-**Cross-platform**: Unlike many of its competitors, DocFetcher does not only run on Windows, but also on Linux and Mac OS X. Thus, if you ever feel like moving away from your Windows box, DocFetcher will probably be waiting for you on the other side.
+**Cross-platform**: Unlike many of its competitors, DocFetcher does not only run on Windows, but also on Linux and Mac OS X. Thus, if you ever feel like moving away from your Windows box and on to Linux or Mac OS X, DocFetcher will be waiting for you on the other side.
 
 **Portable**: One of DocFetcher's greatest strengths is its portability. Basically, with DocFetcher you can build up a complete, fully searchable document repository, and carry it around on your USB drive. More on that in the next section.
 
-**Indexing only what you need**: Among DocFetcher's competitors, especially the commercial ones seem to be rather fond of taking away as many decisions as possible from their supposedly dumb users. More specifically, these programs seem to try very hard to nudge you towards indexing your entire hard drive. In practice though, it seems safe to assume that most people *don't* want to have their entire hard drive indexed: Not only is this a waste of indexing time and disk space, but it also clutters the search results with unwanted files. Hence, DocFetcher indexes only the folders you explicitly want to be indexed, and on top of that you're provided with a multitude of filtering options.
+**Indexing only what you need**: Among DocFetcher's commercial competitors, there seems to be a tendency to nudge users towards indexing the entire hard drive &mdash; perhaps in an attempt to take away as many decisions as possible from supposedly "dumb" users, or worse, in an attempt to harvest more user data. In practice though, it seems safe to assume that most people *don't* want to have their entire hard drive indexed: Not only is this a waste of indexing time and disk space, but it also clutters the search results with unwanted files. Hence, DocFetcher indexes only the folders you explicitly want to be indexed, and on top of that you're provided with a multitude of filtering options.
 
 Portable Document Repositories
 ==============================
