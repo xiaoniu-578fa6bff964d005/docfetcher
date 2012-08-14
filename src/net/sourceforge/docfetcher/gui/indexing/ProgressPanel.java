@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.gui.indexing;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -38,7 +39,7 @@ final class ProgressPanel {
 		Group topGroup = new Group(sash, SWT.SHADOW_OUT);
 		topGroup.setText(Msg.progress.get());
 		topGroup.setLayout(Util.createFillLayout(1));
-		Group bottomGroup = new Group(sash, SWT.SHADOW_OUT);
+		final Group bottomGroup = new Group(sash, SWT.SHADOW_OUT);
 		bottomGroup.setText(Msg.errors.get());
 		bottomGroup.setLayout(Util.createFillLayout(1));
 		
@@ -47,6 +48,12 @@ final class ProgressPanel {
 		int itemLimit = ProgramConf.Int.MaxLinesInProgressPanel.get();
 		progressTable = new ProgressTable(topGroup, itemLimit);
 		errorTable = new ErrorTable(bottomGroup);
+		
+		errorTable.evtErrorCountChanged.add(new Event.Listener<Integer>() {
+			public void update(Integer eventData) {
+				bottomGroup.setText(Msg.errors.get() + " (" + eventData + ")");
+			}
+		});
 	}
 	
 	@NotNull

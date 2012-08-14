@@ -18,6 +18,7 @@ import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.MultiFileLauncher;
 import net.sourceforge.docfetcher.model.index.IndexingError;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
@@ -38,6 +39,8 @@ import org.eclipse.swt.widgets.Composite;
  * @author Tran Nam Quang
  */
 final class ErrorTable {
+	
+	public final Event<Integer> evtErrorCountChanged = new Event<Integer>();
 	
 	private final VirtualTableViewer<IndexingError> tv;
 	private final List<IndexingError> errors = new LinkedList<IndexingError>();
@@ -123,6 +126,7 @@ final class ErrorTable {
 				errors.add(error);
 				tv.setRoot(errors);
 				tv.scrollToBottom();
+				evtErrorCountChanged.fire(errors.size());
 			}
 		});
 	}
