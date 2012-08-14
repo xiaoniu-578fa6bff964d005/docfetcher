@@ -57,13 +57,12 @@ public final class BuildMain {
 		// Read version number from file 'current-version.txt'
 		String versionStr = "";
 		try {
-			versionStr = U.read("current-version.txt");
+			versionStr = U.read("current-version.txt").trim();
 		}
 		catch (Exception e) {
 			Util.printErr(e);
 			System.exit(0);
 		}
-		Util.checkThat(versionStr.trim().equals(versionStr));
 		Util.checkThat(versionStr.split("\r?\n").length == 1);
 		version = versionStr;
 	}
