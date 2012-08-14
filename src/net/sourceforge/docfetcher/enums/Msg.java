@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.sourceforge.docfetcher.util.ClassPathHack;
@@ -729,7 +730,8 @@ public enum Msg {
 				if (bundle.containsKey(msg.name()))
 					msg.value = bundle.getString(msg.name());
 		} catch (Exception e) {
-			Util.printErr(e);
+			// The English language strings are hard-coded,
+			// so there's no English bundle
 		}
 	}
 	

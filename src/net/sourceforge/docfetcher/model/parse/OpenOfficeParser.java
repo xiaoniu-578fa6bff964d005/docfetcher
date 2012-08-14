@@ -159,7 +159,11 @@ abstract class OpenOfficeParser extends FileParser {
 			throw new ParseException(e);
 		}
 		finally {
-			Closeables.closeQuietly(zipFile);
+			try {
+				zipFile.close();
+			}
+			catch (IOException e) {
+			}
 		}
 	}
 
@@ -195,7 +199,11 @@ abstract class OpenOfficeParser extends FileParser {
 		}
 		finally {
 			Closeables.closeQuietly(reader);
-			Closeables.closeQuietly(zipFile);
+			try {
+				zipFile.close();
+			}
+			catch (IOException e) {
+			}
 		}
 	}
 
