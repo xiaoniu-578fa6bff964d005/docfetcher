@@ -74,10 +74,22 @@ abstract class LuceneDocWriter {
 					luceneDoc.add(Fields.AUTHOR.create(author));
 		}
 		
-		// Create content field with metadata appended to it
+		/*
+		 * Create content field with metadata appended to it. Note that two
+		 * versions of the filename are appended: The filename with and without
+		 * file extension. The reason for this is that Lucene's StandardAnalyzer
+		 * won't split the filename at the dot before the file extension, so the
+		 * user wouldn't find the file if we store only the full filename and
+		 * the user searches for the filename without extension.
+		 */
 		luceneDoc.add(Fields.createContent(parseResult.getContent()));
 		StringBuilder metadata = parseResult.getMetadata();
 		metadata.append(filename);
+		String basename = Util.splitFilename(filename)[0];
+		if (!basename.equals(filename)) {
+			metadata.append(" ");
+			metadata.append(basename);
+		}
 		luceneDoc.add(Fields.createContent(metadata));
 		return luceneDoc;
 	}
