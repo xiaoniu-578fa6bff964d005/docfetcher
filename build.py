@@ -56,6 +56,8 @@ for root, dirs, files in os.walk('build/tmp/src-builder'):
 			compile_paths.append(path)
 execute([
 	'javac',
+	'-source 1.6',
+	'-target 1.6',
 	'-sourcepath build/tmp/src-builder',
 	'-classpath \"%s\"' % classpath_sep.join(jars),
 	'-nowarn',
