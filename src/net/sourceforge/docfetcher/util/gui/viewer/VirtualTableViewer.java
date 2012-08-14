@@ -120,7 +120,7 @@ public abstract class VirtualTableViewer<E> {
 		
 		tableColumn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (!sortingEnabled)
+				if (elements == null || !sortingEnabled)
 					return;
 				final int direction = lastSortColumn != column
 					? 1
