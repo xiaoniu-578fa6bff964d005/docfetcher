@@ -84,6 +84,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -212,10 +214,7 @@ public final class Application {
 		// Set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			public void uncaughtException(Thread t, final Throwable e) {
-				if (e instanceof OutOfMemoryError)
-					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) e);
-				else
-					AppUtil.showStackTrace(e);
+				handleCrash(e);
 			}
 		});
 
@@ -274,10 +273,7 @@ public final class Application {
 					display.sleep();
 			}
 			catch (Throwable t) {
-				if (t instanceof OutOfMemoryError)
-					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) t);
-				else
-					AppUtil.showStackTrace(t);
+				handleCrash(t);
 			}
 		}
 
@@ -288,8 +284,16 @@ public final class Application {
 		display.dispose();
 		saveSettingsConfFile();
 	}
+	
+	private static void handleCrash(@NotNull Throwable t) {
+		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(t), OutOfMemoryError.class)) {
+			UtilGui.showOutOfMemoryMessage(shell, e);
+			return;
+		}
+		AppUtil.showStackTrace(t);
+	}
 
-	public static void saveSettingsConfFile() {
+	private static void saveSettingsConfFile() {
 		/*
 		 * Try to save the settings. This may not be possible, for example when
 		 * the user has burned the program onto a CD-ROM.
