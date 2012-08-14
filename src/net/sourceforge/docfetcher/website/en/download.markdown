@@ -7,9 +7,9 @@ out what JRE version you have, open a command prompt and type in
 If Java 1.6.0 or higher is not available on your system, you can obtain it in
 the following places:
 
-* Windows: [http://java.com](http://java.com)
+* Windows: <http://java.com>
 * Linux: In the official software repository of your distribution.
-* Mac OS&nbsp;X: [http://www.apple.com/support/](http://www.apple.com/support/)
+* Mac OS&nbsp;X: <http://www.apple.com/support/>
 
 Latest Release: DocFetcher 1.1
 ==============================

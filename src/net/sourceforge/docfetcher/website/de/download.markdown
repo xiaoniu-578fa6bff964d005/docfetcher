@@ -4,9 +4,9 @@ Eine installierte Java-Laufzeit-Umgebung (JRE), Version 1.6.0 oder neuer, ist er
 
 Falls Java 1.6.0 oder neuer nicht auf Ihrem System verfügbar ist, können Sie es von folgenden Orten beziehen:
 
-* Windows: [http://java.com](http://java.com)
+* Windows: <http://java.com>
 * Linux: Im offiziellen Software-Repository Ihrer Distribution.
-* Mac OS&nbsp;X: [http://www.apple.com/support/](http://www.apple.com/support/)
+* Mac OS&nbsp;X: <http://www.apple.com/support/>
 
 Neueste Version: DocFetcher 1.1
 ===============================

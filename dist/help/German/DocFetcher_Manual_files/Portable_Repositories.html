@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>DocFetcher Benutzerhandbuch - Portable Dokument-Repositories</title>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+		<meta content="Tran Nam Quang" name="author">
+		<link rel="stylesheet" href="style.css" type="text/css">
+	</head>
+	<body>
+		<div class="header">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Zurück zur Hauptseite</a>
+		</div>
+		<div id="main">
+			<h1>Portable Dokument-Repositories</h1><h2>Grundlegende Benutzung</h2><p>Die portable Version von DocFetcher ermöglicht es, ein voll indiziertes und durchsuchbares Dokument-Repository zu erstellen, welches Sie dann mit sich herumtragen und mit anderen teilen können. Falls Sie die portable Version noch nicht haben, können Sie sie von der <a href="http://docfetcher.sourceforge.net/download.html">Projekt-Website</a> beziehen.</p><p>Die portable Version erfordert keine Installation; stattdessen muss einfach nur der Inhalt des heruntergeladenen Archivs in einen Ordner Ihrer Wahl entpackt werden. Sie können dann DocFetcher mit dem passenden Startprogramm für Ihr Betriebssystem starten: <code>DocFetcher.exe</code> auf Windows, <code>DocFetcher.sh</code> auf Linux und das <code>DocFetcher</code> Application Bundle auf Mac OS&nbsp;X. Es muss aber in jedem Fall eine Java-Laufzeit-Umgebung, Version 1.6 oder neuer, installiert sein.</p><p><u>Relative Pfade</u>: Eine wichtige Sache, auf die zu achten ist, besteht darin, dass alle Indizes mit der Einstellung <em>Relative Pfade speichern</em> erstellt werden müssen. Ohne diese Einstellung wird DocFetcher nämlich <em>absolute</em> Pfad-Referenzen zu Ihren Dateien erstellen, sodass Sie dann nur DocFetcher und seine Indizes frei umherschieben können, aber nicht Ihre Dateien &mdash; jedenfalls nicht, ohne Datei-Referenzen ungültig zu machen. Hier ein Beispiel, um dies zu verdeutlichen:</p>
+<ul>
+  <li>Relativer Pfad: <code>..\..\meine-dateien\eine-datei.txt</code></li>
+  <li>Absoluter Pfad: <code>C:\meine-dateien\eine-datei.txt</code></li>
+</ul><p>Der relative Pfad sagt DocFetcher im Wesentlichen, dass es <code>eine-datei.txt</code> dadurch auffinden kann, dass es vom gegenwärtigen Ort zwei Ebenen nach oben und dann in den Ordner <code>meine-dateien</code> hineingehen soll. Der absolute Pfad hingegen stellt eine feste Referenz dar und ist unabhängig von DocFetcher's gegenwärtigem Standort, sodass Sie <code>eine-datei.txt</code> nicht umherschieben können, ohne die Datei-Referenz ungültig zu machen (womit DocFetcher dann nicht mehr imstande sein wird, die Datei aufzufinden).</p><p>Beachten Sie, dass DocFetcher nur <em>versuchen</em> kann, relative Pfade zu speichern: Offenbar ist dies nicht möglich, wenn sich DocFetcher und Ihre Dateien auf unterschiedlichen Laufwerken befinden, z.&nbsp;B. DocFetcher in <code>D:\DocFetcher</code> und Ihre Dateien in <code>E:\meine-dateien</code>.</p><h2>Tipps &amp; Tricks</h2>
+<ul>
+  <li><strong><em>CD-ROM-Archivierung</em></strong>: Eigentlich offensichtlich, aber dennoch erwähnenswert: Wenn Sie DocFetcher auf eine CD-ROM brennen, werden Sie dann nicht mehr in der Lage sein, Programm-Einstellungen oder Indizes zu ändern. Folglich sollten Sie DocFetcher entsprechend konfigurieren, bevor es auf die CD-ROM gebrannt wird. Zudem sollten Sie erwägen, eine Java-Laufzeit-Umgebung mit auf die CD-ROM zu packen.</li>
+  <li><strong><em>Unterschiedliche Programm-Titel</em></strong>: Für die Weitergabe Ihres portablen Dokument-Repositories, oder um die Arbeit mit mehreren DocFetcher-Instanzen weniger verwirrend zu machen, können Sie den einzelnen DocFetcher-Instanzen jeweils einen anderen Programm-Titel zuweisen. Öffnen Sie dazu <code>Erweiterte Einstellungen</code> auf dem Programm-Einstellungs-Fenster und ändern Sie die Einstellung <code>AppName</code> entsprechend ab.</li>
+</ul><h2>Bitte beachten</h2>
+<ul>
+  <li><strong><em>Finger weg vom <code>indexes</code>-Ordner</em></strong>: Sie können, müssen aber nicht Ihre Dateien im DocFetcher-Ordner ablegen. Falls Sie das tun sollten, stecken Sie auf keinen Fall irgendetwas in den <code>indexes</code>-Ordner, da alles, was sich darin befindet, gelöscht werden könnte.</li>
+  <li><strong><em>Dateinamens-Inkompatibilitäten</em></strong>: Hüten Sie sich vor Dateinamens-Inkompatibilitäten zwischen verschiedenen Betriebssystemen. Bspw. können Dateinamen auf Linux Zeichen wie ":" oder "|" enthalten, aber nicht auf Windows. Infolgedessen können Sie ihr Dokument-Repository nur von Linux nach Windows oder in die umgekehrte Richtung bewegen, wenn die Dateien darin keine inkompatiblen Dateinamen haben. Ein ganz anderes Thema sind übrigens Sonderzeichen wie die Umlaute im Deutschen...</li>
+</ul>
+		</div>
+		<div class="footer">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Zurück zur Hauptseite</a>
+		</div>
+	</body>
+</html>

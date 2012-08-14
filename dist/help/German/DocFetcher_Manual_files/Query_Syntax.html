@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>DocFetcher Benutzerhandbuch - Suchanfrage-Syntax</title>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+		<meta content="Tran Nam Quang" name="author">
+		<link rel="stylesheet" href="style.css" type="text/css">
+	</head>
+	<body>
+		<div class="header">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Zurück zur Hauptseite</a>
+		</div>
+		<div id="main">
+			<h1>Suchanfrage-Syntax</h1><p>Diese Seite gibt einen Überblick über die verfügbaren Konstrukte der Suchanfrage-Syntax, wobei die Konstrukte von "einfach" nach "fortgeschritten" sortiert sind. Die Suchanfrage-Syntax wird von DocFetcher's interner Suchmaschine Apache Lucene bereitgestellt und ist auf etwas technischere Weise auf der <a href="http://lucene.apache.org/java/3_4_0/queryparsersyntax.html">Suchanfrage-Syntax-Seite von Lucene</a> erklärt.</p><h2>Boolesche Operatoren</h2><p>DocFetcher unterstützt die Booleschen Operatoren <code>OR</code>, <code>AND</code> und <code>NOT</code>. Wenn Suchbegriffe <em>ohne</em> Boolesche Operatoren hintereinander geschrieben werden, verknüpft DocFetcher sie standardmäßig mittels <code>OR</code>. Wenn Sie stattdessen eine <code>AND</code>-Verknüpfung als Standard wünschen, können Sie dies in den <a href="Preferences.html">Programm-Einstellungen</a> festlegen.</p><p>Anstelle von <code>OR</code>, <code>AND</code> und <code>NOT</code> können Sie auch <code>||</code>, <code>&amp;&amp;</code> und <code>&#39;-&#39;</code> (Minuszeichen), verwenden. Sie können <em>Klammern</em> benutzen, um bestimmte Ausdrücke zu gruppieren. Hier einige Beispiele:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Suchanfrage </th>
+      <th>Gefundene Dateien enthalten...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>dog OR cat</code> </td>
+      <td>entweder <code>dog</code>, oder <code>cat</code>, oder beides</td>
+    </tr>
+    <tr>
+      <td><code>dog AND cat</code> </td>
+      <td>sowohl <code>dog</code> als auch <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>dog cat</code> </td>
+      <td>(standardmäßig äquivalent zur Suchanfrage <code>dog OR cat</code>)</td>
+    </tr>
+    <tr>
+      <td><code>dog NOT cat</code> </td>
+      <td><code>dog</code>, aber nicht <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>-dog cat</code> </td>
+      <td><code>cat</code>, aber nicht <code>dog</code></td>
+    </tr>
+    <tr>
+      <td><code>(dog OR cat) AND mouse</code> </td>
+      <td><code>mouse</code>, und entweder <code>dog</code> oder <code>cat</code>, oder beides</td>
+    </tr>
+  </tbody>
+</table><h2>Keine Unterscheidung von Groß- und Kleinschreibung</h2><p>DocFetcher unterscheidet nicht zwischen Groß- und Kleinschreibung, sodass es keine Rolle spielt, ob die Suchbegriffe komplett in Großbuchstaben, oder komplett in Kleinbuchstaben, oder in einer Mischung von Groß- und Kleinbuchstaben eingegeben werden. Die einzige Ausnahme sind die Schlüsselwörter <code>OR</code>, <code>AND</code>, <code>NOT</code> und <code>TO</code>, die stets in Großschreibung eingegeben werden müssen. (Das Schlüsselwort <code>TO</code> ist weiter unten im Abschnitt 'Bereichs-Suche' erklärt.)</p><h2>Phrasen-Suche und mandatorische Suchbegriffe</h2><p>Um nach einer Phrase zu suchen (d.&nbsp;h. einer festen Abfolge von Wörtern), können Sie die Phrase in Anführungszeichen setzen. Um anzugeben, dass die aufzufindenden Dateien definitiv einen bestimmten Begriff enthalten müssen, können Sie ein <code>&#39;+&#39;</code> vor den Begriff setzen. Natürlich können Sie diese beiden Konstrukte mit Booleschen Operatoren und Klammern kombinieren. Hier wieder ein paar Beispiele:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Suchanfrage </th>
+      <th>Gefundene Dateien enthalten...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>&quot;dog cat mouse&quot;</code> </td>
+      <td>die Wörter <code>dog</code>, <code>cat</code> und <code>mouse</code>, in dieser Reihenfolge</td>
+    </tr>
+    <tr>
+      <td><code>+dog cat</code> </td>
+      <td>definitiv <code>dog</code>, und evtl. auch <code>cat</code></td>
+    </tr>
+    <tr>
+      <td><code>&quot;dog cat&quot; AND mouse</code> </td>
+      <td>die Phrase <code>dog cat</code>, und das Wort <code>mouse</code></td>
+    </tr>
+    <tr>
+      <td><code>+dog +cat</code> </td>
+      <td>(äquivalent zur Suchanfrage <code>dog AND cat</code>)</td>
+    </tr>
+  </tbody>
+</table><h2>Wildcards (Platzhalter)</h2><p>Fragezeichen (<code>&#39;?&#39;</code>) und Sternchen (<code>&#39;*&#39;</code>) können als Wildcards (engl. für Platzhalter) verwendet werden, d.&nbsp;h. sie geben an, dass bestimmte Zeichen unbekannt sind. Das Fragezeichen steht für genau ein unbekanntes Zeichen, und das Sternchen für ein oder mehrere unbekannte Zeichen. Beispiele:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Suchanfrage </th>
+      <th>Gefundene Dateien enthalten...</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>luc?</code> </td>
+      <td><code>lucy</code>, <code>luca</code>, ...</td>
+    </tr>
+    <tr>
+      <td><code>luc*</code> </td>
+      <td><code>luc</code>, <code>lucy</code>, <code>luck</code>, <code>lucene</code>, ...</td>
+    </tr>
+    <tr>
+      <td><code>*ene*</code> </td>
+      <td><code>lucene</code>, <code>energy</code>, <code>generator</code>, ...</td>
+    </tr>
+  </tbody>
+</table><p>Anm.: Suchanfragen, in denen Wildcards als erstes Zeichen in einem Suchbegriff verwendet werden, erfordern im Durchschnitt mehr Suchzeit als andere Suchanfragen. Dies hängt mit der internen Struktur von Indizes zusammen: Wildcards als erstes Zeichen zu verwenden ist so, als würde man die Telefonnummer einer Person im Telefonbuch nachschlagen, aber nur den Vornamen der Person kennen. Ein konkretes Beispiel: Eine Suchanfrage wie <code>*ene*</code> wird wahrscheinlich mehr Zeit benötigen als andere Suchanfragen, da <code>*ene*</code> mit einem Wildcard beginnt.</p><h2>Fuzzy-Suche</h2><p>Die Fuzzy-Suche ist eine Suche nach Wörtern, die einem gegebenen Wort <em>ähneln</em>. Wenn Sie bspw. <code>roam~</code> eingeben, wird DocFetcher nach Dateien suchen, die z.&nbsp;B. <code>foam</code> oder <code>roams</code> enthalten.</p><p>Darüber hinaus können Sie auch einen Ähnlichkeits-Schwellwert zwischen 0 und 1 an die Fuzzy-Suche anhängen, z.&nbsp;B. so: <code>roam~0.8</code>. Je höher der Schwellwert, desto höher die Ähnlichkeit der Fundstellen. Wenn die Schwellwert-Angabe ausgelassen wird, wird implizit ein Wert von 0.5 verwendet.</p><h2>Nachbarschafts-Suche</h2><p>Mittels Nachbarschafts-Suche können Sie nach Wörtern suchen, die innerhalb einer bestimmten Höchst-Distanz entfernt voneinander liegen. Eine Nachbarschafts-Suche können Sie ausführen, indem Sie eine Tilde (<code>&#39;~&#39;</code>) an eine Phrase anhängen, gefolgt von einer Distanz-Angabe. &mdash; Man beachte, dass dies in syntaktischer Hinsicht der Fuzzy-Suche ähnelt. Beispiel: Um nach Dateien zu suchen, die die Wörter <code>wikipedia</code> und <code>lucene</code> enthalten, und in denen die beiden Wörter höchstens 10 Wörter weit voneinander entfernt sind, können Sie folgendes eingeben: <code>&quot;wikipedia lucene&quot;~10</code></p><h2>Boosting</h2><p>Sie können durch Zuweisung von Gewichten zu Suchbegriffen die Sortierung der Suchergebnisse nach Trefferquote beeinflussen. Beispiel: Wenn Sie <code>dog^4 cat</code> anstelle von <code>dog cat</code> eingeben, erhalten Dateien, die <code>dog</code> enthalten, eine höhere Wertung und werden daher weiter oben in der Ergebnisliste erscheinen.</p><p>Derartige Gewichte müssen positiv sein, können aber kleiner als 1 sein (z.&nbsp;B. 0.2). Wenn kein Gewicht angegeben ist, wird der Standardwert 1 verwendet.</p><h2>Feld-Suche</h2><p>Standardmäßig sucht DocFetcher in jeglichem Text aus einer Datei, den es zu extrahieren imstande war. Dazu zählen der "eigentliche" Datei-Inhalt, der Dateiname, sowie Meta-Daten. Stattdessen können Sie die Suche aber auch auf den Dateinamen und/oder bestimmte Meta-Daten-Felder einschränken. Um bspw. nach Dateien zu suchen, deren Titel <code>wikipedia</code> enthält, können Sie eingeben: <code>title:wikipedia</code>. Dies kann mit Phrasen-Suche kombiniert werden, z.&nbsp;B. <code>title:&quot;dog cat&quot;</code>, oder auch mit Klammern, z.&nbsp;B. <code>title:(dog cat)</code>. Wenn Sie übrigens die Anführungszeichen und Klammern in den zwei vorherigen Beispielen auslassen, wird nur der Begriff <code>dog</code> auf den Datei-Titel eingeschränkt, aber nicht <code>cat</code>.</p><p>Welche Felder verfügbar sind, hängt zwar im Allgemeinen vom jeweiligen Dateityp ab, aber Sie können von folgender Daumenregel ausgehen:</p>
+<!-- Do not translate the following field names (filename, title, etc.) -->
+<ul>
+  <li><em>Dateien</em>: filename, title, author</li>
+  <li><em>E-Mails</em>: subject, sender, recipients</li>
+</ul><h2>Bereichs-Suche</h2><p>DocFetcher erlaubt die Suche nach Wörtern, die sich lexikographisch <em>zwischen</em> zwei anderen Wörtern befinden. Bspw. liegt das Wort <code>beta</code> zwischen den Wörtern <code>alpha</code> und <code>gamma</code>. Um z.&nbsp;B. alle Dateien zu finden, die Wörter enthalten, welche sich zwischen <code>alpha</code> und <code>gamma</code> befinden, können Sie folgendes eingeben: <code>[alpha TO gamma]</code>.</p><p>Wenn Sie rechteckige Klammern verwenden, arbeitet die Bereichs-Suche <em>inklusiv</em>, d.&nbsp;h. <code>alpha</code> und <code>gamma</code> gehen mit in die Suchergebnisse ein. Um stattdessen eine <em>exklusive</em> Bereichs-Suche auszuführen, müssen Sie geschweifte Klammern verwenden: <code>{alpha TO gamma}</code></p><p>Sie können auf folgende Weise Bereichs-Suche und Feld-Suche kombinieren: <code>title:{alpha TO gamma}</code>. Damit wird die Bereichs-Suche auf das <code>title</code>-Feld eingeschränkt.</p>
+		</div>
+		<div class="footer">
+			<a href="../DocFetcher_Manual.html#Advanced_Usage">Zurück zur Hauptseite</a>
+		</div>
+	</body>
+</html>

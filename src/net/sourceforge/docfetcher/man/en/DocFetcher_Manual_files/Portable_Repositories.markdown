@@ -20,7 +20,7 @@ Usability tips
 --------------
 
 * ***CD-ROM archiving***: Just common sense, but still: If you put DocFetcher on a CD-ROM, you won't be able to save changes to the preferences or the indexes, so remember to properly configure everything before burning it onto the CD-ROM. Also, you might want to include a Java runtime installer.
-* ***Different program titles***: For redistribution of your portable document repository, or to make working with multiple DocFetcher instances less confusing, you can give each DocFetcher instance a different program window title. To do so, change the `AppName` setting in the file `program.conf`, which can be found in the `conf` folder.
+* ***Different program titles***: For redistribution of your portable document repository, or to make working with multiple DocFetcher instances less confusing, you can give each DocFetcher instance a different program window title. To do so, open the `Advanced Settings` on the preferences dialog and modify the `AppName` setting.
 
 Warnings
 --------

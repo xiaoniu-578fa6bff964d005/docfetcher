@@ -8,7 +8,7 @@ On the right of the `'+'` button is another button. Clicking this one will minim
 
 You can cancel any task by clicking on the close button (`'x'`) of its tab. When a task is cancelled, you'll be given the choice of either keeping or discarding the partially created index. The point is that you can stop indexing at any point and resume later. Resuming is simply done by running an index update on the partial index, via `Update Index` from the `Search Scope` area's context menu.
 
-The configuration window itself has a close button as well (on Windows, this is the `'x'` button on the top right). If you click on it, the whole queue will be cleared, and all indexing tasks will be cancelled.
+The configuration window itself has a close button as well (on Windows, this is the `'x'` button on the top right). If you click on it, all indexing tasks will be cancelled and removed from the queue.
 
 Indexing Options
 ================
