@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.enums;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.sourceforge.docfetcher.util.ClassPathHack;
