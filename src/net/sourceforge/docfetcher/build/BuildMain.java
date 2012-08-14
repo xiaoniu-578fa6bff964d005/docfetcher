@@ -109,10 +109,10 @@ public final class BuildMain {
 		String msgPrefix = isPortable ? "" : "non-";
 		Util.println(U.format("Creating %sportable jar file...", msgPrefix));
 
-		File systemConfDest = new File(mainPath + "/system.conf");
+		File systemConfDest = new File(mainPath + "/system-conf.txt");
 		systemConfDest.delete();
 
-		File programConfDest = new File(mainPath + "/program.conf");
+		File programConfDest = new File(mainPath + "/program-conf.txt");
 		programConfDest.delete();
 
 		File mainJarFile = new File(String.format(
@@ -120,7 +120,7 @@ public final class BuildMain {
 		mainJarFile.delete();
 
 		U.copyTextFile(
-			"dist/system-template.conf",
+			"dist/system-template-conf.txt",
 			systemConfDest.getPath(),
 			lineSep,
 			"${app_name}", appName,
@@ -129,7 +129,7 @@ public final class BuildMain {
 			"${is_portable}", String.valueOf(isPortable));
 
 		U.copyTextFile(
-			"dist/program.conf",
+			"dist/program-conf.txt",
 			programConfDest.getPath(),
 			lineSep);
 
@@ -224,7 +224,7 @@ public final class BuildMain {
 				+ "/" + daemonNames[1]);
 
 		U.copyTextFile(
-			"dist/program.conf", releaseDir + "/conf/program.conf", LineSep.WINDOWS);
+			"dist/program-conf.txt", releaseDir + "/conf/program-conf.txt", LineSep.WINDOWS);
 
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");

@@ -125,8 +125,8 @@ public final class Application {
 		 * We'll first try to load from the jar (normal use case), then from a
 		 * file (we're inside the IDE).
 		 */
-		String systemConfName = "system.conf";
-		String systemConfPath = "dev/system.conf";
+		String systemConfName = "system-conf.txt";
+		String systemConfPath = "dev/system-conf.txt";
 		boolean success = ConfLoader.loadFromStreamOrFile(
 			Main.class, SystemConf.class, systemConfName, systemConfPath);
 		if (!success) {
@@ -521,11 +521,11 @@ public final class Application {
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
-			confFile = new File("dist/program.conf");
+			confFile = new File("dist/program-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
-			confFile = new File(appDataDir, "conf/program.conf");
+			confFile = new File(appDataDir, "conf/program-conf.txt");
 		}
 
 		try {
@@ -582,11 +582,11 @@ public final class Application {
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
-			confFile = new File("bin/settings.conf");
+			confFile = new File("bin/settings-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
-			confFile = new File(appDataDir, "conf/settings.conf");
+			confFile = new File(appDataDir, "conf/settings-conf.txt");
 		}
 
 		try {
