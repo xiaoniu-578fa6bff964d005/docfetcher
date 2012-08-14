@@ -153,8 +153,8 @@ Section "DocFetcher"
 	SetOutPath $INSTDIR\lang
 	File /r ${PORTABLE_PATH}\lang\*.*
 
-	SetOutPath $INSTDIR\templates
-	File /r ${PORTABLE_PATH}\templates\*.xml
+	;SetOutPath $INSTDIR\templates
+	;File /r ${PORTABLE_PATH}\templates\*.xml
 	
 	Delete /REBOOTOK "$INSTDIR\lib\net.sourceforge.docfetcher_*.*"
 	SetOutPath $INSTDIR\lib

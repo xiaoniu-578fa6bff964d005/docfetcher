@@ -163,7 +163,7 @@ public final class BuildMain {
 		String releaseDir = U.format("build/%s-%s", appName, version);
 		U.copyDir("dist/img", releaseDir + "/img");
 		U.copyDir("dist/help", releaseDir + "/help");
-		U.copyDir("dist/templates", releaseDir + "/templates");
+//		U.copyDir("dist/templates", releaseDir + "/templates");
 		U.copyDir("dist/lang", releaseDir + "/lang");
 		updateManualVersionNumber(new File(releaseDir, "help"));
 
