@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -122,6 +121,16 @@ public final class Application {
 	}
 
 	public static void main(String[] args) {
+		/*
+		 * Bug #3553412: Starting with Java 7, calling Arrays.sort can cause an
+		 * IllegalArgumentException with the error message
+		 * "Comparison method violates its general contract!". In DocFetcher,
+		 * this happened on a PDF file with PDFBox 1.7.0. For background, see
+		 * http://stackoverflow.com/questions/7849539/comparison-method
+		 * -violates-its-general-contract-java-7-only
+		 */
+		System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+		
 		/*
 		 * Load system constants; this should be the very first thing to do.
 		 * We'll first try to load from the jar (normal use case), then from a
