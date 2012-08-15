@@ -87,7 +87,8 @@ privileged aspect CodeConventions {
 	
 	declare warning: call(* Closeable+.close(..))
 	&& !withincode(* Closeable+.close(..))
-	&& within(net.sourceforge.docfetcher..*): // Ignore external sources
+	&& within(net.sourceforge.docfetcher..*) // Ignore external sources
+	&& !withincode(@SuppressAjWarnings * *(..)):
 		"Resources should be closed with " +
 		"com.google.common.io.Closeables.closeQuietly(Closeable) " +
 		"inside a finally block.";
