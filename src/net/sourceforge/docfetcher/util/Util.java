@@ -1384,7 +1384,7 @@ public final class Util {
 	 * Runs the given {@code Runnable} via {@link Display#asyncExec(Runnable)}.
 	 * This is useful for running GUI-accessing code from non-GUI threads.
 	 * <p>
-	 * The given Runnable is <b>not</b> run if the given given widget is null or
+	 * The given Runnable is <b>not</b> run if the given widget is null or
 	 * disposed. This helps avoid the common pitfall of trying to access widgets
 	 * from a non-GUI thread when these widgets have already been disposed.
 	 */
@@ -1400,6 +1400,31 @@ public final class Util {
 		widget.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				if (!widget.isDisposed())
+					runnable.run();
+			}
+		});
+	}
+	
+	/**
+	 * Runs the given {@code Runnable} via {@link Display#asyncExec(Runnable)}.
+	 * This is useful for running GUI-accessing code from non-GUI threads.
+	 * <p>
+	 * The given Runnable is <b>not</b> run if the given display is null or
+	 * disposed. This helps avoid the common pitfall of trying to access widgets
+	 * from a non-GUI thread when these widgets have already been disposed.
+	 */
+	public static void runAsyncExec(@Nullable final Display display,
+									@NotNull final Runnable runnable) {
+		/*
+		 * Note: Unlike the syncExec variant, here it's not possible to return a
+		 * boolean flag that indicates whether the Runnable was run, since
+		 * asyncExec may not execute the Runnable immediately.
+		 */
+		if (display == null || display.isDisposed())
+			return;
+		display.asyncExec(new Runnable() {
+			public void run() {
+				if (!display.isDisposed())
 					runnable.run();
 			}
 		});

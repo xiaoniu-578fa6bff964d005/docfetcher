@@ -3,21 +3,24 @@
 ; This must be run after running build.py, because it expects to find the
 ; DocFetcher jar in the build folder.
 ;
-; When building a new release, remember to update the version number in the next
-; command.
-;
 ; DEPENDENCIES
+; All dependencies of this script can be found in dev/nsis-dependencies. They
+; should be installed into the following locations (adjust paths as needed):
+; - Processes.dll -> C:\Program Files\NSIS\Plugins
+; - JREDyna_Inetc.nsh -> C:\Program Files\NSIS\Include
+; - Inetc.zip -> Extract contents into C:\Program Files\NSIS
+;
+; Where the above dependencies came from:
 ; http://nsis.sourceforge.net/Processes_plug-in
 ; http://nsis.sourceforge.net/Inetc_plug-in
 ; http://nsis.sourceforge.net/Java_Runtime_Environment_Dynamic_Installer
-; If you get errors in JREDyna_Inetc just delete CUSTOM_PAGE_JREINFO
-;
+; In the JREDyna_Inetc.nsh file everything related to CUSTOM_PAGE_JREINFO was
+; deleted in order to work around compilation errors.
 
 
 RequestExecutionLevel admin ; without this, the startmenu links won't be removed on Windows Vista/7
 SetCompress force
-SetCompressor /FINAL /SOLID lzma
-SetCompressorDictSize 32
+SetCompressor /FINAL zlib
 
 !define /file VERSION "current-version.txt"
 !define PORTABLE_PATH build\DocFetcher-${VERSION}
@@ -149,9 +152,12 @@ Section "DocFetcher"
 
 	SetOutPath $INSTDIR\img
 	File /r ${PORTABLE_PATH}\img\*.*
+	
+	SetOutPath $INSTDIR\lang
+	File /r ${PORTABLE_PATH}\lang\*.*
 
-	SetOutPath $INSTDIR\templates
-	File /r ${PORTABLE_PATH}\templates\*.xml
+	;SetOutPath $INSTDIR\templates
+	;File /r ${PORTABLE_PATH}\templates\*.xml
 	
 	Delete /REBOOTOK "$INSTDIR\lib\net.sourceforge.docfetcher_*.*"
 	SetOutPath $INSTDIR\lib

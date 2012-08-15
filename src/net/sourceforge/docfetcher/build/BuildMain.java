@@ -57,13 +57,12 @@ public final class BuildMain {
 		// Read version number from file 'current-version.txt'
 		String versionStr = "";
 		try {
-			versionStr = U.read("current-version.txt");
+			versionStr = U.read("current-version.txt").trim();
 		}
 		catch (Exception e) {
 			Util.printErr(e);
 			System.exit(0);
 		}
-		Util.checkThat(versionStr.trim().equals(versionStr));
 		Util.checkThat(versionStr.split("\r?\n").length == 1);
 		version = versionStr;
 	}
@@ -87,7 +86,8 @@ public final class BuildMain {
 		javac.setProject(new Project());
 		javac.setSrcdir(new Paths().addDirSet("build/tmp/src").get());
 		javac.setClasspath(new Paths().addFileSet("lib", "**/*.jar").get());
-		javac.setSource("5");
+		javac.setSource("1.6");
+		javac.setTarget("1.6");
 		javac.setDebug(true);
 		javac.setOptimize(true);
 		javac.setFork(true); // Won't find javac executable without this
@@ -108,10 +108,10 @@ public final class BuildMain {
 		String msgPrefix = isPortable ? "" : "non-";
 		Util.println(U.format("Creating %sportable jar file...", msgPrefix));
 
-		File systemConfDest = new File(mainPath + "/system.conf");
+		File systemConfDest = new File(mainPath + "/system-conf.txt");
 		systemConfDest.delete();
 
-		File programConfDest = new File(mainPath + "/program.conf");
+		File programConfDest = new File(mainPath + "/program-conf.txt");
 		programConfDest.delete();
 
 		File mainJarFile = new File(String.format(
@@ -119,7 +119,7 @@ public final class BuildMain {
 		mainJarFile.delete();
 
 		U.copyTextFile(
-			"dist/system-template.conf",
+			"dist/system-template-conf.txt",
 			systemConfDest.getPath(),
 			lineSep,
 			"${app_name}", appName,
@@ -128,7 +128,7 @@ public final class BuildMain {
 			"${is_portable}", String.valueOf(isPortable));
 
 		U.copyTextFile(
-			"dist/program.conf",
+			"dist/program-conf.txt",
 			programConfDest.getPath(),
 			lineSep);
 
@@ -162,7 +162,8 @@ public final class BuildMain {
 		String releaseDir = U.format("build/%s-%s", appName, version);
 		U.copyDir("dist/img", releaseDir + "/img");
 		U.copyDir("dist/help", releaseDir + "/help");
-		U.copyDir("dist/templates", releaseDir + "/templates");
+//		U.copyDir("dist/templates", releaseDir + "/templates");
+		U.copyDir("dist/lang", releaseDir + "/lang");
 		updateManualVersionNumber(new File(releaseDir, "help"));
 
 		String excludedLibs = U.readPatterns("lib/excluded_jar_patterns.txt");
@@ -222,7 +223,7 @@ public final class BuildMain {
 				+ "/" + daemonNames[1]);
 
 		U.copyTextFile(
-			"dist/program.conf", releaseDir + "/conf/program.conf", LineSep.WINDOWS);
+			"dist/program-conf.txt", releaseDir + "/conf/program-conf.txt", LineSep.WINDOWS);
 
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");
@@ -280,6 +281,7 @@ public final class BuildMain {
 
 		U.copyDir("dist/img", resourcesDir + "/img");
 		U.copyDir("dist/help", resourcesDir + "/help");
+		U.copyDir("dist/lang", resourcesDir + "/lang");
 		updateManualVersionNumber(new File(resourcesDir, "help"));
 		U.copyBinaryFile(
 			"dist/DocFetcher.icns",

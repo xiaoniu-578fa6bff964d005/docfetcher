@@ -11,8 +11,11 @@
 
 package net.sourceforge.docfetcher.enums;
 
+import java.io.File;
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
+import net.sourceforge.docfetcher.util.ClassPathHack;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
@@ -212,12 +215,19 @@ public enum Msg {
 		"states of all of the folder's subfolders. This menu entry on the " +
 		"other hand allows the user to change the check state of a folder " +
 		"*without* changing the check states of the folder's subfolders."),
+	invert_selection (
+		"Invert Selection",
+		"Context menu entry for inverting the selection in a list."),
 	open_folder ("Open Folder",
 		Comments.searchScopeEntry + " It allows the user to open the selected " +
 		"folder in the system's file manager, e.g. Windows Explorer."),
 	list_docs ("List Documents",
 		Comments.searchScopeEntry + " It allows the user to show the contents " +
 		"of the selected folder in the search results pane."),
+	no_files_in_cb (
+		"No files in clipboard found.",
+		"Error message shown when the user tries to paste files from the " +
+		"clipboard, and the clipboard is empty."),
 	
 	// Various GUI controls
 	search ("Search",
@@ -612,6 +622,9 @@ public enum Msg {
 	keybox_msg (
 		"Please enter a key:",
 		"The message displayed on the 'Enter Key' dialog."),
+	advanced_settings_link (
+		"Advanced Settings",
+		"Hyperlink on preferences dialog to configuration file containing advanced settings."),
 	
 	// Hotkeys
 	f1 ("F1"),
@@ -662,27 +675,10 @@ public enum Msg {
 	open ("Open"),
 	open_parent ("Open Parent Folder"),
 	open_limit ("The number of entries that can be opened simultaneously is limited to {0}."),
-	
-	/*
-	 * TODO post-release-1.1: Various message strings that require implementation of features
-	 */
-	invert_selection ("Invert Selection"),
-	no_files_in_cb ("No files in clipboard found."),
-	preview_limit_hint ("DocFetcher: The number of characters exceeded the limit of {0} characters. You can increase the limit by modifying the \"{1}\" entry in the {2} file; however, this might crash the program."),
-	jobs ("{0} Job(s)"),
-	open_file_error ("Error on opening file: {0}"),
-	enter_nonempty_string ("Please enter a non-empty search string."),
-	search_scope_empty ("Cannot perform search: No folders have been indexed yet."),
-	minsize_not_greater_maxsize ("The minimum filesize must not be greater than the maximum filesize."),
-	filesize_out_of_range ("Filesizes must be between 0 and (2^63 - 1) Bytes."),
-	no_filetypes_selected ("No filetypes have been selected."),
-		
-	num_results_detail ("Results: {0}-{1} of {2}"),
-	num_documents_added ("Documents added: {0}"),
 	;
 	
 	private static boolean checkEnabled = true;
-	private final String value;
+	private String value;
 	private final String comment;
 	
 	Msg(@NotNull String defaultValue) {
@@ -717,6 +713,25 @@ public enum Msg {
 	
 	public static void setCheckEnabled(boolean checkEnabled) {
 		Msg.checkEnabled = checkEnabled;
+	}
+	
+	public static void loadFromDisk() {
+		try {
+			final File langDir;
+			if (SystemConf.Bool.IsDevelopmentVersion.get())
+				langDir = new File("dist/lang");
+			else
+				langDir = new File("lang");
+			ClassPathHack.addFile(langDir);
+			
+			ResourceBundle bundle = ResourceBundle.getBundle("Resource");
+			for (Msg msg : Msg.values())
+				if (bundle.containsKey(msg.name()))
+					msg.value = bundle.getString(msg.name());
+		} catch (Exception e) {
+			// The English language strings are hard-coded,
+			// so there's no English bundle
+		}
 	}
 	
 	private static final class Comments {

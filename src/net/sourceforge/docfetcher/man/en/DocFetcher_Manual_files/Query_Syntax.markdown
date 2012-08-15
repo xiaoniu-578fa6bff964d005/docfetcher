@@ -8,7 +8,7 @@ DocFetcher supports the boolean operators `OR`, `AND` and `NOT`. If words are co
 
 Instead of `OR`, `AND` and `NOT`, you can also use `||`, `&&` and `'-'` (minus symbol), respectively. You can use *parentheses* to group certain expressions. Here are some examples:
 
-Query                    | Resulting documents contain...      
+Query                    | Resulting documents contain...
 -------------------------|---------------------------------------------
 `dog OR cat`             | either `dog`, or `cat`, or both
 `dog AND cat`            | both `dog` and `cat`
@@ -27,7 +27,7 @@ Phrase Searches and Required Terms
 ----------------------------------
 To search for a phrase (i.e. a sequence of words), put the phrase in double quotes. To indicate that the documents to search for must contain a particular word, put a `'+'` in front of the word. Of course you can combine these constructs with boolean operators and parentheses. Again, some examples:
 
-Query                 | Resulting documents contain...      
+Query                 | Resulting documents contain...
 ----------------------|-------------------------------------
 `"dog cat mouse"`     | the words `dog`, `cat` and `mouse`, in that particular order
 `+dog cat`            | definitely `dog`, and maybe also `cat`
@@ -37,9 +37,9 @@ Query                 | Resulting documents contain...
 
 Wildcards
 ---------
-Question marks (`'?'`) and asterisks (`'*'`) can be used to indicate that some characters are unknown. The question mark stands for exactly one unknown character, while the asterisk stands for zero or more unknown characters.
+Question marks (`'?'`) and asterisks (`'*'`) can be used to indicate that some characters are unknown. The question mark stands for exactly one unknown character, while the asterisk stands for zero or more unknown characters. Examples:
 
-Query        | Resulting documents contain...      
+Query        | Resulting documents contain...
 -------------|-------------------------------------
 `luc?`       | `lucy`, `luca`, ...
 `luc*`       | `luc`, `lucy`, `luck`, `lucene`, ...
@@ -73,6 +73,7 @@ By default, DocFetcher will search in all the textual data it is capable of extr
 
 Which fields are available generally depends on the document format, but you can use this as a rule of thumb:
 
+<!-- Do not translate the following field names (filename, title, etc.) -->
 * *Files*: filename, title, author
 * *Emails*: subject, sender, recipients
 

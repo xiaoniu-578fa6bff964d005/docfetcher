@@ -56,7 +56,7 @@ public final class SearchBar {
 	private final Combo searchBox;
 	private final Button searchBt;
 	private final ToolBar toolBar;
-	private final MemoryList<String> searchHistory;	
+	private final MemoryList<String> searchHistory;
 
 	public SearchBar(@NotNull Composite parent, @NotNull final File programConfFile) {
 		comp = new CustomBorderComposite(parent) {
@@ -104,7 +104,7 @@ public final class SearchBar {
 		tif.image(Img.PREFERENCES.get()).toolTip(Msg.preferences.get())
 				.listener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile);						
+						PrefDialog prefDialog = new PrefDialog(comp.getShell(), programConfFile);
 						prefDialog.evtOKClicked.add(new Event.Listener<Void> () {
 						    public void update(Void eventData) {
 						    	evtOKClicked.fire(null);

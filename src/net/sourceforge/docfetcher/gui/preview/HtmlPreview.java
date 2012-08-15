@@ -22,6 +22,7 @@ import net.sourceforge.docfetcher.gui.CustomBorderComposite;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.gui.BrowserPopupBlocker;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.ToolItemFactory;
 
@@ -183,6 +184,9 @@ final class HtmlPreview extends ToolBarForm {
 	            locationBar.setBackground(Col.LIST_BACKGROUND.get());
 			}
 		});
+		
+		// Block popups
+		BrowserPopupBlocker.initialize(parent.getDisplay(), browser);
 		
 		return browser;
 	}

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -84,6 +83,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -121,12 +122,22 @@ public final class Application {
 
 	public static void main(String[] args) {
 		/*
+		 * Bug #3553412: Starting with Java 7, calling Arrays.sort can cause an
+		 * IllegalArgumentException with the error message
+		 * "Comparison method violates its general contract!". In DocFetcher,
+		 * this happened on a PDF file with PDFBox 1.7.0. For background, see
+		 * http://stackoverflow.com/questions/7849539/comparison-method
+		 * -violates-its-general-contract-java-7-only
+		 */
+		System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+		
+		/*
 		 * Load system constants; this should be the very first thing to do.
 		 * We'll first try to load from the jar (normal use case), then from a
 		 * file (we're inside the IDE).
 		 */
-		String systemConfName = "system.conf";
-		String systemConfPath = "dev/system.conf";
+		String systemConfName = "system-conf.txt";
+		String systemConfPath = "dev/system-conf.txt";
 		boolean success = ConfLoader.loadFromStreamOrFile(
 			Main.class, SystemConf.class, systemConfName, systemConfPath);
 		if (!success) {
@@ -146,6 +157,7 @@ public final class Application {
 		AppUtil.Const.IS_PORTABLE.set(SystemConf.Bool.IsPortable.get());
 		AppUtil.Const.IS_DEVELOPMENT_VERSION.set(SystemConf.Bool.IsDevelopmentVersion.get());
 
+		Msg.loadFromDisk();
 		Msg.setCheckEnabled(false);
 		AppUtil.Messages.system_error.set(Msg.system_error.get());
 		AppUtil.Messages.confirm_operation.set(Msg.confirm_operation.get());
@@ -211,10 +223,7 @@ public final class Application {
 		// Set default uncaught exception handler
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			public void uncaughtException(Thread t, final Throwable e) {
-				if (e instanceof OutOfMemoryError)
-					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) e);
-				else
-					AppUtil.showStackTrace(e);
+				handleCrash(e);
 			}
 		});
 
@@ -273,10 +282,7 @@ public final class Application {
 					display.sleep();
 			}
 			catch (Throwable t) {
-				if (t instanceof OutOfMemoryError)
-					UtilGui.showOutOfMemoryMessage(shell, (OutOfMemoryError) t);
-				else
-					AppUtil.showStackTrace(t);
+				handleCrash(t);
 			}
 		}
 
@@ -287,8 +293,16 @@ public final class Application {
 		display.dispose();
 		saveSettingsConfFile();
 	}
+	
+	private static void handleCrash(@NotNull Throwable t) {
+		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(t), OutOfMemoryError.class)) {
+			UtilGui.showOutOfMemoryMessage(shell, e);
+			return;
+		}
+		AppUtil.showStackTrace(t);
+	}
 
-	public static void saveSettingsConfFile() {
+	private static void saveSettingsConfFile() {
 		/*
 		 * Try to save the settings. This may not be possible, for example when
 		 * the user has burned the program onto a CD-ROM.
@@ -436,7 +450,7 @@ public final class Application {
 					// Confirm deletion of obsolete files inside the index
 					// folder
 					if (!loadingProblems.getObsoleteFiles().isEmpty()) {
-						Util.runAsyncExec(mainShell, new Runnable() {
+						Util.runSyncExec(mainShell, new Runnable() {
 							public void run() {
 								reportObsoleteIndexFiles(
 									mainShell,
@@ -520,11 +534,11 @@ public final class Application {
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
-			confFile = new File("dist/program.conf");
+			confFile = new File("dist/program-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
-			confFile = new File(appDataDir, "conf/program.conf");
+			confFile = new File(appDataDir, "conf/program-conf.txt");
 		}
 
 		try {
@@ -581,11 +595,11 @@ public final class Application {
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
-			confFile = new File("bin/settings.conf");
+			confFile = new File("bin/settings-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
-			confFile = new File(appDataDir, "conf/settings.conf");
+			confFile = new File(appDataDir, "conf/settings-conf.txt");
 		}
 
 		try {
