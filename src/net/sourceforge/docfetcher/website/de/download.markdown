@@ -23,16 +23,16 @@ Alle unten aufgeführten Downloads unterstützen sowohl 32-Bit- als auch 64-Bit-
 <th>Unterstützte Betriebssysteme</th>
 </tr>
 <tr>
-<td align="left">TODO exe <br/> Führen Sie das Installations-Programm aus und folgen Sie den Anweisungen.</td>
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1/docfetcher_1.1_win32_setup.exe/download">docfetcher_1.1_win32_setup.exe</a> <br/> Führen Sie das Installations-Programm aus und folgen Sie den Anweisungen.</td>
 <td>Windows&nbsp;XP/Vista/7</td>
 </tr>
 <tr>
-<td align="left">TODO portable <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1/docfetcher-1.1-portable.zip/download">docfetcher-1.1-portable.zip</a> <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
 </td>
 <td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
 <tr>
-<td align="left">TODO mac <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1/DocFetcher-1.1.dmg/download">DocFetcher-1.1.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
 </td>
 <td>Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
