@@ -32,7 +32,7 @@ Alle unten aufgeführten Downloads unterstützen sowohl 32-Bit- als auch 64-Bit-
 <td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.1/DocFetcher-1.1.1.dmg/download">DocFetcher-1.1.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.1/DocFetcher-1.1.1.dmg/download">DocFetcher-1.1.1.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
 </td>
 <td>Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
