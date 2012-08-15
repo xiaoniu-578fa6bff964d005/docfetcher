@@ -22,13 +22,13 @@ public final class SourceCodeTokenizer extends CharTokenizer {
 
 	/** Collects only characters which do not satisfy
 	 * {@link Character#isWhitespace(int)}.
-	 *  or ='.' or ='='
+	 *  or ='.' or ='=' ...
 	 */
 	@Override
 	protected boolean isTokenChar(int c) {
 		return !(Character.isWhitespace(c) || (c=='.') || (c=='=') || (c=='"') 
-				|| (c=='<') || (c=='>') 
-				|| (c=='(') || (c==')') 
-				|| (c=='{') || (c=='}'));
+				|| (c=='<') || (c=='>') || (c=='(') || (c==')')
+				|| (c=='[') || (c==']') || (c=='/') || (c=='\\')
+				|| (c=='{') || (c=='}') || (c=='+') || (c=='*'));
 	}
 }
