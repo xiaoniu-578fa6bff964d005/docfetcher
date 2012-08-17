@@ -136,6 +136,11 @@ Section "DocFetcher"
 		Sleep 250
     Goto killdaemon
     nodaemon:
+	
+	; Remove existing DocFetcher folder. This is necessary because:
+	; - Otherwise the uninstaller might not work cleanly.
+	; - Loading different versions of the same library might crash the program. See bug #3558268.
+	RMDir /r $INSTDIR
 
 	; Copy files
 	SetOutPath $INSTDIR
