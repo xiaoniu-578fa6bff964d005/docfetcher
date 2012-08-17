@@ -34,8 +34,10 @@
 	- output is in the "build" folder
 - build-man.py:
 	- recreates the manual
+	- output is in dist/help
 - build-website.py:
 	- recreates the website
+	- output is in dist/website
 - build-dmg.sh:
 	- builds a Mac OS X disk image
 	- must run build.py first
@@ -44,3 +46,7 @@
 - build-daemon.xml:
 	- Ant file for building the DocFetcher daemon
 	- probably stopped working a long time ago
+- deploy-website.sh:
+	- deploys the website to the project webspace on SourceForge.net
+	- will automatically run build-website.py
+	- must specify SourceForge.net user name

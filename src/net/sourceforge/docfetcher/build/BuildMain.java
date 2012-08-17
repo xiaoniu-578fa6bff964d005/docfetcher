@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.build.U.LineSep;
 import net.sourceforge.docfetcher.man.Manual;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Jar;
@@ -44,7 +45,7 @@ import com.google.common.base.Strings;
 public final class BuildMain {
 
 	public static final String appName = "DocFetcher";
-	private static final String version;
+	private static final String version = readVersionNumber();
 
 	private static final String packageId = Main.class.getPackage().getName();
 	private static final String packagePath = packageId.replace(".", "/");
@@ -52,9 +53,10 @@ public final class BuildMain {
 
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
 	private static final String buildDate = dateFormat.format(new Date());
-
-	static {
-		// Read version number from file 'current-version.txt'
+	
+	// Reads version number from file 'current-version.txt'
+	@NotNull
+	public static String readVersionNumber() {
 		String versionStr = "";
 		try {
 			versionStr = U.read("current-version.txt").trim();
@@ -64,7 +66,7 @@ public final class BuildMain {
 			System.exit(0);
 		}
 		Util.checkThat(versionStr.split("\r?\n").length == 1);
-		version = versionStr;
+		return versionStr;
 	}
 
 	public static void main(String[] args) throws Exception {

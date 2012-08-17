@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Properties;
 
 import net.sourceforge.docfetcher.UtilGlobal;
+import net.sourceforge.docfetcher.build.BuildMain;
 import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -34,6 +35,7 @@ public final class Website {
 	
 	private static final String packagePath = Website.class.getPackage().getName().replace('.', '/');
 	private static final File websiteDir = new File(String.format("src/%s", packagePath));
+	private static final String version = BuildMain.readVersionNumber();
 
 	public static void main(String[] args) throws Exception {
 		for (File srcDir : Util.listFiles(websiteDir)) {
@@ -58,6 +60,14 @@ public final class Website {
 			Files.createParentDirs(dstFile);
 			Files.copy(file, dstFile);
 		}
+		
+		// Deploy PAD file
+		String padFilename = "docfetcher-pad.xml";
+		File padFileSrc = new File(websiteDir, padFilename);
+		File padFileDst = new File("dist/website", padFilename);
+		String padContents = CharsetDetectorHelper.toString(padFileSrc);
+		padContents = UtilGlobal.replace(padFileSrc.getPath(), padContents, "${version}", version);
+		Files.write(padContents, padFileDst, Charsets.UTF_8);
 	}
 	
 	private static void convertDir(	@NotNull PegDownProcessor processor,
@@ -111,6 +121,12 @@ public final class Website {
 			String awardsTable = CharsetDetectorHelper.toString(awardsFile);
 			html = UtilGlobal.replace(path, html, "${awards_table}", awardsTable);
 		}
+		
+		// Insert version number; must be done after inserting the markdown
+		String versionKey = "${version}";
+		if (html.contains(versionKey))
+			html = UtilGlobal.replace(path, html, versionKey, version);
+		
 		return html;
 	}
 	

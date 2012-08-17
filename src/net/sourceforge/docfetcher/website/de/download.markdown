@@ -8,8 +8,8 @@ Falls Java 1.6.0 oder neuer nicht auf Ihrem System verfügbar ist, können Sie e
 * Linux: Im offiziellen Software-Repository Ihrer Distribution.
 * Mac OS&nbsp;X: <http://www.apple.com/support/>
 
-Neueste Version: DocFetcher 1.1
-===============================
+Neueste Version: DocFetcher ${version}
+======================================
 
 Für eine Liste von Änderungen im Vergleich zu vorherigen Versionen, siehe den [ChangeLog](http://docfetcher.sourceforge.net/wiki/doku.php?id=changelog).
 
@@ -23,16 +23,16 @@ Alle unten aufgeführten Downloads unterstützen sowohl 32-Bit- als auch 64-Bit-
 <th>Unterstützte Betriebssysteme</th>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/docfetcher_1.1.2_win32_setup.exe/download">docfetcher_1.1.2_win32_setup.exe</a> <br/> Führen Sie das Installations-Programm aus und folgen Sie den Anweisungen.</td>
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher_${version}_win32_setup.exe/download">docfetcher_${version}_win32_setup.exe</a> <br/> Führen Sie das Installations-Programm aus und folgen Sie den Anweisungen.</td>
 <td>Windows&nbsp;XP/Vista/7</td>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/docfetcher-1.1.2-portable.zip/download">docfetcher-1.1.2-portable.zip</a> <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
 </td>
 <td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/DocFetcher-1.1.2.dmg/download">DocFetcher-1.1.2.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
 </td>
 <td>Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
