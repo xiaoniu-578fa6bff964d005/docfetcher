@@ -26,16 +26,16 @@ All downloads below support both 32-bit and 64-bit operating systems.
 <th>Supported Platforms</th>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.1/docfetcher_1.1.1_win32_setup.exe/download">docfetcher_1.1.1_win32_setup.exe</a> <br/> Run the installer and follow the instructions.</td>
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/docfetcher_1.1.2_win32_setup.exe/download">docfetcher_1.1.2_win32_setup.exe</a> <br/> Run the installer and follow the instructions.</td>
 <td>Windows&nbsp;XP/Vista/7</td>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.1/docfetcher-1.1.1-portable.zip/download">docfetcher-1.1.1-portable.zip</a> <br/> This is the portable version that runs on all supported platforms. Installation: Unpack the archive into a folder of your choice, then launch DocFetcher with the respective launcher for your platform. Make sure you have write permissions for the destination folder (i.e. don't unpack into a folder like "C:\Program&nbsp;Files").
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/docfetcher-1.1.2-portable.zip/download">docfetcher-1.1.2-portable.zip</a> <br/> This is the portable version that runs on all supported platforms. Installation: Unpack the archive into a folder of your choice, then launch DocFetcher with the respective launcher for your platform. Make sure you have write permissions for the destination folder (i.e. don't unpack into a folder like "C:\Program&nbsp;Files").
 </td>
 <td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 and newer</td>
 </tr>
 <tr>
-<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.1/DocFetcher-1.1.1.dmg/download">DocFetcher-1.1.1.dmg</a> <br/> Launch DocFetcher by double-clicking on the application bundle.</td>
+<td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/1.1.2/DocFetcher-1.1.2.dmg/download">DocFetcher-1.1.2.dmg</a> <br/> Launch DocFetcher by double-clicking on the application bundle.</td>
 <td>Mac OS&nbsp;X 10.5 and newer</td>
 </tr>
 </table>
