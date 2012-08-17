@@ -209,16 +209,7 @@ Section "un.Uninstall"
 	Sleep 1000
 
 	; Remove program folder
-	Delete /REBOOTOK $INSTDIR\DocFetcher.exe
-	Delete /REBOOTOK $INSTDIR\uninstaller.exe
-	Delete /REBOOTOK $INSTDIR\docfetcher-daemon-windows.exe
-	Delete /REBOOTOK $INSTDIR\Readme.txt
-	Delete /REBOOTOK $INSTDIR\hs_err_pid*.log
-	RMDir /r /REBOOTOK $INSTDIR\misc
-	RMDir /r /REBOOTOK $INSTDIR\help
-	RMDir /r /REBOOTOK $INSTDIR\img
-	RMDir /r /REBOOTOK $INSTDIR\lib
-	RMDir $INSTDIR
+	RMDir /r /REBOOTOK $INSTDIR
 
 	; Remove registry key
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher"
