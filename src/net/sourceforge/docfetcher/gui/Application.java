@@ -358,12 +358,16 @@ public final class Application {
 		final Display display = mainShell.getDisplay();
 
 		File indexParentDir;
-		if (SystemConf.Bool.IsDevelopmentVersion.get())
+		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			indexParentDir = new File("bin/indexes");
-		else if (SystemConf.Bool.IsPortable.get())
-			indexParentDir = new File("indexes");
-		else
-			indexParentDir = AppUtil.getAppDataDir();
+		} else {
+			File appDataDir = AppUtil.getAppDataDir();
+			if (SystemConf.Bool.IsPortable.get())
+				indexParentDir = new File(appDataDir, "indexes");
+			else
+				indexParentDir = appDataDir;
+		}
+		
 		indexParentDir.mkdirs();
 
 		int cacheCapacity = ProgramConf.Int.UnpackCacheCapacity.get();

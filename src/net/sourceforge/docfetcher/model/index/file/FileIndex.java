@@ -525,7 +525,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			context.fail(
 				ErrorType.ARCHIVE_UNPACK_DISKSPACE, archiveFolder, e);
 			return;
-
 		}
 		finally {
 			/*

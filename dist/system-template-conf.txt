@@ -4,3 +4,9 @@ ProgramName = ${app_name}
 ProgramVersion = ${app_version}
 BuildDate = ${build_date}
 IsPortable = ${is_portable}
+
+# Path to a folder where all application data will be stored. Leave this to
+# "${default}" to let DocFetcher figure out a suitable place.
+# If you use a relative path here, it will be resolved against the current
+# working directory, which usually is the DocFetcher folder.
+AppDataDir=${default}

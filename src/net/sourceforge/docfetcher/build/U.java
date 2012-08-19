@@ -110,9 +110,6 @@ final class U {
 		}
 		if (replacements != null)
 			contents = UtilGlobal.replace(srcPath, contents, replacements);
-		if (!dstPath.endsWith(".sh") && !contents.startsWith("#!") && contents.contains("${"))
-			Util.printErr(format("Warning: File '%s' contains "
-					+ "suspicious substitution pattern: ${", srcPath));
 		U.write(contents, dstPath);
 	}
 	

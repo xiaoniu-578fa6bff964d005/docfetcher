@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
 import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.enums.SystemConf;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -297,7 +298,7 @@ public final class AppUtil {
 	public static void sendHotkeyToFront() {
 		try {
 			int one = SettingsConf.IntArray.HotkeyToFront.get()[0];
-			one = KeyCodeTranslator.translateSWTKey(one);			
+			one = KeyCodeTranslator.translateSWTKey(one);
 			int two = SettingsConf.IntArray.HotkeyToFront.get()[1];
 			two = KeyCodeTranslator.translateSWTKey(two);
 			Robot robot = new Robot();
@@ -361,7 +362,7 @@ public final class AppUtil {
 		shell.dispose();
 		display.dispose();
 		return buttonID;
-	}	
+	}
 
 	/**
 	 * Shows the given message in a confirmation message box and returns the
@@ -560,6 +561,17 @@ public final class AppUtil {
 		
 		if (appDataDir != null)
 			return appDataDir; // Return cached value
+		
+		String appDataDirOverride = SystemConf.Str.AppDataDir.get().trim();
+		if (!appDataDirOverride.equals("${default}")) {
+			File appDataDir = Util.getCanonicalFile(appDataDirOverride);
+			if (!appDataDir.exists())
+				appDataDir.mkdirs(); // may fail
+			if (appDataDir.isDirectory()) {
+				AppUtil.appDataDir = appDataDir; // Store value in cache
+				return appDataDir;
+			}
+		}
 		
 		String programName = Const.PROGRAM_NAME.value;
 		File appDataDir = null;
