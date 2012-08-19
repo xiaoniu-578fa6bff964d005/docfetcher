@@ -54,7 +54,7 @@ public enum Msg {
 		"Ooops! This program just died! " +
 		"Please help us to fix this problem by " +
 		"posting the stacktrace below on our " +
-		"<a href=\"http://sourceforge.net/apps/mediawiki/docfetcher/index.php?title=Bug_Reports\">bug tracker</a> (no registration required).\n\n" +
+		"<a href=\"http://sourceforge.net/tracker/?group_id=197779&atid=962834\">bug tracker</a> (no registration required).\n\n" +
 		"The stacktrace has been written to:\n{0}.",
 		//
 		"This message is shown when the program crashes. Below the message, " +
