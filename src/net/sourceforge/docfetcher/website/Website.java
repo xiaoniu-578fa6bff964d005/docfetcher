@@ -65,9 +65,8 @@ public final class Website {
 		}
 		
 		// Deploy PAD file
-		String padFilename = "docfetcher-pad.xml";
-		File padFileSrc = new File(websiteDir, padFilename);
-		File padFileDst = new File("dist/website", padFilename);
+		File padFileSrc = new File(websiteDir, "docfetcher-pad-template.xml");
+		File padFileDst = new File("dist/website", "docfetcher-pad.xml");
 		String padContents = CharsetDetectorHelper.toString(padFileSrc);
 		padContents = UtilGlobal.replace(padFileSrc.getPath(), padContents, "${version}", version);
 		Files.write(padContents, padFileDst, Charsets.UTF_8);
@@ -83,6 +82,35 @@ public final class Website {
 		prop.store(w, "");
 		Closeables.closeQuietly(w);
 		Util.println("File written: " + propFile.getPath());
+		
+		// Deploy help file for GUI translators
+		File propHelpSrc = new File(websiteDir, "prop-help-template.html");
+		File propHelpDst = new File("dist/website", "properties-help.html");
+		StringBuilder sb = new StringBuilder();
+		for (Msg msg : Msg.values()) {
+			sb.append("<tr align=\"left\">");
+			sb.append("<td>");
+			sb.append(escapeHtml(propHelpSrc.getPath(), msg.get()));
+			sb.append("</td>");
+			sb.append(Util.LS);
+			sb.append("<td>");
+			sb.append(msg.getComment());
+			sb.append("</td>");
+			sb.append("</tr>");
+			sb.append(Util.LS);
+		}
+		String propHelpContents = CharsetDetectorHelper.toString(propHelpSrc);
+		propHelpContents = UtilGlobal.replace(
+			propHelpSrc.getPath(), propHelpContents, "${contents}",
+			sb.toString());
+		Files.write(propHelpContents, propHelpDst, Charsets.UTF_8);
+		Util.println("File written: " + propHelpDst.getPath());
+	}
+	
+	@NotNull
+	private static String escapeHtml(@NotNull String srcPath, @NotNull String input) {
+		return UtilGlobal.replaceSilently(input,
+			"&", "&amp;", "\"", "&quot;", "<", "&lt;", ">", "&gt;", "\n", "<br/>", "\t", "&emsp;");
 	}
 	
 	private static void convertDir(	@NotNull PegDownProcessor processor,

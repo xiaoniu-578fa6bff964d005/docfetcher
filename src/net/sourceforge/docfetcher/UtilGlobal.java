@@ -69,4 +69,16 @@ public final class UtilGlobal {
 		return input;
 	}
 	
+	@NotNull
+	public static String replaceSilently(	@NotNull String input,
+											@NotNull String... replacements) {
+		Util.checkThat(replacements.length % 2 == 0);
+		for (int i = 0; i < replacements.length; i += 2) {
+			String s1 = replacements[i];
+			String s2 = replacements[i + 1];
+			input = input.replace(s1, s2);
+		}
+		return input;
+	}
+	
 }

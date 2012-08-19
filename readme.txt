@@ -49,4 +49,4 @@
 - deploy-website.sh:
 	- deploys the website to the project webspace on SourceForge.net
 	- will automatically run build-website.py
-	- must specify SourceForge.net user name
+	- must specify SourceForge.net user name and password
