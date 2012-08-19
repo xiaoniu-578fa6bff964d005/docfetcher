@@ -12,12 +12,14 @@
 package net.sourceforge.docfetcher.website;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Properties;
 
 import net.sourceforge.docfetcher.UtilGlobal;
 import net.sourceforge.docfetcher.build.BuildMain;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -26,6 +28,7 @@ import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 
 /**
@@ -68,6 +71,18 @@ public final class Website {
 		String padContents = CharsetDetectorHelper.toString(padFileSrc);
 		padContents = UtilGlobal.replace(padFileSrc.getPath(), padContents, "${version}", version);
 		Files.write(padContents, padFileDst, Charsets.UTF_8);
+		Util.println("File written: " + padFileDst.getPath());
+		
+		// Deploy English Resource.properties; this is currently used for
+		// GUI translation via transifex.com
+		Properties prop = new Properties();
+		for (Msg msg : Msg.values())
+			prop.put(msg.name(), msg.get());
+		File propFile = new File("dist/website", "Resource.properties");
+		FileWriter w = new FileWriter(propFile);
+		prop.store(w, "");
+		Closeables.closeQuietly(w);
+		Util.println("File written: " + propFile.getPath());
 	}
 	
 	private static void convertDir(	@NotNull PegDownProcessor processor,
