@@ -29,6 +29,7 @@ import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.lucene.search.Query;
 
@@ -43,7 +44,7 @@ public final class OutlookMailResource extends MailResource {
 	private final HighlightedString body;
 	private final String sender;
 	private final List<String> recipients;
-	private final Date date;
+	@Nullable private final Date date;
 	private final List<Attachment> attachments;
 	
 	OutlookMailResource(@NotNull IndexingConfig config,
@@ -59,7 +60,10 @@ public final class OutlookMailResource extends MailResource {
 		body = HighlightService.highlight(query, isPhraseQuery, email.getBody());
 		sender = OutlookContext.getSender(email);
 		recipients = OutlookContext.getRecipients(email);
+		
+		// this method can return null, see bug #3559892
 		date = email.getMessageDeliveryTime();
+		
 		attachments = new ArrayList<Attachment> (email.getNumberOfAttachments());
 		
 		new AttachmentVisitor(config, email, false) {
@@ -98,7 +102,7 @@ public final class OutlookMailResource extends MailResource {
 		return Collections.unmodifiableList(recipients);
 	}
 
-	@NotNull
+	@Nullable
 	public Date getDate() {
 		return date;
 	}

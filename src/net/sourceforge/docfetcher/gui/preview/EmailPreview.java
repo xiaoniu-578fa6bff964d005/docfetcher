@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.gui.preview;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
@@ -189,7 +190,11 @@ final class EmailPreview extends Composite {
 		else
 			toField.setToolTipText("");
 		subjectField.setText(mailResource.getSubject());
-		dateField.setText(dateFormat.format(mailResource.getDate()));
+		Date date = mailResource.getDate();
+		if (date != null)
+			dateField.setText(dateFormat.format(date));
+		else
+			dateField.setText("");
 		toolBarWithTextViewer.setText(mailResource.getBody());
 		
 		// TODO post-release-1.1: set attachments -> maybe do this in separate threads;

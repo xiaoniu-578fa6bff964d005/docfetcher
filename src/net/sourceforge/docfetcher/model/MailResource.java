@@ -68,7 +68,7 @@ public abstract class MailResource {
 	@NotNull
 	public abstract List<String> getRecipients();
 
-	@NotNull
+	@Nullable
 	public abstract Date getDate();
 
 	@Immutable
