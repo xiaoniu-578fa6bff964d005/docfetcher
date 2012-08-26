@@ -78,7 +78,6 @@ public final class SystemConf {
 		ProgramName ("Unspecified"),
 		ProgramVersion ("Unspecified"),
 		BuildDate ("Unspecified"),
-		AppDataDir ("${default}"),
 		;
 
 		private String value;

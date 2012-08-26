@@ -26,8 +26,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
 import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.enums.SettingsConf;
-import net.sourceforge.docfetcher.enums.SystemConf;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
@@ -562,8 +560,8 @@ public final class AppUtil {
 		if (appDataDir != null)
 			return appDataDir; // Return cached value
 		
-		String appDataDirOverride = SystemConf.Str.AppDataDir.get().trim();
-		if (!appDataDirOverride.equals("${default}")) {
+		String appDataDirOverride = System.getenv("DOCFETCHER_HOME");
+		if (appDataDirOverride != null) {
 			File appDataDir = Util.getCanonicalFile(appDataDirOverride);
 			if (!appDataDir.exists())
 				appDataDir.mkdirs(); // may fail
