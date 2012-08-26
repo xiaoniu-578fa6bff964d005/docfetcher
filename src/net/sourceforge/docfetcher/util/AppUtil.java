@@ -484,6 +484,7 @@ public final class AppUtil {
 		sb.append("program.name=" + Const.PROGRAM_NAME.value + Util.LS);
 		sb.append("program.version=" + Const.PROGRAM_VERSION.value + Util.LS);
 		sb.append("program.build=" + Const.PROGRAM_BUILD_DATE.value + Util.LS);
+		sb.append("program.portable=" + Const.IS_PORTABLE.asBoolean() + Util.LS);
 		String[] keys = {
 				"java.runtime.name",
 				"java.runtime.version",
