@@ -14,6 +14,8 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -37,6 +39,7 @@ import com.pff.PSTException;
 import com.pff.PSTFile;
 import com.pff.PSTFolder;
 import com.pff.PSTMessage;
+import com.pff.PSTObject;
 
 /**
  * @author Tran Nam Quang
@@ -162,53 +165,72 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		folder.setHasDeepContent(false);
 		final Map<String, MailDocument> unseenMails = Maps.newHashMap(folder.getDocumentMap());
 		final Map<String, MailFolder> unseenSubFolders = Maps.newHashMap(folder.getSubFolderMap());
+		final List<PSTFolder> subFoldersToVisit = new LinkedList<PSTFolder>();
 		
 		// Visit mails
 		if (pstFolder.getContentCount() > 0) {
 			try {
-				PSTMessage pstMail = (PSTMessage) pstFolder.getNextChild();
-				while (pstMail != null) {
+				PSTObject pstObject = pstFolder.getNextChild();
+				while (pstObject != null) {
 					if (context.isStopped()) break;
+					
 					/*
-					 * Note: The user should not be allowed to stop the indexing
-					 * in the middle of email processing (e.g. between
-					 * attachments), otherwise we could end up indexing emails
-					 * which have only one half of all attachments, which would
-					 * complicate email modification detection.
-					 * 
-					 * Note: For the email UID, we'll use the 'descriptor node
-					 * ID' rather than the 'internet message ID', for several
-					 * reasons: (1) Not every email has an internet message ID,
-					 * e.g. unsent emails. (2) The descriptor node ID is only an
-					 * internal ID used by Outlook, but it does not change. (3)
-					 * The descriptor node ID allows fast retrieval of single
-					 * emails, which is what we need for the preview.
+					 * Bug #3561223: The documentation for java-libpst 0.7
+					 * indicates we can expect the PST object to be an instance
+					 * of PSTMessage. However, a bug report has shown that it
+					 * may also be a PSTFolder, probably in some very rare
+					 * cases.
 					 */
-					String id = String.valueOf(pstMail.getDescriptorNodeId());
-					long newLastModified = pstMail.getLastModificationTime().getTime();
-					MailDocument mail = unseenMails.remove(id);
-					if (mail == null) { // Mail added
-						String subject = pstMail.getSubject();
-						mail = new MailDocument(
-							folder, id, subject, newLastModified);
-						context.index(mail, pstMail, true);
+					if (pstObject instanceof PSTFolder) {
+						subFoldersToVisit.add((PSTFolder) pstObject);
 					}
-					else if (mail.isModified(newLastModified)) { // Mail modified
+					else if (pstObject instanceof PSTMessage) {
 						/*
-						 * Note: Outlook mails are not immutable, because
-						 * Outlook allows modifying the subject and body, as
-						 * well as removing attachments. Such modifications will
-						 * alter the last-modified value as provided by the
-						 * PSTMessage object. It is not clear though whether any
-						 * other changes are possible, and if so, whether we can
-						 * rely on the last-modified value to reflect such
-						 * changes.
+						 * Note: The user should not be allowed to stop the
+						 * indexing in the middle of email processing (e.g.
+						 * between attachments), otherwise we could end up
+						 * indexing emails which have only one half of all
+						 * attachments, which would complicate email
+						 * modification detection.
 						 */
-						mail.setLastModified(newLastModified);
-						context.index(mail, pstMail, false);
+						/*
+						 * Note: For the email UID, we'll use the 'descriptor
+						 * node ID' rather than the 'internet message ID', for
+						 * several reasons: (1) Not every email has an internet
+						 * message ID, e.g. unsent emails. (2) The descriptor
+						 * node ID is only an internal ID used by Outlook, but
+						 * it does not change. (3) The descriptor node ID allows
+						 * fast retrieval of single emails, which is what we
+						 * need for the preview.
+						 */
+						PSTMessage pstMail = (PSTMessage) pstObject;
+						String id = String.valueOf(pstMail.getDescriptorNodeId());
+						long newLastModified = pstMail.getLastModificationTime().getTime();
+						MailDocument mail = unseenMails.remove(id);
+						if (mail == null) { // Mail added
+							String subject = pstMail.getSubject();
+							mail = new MailDocument(
+								folder, id, subject, newLastModified);
+							context.index(mail, pstMail, true);
+						}
+						else if (mail.isModified(newLastModified)) { // Mail modified
+							/*
+							 * Note: Outlook mails are not immutable, because
+							 * Outlook allows modifying the subject and body, as
+							 * well as removing attachments. Such modifications
+							 * will alter the last-modified value as provided by
+							 * the PSTMessage object. It is not clear though
+							 * whether any other changes are possible, and if
+							 * so, whether we can rely on the last-modified
+							 * value to reflect such changes.
+							 */
+							mail.setLastModified(newLastModified);
+							context.index(mail, pstMail, false);
+						}
 					}
+					
 					try {
-						pstMail = (PSTMessage) pstFolder.getNextChild();
+						pstObject = pstFolder.getNextChild();
 					}
 					catch (IndexOutOfBoundsException e) {
 						/*
@@ -216,7 +238,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 						 * v0.5 and probably also v0.7.
 						 */
 						Util.printErr(e.getMessage());
-						pstMail = null;
+						pstObject = null; // get out of loop
 					}
 				}
 			} catch (IOException e) {
@@ -226,9 +248,10 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		}
 		
 		// Visit subfolders
-		if (pstFolder.hasSubfolders()) {
+		if (pstFolder.hasSubfolders() || !subFoldersToVisit.isEmpty()) {
 			try {
-				for (PSTFolder pstSubFolder : pstFolder.getSubFolders()) {
+				subFoldersToVisit.addAll(pstFolder.getSubFolders());
+				for (PSTFolder pstSubFolder : subFoldersToVisit) {
 					if (context.isStopped()) break;
 					String foldername = pstSubFolder.getDisplayName();
 					MailFolder subFolder = unseenSubFolders.remove(foldername);
