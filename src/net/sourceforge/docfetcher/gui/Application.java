@@ -20,7 +20,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -192,6 +195,8 @@ public final class Application {
 		// Check single instance
 		if (!AppUtil.checkSingleInstance())
 			return;
+		
+		checkMultipleDocFetcherJars();
 
 		// Determine shell title
 		String shellTitle;
@@ -316,6 +321,27 @@ public final class Application {
 				AppUtil.showStackTraceInOwnDisplay(e);
 			}
 		}
+	}
+	
+	/**
+	 * Checks for multiple loaded DocFetcher jars. This should be called before
+	 * creating the display.
+	 */
+	private static void checkMultipleDocFetcherJars() {
+		if (SystemConf.Bool.IsDevelopmentVersion.get())
+			return;
+		if (!(AppUtil.isPortable() || Util.IS_WINDOWS))
+			return;
+		Pattern p = Pattern.compile("net\\.sourceforge\\.docfetcher.*\\.jar");
+		List<File> dfJars = new LinkedList<File>();
+		for (File jarFile : Util.listFiles(new File("lib")))
+			if (p.matcher(jarFile.getName()).matches())
+				dfJars.add(jarFile);
+		if (dfJars.size() == 1)
+			return;
+		assert !dfJars.isEmpty();
+		String msg = Msg.multiple_docfetcher_jars.format(Util.join("\n", dfJars));
+		AppUtil.showErrorOnStart(msg, false);
 	}
 
 	private static void initGlobalKeys(@NotNull Display display) {

@@ -118,6 +118,15 @@ public enum Msg {
 	delete_bt (
 		"&Delete",
 		"Label for a 'delete' button."),
+	multiple_docfetcher_jars (
+		"These files were found inside the DocFetcher folder:\n{0}\n\n" +
+		"This indicates that multiple DocFetcher versions were installed or " +
+		"unpacked on top of one another. Since this may cause unpredictable " +
+		"program failures, it is strongly recommended to reinstall or unpack " +
+		"DocFetcher into a new, empty folder.",
+		"An error message that is shown during startup if it seems as if the " +
+		"user has installed or unpacked multiple DocFetcher instances on top " +
+		"of one another."),
 	
 	// Filter panel
 	min_max_filesize (
