@@ -991,7 +991,7 @@ public final class Application {
 	}
 
 	private static void handleShellClosed(@NotNull ShellEvent e) {
-		if (SettingsConf.Bool.CloseToTray.get() && !systemTrayShutdown) {
+		if (SettingsConf.Bool.CloseToTray.get() && !systemTrayShutdown && !Util.IS_UBUNTU_UNITY) {
 			e.doit = false;
 			systemTrayHider.hide();
 		} else {
