@@ -733,13 +733,22 @@ public enum Msg {
 				langDir = new File("lang");
 			ClassPathHack.addFile(langDir);
 			
+			/*
+			 * Notes: (1) The translated strings must be trimmed, because
+			 * translators sometimes accidentally add newlines. (2) Replacing
+			 * the character \\u00BB with tabs is necessary because those tabs
+			 * somehow get replaced with \\u00BB after going through
+			 * transifex.com.
+			 */
 			ResourceBundle bundle = ResourceBundle.getBundle("Resource");
 			for (Msg msg : Msg.values())
 				if (bundle.containsKey(msg.name()))
-					msg.value = bundle.getString(msg.name());
+					msg.value = bundle.getString(msg.name()).trim().replace('\u00BB', '\t');
 		} catch (Exception e) {
-			// The English language strings are hard-coded,
-			// so there's no English bundle
+			/*
+			 * The English language strings are hard-coded, so there's no
+			 * English bundle, which causes this exception.
+			 */
 		}
 	}
 	
