@@ -539,10 +539,9 @@ public final class Util {
 
 	@NotNull
 	public static Button createPushButton(	@NotNull Composite parent,
-											@NotNull Image image,
+											@Nullable Image image,
 											@Nullable String toolTip,
 											@NotNull SelectionListener listener) {
-		Util.checkNotNull(image);
 		Button bt = new Button(parent, SWT.PUSH);
 		bt.setImage(image);
 		if (toolTip != null)
