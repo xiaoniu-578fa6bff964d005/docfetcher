@@ -83,6 +83,11 @@ public final class Website {
 		Closeables.closeQuietly(w);
 		Util.println("File written: " + propFile.getPath());
 		
+		// Deploy index.php file
+		File indexPhpFile = new File("dist/website/index.php");
+		Files.copy(new File(websiteDir, "index.php"), indexPhpFile);
+		Util.println("File written: " + indexPhpFile.getPath());
+		
 		// Deploy help file for GUI translators
 		File propHelpSrc = new File(websiteDir, "prop-help-template.html");
 		File propHelpDst = new File("dist/website", "properties-help.html");

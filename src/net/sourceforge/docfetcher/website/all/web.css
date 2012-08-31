@@ -62,9 +62,9 @@ div#page {
 }
 
 div#lang-buttons {
-	_display:none; <!-- On IE, the language button layout is broken, so hide it -->
 	float:right;
 	margin:53px 0px 0px 0px;
+	line-height:20px;
 }
 
 ul#nav-bar {
