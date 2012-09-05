@@ -41,7 +41,7 @@ final class HighlightingText {
 	
 	private static final int margin = 10;
 	
-	@NotNull private StyledText textViewer;
+	@NotNull private StyledText textViewer; //TODO Replace with: http://sourceforge.net/projects/jintilla
 	@NotNull private StyleRange highlightStyle;
 	@NotNull private Color highlightColor;
 	
