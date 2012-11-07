@@ -151,6 +151,7 @@ Section "DocFetcher"
 	File ${PORTABLE_PATH}\misc\*.bat
 	File ${PORTABLE_PATH}\misc\*.exe
 	File ${PORTABLE_PATH}\misc\licenses.zip
+	File ${PORTABLE_PATH}\misc\paths.txt
 
 	SetOutPath $INSTDIR\help
 	File /r ${PORTABLE_PATH}\help\*.*

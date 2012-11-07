@@ -227,6 +227,8 @@ public final class BuildMain {
 		U.copyTextFile(
 			"dist/program-conf.txt", releaseDir + "/conf/program-conf.txt", LineSep.WINDOWS);
 
+		U.copyTextFile("dist/paths.txt", releaseDir + "/misc/paths.txt", LineSep.WINDOWS);
+		
 		U.copyBinaryFile("build/tmp/licenses.zip", releaseDir
 				+ "/misc/licenses.zip");
 
@@ -309,6 +311,8 @@ public final class BuildMain {
 			"Cannot make the Mac OS X launcher shell script executable.",
 			launcher);
 
+		U.copyTextFile("dist/paths.txt", resourcesDir + "/misc/paths.txt", LineSep.WINDOWS);
+		
 		U.copyBinaryFile("build/tmp/licenses.zip", resourcesDir
 				+ "/misc/licenses.zip");
 

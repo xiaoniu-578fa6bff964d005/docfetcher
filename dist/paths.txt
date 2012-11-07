@@ -1,0 +1,15 @@
+# This configuration file allows you to customize the paths where DocFetcher
+# will look for its settings and index files. Lines starting with '#' are
+# ignored. Remove the '#' characters in front of the "key=value" lines to enable
+# them.
+# You can specify relative paths with ".." (two dots), which means "go up one
+# level in the folder hierarchy". Relative paths are relative to the DocFetcher
+# folder, not to this file.
+# Backslashes must be escaped, i.e. whenever you want to write down a '\'
+# character, insert '\\' instead.
+
+# Where the settings are stored:
+#settings=C:\\path\\to\\settings\\folder
+
+# Where the indexes are stored:
+#indexes=C:\\path\\to\\indexes\\folder

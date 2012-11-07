@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.Main;
@@ -52,6 +53,7 @@ import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.ConfLoader;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.Event;
@@ -206,8 +208,18 @@ public final class Application {
 		System.setProperty("swt.library.path", Util.getAbsPath(swtLibDir));
 
 		// Load program configuration and preferences
-		programConfFile = loadProgramConf();
-		settingsConfFile = loadSettingsConf();
+		File confPathOverride = null;
+		File indexPathOverride = null;
+		try {
+			Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
+			confPathOverride = toFile(pathProps, "settings");
+			indexPathOverride = toFile(pathProps, "indexes");
+		}
+		catch (IOException e1) {
+			// Ignore
+		}
+		programConfFile = loadProgramConf(confPathOverride);
+		settingsConfFile = loadSettingsConf(confPathOverride);
 
 		// Check single instance
 		if (!AppUtil.checkSingleInstance())
@@ -227,7 +239,7 @@ public final class Application {
 		Display display = new Display();
 		AppUtil.setDisplay(display);
 		shell = new Shell(display);
-		loadIndexRegistry(shell);
+		loadIndexRegistry(shell, indexPathOverride);
 
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
@@ -316,6 +328,14 @@ public final class Application {
 		saveSettingsConfFile();
 	}
 	
+	@Nullable
+	private static File toFile(@NotNull Properties props, @NotNull String key) {
+		String value = props.getProperty(key);
+		if (value == null)
+			return null;
+		return Util.getCanonicalFile(value);
+	}
+	
 	private static void handleCrash(@NotNull Throwable t) {
 		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(t), OutOfMemoryError.class)) {
 			UtilGui.showOutOfMemoryMessage(shell, e);
@@ -396,14 +416,19 @@ public final class Application {
 		});
 	}
 
-	private static void loadIndexRegistry(@NotNull final Shell mainShell) {
+	private static void loadIndexRegistry(@NotNull final Shell mainShell, @Nullable File pathOverride) {
 		Util.assertSwtThread();
 		final Display display = mainShell.getDisplay();
 
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			indexParentDir = new File("bin/indexes");
-		} else {
+		}
+		else if (pathOverride != null && !pathOverride.isFile()) {
+			pathOverride.mkdirs();
+			indexParentDir = pathOverride;
+		}
+		else {
 			File appDataDir = AppUtil.getAppDataDir();
 			if (SystemConf.Bool.IsPortable.get())
 				indexParentDir = new File(appDataDir, "indexes");
@@ -575,13 +600,17 @@ public final class Application {
 		}
 	}
 
-	private static File loadProgramConf() {
+	private static File loadProgramConf(@Nullable File pathOverride) {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			confFile = new File("dist/program-conf.txt");
+		}
+		else if (pathOverride != null && !pathOverride.isFile()) {
+			pathOverride.mkdirs();
+			confFile = new File(pathOverride, "program-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
@@ -636,13 +665,17 @@ public final class Application {
 		}
 	}
 	
-	private static File loadSettingsConf() {
+	private static File loadSettingsConf(@Nullable File pathOverride) {
 		AppUtil.checkConstInitialized();
 		AppUtil.ensureNoDisplay();
 
 		File confFile;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			confFile = new File("bin/settings-conf.txt");
+		}
+		else if (pathOverride != null && !pathOverride.isFile()) {
+			pathOverride.mkdirs();
+			confFile = new File(pathOverride, "settings-conf.txt");
 		}
 		else {
 			File appDataDir = AppUtil.getAppDataDir();
