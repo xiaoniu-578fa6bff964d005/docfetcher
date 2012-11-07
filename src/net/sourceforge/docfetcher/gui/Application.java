@@ -182,8 +182,25 @@ public final class Application {
 		 * ${user.home}/.swt. This is unsuitable especially for the portable
 		 * version of DocFetcher, which should not leave any files in the
 		 * system.
+		 * 
+		 * Bug #399: The DLLs for 32-bit and 64-bit Windows have the same names,
+		 * so we must extract them into separate directories in order to avoid
+		 * name clashes, which would cause the program to fail during startup.
+		 * https://sourceforge.net/p/docfetcher/bugs/399/
 		 */
-		String swtLibSuffix = AppUtil.isPortable() ? "lib/swt" : "swt";
+		String swtLibSuffix = AppUtil.isPortable() ? "lib/swt/" : "swt/";
+		if (Util.IS_WINDOWS)
+			swtLibSuffix += "windows-";
+		else if (Util.IS_LINUX)
+			swtLibSuffix += "linux-";
+		else if (Util.IS_MAC_OS_X)
+			swtLibSuffix += "macosx-";
+		else
+			swtLibSuffix += "unknown-";
+		if (Util.IS_64_BIT_JVM)
+			swtLibSuffix += "64";
+		else
+			swtLibSuffix += "32";
 		File swtLibDir = new File(AppUtil.getAppDataDir(), swtLibSuffix);
 		swtLibDir.mkdirs(); // SWT won't recognize the path if it doesn't exist
 		System.setProperty("swt.library.path", Util.getAbsPath(swtLibDir));

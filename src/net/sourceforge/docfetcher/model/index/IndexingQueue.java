@@ -236,7 +236,7 @@ public final class IndexingQueue {
 			 * is not needed: The task must either have been removed from the
 			 * task queue when the lock was held, or it was not an update task.
 			 * In both cases, changing the deletion field at this point should
-			 * not be not possible.
+			 * not be possible.
 			 */
 			PendingDeletion deletion = task.getDeletion();
 			if (deletion == null) {

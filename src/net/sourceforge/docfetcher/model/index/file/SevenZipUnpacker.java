@@ -79,10 +79,10 @@ abstract class SevenZipUnpacker<T> {
 			 * including those we don't need. For the latter, we can give J7Zip
 			 * a NullOutputStream in order to avoid consuming disk space.
 			 * 
-			 * 1) Wrapping the FileOutputStream into a BufferedOutputStream does
+			 * 2) Wrapping the FileOutputStream into a BufferedOutputStream does
 			 * not seem to have a significant effect on performance.
 			 * 
-			 * 2) Not sure what to do if we fail to create the output stream.
+			 * 3) Not sure what to do if we fail to create the output stream.
 			 * Here we're letting the IOException propagate outwards, but J7zip
 			 * might expect HRESULT.E_FAIL or something else.
 			 */
