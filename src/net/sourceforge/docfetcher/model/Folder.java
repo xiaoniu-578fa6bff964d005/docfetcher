@@ -64,6 +64,7 @@ public abstract class Folder
 	private static final long serialVersionUID = 1L;
 
 	// Making these events non-static would lead to trouble with serialization
+	public static final Event<FolderEvent> evtFolderAdding = new Event<FolderEvent>();
 	public static final Event<FolderEvent> evtFolderAdded = new Event<FolderEvent>();
 	public static final Event<FolderEvent> evtFolderRemoved = new Event<FolderEvent>();
 
@@ -211,6 +212,7 @@ public abstract class Folder
 	// will replace folder with identical name
 	@SuppressWarnings("unchecked")
 	public final void putSubFolder(@NotNull F subFolder) {
+		evtFolderAdding.fire(new FolderEvent(this, subFolder));
 		synchronized (this) {
 			if (subFolders == null)
 				subFolders = Maps.newHashMap();

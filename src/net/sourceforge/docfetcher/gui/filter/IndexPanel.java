@@ -67,6 +67,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.sun.jna.platform.win32.Shell32Util;
 
 public final class IndexPanel {
@@ -86,6 +88,7 @@ public final class IndexPanel {
 	private final Tree tree;
 	private final IndexRegistry indexRegistry;
 	private final DialogFactory dialogFactory;
+	private final Set<ViewNode> nodesToBeAdded = new HashSet<ViewNode>();
 	
 	@NotNull private MenuAction updateIndexAction;
 	@NotNull private MenuAction removeIndexAction;
@@ -122,7 +125,28 @@ public final class IndexPanel {
 
 		viewer = new SimpleTreeViewer<ViewNode>(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI) {
 			protected Iterable<ViewNode> getChildren(ViewNode element) {
-				return element.getChildren();
+				/*
+				 * Workaround for bug #3534802: In earlier versions, the
+				 * children of the given element were returned directly, without
+				 * the additional filtering below. This caused the program to
+				 * crash in a rare concurrency situation: (1) The indexing
+				 * thread running in the background adds a new subfolder to a
+				 * certain folder. (2) Afterwards, it notifies a listener of
+				 * this addition. The listener runs in the GUI thread, and its
+				 * job is to create a new tree item for the newly added
+				 * subfolder. (3) Between the steps 1 and 2, the user expands a
+				 * folder in the Search Scope pane so that the newly added
+				 * subfolder ought to become visible. However, the tree item for
+				 * this subfolder hasn't been created yet (to be done in step
+				 * 2), and this crashes the program. (4) The workaround used
+				 * here is to filter out subfolders for which no tree item has
+				 * been created yet.
+				 */
+				return Iterables.filter(element.getChildren(), new Predicate<ViewNode>() {
+					public boolean apply(ViewNode child) {
+						return !nodesToBeAdded.contains(child);
+					}
+				});
 			}
 
 			protected String getLabel(ViewNode element) {
@@ -149,11 +173,21 @@ public final class IndexPanel {
 		 * Update the tree viewer when the internal tree structure changes. This
 		 * can be caused by an index update running in the background.
 		 */
+		Folder.evtFolderAdding.add(new Event.Listener<FolderEvent>() {
+			public void update(final FolderEvent eventData) {
+				Util.runSwtSafe(tree, new Runnable() {
+					public void run() {
+						nodesToBeAdded.add(eventData.folder);
+					}
+				});
+			}
+		});
 		Folder.evtFolderAdded.add(new Event.Listener<FolderEvent>() {
 			public void update(final FolderEvent eventData) {
 				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
 						viewer.add(eventData.parent, eventData.folder);
+						nodesToBeAdded.remove(eventData.folder);
 					}
 				});
 			}
