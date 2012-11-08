@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.model.Cancelable;
 import net.sourceforge.docfetcher.model.DocumentType;
 import net.sourceforge.docfetcher.model.Path;
@@ -202,6 +203,9 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 		catch (IndexingException e) {
 			report(ErrorType.IO_EXCEPTION, reporter, e.getIOException());
 		}
+		catch (WrappedStackOverflowError e) {
+			report(ErrorType.STACK_OVERFLOW, reporter, e);
+		}
 		finally {
 			Closeables.closeQuietly(writer);
 			reporter.setEndTime(System.currentTimeMillis());
@@ -211,7 +215,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 	
 	private void report(@NotNull ErrorType errorType,
 	                    @NotNull IndexingReporter reporter,
-						@Nullable Exception e) {
+						@Nullable Throwable e) {
 		FileFolder rootFolder = getRootFolder();
 		IndexingError error = new IndexingError(errorType, rootFolder, e);
 		rootFolder.setError(error);
@@ -381,6 +385,16 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				}
 				try {
 					visitDirOrZip(context, subFolder, dir);
+				}
+				catch (StackOverflowError e) {
+					/*
+					 * Folder hierarchy was too deep. Throw wrapped
+					 * StackOverflowError with a more helpful error message.
+					 */
+					int depth = subFolder.getParentCount();
+					String path = subFolder.getPath().getCanonicalPath();
+					String msg = Msg.folder_hierarchy_too_deep.format(depth, path);
+					throw new WrappedStackOverflowError(msg, e);
 				}
 				catch (IndexingException e) {
 					stop(e);

@@ -530,6 +530,8 @@ public enum Msg {
 	archive_entry_encrypted ("Archive entry is encrypted."),
 	not_an_archive ("Not an archive."),
 	parser_not_found ("Could not find a suitable parser."),
+	folder_hierarchy_too_deep ("The folder hierarchy is too deep (at least {0} levels). Please " +
+			"reduce the folder depth and rebuild the index. This error occurred at: {1}"),
 	document ("Document"),
 	error_message ("Error Message"),
 	total_elapsed_time ("Total elapsed time: {0}"),

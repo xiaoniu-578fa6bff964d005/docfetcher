@@ -123,6 +123,16 @@ public abstract class Folder
 		this.lastModified = lastModified;
 		updatePathHashCode();
 	}
+	
+	public final synchronized int getParentCount() {
+		int count = 0;
+		F current = parent;
+		while (current != null) {
+			count++;
+			current = current.parent; // this is not really thread-safe :-/
+		}
+		return count;
+	}
 
 	protected void updatePathHashCode() {
 		if (path != null) {

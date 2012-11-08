@@ -37,6 +37,7 @@ public final class IndexingError implements Serializable {
 		OUT_OF_MEMORY (Msg.out_of_memory_instructions_brief.get()),
 		NOT_AN_ARCHIVE (Msg.not_an_archive.get()),
 		ENCODING,
+		STACK_OVERFLOW,
 		
 		// Outlook
 		ATTACHMENT,
