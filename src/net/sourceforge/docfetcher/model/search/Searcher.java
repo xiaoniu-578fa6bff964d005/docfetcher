@@ -293,6 +293,9 @@ public final class Searcher {
 			}
 			return Arrays.asList(results);
 		}
+		catch (IllegalArgumentException e) {
+			throw wrapEmptyIndexException(e);
+		}
 		catch (IOException e) {
 			throw new SearchException(e.getMessage()); // TODO i18n
 		}
@@ -302,6 +305,23 @@ public final class Searcher {
 		finally {
 			readLock.unlock();
 		}
+	}
+	
+	@NotNull
+	private static SearchException wrapEmptyIndexException(@NotNull IllegalArgumentException e)
+			throws SearchException {
+		/*
+		 * Workaround for bug #390: Lucene 3.5 throws this exception if the
+		 * indexes are empty, i.e. if no documents have been indexed so far.
+		 * This happens if the user indexes an empty folder hierarchy with no
+		 * files in it. Apparently, this problem has been fixed in Lucene 4.0,
+		 * so when the Lucene jar is upgraded to 4.0, this workaround may be
+		 * removed.
+		 */
+		if (e.getMessage().contains("numHits must be > 0"))
+			return new SearchException("No files were indexed."); // not internationalized
+		else
+			throw e;
 	}
 	
 	@ImmutableCopy
@@ -345,6 +365,9 @@ public final class Searcher {
 			});
 			
 			return Arrays.asList(results);
+		}
+		catch (IllegalArgumentException e) {
+			throw wrapEmptyIndexException(e);
 		}
 		catch (IOException e) {
 			throw new SearchException(e.getMessage()); // TODO i18n
@@ -452,6 +475,9 @@ public final class Searcher {
 			
 			return new ResultPage(
 				Arrays.asList(results), newPageIndex, pageCount, hitCount);
+		}
+		catch (IllegalArgumentException e) {
+			throw wrapEmptyIndexException(e);
 		}
 		catch (OutOfMemoryError e) {
 			throw new CheckedOutOfMemoryError(e);
