@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model.index.outlook;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -205,15 +206,17 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 						 */
 						PSTMessage pstMail = (PSTMessage) pstObject;
 						String id = String.valueOf(pstMail.getDescriptorNodeId());
-						long newLastModified = pstMail.getLastModificationTime().getTime();
+						Date newLastModDate = pstMail.getLastModificationTime();
+						// Bug #397: The last-modification date can be null
+						long newLastMod = newLastModDate == null ? 0 : newLastModDate.getTime();
 						MailDocument mail = unseenMails.remove(id);
 						if (mail == null) { // Mail added
 							String subject = pstMail.getSubject();
 							mail = new MailDocument(
-								folder, id, subject, newLastModified);
+								folder, id, subject, newLastMod);
 							context.index(mail, pstMail, true);
 						}
-						else if (mail.isModified(newLastModified)) { // Mail modified
+						else if (mail.isModified(newLastMod)) { // Mail modified
 							/*
 							 * Note: Outlook mails are not immutable, because
 							 * Outlook allows modifying the subject and body, as
@@ -224,7 +227,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 							 * so, whether we can rely on the last-modified
 							 * value to reflect such changes.
 							 */
-							mail.setLastModified(newLastModified);
+							mail.setLastModified(newLastMod);
 							context.index(mail, pstMail, false);
 						}
 					}
