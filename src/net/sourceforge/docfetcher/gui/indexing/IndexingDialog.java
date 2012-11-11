@@ -221,7 +221,19 @@ public final class IndexingDialog implements Dialog {
 		
 		removedListener = new Event.Listener<Task>() {
 			public void update(final Task task) {
-				assert !shell.isDisposed();
+				/*
+				 * Bug #369: In earlier versions, it was asserted that the shell
+				 * wasn't disposed at this point. This crashed the program
+				 * because for some unknown reason the assertion can be false.
+				 * User comment from bug report: "Happend when I closed an
+				 * indexing window. It had finished indexing files on network
+				 * drive several minutes ago. Number of files ~25k, files with
+				 * errors ~1k. I copied the list of errors twice before I closed
+				 * the window. The copying took a long time."
+				 */
+				if (shell.isDisposed())
+					return;
+				
 				Util.runSwtSafe(tabFolder, new Runnable() {
 					public void run() {
 						for (CTabItem item : tabFolder.getItems()) {
