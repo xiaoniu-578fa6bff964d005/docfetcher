@@ -171,7 +171,16 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		// Visit mails
 		if (pstFolder.getContentCount() > 0) {
 			try {
-				PSTObject pstObject = pstFolder.getNextChild();
+				PSTObject pstObject;
+				try {
+					pstObject = pstFolder.getNextChild();
+				}
+				catch (IndexOutOfBoundsException e) {
+					// Bug #374. See similar bugfix inside the following loop.
+					Util.printErr(e.getMessage());
+					pstObject = null; // skip following loop
+				}
+				
 				while (pstObject != null) {
 					if (context.isStopped()) break;
 					
