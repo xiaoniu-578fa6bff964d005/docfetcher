@@ -17,6 +17,7 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingReporter;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.ImmutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -64,7 +65,8 @@ public abstract class TreeIndex <
 		this.config = new IndexingConfig() {
 			@Override
 			protected void onStoreRelativePathsChanged() {
-				Path newPath = config.getStorablePath(getCanonicalRootFile());
+				File oldFile = rootFolder.getPath().getCanonicalFile();
+				Path newPath = config.getStorablePath(oldFile);
 				rootFolder.setPath(newPath);
 			}
 			protected void onWatchFoldersChanged() {
@@ -86,7 +88,11 @@ public abstract class TreeIndex <
 		}
 		else {
 			String indexDirName = getIndexDirName(rootFile) + "_" + created;
-			fileIndexDirPath = new Path(new File(indexParentDir, indexDirName).getPath());
+			File indexDir = new File(indexParentDir, indexDirName);
+			if (AppUtil.isPortable())
+				fileIndexDirPath = new Path(UtilModel.getRelativePathIfPossible(indexDir));
+			else
+				fileIndexDirPath = new Path(indexDir);
 		}
 	}
 	
@@ -119,7 +125,7 @@ public abstract class TreeIndex <
 	protected final File getIndexParentDir() {
 		if (fileIndexDirPath == null)
 			return null;
-		if (indexParentDir == null)
+		if (indexParentDir == null) // is null after deserialization
 			indexParentDir = Util.getParentFile(fileIndexDirPath.getCanonicalFile());
 		return indexParentDir;
 	}

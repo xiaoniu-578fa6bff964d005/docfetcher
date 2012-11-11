@@ -63,6 +63,10 @@ public final class Path implements Serializable {
 	private final String path;
 	@Nullable private transient File canonicalFile;
 	
+	public Path(@NotNull File file) {
+		this(file.getPath());
+	}
+	
 	public Path(@NotNull String path) {
 		Util.checkNotNull(path);
 		this.path = normalizePath(path);

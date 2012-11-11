@@ -87,6 +87,21 @@ public final class UtilModel {
 		return ImmutableMap.copyOf(map);
 	}
 	
+	@NotNull
+	public static String getRelativePathIfPossible(@NotNull File file) {
+		String absPath = Util.getAbsPath(file);
+		assert Util.USER_DIR.isAbsolute();
+		if (absPath.equals(Util.USER_DIR_PATH))
+			return "";
+		if (Util.IS_WINDOWS) {
+			String d1 = Util.getDriveLetter(Util.USER_DIR_PATH);
+			String d2 = Util.getDriveLetter(absPath);
+			if (!d1.equals(d2))
+				return absPath;
+		}
+		return UtilModel.getRelativePath(Util.USER_DIR_PATH, absPath);
+	}
+	
 	/**
 	 * Returns a relative path that allows navigation from the absolute source
 	 * path {@code srcPath} to the absolute destination path {@code dstPath}.

@@ -325,7 +325,7 @@ public final class IndexRegistry {
 		 * resulting in a serialization of both operations.
 		 */
 
-		// Ensure this method can only called once
+		// Ensure this method can only be called once
 		Util.checkThat(searcher.isNull());
 
 		indexParentDir.mkdirs(); // Needed for the folder watching
