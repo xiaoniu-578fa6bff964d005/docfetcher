@@ -1,12 +1,20 @@
-# This configuration file allows you to customize the paths where DocFetcher
-# will look for its settings and index files. Lines starting with '#' are
-# ignored. Remove the '#' characters in front of the "key=value" lines to enable
-# them.
+# In this configuration file you can customize the paths where DocFetcher will
+# look for its settings and index files. This file follows the conventions of
+# the Java Properties format. In particular, the following rules apply:
+# * Lines starting with '#' are considered comments and will be ignored. Remove
+#   the '#' characters in front of the "key=value" lines below to enable the
+#   respective settings.
+# * Backslashes must be escaped, i.e. whenever you want to write down a '\'
+#   character, insert '\\' instead.
+# * Other characters to be escaped with a backslash include ' and ". Thus, you
+#   have to enter \' and \" instead.
+# * The expected encoding is ISO-8859-1, aka Latin-1. All non-Latin-1 characters
+#   must be entered as Unicode escapes, e.g. '\u00F6' instead of 'ö'.
 # You can specify relative paths with ".." (two dots), which means "go up one
 # level in the folder hierarchy". Relative paths are relative to the DocFetcher
-# folder, not to this file.
-# Backslashes must be escaped, i.e. whenever you want to write down a '\'
-# character, insert '\\' instead.
+# folder, not to this file. Example: ..\\some\\folder
+# For more information on the Properties format, see:
+# http://en.wikipedia.org/wiki/.properties
 
 # Where the settings are stored:
 #settings=C:\\path\\to\\settings\\folder
