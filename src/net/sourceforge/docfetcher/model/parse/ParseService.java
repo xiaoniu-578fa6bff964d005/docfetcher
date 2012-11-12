@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.InvalidPathException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -279,15 +278,15 @@ public final class ParseService {
 						tzFile.cp(tempFile);
 						result = fileParser.parse(tempFile, context);
 					}
-					catch (InvalidPathException e) {
+					catch (RuntimeException e) {
 						/*
-						 * Bug #408: This happens if we try to unpack a file
-						 * whose name contains a character that is not valid on
-						 * the current platform. For example, the user could
-						 * create a file with a colon (':') in its name on
-						 * Linux, put this file in an archive, and then try to
-						 * index the archive on Windows. - The colon character
-						 * is supported on Linux, but not on Windows.
+						 * Bug #408: We'll get an InvalidPathException if we try
+						 * to unpack a file whose name contains a character that
+						 * is not valid on the current platform. For example,
+						 * the user could create a file with a colon (':') in
+						 * its name on Linux, put this file in an archive, and
+						 * then try to index the archive on Windows. - The colon
+						 * character is supported on Linux, but not on Windows.
 						 */
 						throw new ParseException(e);
 					}
