@@ -5,15 +5,16 @@
 # Requirements:
 # - mkfs.hfsplus must be installed
 # - the script build.py must be run first
-# - this script must be run as root
+# - do not run this as root, see bug #412
 #
 # Output:
 # - build/DocFetcher-{version-number}.dmg
 
-if [ -z "$SUDO_COMMAND" ] # Need to run this with sudo
+user=$(whoami)
+if [ $user = "root" ]
 then
-  mntusr=$(id -u) grpusr=$(id -g) sudo $0 $*
-  exit 0
+	echo "Do not run this script as root."
+	exit 0
 fi
 
 version=`cat current-version.txt`
@@ -27,9 +28,11 @@ rm -f $dmg_path
 dd if=/dev/zero of=$dmg_path bs=1024 count=$dir_size
 mkfs.hfsplus -v "DocFetcher" $dmg_path
 
-mkdir /mnt/tmp-docfetcher
-mount -o loop $dmg_path /mnt/tmp-docfetcher
-cp -r build/DocFetcher.app /mnt/tmp-docfetcher
+sudo mkdir /mnt/tmp-docfetcher
+sudo mount -o loop $dmg_path /mnt/tmp-docfetcher
 
-umount /mnt/tmp-docfetcher
-rm -rf /mnt/tmp-docfetcher
+sudo cp -r build/DocFetcher.app /mnt/tmp-docfetcher
+sudo chown -R $user:$user /mnt/tmp-docfetcher
+
+sudo umount /mnt/tmp-docfetcher
+sudo rm -rf /mnt/tmp-docfetcher
