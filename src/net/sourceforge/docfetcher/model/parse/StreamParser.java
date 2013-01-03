@@ -16,18 +16,38 @@ import java.io.InputStream;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
+ * An implementation of <tt>Parser</tt> that works on <tt>InputStream</tt>s.
+ * 
  * @author Tran Nam Quang
  */
 abstract class StreamParser extends Parser {
 	
-	// Implementor does not need to close the input stream
-	// If the indexing is canceled, this method should stop all parsing
-	// immediately if possible and return the partially extracted text.
+	/**
+	 * This method extracts text and metadata from the given input stream for
+	 * internal consumption by the indexing engine.
+	 * <p>
+	 * The given <tt>ParseContext</tt> object provides implementors with
+	 * additional information, such as whether the indexing has been cancelled
+	 * by the user. In the latter case, this method should stop all parsing as
+	 * soon as possible and return any partially extracted text.
+	 * <p>
+	 * Note: The given input stream is closed automatically after this method
+	 * returns.
+	 */
 	@NotNull
 	protected abstract ParseResult parse(	@NotNull InputStream in,
 	                                     	@NotNull ParseContext context)
 			throws ParseException;
 	
+	/**
+	 * This method extracts text from the given input stream for presentation on
+	 * the preview pane. The default implementation uses the text extracted from
+	 * the <tt>parse</tt> method; implementors may override to output more
+	 * human-friendly text.
+	 * <p>
+	 * Note: The given input stream is closed automatically after this method
+	 * returns.
+	 */
 	@NotNull
 	protected String renderText(@NotNull InputStream in,
 	                            @NotNull String filename)

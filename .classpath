@@ -65,5 +65,7 @@
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-memory-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-queries-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/metadata-extractor/metadata-extractor-2.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/metadata-extractor/xmpcore.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
