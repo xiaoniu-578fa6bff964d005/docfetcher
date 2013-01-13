@@ -81,6 +81,7 @@ public final class ParseService {
 		htmlParser = new HtmlParser(),
 		
 		new ExifParser(),
+		new MP3Parser(),
 		new AbiWordParser(),
 		new PdfParser(),
 		new RtfParser(),

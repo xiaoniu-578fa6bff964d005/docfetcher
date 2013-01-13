@@ -165,6 +165,7 @@ public enum Msg {
 	filetype_odp ("OpenOffice.org Impress (odp, otp)", Comments.filetype),
 	filetype_pdf ("PDF Document (pdf)", Comments.filetype),
 	filetype_jpg ("JPEG (jpg, jpeg)", Comments.filetype),
+	filetype_mp3 ("MP3 (mp3)", Comments.filetype),
 	filetype_rtf ("Rich Text Format (rtf)", Comments.filetype),
 	filetype_svg ("Scalable Vector Graphics (svg)", Comments.filetype),
 	filetype_txt ("Plain Text", Comments.filetype),
