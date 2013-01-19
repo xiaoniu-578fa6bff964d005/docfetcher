@@ -5,18 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 
 import net.sourceforge.docfetcher.enums.Msg;
 
 /**
  * <p>Based on ID3 specifications in http://id3.org
  * 
- * <p>Currently only ID3v2.4.0 is parsed here.
+ * <p>Currently only ID3 v2.3 and v2.4 are supported.
  * 
  * @author Paulos Siahu
  */
-public class MP3Parser extends StreamParser {
+final class MP3Parser extends StreamParser {
 
 	private static final Collection<String> extensions = Arrays.asList(
 			"mp3");
@@ -24,16 +23,11 @@ public class MP3Parser extends StreamParser {
 	private static final Collection<String> types = Arrays.asList(
 			"audio/mpeg");
 
-	private static HashSet<String> tagIDs;
-
 	
 	public MP3Parser() {
-		tagIDs = new HashSet<String>();
-		tagIDs.add("TALB");
-		tagIDs.add("TIT2");
-		tagIDs.add("TIT3s");
 	}
 
+	
 	protected String extract(InputStream in, boolean forViewing) throws IOException, ParseException {
 		StringBuffer sb = new StringBuffer();
 		DataInputStream raf = new DataInputStream(in);
@@ -59,7 +53,8 @@ public class MP3Parser extends StreamParser {
 			}
 			int textlength = (data[4] << 24) | (data[5] << 16) | (data[6] << 8) | (data[7]);
 			String tagID = new String(id);
-			if (tagIDs.contains(tagID)) {
+			if ((tagID.startsWith("T") || tagID.equals("COMM"))
+					&& (tagID.equals("TXXX") == false)) {
 				byte[] text = new byte[textlength-1];
 				raf.readByte();
 				pos++;
