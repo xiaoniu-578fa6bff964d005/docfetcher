@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -44,16 +45,12 @@ import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer;
 import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import com.google.common.primitives.Longs;
@@ -311,20 +308,11 @@ public final class ResultPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				StringBuilder sb = new StringBuilder();
-				boolean first = true;
-				for (ResultDocument doc : getSelection()) {
-					if (first)
-						first = false;
-					else
-						sb.append(Util.LS);
-					sb.append(doc.getPath().getCanonicalPath());
-				}
-				Display display = viewer.getControl().getDisplay();
-				Clipboard clipboard = new Clipboard(display);
-				Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-				clipboard.setContents(new Object[] {sb.toString()}, types);
-				clipboard.dispose();
+				List<ResultDocument> docs = getSelection();
+				List<File> files = new ArrayList<File>(docs.size());
+				for (ResultDocument doc : docs)
+					files.add(doc.getPath().getCanonicalFile());
+				Util.setClipboard(files);
 			}
 		});
 	}
