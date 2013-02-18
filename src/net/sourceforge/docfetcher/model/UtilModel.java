@@ -89,6 +89,8 @@ public final class UtilModel {
 	
 	@NotNull
 	public static String getRelativePathIfPossible(@NotNull File file) {
+		if (Util.isUncPath(file))
+			return file.getPath();
 		String absPath = Util.getAbsPath(file);
 		assert Util.USER_DIR.isAbsolute();
 		if (absPath.equals(Util.USER_DIR_PATH))

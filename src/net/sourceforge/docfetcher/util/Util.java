@@ -681,10 +681,16 @@ public final class Util {
 	/**
 	 * For the given file, returns an absolute path in which all backward
 	 * slashes have been replaced by forward slashes.
+	 * <p>
+	 * Exception: If the file's path is a UNC path, the UNC path is returned as
+	 * is.
 	 */
 	@NotNull
 	@SuppressAjWarnings
 	public static String getAbsPath(@NotNull File file) {
+		String absPath = file.getAbsolutePath();
+		if (absPath.startsWith("\\\\")) // UNC path?
+			return absPath;
 		/*
 		 * We'll replace "//" with "/" here due to a bug in the
 		 * File.getAbsolutePath method: On Windows, if the given file has the
@@ -692,7 +698,14 @@ public final class Util {
 		 * device, e.g. "C:\", then getAbsolutePath will return "C:\\SOME_PATH"
 		 * rather than the more sensible value "C:\SOME_PATH".
 		 */
-		return file.getAbsolutePath().replace('\\', '/').replace("//", "/");
+		return absPath.replace('\\', '/').replace("//", "/");
+	}
+	
+	/**
+	 * Returns whether given file's path is a UNC path.
+	 */
+	public static boolean isUncPath(@NotNull File file) {
+		return file.getPath().startsWith("\\\\");
 	}
 
 	/**

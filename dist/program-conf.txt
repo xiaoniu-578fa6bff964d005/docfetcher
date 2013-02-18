@@ -37,7 +37,7 @@ HtmlExtensions = html;htm;xhtml;shtml;shtm;php;asp;jsp
 MaxLinesInProgressPanel = 1000
 
 # The size limit of the search history, which can be accessed through the
-# drop-down menu next to the search textfield.
+# drop-down menu next to the search text field.
 SearchHistorySize = 20
 
 # The maximum width of the search text field in pixels.
