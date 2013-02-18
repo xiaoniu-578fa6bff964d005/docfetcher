@@ -53,6 +53,10 @@ public abstract class VirtualTableViewer<E> {
 			this.label = Util.checkNotNull(label);
 			this.orientation = orientation;
 		}
+		@NotNull
+		public final String getLabel() {
+			return label;
+		}
 		public final void setLabel(@NotNull String label) {
 			Util.checkNotNull(label);
 			if (this.label.equals(label)) return;
@@ -120,21 +124,25 @@ public abstract class VirtualTableViewer<E> {
 		
 		tableColumn.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (elements == null || !sortingEnabled)
-					return;
-				final int direction = lastSortColumn != column
-					? 1
-					: column.lastSortDirection * -1;
-				Collections.sort(elements, new Comparator<E>() {
-					public int compare(E e1, E e2) {
-						return column.compare(e1, e2) * direction;
-					};
-				});
-				table.clearAll();
-				lastSortColumn = column;
-				column.lastSortDirection = direction;
+				sortByColumn(column);
 			}
 		});
+	}
+	
+	public final void sortByColumn(@NotNull final Column<E> column) {
+		if (elements == null || !sortingEnabled)
+			return;
+		final int direction = lastSortColumn != column
+			? 1
+			: column.lastSortDirection * -1;
+		Collections.sort(elements, new Comparator<E>() {
+			public int compare(E e1, E e2) {
+				return column.compare(e1, e2) * direction;
+			};
+		});
+		table.clearAll();
+		lastSortColumn = column;
+		column.lastSortDirection = direction;
 	}
 	
 	@Immutable

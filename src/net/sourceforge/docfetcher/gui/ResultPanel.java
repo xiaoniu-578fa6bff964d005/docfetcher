@@ -23,6 +23,7 @@ import java.util.Set;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.model.FileResource;
 import net.sourceforge.docfetcher.model.Path;
@@ -356,6 +357,18 @@ public final class ResultPanel {
 		setActualHeaderMode(results); // TODO post-release-1.1: needs some refactoring
 		
 		viewer.setRoot(results);
+		
+		// Apply custom initial sorting
+		String sortName = ProgramConf.Str.InitialSorting.get().trim();
+		if (!sortName.isEmpty()) {
+			for (Column<ResultDocument> column : viewer.getColumns()) {
+				if (column.getLabel().equals(sortName)) {
+					viewer.sortByColumn(column);
+					break;
+				}
+			}
+		}
+		
 		viewer.scrollToTop();
 	}
 	
