@@ -201,7 +201,7 @@ abstract class MSOfficeParser extends FileParser {
 				String author;
 				String defaultAuthor = si.getAuthor();
 				String lastAuthor = si.getLastAuthor();
-				if (defaultAuthor.equals(lastAuthor))
+				if (defaultAuthor == null || defaultAuthor.equals(lastAuthor))
 					author = defaultAuthor;
 				else
 					author = defaultAuthor + ", " + lastAuthor; //$NON-NLS-1$
