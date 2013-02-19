@@ -521,7 +521,8 @@ public final class Application {
 					
 					// Confirm deletion of obsolete files inside the index
 					// folder
-					if (!loadingProblems.getObsoleteFiles().isEmpty()) {
+					if (ProgramConf.Bool.ReportObsoleteIndexFiles.get()
+							&& !loadingProblems.getObsoleteFiles().isEmpty()) {
 						Util.runSyncExec(mainShell, new Runnable() {
 							public void run() {
 								reportObsoleteIndexFiles(

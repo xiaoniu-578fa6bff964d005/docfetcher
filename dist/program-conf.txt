@@ -89,3 +89,8 @@ AllowIndexCreation = true
 AllowIndexUpdate = true
 AllowIndexRebuild = true
 AllowIndexDeletion = true
+
+# By default, when DocFetcher starts up it checks the index folder for any
+# obsolete index files, and if it finds any, it asks the user whether the files
+# should be deleted. You can turn this off with this setting.
+ReportObsoleteIndexFiles = true

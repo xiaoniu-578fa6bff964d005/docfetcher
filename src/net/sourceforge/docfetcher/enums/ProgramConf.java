@@ -54,6 +54,7 @@ public final class ProgramConf {
 		AllowIndexRebuild (true),
 		AllowIndexDeletion (true),
 		ShowAdvancedSettingsLink (true),
+		ReportObsoleteIndexFiles (true),
 		;
 
 		private boolean value;
