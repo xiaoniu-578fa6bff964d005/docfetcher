@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.Img;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
@@ -22,8 +24,11 @@ import net.sourceforge.docfetcher.model.search.Range;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.ContextMenuManager;
+import net.sourceforge.docfetcher.util.gui.MenuAction;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
@@ -101,6 +106,14 @@ final class HighlightingText {
 				for (Resource resource : resources)
 					if (resource != null)
 						resource.dispose();
+			}
+		});
+		
+		// Context menu
+		ContextMenuManager menuManager = new ContextMenuManager(textViewer);
+		menuManager.add(new MenuAction(Img.CLIPBOARD.get(), Msg.copy.get()) {
+			public void run() {
+				textViewer.invokeAction(ST.COPY);
 			}
 		});
 	}
