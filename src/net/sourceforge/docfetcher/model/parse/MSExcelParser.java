@@ -20,6 +20,7 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.hssf.OldExcelFormatException;
@@ -61,7 +62,7 @@ final class MSExcelParser extends MSOfficeParser {
 				Closeables.closeQuietly(in);
 				return extractWithJexcelAPI(file);
 			}
-			extractor.setFormulasNotResults(true);
+			extractor.setFormulasNotResults(ProgramConf.Bool.IndexExcelFormulas.get());
 			return extractor.getText();
 		}
 		catch (IOException e) {

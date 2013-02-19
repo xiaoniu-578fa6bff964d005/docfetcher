@@ -55,6 +55,7 @@ public final class ProgramConf {
 		AllowIndexDeletion (true),
 		ShowAdvancedSettingsLink (true),
 		ReportObsoleteIndexFiles (true),
+		IndexExcelFormulas (true),
 		;
 
 		private boolean value;

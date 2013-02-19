@@ -16,12 +16,15 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
+import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackageProperties;
+import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 
 /**
  * @author Tran Nam Quang
@@ -61,8 +64,7 @@ abstract class MSOffice2007Parser extends FileParser {
 	protected ParseResult parse(File file, ParseContext context)
 			throws ParseException {
 		try {
-			// Extract contents
-			String contents = ExtractorFactory.createExtractor(file).getText();
+			String contents = extractText(file);
 			
 			// Open up properties
 			OPCPackage pkg = OPCPackage.open(file.getPath(), PackageAccess.READ);
@@ -108,11 +110,21 @@ abstract class MSOffice2007Parser extends FileParser {
 	protected final String renderText(File file, String filename)
 			throws ParseException {
 		try {
-			return ExtractorFactory.createExtractor(file).getText();
+			return extractText(file);
 		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
+	}
+	
+	@NotNull
+	private static String extractText(@NotNull File file) throws Exception {
+		POITextExtractor extractor = ExtractorFactory.createExtractor(file);
+		if (extractor instanceof XSSFExcelExtractor) {
+			boolean indexFormulas = ProgramConf.Bool.IndexExcelFormulas.get();
+			((XSSFExcelExtractor) extractor).setFormulasNotResults(indexFormulas);
+		}
+		return extractor.getText();
 	}
 
 	protected final Collection<String> getExtensions() {
