@@ -100,6 +100,7 @@ public final class TestParseFromZip {
 			protected void handleInputStream(InputStream in) throws Exception {
 				OPCPackage pkg = OPCPackage.open(in);
 				pkg.getPackageProperties();
+				Closeables.closeQuietly(pkg);
 			}
 		};
 	}
@@ -113,6 +114,7 @@ public final class TestParseFromZip {
 				assertEquals(620, length);
 				OPCPackage pkg = OPCPackage.open(in);
 				pkg.getPackageProperties();
+				Closeables.closeQuietly(pkg);
 			}
 		};
 	}

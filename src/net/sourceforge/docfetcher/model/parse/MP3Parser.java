@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
  * <p>Based on ID3 specifications in http://id3.org
@@ -23,12 +24,9 @@ final class MP3Parser extends StreamParser {
 	private static final Collection<String> types = Arrays.asList(
 			"audio/mpeg");
 
-	
-	public MP3Parser() {
-	}
-
-	
-	protected String extract(InputStream in, boolean forViewing) throws IOException, ParseException {
+	@NotNull
+	private static String extract(@NotNull InputStream in, boolean forViewing)
+			throws IOException, ParseException {
 		StringBuffer sb = new StringBuffer();
 		DataInputStream raf = new DataInputStream(in);
 		
@@ -67,7 +65,6 @@ final class MP3Parser extends StreamParser {
 		
 		return sb.toString();
 	}
-
 	
 	@Override
 	protected ParseResult parse(InputStream in, ParseContext context)
@@ -80,7 +77,6 @@ final class MP3Parser extends StreamParser {
 		}
 		return new ParseResult(text);
 	}
-
 	
 	@Override
 	protected String renderText(InputStream in, String filename)
@@ -94,18 +90,15 @@ final class MP3Parser extends StreamParser {
 		return text;
 	}
 
-
 	@Override
 	protected Collection<String> getExtensions() {
 		return extensions;
 	}
 
-	
 	@Override
 	protected Collection<String> getTypes() {
 		return types;
 	}
-
 	
 	@Override
 	public String getTypeLabel() {

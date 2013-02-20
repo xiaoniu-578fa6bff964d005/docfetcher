@@ -80,9 +80,10 @@ final class MSExcelParser extends MSOfficeParser {
 	@NotNull
 	private String extractWithJexcelAPI(@NotNull File file)
 			throws ParseException {
-		StringBuilder sb = new StringBuilder();
+		Workbook workbook = null;
 		try {
-			Workbook workbook = Workbook.getWorkbook(file);
+			workbook = Workbook.getWorkbook(file);
+			StringBuilder sb = new StringBuilder();
 			for (int sIndex = 0; sIndex < workbook.getNumberOfSheets(); sIndex++) {
 				Sheet sheet = workbook.getSheet(sIndex);
 				sb.append(sheet.getName()).append("\n\n"); //$NON-NLS-1$
@@ -94,11 +95,16 @@ final class MSExcelParser extends MSOfficeParser {
 				}
 				sb.append("\n\n\n"); //$NON-NLS-1$
 			}
+			return sb.toString();
 		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
-		return sb.toString();
+		finally {
+			if (workbook != null) {
+				workbook.close();
+			}
+		}
 	}
 	
 }

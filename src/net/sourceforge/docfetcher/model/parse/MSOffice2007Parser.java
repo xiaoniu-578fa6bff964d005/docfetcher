@@ -26,6 +26,8 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackageProperties;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 
+import com.google.common.io.Closeables;
+
 /**
  * @author Tran Nam Quang
  */
@@ -63,11 +65,12 @@ abstract class MSOffice2007Parser extends FileParser {
 	@Override
 	protected ParseResult parse(File file, ParseContext context)
 			throws ParseException {
+		OPCPackage pkg = null;
 		try {
 			String contents = extractText(file);
 			
 			// Open up properties
-			OPCPackage pkg = OPCPackage.open(file.getPath(), PackageAccess.READ);
+			pkg = OPCPackage.open(file.getPath(), PackageAccess.READ);
 			PackageProperties props = pkg.getPackageProperties();
 			
 			// Get author(s)
@@ -103,6 +106,9 @@ abstract class MSOffice2007Parser extends FileParser {
 		}
 		catch (Exception e) {
 			throw new ParseException(e);
+		}
+		finally {
+			Closeables.closeQuietly(pkg);
 		}
 	}
 	
