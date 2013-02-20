@@ -43,6 +43,8 @@ Unterstützte Datei-Formate
 * Rich Text Format (rtf)
 * AbiWord (abw, abw.gz, zabw)
 * Microsoft Compiled HTML Help (chm)
+* MP3 Metadaten (mp3)
+* JPEG Exif Metadaten (jpg, jpeg)
 * Microsoft Visio (vsd)
 * Scalable Vector Graphics (svg)
 
