@@ -46,9 +46,11 @@ import net.sourceforge.docfetcher.model.FolderWatcher;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
 import net.sourceforge.docfetcher.model.IndexRegistry;
+import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.Task.CancelAction;
 import net.sourceforge.docfetcher.model.index.Task.CancelHandler;
+import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
@@ -220,6 +222,12 @@ public final class Application {
 		}
 		programConfFile = loadProgramConf(confPathOverride);
 		settingsConfFile = loadSettingsConf(confPathOverride);
+		
+		// Update indexes in headless mode
+		if (args.length >= 1 && args[0].equals("--update-indexes")) {
+			loadIndexRegistryHeadless(getIndexParentDir(indexPathOverride));
+			return;
+		}
 
 		// Check single instance
 		if (!AppUtil.checkSingleInstance())
@@ -239,7 +247,7 @@ public final class Application {
 		Display display = new Display();
 		AppUtil.setDisplay(display);
 		shell = new Shell(display);
-		loadIndexRegistry(shell, indexPathOverride);
+		loadIndexRegistry(shell, getIndexParentDir(indexPathOverride));
 
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(
@@ -415,11 +423,9 @@ public final class Application {
 			}
 		});
 	}
-
-	private static void loadIndexRegistry(@NotNull final Shell mainShell, @Nullable File pathOverride) {
-		Util.assertSwtThread();
-		final Display display = mainShell.getDisplay();
-
+	
+	@NotNull
+	private static File getIndexParentDir(@Nullable File pathOverride) {
 		File indexParentDir;
 		if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 			indexParentDir = new File("bin/indexes");
@@ -435,8 +441,13 @@ public final class Application {
 			else
 				indexParentDir = appDataDir;
 		}
-		
 		indexParentDir.mkdirs();
+		return indexParentDir;
+	}
+
+	private static void loadIndexRegistry(@NotNull final Shell mainShell, @NotNull File indexParentDir) {
+		Util.assertSwtThread();
+		final Display display = mainShell.getDisplay();
 
 		int cacheCapacity = ProgramConf.Int.UnpackCacheCapacity.get();
 		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
@@ -555,6 +566,35 @@ public final class Application {
 				}
 			}
 		}.start();
+	}
+	
+	private static void loadIndexRegistryHeadless(@NotNull File indexParentDir) {
+		int cacheCapacity = ProgramConf.Int.UnpackCacheCapacity.get();
+		int reporterCapacity = ProgramConf.Int.MaxLinesInProgressPanel.get();
+		indexRegistry = new IndexRegistry(
+			indexParentDir, cacheCapacity, reporterCapacity);
+		
+		try {
+			indexRegistry.load(Cancelable.nullCancelable);
+			final IndexingQueue queue = indexRegistry.getQueue();
+			
+			queue.evtQueueEmpty.add(new Event.Listener<Void>() {
+				public void update(Void eventData) {
+					indexRegistry.getSearcher().shutdown();
+					queue.shutdown(new CancelHandler() {
+						public CancelAction cancel() {
+							return CancelAction.KEEP;
+						}
+					});
+				}
+			});
+			
+			for (LuceneIndex index : indexRegistry.getIndexes())
+				queue.addTask(index, IndexAction.UPDATE);
+		}
+		catch (IOException e) {
+			Util.printErr(e);
+		}
 	}
 	
 	private static void reportObsoleteIndexFiles(	@NotNull Shell mainShell,

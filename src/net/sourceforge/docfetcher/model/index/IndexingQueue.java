@@ -196,6 +196,10 @@ public final class IndexingQueue {
 						indexRegistry.save(luceneIndex);
 						indexRegistry.getSearcher().replaceLuceneSearcher();
 					}
+					
+					// Output for index updates from the command-line
+					File rootFile = task.getLuceneIndex().getCanonicalRootFile();
+					Util.println("Updated: " + rootFile);
 				}
 				else {
 					doDelete = true;
