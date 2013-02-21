@@ -80,6 +80,7 @@ public final class ProgramConf {
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),
 		Analyzer (0, 0),
+		InitialSorting (-1, -1),
 		;
 
 		private int value;
@@ -105,7 +106,6 @@ public final class ProgramConf {
 
 	public static enum Str implements Loadable {
 		AppName ("DocFetcher"),
-		InitialSorting (""),
 		;
 
 		private String value;

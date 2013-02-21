@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.gui.ResultPanel.HeaderMode;
 import net.sourceforge.docfetcher.gui.filter.FileTypePanel;
 import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
@@ -316,6 +317,7 @@ public final class SearchQueue {
 		Util.runSyncExec(searchBar.getControl(), new Runnable() {
 			public void run() {
 				resultPanel.setResults(visibleResults, mode);
+				resultPanel.sortByColumn(ProgramConf.Int.InitialSorting.get());
 				if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST))
 					resultPanel.getControl().setFocus();
 				updateResultStatus(); // Must be done *after* setting the results

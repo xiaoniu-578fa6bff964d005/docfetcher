@@ -44,9 +44,9 @@ SearchHistorySize = 20
 SearchBoxMaxWidth = 200
 
 # By default, DocFetcher initially sorts the results by score. To change the
-# initial sorting criterion, specify the exact name of the table column to sort
-# by here.
-InitialSorting =
+# initial sorting criterion, specify the number of the column to sort by here.
+# The numbering starts at 0. Out-of-range values will be ignored.
+InitialSorting = -1
 
 # Desktop interface: The maximum number of search results to return for each
 # query. If you set a value that is too high, DocFetcher may crash with an
