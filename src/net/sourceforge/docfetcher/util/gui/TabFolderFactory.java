@@ -47,7 +47,7 @@ public final class TabFolderFactory {
 				setTabColors(tabFolder);
 				
 				// Adapt colors to OS theme changes
-				tabFolder.getDisplay().addListener(SWT.Settings, new Listener() {
+				tabFolder.addListener(SWT.Settings, new Listener() {
 					public void handleEvent(Event event) {
 						setTabColors(tabFolder);
 					}
