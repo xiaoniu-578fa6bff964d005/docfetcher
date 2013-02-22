@@ -145,6 +145,20 @@ public abstract class VirtualTableViewer<E> {
 		column.lastSortDirection = direction;
 	}
 	
+	public final void sortByColumn(@NotNull final Column<E> column, boolean up) {
+		if (elements == null || !sortingEnabled)
+			return;
+		final int direction = up ? 1 : -1;
+		Collections.sort(elements, new Comparator<E>() {
+			public int compare(E e1, E e2) {
+				return column.compare(e1, e2) * direction;
+			};
+		});
+		table.clearAll();
+		lastSortColumn = column;
+		column.lastSortDirection = direction;
+	}
+	
 	@Immutable
 	@NotNull
 	public final List<Column<E>> getColumns() {

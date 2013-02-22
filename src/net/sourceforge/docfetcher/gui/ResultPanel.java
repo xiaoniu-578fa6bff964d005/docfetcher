@@ -371,19 +371,22 @@ public final class ResultPanel {
 		}
 	}
 
-	// out-of-range values will be ignored
+	// sign of given index specifies direction of sorting
+	// zero and out-of-range values will be ignored
 	public void sortByColumn(int columnIndex) {
+		if (columnIndex == 0)
+			return;
 		/*
 		 * Note: The column to sort by must be specified as an index, since the
 		 * column names may change.
 		 */
 		try {
-			if (columnIndex < 0)
-				return;
+			int index = Math.abs(columnIndex);
 			List<Column<ResultDocument>> columns = viewer.getColumns();
-			if (columnIndex >= columns.size())
+			if (index >= columns.size())
 				return;
-			viewer.sortByColumn(columns.get(columnIndex));
+			boolean up = Math.signum(columnIndex) > 0;
+			viewer.sortByColumn(columns.get(index), up);
 		}
 		catch (NumberFormatException e) {
 			return;
