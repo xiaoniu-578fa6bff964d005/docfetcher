@@ -122,6 +122,9 @@ public final class Application {
 	private static StatusBar statusBar;
 	private static boolean systemTrayShutdown = false;
 	private static File settingsConfFile;
+	
+	private static boolean indexRegistryLoaded = false; // should only be accessed from SWT thread
+	private static Runnable clearIndexLoadingMsg; // should only be accessed from SWT thread
 
 	private Application() {
 		throw new UnsupportedOperationException();
@@ -495,7 +498,7 @@ public final class Application {
 							return display.isDisposed();
 						}
 					});
-
+					
 					// Program may have been shut down while it was loading the indexes
 					if (display.isDisposed())
 						return;
@@ -563,6 +566,15 @@ public final class Application {
 						AppUtil.showStackTraceInOwnDisplay(e);
 					else
 						AppUtil.showStackTrace(e);
+				}
+				finally {
+					Util.runAsyncExec(mainShell, new Runnable() {
+						public void run() {
+							indexRegistryLoaded = true;
+							if (clearIndexLoadingMsg != null)
+								clearIndexLoadingMsg.run();
+						}
+					});
 				}
 			}
 		}.start();
@@ -793,9 +805,20 @@ public final class Application {
 			}
 		};
 		expander.setTopText(Msg.document_types.get());
-		expander.setBottomText(Msg.search_scope.get());
+		if (indexRegistryLoaded) {
+			expander.setBottomText(Msg.search_scope.get());
+		}
+		else {
+			expander.setBottomText(Msg.search_scope.get() + " (" + Msg.loading.get() + ")");
+			clearIndexLoadingMsg = new Runnable() {
+				public void run() {
+					Util.assertSwtThread();
+					expander.setBottomText(Msg.search_scope.get());
+				}
+			};
+		}
 		expander.setSashWidth(sashWidth);
-
+		
 		// Restore sash weights and maximization states
 		expander.setSashWeights(SettingsConf.IntArray.FilterSash.get());
 		if (SettingsConf.Bool.TypesFilterMaximized.get())
