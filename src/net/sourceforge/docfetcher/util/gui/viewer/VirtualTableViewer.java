@@ -165,6 +165,15 @@ public abstract class VirtualTableViewer<E> {
 		return Collections.unmodifiableList(columns);
 	}
 	
+	@Immutable
+	@NotNull
+	public final List<Column<E>> getColumnsVisualOrder() {
+		List<Column<E>> visualColumns = new ArrayList<Column<E>>(columns.size());
+		for (int index : table.getColumnOrder())
+			visualColumns.add(columns.get(index));
+		return Collections.unmodifiableList(visualColumns);
+	}
+	
 	// does not take sorting into account
 	public final void setRoot(@NotNull Object rootElement) {
 		Util.checkNotNull(rootElement);

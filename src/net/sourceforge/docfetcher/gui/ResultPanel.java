@@ -373,6 +373,8 @@ public final class ResultPanel {
 
 	// sign of given index specifies direction of sorting
 	// zero and out-of-range values will be ignored
+	// column numbering starts at 1
+	// the index points at the column in visual order, not in creation order
 	public void sortByColumn(int columnIndex) {
 		if (columnIndex == 0)
 			return;
@@ -381,8 +383,8 @@ public final class ResultPanel {
 		 * column names may change.
 		 */
 		try {
-			int index = Math.abs(columnIndex);
-			List<Column<ResultDocument>> columns = viewer.getColumns();
+			int index = Math.abs(columnIndex) - 1;
+			List<Column<ResultDocument>> columns = viewer.getColumnsVisualOrder();
 			if (index >= columns.size())
 				return;
 			boolean up = Math.signum(columnIndex) > 0;
