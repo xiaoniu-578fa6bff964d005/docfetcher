@@ -64,9 +64,11 @@ WebInterfacePageSize = 50
 PatternTableHeight = 4
 
 # This setting determines whether DocFetcher indexes a formula in an MS Excel
-# file as is, or whether it indexes the formula's result instead. Changes to
-# this setting will immediately affect the preview pane, but not the indexes,
-# so you'll have to rebuild the latter after the change.
+# file as is, or whether it indexes the formula's result instead. For example,
+# if a cell contains the formula "=2+2", DocFetcher will either literally
+# extract "=2+2" from the cell, or "4", depending on this setting's value.
+# Changes to this setting will immediately affect the preview pane, but not the
+# indexes, so you'll have to rebuild the latter after the change.
 IndexExcelFormulas = true
 
 # If this is set to true, all text extraction during indexing will be disabled.
