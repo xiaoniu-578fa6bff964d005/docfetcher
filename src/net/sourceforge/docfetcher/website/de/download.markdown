@@ -1,4 +1,13 @@
-Erforderlich: Java-Laufzeit-Umgebung
+Hinweis zu Java-Sicherheitslücken
+====================================
+Falls Sie von den Java-Sicherheitslücken gelesen haben, die vor einer Weile in den Medien berichtet wurden, und sich nun davor scheuen, den Java-basierten DocFetcher zu installieren, sei hiermit Entwarnung gegeben:
+
+Die berichteten Java-Sicherheitslücken betreffen nur **das Java-Plugin in Ihrem Webbrowser**, nicht eigenständige Java-basierte Programme wie DocFetcher. Deaktivieren oder deinstallieren Sie einfach das Java-Plugin, und schon sind Sie auf der sicheren Seite. Die Java-Laufzeit-Umgebung, DocFetcher und andere Java-basierte Programme zu installieren ist genauso ungefährlich (oder gefährlich) wie jedwede andere Programme zu installieren.
+
+Für weitere Info sei auf [diese Diskussion](http://sourceforge.net/p/docfetcher/discussion/702424/thread/b4c0d714/) in unserem Forum verwiesen.
+
+
+Schritt 1: Java-Laufzeit-Umgebung installieren
 ====================================
 Eine installierte Java-Laufzeit-Umgebung (JRE), Version 1.6.0 oder neuer, ist erforderlich. Um herauszufinden, welche JRE installiert ist, können Sie eine Eingabeaufforderung (Konsole) öffnen und eingeben: "java -version"
 
@@ -8,7 +17,7 @@ Falls Java 1.6.0 oder neuer nicht auf Ihrem System verfügbar ist, können Sie e
 * Linux: Im offiziellen Software-Repository Ihrer Distribution.
 * Mac OS&nbsp;X: <http://www.apple.com/support/>
 
-Neueste Version: DocFetcher ${version}
+Schritt 2: DocFetcher ${version} installieren
 ======================================
 
 Für eine Liste von Änderungen im Vergleich zu vorherigen Versionen, siehe den [ChangeLog](http://docfetcher.sourceforge.net/wiki/doku.php?id=changelog).

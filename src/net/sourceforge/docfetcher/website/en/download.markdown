@@ -1,4 +1,13 @@
-Required: Java Runtime Environment
+A Note About Java Vulnerabilities
+==================================
+You may have heard about the Java vulnerabilties that were recently reported in the media, and seeing that DocFetcher is a Java-based program, you might now be worrying that installing DocFetcher along with the Java Runtime could expose you to security risks. Here's why you can stop worrying:
+
+The reported Java vulnerabilities only affect **the Java plugin in your web browser**, not standalone Java-based programs like DocFetcher. So just deactivate or deinstall the Java plugin and you'll be fine. Installing the Java Runtime, DocFetcher and other Java-based programs is just as safe (or unsafe) as installing any other program.
+
+For more info, see [this discussion](http://sourceforge.net/p/docfetcher/discussion/702424/thread/b4c0d714/) on our forum.
+
+
+Step 1: Install Java Runtime
 ==================================
 A Java Runtime Environment (JRE), version 1.6.0 or higher, is required. To find
 out what JRE version you have, open a command prompt and type in
@@ -11,7 +20,8 @@ the following places:
 * Linux: In the official software repository of your distribution.
 * Mac OS&nbsp;X: <http://www.apple.com/support/>
 
-Latest Release: DocFetcher ${version}
+
+Step 2: Install DocFetcher ${version}
 =====================================
 
 For a list of changes from previous releases, see the [changelog](http://docfetcher.sourceforge.net/wiki/doku.php?id=changelog).
