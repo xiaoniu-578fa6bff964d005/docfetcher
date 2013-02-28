@@ -91,7 +91,8 @@ public final class Path implements Serializable {
 	
 	@NotNull
 	private static String normalizePath(@NotNull String path) {
-		path = Util.fileSepMatcher.trimTrailingFrom(path).replace("\\", "/");
+		path = Util.fileSepMatcher.trimTrailingFrom(path);
+		path = Util.toForwardSlashes(path);
 		return normalizeUnicode(path, true);
 	}
 	

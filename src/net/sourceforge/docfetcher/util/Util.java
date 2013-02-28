@@ -109,7 +109,7 @@ public final class Util {
 	public static final File TEMP_DIR = new File(System.getProperty("java.io.tmpdir"));
 
 	/** The current directory. Does not contain backward slashes. */
-	public static final String USER_DIR_PATH = System.getProperty("user.dir").replace('\\', '/');
+	public static final String USER_DIR_PATH = toForwardSlashes(System.getProperty("user.dir"));
 
 	/** The current directory. */
 	public static final File USER_DIR = new File(USER_DIR_PATH);
@@ -627,7 +627,7 @@ public final class Util {
 			sb.append('/');
 			sb.append(fileSepMatcher.trimFrom(more[i]));
 		}
-		return sb.toString().replace('\\', '/');
+		return toForwardSlashes(sb.toString());
 	}
 
 	/**
@@ -645,7 +645,7 @@ public final class Util {
 			sb.append('/');
 			sb.append(fileSepMatcher.trimFrom(it.next().toString()));
 		}
-		return sb.toString().replace('\\', '/');
+		return toForwardSlashes(sb.toString());
 	}
 
 	@NotNull
@@ -898,6 +898,13 @@ public final class Util {
 		if (parent == null)
 			parent = file.getAbsoluteFile().getParentFile();
 		return parent;
+	}
+	
+	@NotNull
+	public static String toForwardSlashes(@NotNull String path) {
+		if (path.startsWith("\\\\")) // UNC path?
+			return path;
+		return path.replace('\\', '/');
 	}
 
 	/**

@@ -449,7 +449,7 @@ public final class FileFactory {
 					if (fh.isEncrypted() || fh.isDirectory())
 						continue;
 					String currentPath = fh.isUnicode() ? fh.getFileNameW() : fh.getFileNameString();
-					currentPath = currentPath.replace('\\', '/');
+					currentPath = Util.toForwardSlashes(currentPath);
 					assert noTrailingSlash(currentPath);
 					
 					if (entryPath.equals(currentPath) ||
@@ -473,7 +473,7 @@ public final class FileFactory {
 					continue;
 				
 				String currentPath = fh.isUnicode() ? fh.getFileNameW() : fh.getFileNameString();
-				currentPath = currentPath.replace('\\', '/');
+				currentPath = Util.toForwardSlashes(currentPath);
 				assert noTrailingSlash(currentPath);
 				
 				// TODO post-release-1.1: throw disk space exception

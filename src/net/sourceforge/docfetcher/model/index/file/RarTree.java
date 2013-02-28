@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingError.ErrorType;
+import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
@@ -99,7 +100,7 @@ final class RarTree extends SolidArchiveTree<FileHeader> {
 		private static final RarEntryReader instance = new RarEntryReader();
 		public String getInnerPath(FileHeader entry) {
 			String subPath = entry.isUnicode() ? entry.getFileNameW() : entry.getFileNameString();
-			return subPath.replace('\\', '/');
+			return Util.toForwardSlashes(subPath);
 		}
 		public boolean isDirectory(FileHeader entry) {
 			return entry.isDirectory();
