@@ -44,6 +44,8 @@ import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer;
 import net.sourceforge.docfetcher.util.gui.viewer.VirtualTableViewer.Column;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -113,12 +115,14 @@ public final class ResultPanel {
 		Table table = viewer.getControl();
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
-				List<ResultDocument> selection = viewer.getSelection();
-				if (selection.isEmpty())
-					return;
-				ResultDocument doc = selection.get(0);
-				if (!doc.isEmail())
-					launchFiles(Collections.singletonList(doc));
+				launchSelection();
+			}
+		});
+		
+		table.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				if (Util.isEnterKey(e.keyCode))
+					launchSelection();
 			}
 		});
 		
@@ -225,6 +229,15 @@ public final class ResultPanel {
 		
 		SettingsConf.ColumnWidths.ResultPanel.bind(table);
 		SettingsConf.ColumnOrder.ResultPanelColumnOrder.bind(table);
+	}
+	
+	private void launchSelection() {
+		List<ResultDocument> selection = viewer.getSelection();
+		if (selection.isEmpty())
+			return;
+		ResultDocument doc = selection.get(0);
+		if (!doc.isEmail())
+			launchFiles(Collections.singletonList(doc));
 	}
 	
 	private static int compareAlphanum(@NotNull String s1, @NotNull String s2) {
