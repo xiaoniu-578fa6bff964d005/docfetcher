@@ -188,7 +188,6 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				visitSolidArchive(context, rootFolder, archiveTree);
 			}
 
-			writer.optimize();
 			return IndexingResult.SUCCESS_CHANGED;
 		}
 		catch (ArchiveEncryptedException e) {

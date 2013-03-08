@@ -49,10 +49,6 @@ final class SimpleDocWriter extends LuceneDocWriter implements Closeable {
 	public void delete(String uid) throws IOException {
 		writer.delete(uid);
 	}
-	
-	public final void optimize() throws IOException {
-		writer.optimize();
-	}
 
 	public final void close() throws IOException {
 		writer.close();

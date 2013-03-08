@@ -83,10 +83,6 @@ public final class IndexWriterAdapter implements Closeable {
 		writer.deleteDocuments(idTerm.createTerm(uid));
 	}
 	
-	public void optimize() throws IOException {
-		writer.optimize();
-	}
-	
 	public void close() throws IOException {
 		writer.close();
 	}

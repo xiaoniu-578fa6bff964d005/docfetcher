@@ -121,7 +121,6 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 				}
 			}.getSimplifiedRoot(getRootFolder());
 			
-			writer.optimize();
 			return IndexingResult.SUCCESS_CHANGED;
 		}
 		catch (PSTException e) {
