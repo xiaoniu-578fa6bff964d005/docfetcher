@@ -188,7 +188,7 @@ Section "DocFetcher"
 	WriteRegStr HKLM $regkey "DisplayVersion" "${VERSION}"
 	WriteRegDWORD HKLM $regkey "NoModify" 1
 	WriteRegDWORD HKLM $regkey "NoRepair" 1
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon" "$INSTDIR\docfetcher-daemon-win.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon" "$INSTDIR\docfetcher-daemon-win.exe"
 
 	SetShellVarContext current
 
