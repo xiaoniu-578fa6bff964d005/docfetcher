@@ -169,6 +169,7 @@ public enum Msg {
 	filetype_rtf ("Rich Text Format (rtf)", Comments.filetype),
 	filetype_svg ("Scalable Vector Graphics (svg)", Comments.filetype),
 	filetype_txt ("Plain Text", Comments.filetype),
+	filetype_flac ("FLAC (flac)", Comments.filetype),
 	
 	// Search scope context menu entries
 	create_index_from (

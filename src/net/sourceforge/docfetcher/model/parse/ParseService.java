@@ -82,6 +82,7 @@ public final class ParseService {
 		
 		new ExifParser(),
 		new MP3Parser(),
+		new FLACParser(),
 		new AbiWordParser(),
 		new PdfParser(),
 		new RtfParser(),
