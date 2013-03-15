@@ -123,6 +123,8 @@ public final class ResultPanel {
 			public void keyReleased(KeyEvent e) {
 				if (Util.isEnterKey(e.keyCode))
 					launchSelection();
+				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'c')
+					copyToClipboard();
 			}
 		});
 		
@@ -320,13 +322,19 @@ public final class ResultPanel {
 				return !viewer.getSelection().isEmpty();
 			}
 			public void run() {
-				List<ResultDocument> docs = getSelection();
-				List<File> files = new ArrayList<File>(docs.size());
-				for (ResultDocument doc : docs)
-					files.add(doc.getPath().getCanonicalFile());
-				Util.setClipboard(files);
+				copyToClipboard();
 			}
 		});
+	}
+	
+	private void copyToClipboard() {
+		List<ResultDocument> docs = getSelection();
+		if (docs.isEmpty())
+			return;
+		List<File> files = new ArrayList<File>(docs.size());
+		for (ResultDocument doc : docs)
+			files.add(doc.getPath().getCanonicalFile());
+		Util.setClipboard(files);
 	}
 	
 	@NotNull
