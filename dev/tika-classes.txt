@@ -14,3 +14,5 @@ DocFetcher makes use of the RTF parser from Apache Tika 1.0. The following is a 
   * org.apache.tika.parser.ParseContext
   * org.apache.tika.parser.Parser
   * org.apache.tika.utils.CharsetUtils
+
+Additionally, two instances of the assertion "assert param == 0;" were removed from the class org.apache.tika.parser.rtf.TextExtractor in order to fix a crash on RTF files created by TextMaker. See: http://sourceforge.net/p/docfetcher/discussion/702424/thread/8a3dd4f6/
