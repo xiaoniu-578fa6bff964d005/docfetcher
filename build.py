@@ -72,7 +72,7 @@ execute([
 	'jar cfe',
 	jar_path,
 	main_class,
-	'-C build/tmp/src-builder net'
+	'-C build/tmp/src-builder .'
 ])
 
 print 'Launching builder...'
@@ -80,6 +80,7 @@ print '-' * 40
 jars.append(jar_path)
 execute([
 	'java',
+	'-enableassertions', # required by test classes
 	'-classpath \"%s\"' % classpath_sep.join(jars),
 	main_class
 ])
