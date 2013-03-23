@@ -49,7 +49,7 @@ final class MP3Parser extends StreamParser {
 			if (Arrays.equals(id, new byte[] {0x0, 0x0, 0x0, 0x0})) { // End
 				break;
 			}
-			int textlength = (data[4] << 24) | (data[5] << 16) | (data[6] << 8) | (data[7]);
+			int textlength = ((data[4]&0xFF) << 24) | ((data[5]&0xFF) << 16) | ((data[6]&0xFF) << 8) | (data[7]&0xFF);
 			String tagID = new String(id);
 			if ((tagID.startsWith("T") || tagID.equals("COMM"))
 					&& (tagID.equals("TXXX") == false)) {
@@ -59,7 +59,7 @@ final class MP3Parser extends StreamParser {
 				pos += raf.read(text);
 				sb.append((forViewing ? tagID+"=" : "") + new String(text) + "\n");
 			} else {
-				raf.skipBytes(textlength);
+				pos += raf.skipBytes(textlength);
 			}
 		}
 		
@@ -104,5 +104,4 @@ final class MP3Parser extends StreamParser {
 	public String getTypeLabel() {
 		return Msg.filetype_mp3.get();
 	}
-
 }
