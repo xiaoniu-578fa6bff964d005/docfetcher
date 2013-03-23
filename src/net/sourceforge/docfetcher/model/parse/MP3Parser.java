@@ -43,7 +43,7 @@ final class MP3Parser extends StreamParser {
 			size = (size << 7) + data[i];  // synchsafe integer only uses 7 bits of each byte.
 		}
 		
-		while (pos < size) {
+		for (int safeCount=0; (pos < size) && (safeCount<100); safeCount++) {
 			pos += raf.read(data);
 			byte[] id = Arrays.copyOfRange(data, 0, 4);
 			if (Arrays.equals(id, new byte[] {0x0, 0x0, 0x0, 0x0})) { // End
