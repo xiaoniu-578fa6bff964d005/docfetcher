@@ -1,6 +1,5 @@
 package net.sourceforge.docfetcher.model.parse;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -28,13 +27,12 @@ final class MP3Parser extends StreamParser {
 	private static String extract(@NotNull InputStream in, boolean forViewing)
 			throws IOException, ParseException {
 		StringBuffer sb = new StringBuffer();
-		DataInputStream raf = new DataInputStream(in);
 		
 		/*
 		 * Check if the file starts with the ID3 identifier.
 		 */
 		byte[] data = new byte[10];
-		long pos = raf.read(data);
+		long pos = in.read(data);
 		if (Arrays.equals(Arrays.copyOfRange(data, 0, 3), new byte[] {0x49, 0x44, 0x33}) == false) { // "ID3"
 			return sb.toString();
 		}
@@ -44,7 +42,9 @@ final class MP3Parser extends StreamParser {
 		}
 		
 		for (int safeCount=0; (pos < size) && (safeCount<100); safeCount++) {
-			pos += raf.read(data);
+			int bytesRead = in.read(data);
+			if (bytesRead < 0) break;
+			pos += bytesRead;
 			byte[] id = Arrays.copyOfRange(data, 0, 4);
 			if (Arrays.equals(id, new byte[] {0x0, 0x0, 0x0, 0x0})) { // End
 				break;
@@ -54,12 +54,15 @@ final class MP3Parser extends StreamParser {
 			if ((tagID.startsWith("T") || tagID.equals("COMM"))
 					&& (tagID.equals("TXXX") == false)) {
 				byte[] text = new byte[textlength-1];
-				raf.readByte();
+				bytesRead = in.read();
+				if (bytesRead < 0) break;
 				pos++;
-				pos += raf.read(text);
+				bytesRead = in.read(text);
+				if (bytesRead < 0) break;
+				pos += bytesRead;
 				sb.append((forViewing ? tagID+"=" : "") + new String(text) + "\n");
 			} else {
-				pos += raf.skipBytes(textlength);
+				pos += in.skip(textlength);
 			}
 		}
 		
