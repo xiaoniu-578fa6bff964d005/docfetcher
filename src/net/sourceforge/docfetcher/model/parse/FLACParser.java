@@ -25,11 +25,11 @@ final class FLACParser extends StreamParser {
 
 	
 	private static long[] readMetadataBlock(byte[] data) {
-		long last = data[0] & 0x80;
-		long type = data[0] & 0x7F;
+		long last = (data[0] & 0x80) >> 7; // get the most significant bit
+		long type = data[0] & 0x7F; // get the other bits
 		long size = 0;
 		for (int i=1; i<4; i++) {
-			size = (size << 8) + data[i];
+			size = (size << 8) + (data[i]&0xFF);
 		}
 		return new long[] {last, type, size};
 	}
@@ -39,14 +39,13 @@ final class FLACParser extends StreamParser {
 	private static String extract(@NotNull InputStream in, boolean forViewing)
 			throws IOException, ParseException {
 		StringBuffer sb = new StringBuffer();
-		DataInputStream raf = new DataInputStream(in);
+		DataInputStream dis = new DataInputStream(in);
 		
 		/*
 		 * Check if the file starts with the FLAC identifier.
 		 */
-		byte[] data = new byte[4];
-		raf.read(data);
-		if (Arrays.equals(Arrays.copyOfRange(data, 0, 4), new byte[] {0x66, 0x4C, 0x61, 0x43}) == false) { // "fLaC"
+		int id = dis.readInt();
+		if (id != 0x664C6143) { // "fLaC"
 			return sb.toString();
 		}
 		
@@ -55,15 +54,15 @@ final class FLACParser extends StreamParser {
 		 */
 		long[] typesize = null;
 		for (int i = 0; i < 100; i++) { // 100 is a safe-guard number to prevent an infinite loop due to corrupted data stream
-			data = new byte[4];
-			raf.read(data);
+			byte[] data = new byte[4];
+			dis.readFully(data);
 			typesize = readMetadataBlock(data);
 			long last = typesize[0];
 			long type = typesize[1];
 			long size = typesize[2];
 			
 			if (type != 0x04) {
-				raf.skip(size);
+				dis.skipBytes((int)size);
 			} else {
 				break;
 			}
@@ -72,52 +71,12 @@ final class FLACParser extends StreamParser {
 			}
 		}
 
-		// vendor_length
-		data = new byte[4];
-		raf.read(data);
-		long size = 0;
-		for(int i=0; i<4; i++) {
-			size += (data[i] << (i*8));
-		}
+		VorbisComment vb = new VorbisComment();
+		vb.parse(dis, sb, forViewing);
 		
-		// vendor string
-		raf.skip(size);
-		
-		// user_comment_list_length
-		data = new byte[4];
-		raf.read(data);
-		long commentCount = 0;
-		for(int i=0; i<4; i++) {
-			commentCount += (data[i] << (i*8));
-		}
-		
-		// 100 is a safe-guard number to prevent an infinite loop due to corrupted data stream
-		commentCount = Math.min(commentCount, 100);
-		
-		for (int i = 0; i < commentCount; i++) {
-			
-			// length
-			data = new byte[4];
-			raf.read(data);
-			size = 0;
-			for(int j=0; j<4; j++) {
-				size += (data[j] << (j*8));
-			}
-			
-			data = new byte[(int)size];
-			raf.read(data);
-			String entry = new String(data);
-			if (forViewing == false) {
-				String[] cells = entry.split("=");
-				if (cells != null && cells.length >= 2) {
-					entry = cells[1];
-				}
-			}
-			sb.append(entry + "\n");
-		}
-
 		return sb.toString();
 	}
+	
 	
 	@Override
 	protected ParseResult parse(InputStream in, ParseContext context)
