@@ -504,6 +504,14 @@ public final class Searcher {
 			boolean isPhraseQuery = queryParser.isPhraseQuery();
 			return new QueryWrapper(query, isPhraseQuery);
 		}
+		catch (IllegalArgumentException e) {
+			/*
+			 * This happens for example when you enter a fuzzy search with
+			 * similarity >= 1, e.g. "fuzzy~1".
+			 */
+			String msg = Msg.invalid_query.get() + "\n\n" + e.getMessage();
+			throw new SearchException(msg);
+		}
 		catch (ParseException e) {
 			String msg = Msg.invalid_query.get() + "\n\n" + e.getMessage();
 			throw new SearchException(msg);
