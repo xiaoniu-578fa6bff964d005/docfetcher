@@ -58,8 +58,24 @@ public abstract class SimpleTreeViewer<E> {
 		this.tree = Util.checkNotNull(tree);
 		
 		tree.addTreeListener(new TreeListener() {
-			public void treeExpanded(TreeEvent e) {
-				loadNextButOneLevel((TreeItem) e.item);
+			public void treeExpanded(final TreeEvent e) {
+				try {
+					loadNextButOneLevel((TreeItem) e.item);
+				}
+				catch (IllegalArgumentException e1) {
+					/*
+					 * Workaround for bug #422 and others: Due to an unknown
+					 * concurrency bug, trying to load the next tree level can
+					 * result in this exception. The workaround is to try again
+					 * later when this happens.
+					 */
+					Util.runAsyncExec(tree, new Runnable() {
+						public void run() {
+							if (!e.item.isDisposed())
+								loadNextButOneLevel((TreeItem) e.item);
+						}
+					});
+				}
 			}
 			public void treeCollapsed(TreeEvent e) {
 				disposeNextButOneLevel((TreeItem) e.item);
