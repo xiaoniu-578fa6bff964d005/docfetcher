@@ -54,28 +54,12 @@ public abstract class SimpleTreeViewer<E> {
 		this(new Tree(parent, style));
 	}
 	
-	public SimpleTreeViewer(@NotNull final Tree tree) {
+	public SimpleTreeViewer(@NotNull Tree tree) {
 		this.tree = Util.checkNotNull(tree);
 		
 		tree.addTreeListener(new TreeListener() {
 			public void treeExpanded(final TreeEvent e) {
-				try {
-					loadNextButOneLevel((TreeItem) e.item);
-				}
-				catch (IllegalArgumentException e1) {
-					/*
-					 * Workaround for bug #422 and others: Due to an unknown
-					 * concurrency bug, trying to load the next tree level can
-					 * result in this exception. The workaround is to try again
-					 * later when this happens.
-					 */
-					Util.runAsyncExec(tree, new Runnable() {
-						public void run() {
-							if (!e.item.isDisposed())
-								loadNextButOneLevel((TreeItem) e.item);
-						}
-					});
-				}
+				loadNextButOneLevel((TreeItem) e.item);
 			}
 			public void treeCollapsed(TreeEvent e) {
 				disposeNextButOneLevel((TreeItem) e.item);
@@ -118,10 +102,31 @@ public abstract class SimpleTreeViewer<E> {
 		}
 	}
 	
-	private void loadNextButOneLevel(TreeItem item) {
-		E element = getElement(item);
+	private void loadNextButOneLevel(final TreeItem item) {
+		final E element = getElement(item);
+		
+		boolean parentNull = false;
 		for (E child : getFilteredChildren(element))
-			createChildItems(elementToItemMap.get(child), child);
+			parentNull |= elementToItemMap.get(child) == null;
+		
+		/*
+		 * Workaround for bug #422 and others: Due to an unknown concurrency
+		 * bug, one of the parents can be null. The workaround is to try again
+		 * later when this happens.
+		 */
+		if (parentNull) {
+			Util.runAsyncExec(tree, new Runnable() {
+				public void run() {
+					if (!item.isDisposed()) {
+						for (E child : getFilteredChildren(element))
+							createChildItems(elementToItemMap.get(child), child);
+					}
+				}
+			});
+		} else {
+			for (E child : getFilteredChildren(element))
+				createChildItems(elementToItemMap.get(child), child);
+		}
 	}
 	
 	private void disposeNextButOneLevel(TreeItem item) {
