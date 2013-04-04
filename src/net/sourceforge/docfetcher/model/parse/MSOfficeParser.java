@@ -152,6 +152,10 @@ abstract class MSOfficeParser extends FileParser {
 			in = new FileInputStream(file);
 			return extractText(in);
 		}
+		catch (AssertionError e) {
+			// Bug #469
+			throw new ParseException(e);
+		}
 		catch (IOException e) {
 			throw new ParseException(e);
 		}
