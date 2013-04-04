@@ -182,7 +182,8 @@ public final class FileFactory {
 												@NotNull final String entryPath)
 			throws ArchiveEncryptedException, DiskSpaceException,
 			FileNotFoundException, IOException {
-		assert archiveFile.isArchive() && archiveFile.getEnclArchive() == null;
+		assert archiveFile.isArchive();
+		assert archiveFile.getEnclArchive() == null;
 		
 		final FileResource[] result = new FileResource[1];
 		final Exception[] exception = new Exception[1];
