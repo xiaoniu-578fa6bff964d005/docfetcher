@@ -36,8 +36,9 @@ public enum Fields {
 	 * stored in the Lucene index (via Store.YES), because the user might have
 	 * indexed a document repository on a removable media, which may or may not
 	 * be available during searches. On the other hand, the information that is
-	 * displayed on the preview panel should loaded from the document repository
-	 * rather than the Lucene index in order to display up-to-date content.
+	 * displayed on the preview panel should be loaded from the document
+	 * repository rather than the Lucene index in order to display up-to-date
+	 * content.
 	 */
 	
 	// Fields available for files and emails
