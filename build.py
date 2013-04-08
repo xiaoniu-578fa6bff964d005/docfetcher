@@ -12,7 +12,7 @@ from os.path import exists, join, isfile, isdir
 is_windows = 'windows' in platform.system().lower()
 classpath_sep = ';' if is_windows else ':'
 
-print 'Cleaning build directory...'
+print('Cleaning build directory...')
 if not exists('build'):
 	os.makedirs('build')
 for filename in os.listdir('build'):
@@ -22,7 +22,7 @@ for filename in os.listdir('build'):
 	elif isdir(path):
 		shutil.rmtree(path)
 
-print 'Copying sources to build directory...'
+print('Copying sources to build directory...')
 shutil.copytree(
 	'src',
 	'build/tmp/src-builder',
@@ -42,7 +42,7 @@ for root, dirs, files in os.walk('lib'):
 package = 'net.sourceforge.docfetcher'
 package_path = package.replace('.', '/')
 
-print 'Compiling sources...'
+print('Compiling sources...')
 compile_paths = [
 	join('build/tmp/src-builder',\
 	package_path, 'build/BuildMain.java')
@@ -67,7 +67,7 @@ execute([
 jar_path = 'build/tmp/docfetcher-builder.jar'
 main_class = package + '.build.BuildMain'
 
-print 'Creating builder jar...'
+print('Creating builder jar...')
 execute([
 	'jar cfe',
 	jar_path,
@@ -75,8 +75,8 @@ execute([
 	'-C build/tmp/src-builder .'
 ])
 
-print 'Launching builder...'
-print '-' * 40
+print('Launching builder...')
+print('-' * 40)
 jars.append(jar_path)
 execute([
 	'java',

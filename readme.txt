@@ -30,7 +30,8 @@
 - build-win-installer.nsi
 	- NSIS script for building the Windows installer
 	- requires NSIS and must be run on Windows
-	- must run build.py first
+	- requires NSIS plugins in dev/nsis-dependencies
+	- must run build.py first before running this
 	- output is in the "build" folder
 - build-man.py:
 	- recreates the manual
