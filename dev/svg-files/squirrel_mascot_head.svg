@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="squirrel_mascot_head.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/qforce/Desktop/docfetcher64.png"
+   inkscape:export-xdpi="180"
+   inkscape:export-ydpi="180"
+   version="1.0">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4778">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4780" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop4782" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2596"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       id="linearGradient2590">
+      <stop
+         id="stop2592"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop2594"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="29.748656"
+     inkscape:cy="13.545951"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="729"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="" />
+        <dc:language>en</dc:language>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>squirrel docfetcher</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Tran Nam Quang</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Tran Nam Quang</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date>2008-04-19</dc:date>
+        <dc:title>DocFetcher Squirrel Mascot</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3609"
+       transform="matrix(0.1747035,0,0,0.1747035,-53.309461,-63.832465)">
+      <path
+         id="path3570"
+         d="M 465.6875,379.09375 C 458.03468,378.93336 444.78177,394.94371 438.40625,401.5 C 428.83493,395.92107 417.00595,394.06301 409.15625,394.125 C 396.68156,394.22351 398.19595,393.97015 384.21875,395.65625 C 372.98656,397.0112 351.54766,404.31136 339.59375,414.0625 C 330.70253,405.85102 316.75073,389.34243 311.5,397.15625 C 306.40435,404.7393 316.76585,428.21816 324.1875,440.5625 C 322.68017,444.63317 321.17217,448.76898 318.75,453.8125 C 315.40371,460.78024 313.07474,470.08076 312.53125,479.28125 C 310.21927,484.66807 310.80643,491.61428 313.03125,496.90625 C 321.87185,520.15834 345.54099,534.42022 371.59375,534.8125 C 397.6465,535.20479 433.15401,527.54346 453.34375,517.78125 C 473.53348,508.01906 482.88757,493.24918 483.28125,479.46875 C 483.5642,469.56406 481.78921,461.95656 476.5,457.875 C 471.48212,446.7287 464.2703,437.77996 457.90625,427.28125 C 463.486,412.76521 475.24637,394.47086 470.125,382.5 C 469.11361,380.13594 467.56285,379.13306 465.6875,379.09375 z"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#808000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <g
+         transform="translate(25,-69.285718)"
+         id="g2719">
+        <path
+           style="fill:#d0b464;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 412.26786,471.91071 C 420.78491,479.20605 427.32208,488.12231 432.28571,498.22321 C 437.55259,483.46878 450.44204,464.20947 445.125,451.78125 C 439.73091,439.17292 419.41619,465.00631 412.26786,471.91071 z"
+           id="path4932"
+           sodipodi:nodetypes="cczc" />
+        <path
+           style="fill:#d0b464;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 286.5,466.45089 C 280.81611,474.90932 294.38689,503.17683 301.62946,513.66964 C 306.76663,504.07554 309.52125,494.72513 316.68304,485.21875 C 308.06353,478.05544 292.18389,457.99247 286.5,466.45089 z"
+           id="path4930"
+           sodipodi:nodetypes="cccz" />
+        <path
+           sodipodi:nodetypes="cccccccc"
+           id="path2404"
+           d="M 390.91715,474.95573 C 380.17186,475.17873 374.58125,473.44378 364.24997,474.83172 C 345.34659,473.9413 329.47229,479.36118 314.32463,497.52285 C 311.35492,506.64748 298.58444,530.01831 313.33893,532.41453 C 327.36091,537.23242 346.4725,536.96143 361.0391,534.9767 C 375.71238,534.73848 396.44289,528.47145 410.09956,523.60389 C 424.3879,517.41108 423.24426,505.83267 419.42885,494.763 C 413.99707,485.29648 399.27459,474.78228 390.91715,474.95573 z"
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 337.30462,503.08502 C 331.53829,507.8051 330.63065,520.69746 337.60983,525.46158 C 340.40615,526.71346 353.89304,526.86078 355.27568,520.90115 C 356.55836,513.11082 356.0296,501.13754 346.32906,500.01572 C 343.46546,499.83178 340.86216,500.7205 337.30462,503.08502 z"
+           id="path4940"
+           sodipodi:nodetypes="ccccc"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 389.76577,499.23818 C 397.84951,504.49119 397.86188,519.68539 389.81884,523.41409 C 383.86173,523.56861 374.89277,525.9836 371.99544,519.41251 C 369.80425,512.00134 370.4334,502.58237 377.05583,497.74871 C 380.78692,495.21313 385.98255,496.79482 389.76577,499.23818 z"
+           id="path4946"
+           sodipodi:nodetypes="ccccc"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#d0b464;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 384.15625,463.40625 C 371.68156,463.50477 373.19595,463.2514 359.21875,464.9375 C 345.24154,466.6236 315.45146,477.50392 307.8125,490.875 C 300.17354,504.24608 299.54451,511.04235 293.75893,523.08929 C 287.93805,535.20972 285.15498,554.40775 289.59375,567.8125 C 294.03251,581.21724 299.05797,584.67658 314.625,589.21875 C 330.19203,593.76093 354.52983,592.43056 376.4375,592.65625 C 398.34517,592.88194 426.68109,585.17397 442.84375,572.59375 C 459.00641,560.01354 458.73636,543.88859 451.96875,528.21875 C 445.24146,512.64228 434.16002,501.49445 426.69844,484.88261 C 419.14972,468.07675 396.63094,463.30773 384.15625,463.40625 z M 397.9375,486.0625 C 409.71225,486.83409 416.95457,497.92392 418.03125,507.625 C 418.49212,513.02842 421.13334,515.69061 415.0625,517.90625 C 405.56901,519.95601 394.53251,520.05089 384.21875,522.46875 C 375.21702,522.73948 372.6302,520.637 372.03125,510.21875 C 372.19449,497.94542 383.16004,486.37641 397.9375,486.0625 z M 333.375,491.25 C 345.31508,490.95132 355.85546,503.97479 354.71875,515.875 C 352.76071,526.63506 344.93112,524.98185 337.78125,524.96875 C 329.80617,524.56605 321.74705,527.4146 313.875,525.5625 C 307.84771,523.1352 310.06042,515.37408 311.1875,510.65625 C 314.08315,498.84745 321.43492,491.54868 333.375,491.25 z"
+           id="path4934"
+           sodipodi:nodetypes="czzzzzzzzzzcccccccccccz" />
+        <path
+           id="path4752"
+           d="M 427.71557,540.12658 C 410.43767,540.30482 395.09971,548.08725 378.67684,551.36638 C 367.37284,552.65821 355.93582,554.53242 344.42322,553.82317 C 331.15781,551.68307 317.60807,548.69499 304.09764,551.48922 C 295.05638,553.85144 294.44709,562.30819 297.59,567.92921 C 305.29295,583.16267 327.53885,591.82836 348.61644,592.76323 C 372.93923,592.34234 397.81018,589.58952 419.84652,581.60533 C 432.99347,576.79823 445.82094,568.11501 445.93153,556.50517 C 446.50698,550.05871 443.16401,541.37519 433.13408,540.33132 C 431.30162,540.17382 429.50296,540.10815 427.71557,540.12658 z"
+           style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           sodipodi:nodetypes="cccccccccc"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 349.67457,569.8694 C 351.84089,576.58753 354.61991,588.43275 362.81392,584.23312 C 371.77776,587.19848 375.18486,575.50767 376.61686,568.19866 C 366.66231,569.73586 358.43105,570.30223 349.86297,569.81874 L 349.67458,569.8694 L 349.67457,569.8694 z"
+           id="path4954"
+           sodipodi:nodetypes="cccccc"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#f5e2cc;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 437.36468,523.74845 C 417.535,524.02051 396.99434,537.41619 381.08343,540.9047 C 365.17252,544.39322 355.98965,546.8293 341.77093,544.6547 C 327.5522,542.48011 310.99546,536.82714 295.48969,541.0922 C 285.11313,544.69784 284.41385,557.60609 288.02094,566.18595 C 296.86154,589.43805 320.53067,603.69992 346.58343,604.0922 C 372.63619,604.48447 408.14369,596.82316 428.33343,587.06095 C 448.52317,577.29874 457.87725,562.52888 458.27093,548.74845 C 458.66461,534.96802 455.09467,525.6543 443.58343,524.06095 C 441.48034,523.82054 439.41603,523.72031 437.36468,523.74845 z M 412.98968,556.93595 C 414.7006,556.94637 415.81951,557.66012 415.98968,559.5297 C 416.82816,568.42936 401.4365,574.40853 393.45843,579.5297 C 379.2658,586.9993 362.50589,589.71065 346.77093,586.7172 C 337.354,583.78051 333.08671,581.90932 328.64593,578.37345 C 324.88936,575.52936 320.81892,572.1187 320.86469,568.37345 C 321.06218,562.48098 336.04755,570.10767 343.36468,570.4047 C 359.70965,572.4689 376.48358,569.88576 392.11468,564.93595 C 397.46606,563.33504 407.85691,556.9047 412.98968,556.93595 z"
+           id="path4936"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587"
+           sodipodi:nodetypes="czzcczzzccccccccccc" />
+        <path
+           style="fill:#a55c3e;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 350.09406,545.11203 C 349.9507,550.75473 357.96616,562.55208 361.93382,562.60141 C 365.90148,562.65075 374.29285,548.97506 373.21056,543.6318 C 372.12827,538.28854 368.3651,539.00054 361.37368,539.70222 C 354.36228,540.40591 350.23742,539.46933 350.09406,545.11203 z"
+           id="path4952"
+           sodipodi:nodetypes="czzzz"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 342.22688,509.99455 C 342.17223,519.38972 333.74821,511.74746 337.65457,506.45955 C 340.03318,502.46519 342.52839,507.51069 342.22688,509.99455 z"
+           id="path4942"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-ydpi="7.8856587" />
+        <path
+           inkscape:export-ydpi="7.8856587"
+           inkscape:export-xdpi="7.8856587"
+           inkscape:export-filename="C:\Dokumente und Einstellungen\Tran Nam Quang\Desktop\dfu16.png"
+           id="path3184"
+           d="M 381.11775,505.95394 C 381.0631,515.34911 372.63908,507.70685 376.54544,502.41894 C 378.92405,498.42458 381.41926,503.47008 381.11775,505.95394 z"
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      </g>
+    </g>
+  </g>
+</svg>
