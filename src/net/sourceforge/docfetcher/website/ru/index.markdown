@@ -44,6 +44,7 @@ DocFetcher ­– это приложение с открытым исходны�
 * AbiWord (abw, abw.gz, zabw)
 * Microsoft Compiled HTML Help (chm)
 * MP3 Metadata (mp3)
+* FLAC Metadata (flac)
 * JPEG Exif Metadata (jpg, jpeg)
 * Microsoft Visio (vsd)
 * Scalable Vector Graphics (svg)

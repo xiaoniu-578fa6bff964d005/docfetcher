@@ -51,6 +51,7 @@ Unterstützte Datei-Formate
 * AbiWord (abw, abw.gz, zabw)
 * Microsoft Compiled HTML Help (chm)
 * MP3 Metadaten (mp3)
+* FLAC Metadaten (flac)
 * JPEG Exif Metadaten (jpg, jpeg)
 * Microsoft Visio (vsd)
 * Scalable Vector Graphics (svg)
