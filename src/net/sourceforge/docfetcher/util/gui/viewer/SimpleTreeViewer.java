@@ -102,30 +102,18 @@ public abstract class SimpleTreeViewer<E> {
 		}
 	}
 	
-	private void loadNextButOneLevel(final TreeItem item) {
-		final E element = getElement(item);
-		
-		boolean parentNull = false;
-		for (E child : getFilteredChildren(element))
-			parentNull |= elementToItemMap.get(child) == null;
-		
-		/*
-		 * Workaround for bug #422 and others: Due to an unknown concurrency
-		 * bug, one of the parents can be null. The workaround is to try again
-		 * later when this happens.
-		 */
-		if (parentNull) {
-			Util.runAsyncExec(tree, new Runnable() {
-				public void run() {
-					if (!item.isDisposed()) {
-						for (E child : getFilteredChildren(element))
-							createChildItems(elementToItemMap.get(child), child);
-					}
-				}
-			});
-		} else {
-			for (E child : getFilteredChildren(element))
-				createChildItems(elementToItemMap.get(child), child);
+	private void loadNextButOneLevel(TreeItem item) {
+		E element = getElement(item);
+		for (E child : getFilteredChildren(element)) {
+			/*
+			 * Workaround for bug #422 and others: Due to an unknown bug
+			 * (probably involving concurrency), one of the parents can be null.
+			 * For now, just ignore it. Workaround with asyncExec didn't work,
+			 * as was shown in bug #491.
+			 */
+			TreeItem childItem = elementToItemMap.get(child);
+			if (childItem != null)
+				createChildItems(childItem, child);
 		}
 	}
 	
