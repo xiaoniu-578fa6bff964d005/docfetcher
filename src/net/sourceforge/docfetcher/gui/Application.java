@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.Main;
@@ -344,6 +345,13 @@ public final class Application {
 		String value = props.getProperty(key);
 		if (value == null)
 			return null;
+		Pattern homePattern = Pattern.compile("\\$\\{user\\.home}(?:[\\\\/](.*))?");
+		Matcher m = homePattern.matcher(value);
+		if (m.matches()) {
+			if (m.group(1) == null || m.group(1).trim().isEmpty())
+				return new File(Util.USER_HOME_PATH);
+			return new File(Util.USER_HOME_PATH, m.group(1));
+		}
 		return Util.getCanonicalFile(value);
 	}
 	

@@ -10,9 +10,15 @@
 #   have to enter \' and \" instead.
 # * The expected encoding is ISO-8859-1, aka Latin-1. All non-Latin-1 characters
 #   must be entered as Unicode escapes, e.g. '\u00F6' instead of 'ö'.
+#
 # You can specify relative paths with ".." (two dots), which means "go up one
 # level in the folder hierarchy". Relative paths are relative to the DocFetcher
 # folder, not to this file. Example: ..\\some\\folder
+#
+# DocFetcher recognizes the special variable ${user.home}, which points to the
+# current user's home directory. Accordingly, ${user.home}/.docfetcher would be
+# a folder named '.docfetcher' under the home directory.
+#
 # For more information on the Properties format, see:
 # http://en.wikipedia.org/wiki/.properties
 
