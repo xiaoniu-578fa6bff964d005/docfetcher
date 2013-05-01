@@ -180,6 +180,20 @@ public final class Application {
 		Msg.setCheckEnabled(true);
 		AppUtil.Messages.checkInitialized();
 
+		// Path overrides
+		File confPathOverride = null;
+		File indexPathOverride = null;
+		File swtLibDir = null;
+		try {
+			Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
+			confPathOverride = toFile(pathProps, "settings");
+			indexPathOverride = toFile(pathProps, "indexes");
+			swtLibDir = toFile(pathProps, "swt");
+		}
+		catch (IOException e1) {
+			// Ignore
+		}
+		
 		/*
 		 * Set the path from which to load the native SWT libraries. This must
 		 * be done before doing the single instance check, because that's where
@@ -196,34 +210,27 @@ public final class Application {
 		 * name clashes, which would cause the program to fail during startup.
 		 * https://sourceforge.net/p/docfetcher/bugs/399/
 		 */
-		String swtLibSuffix = AppUtil.isPortable() ? "lib/swt/" : "swt/";
+		String swtLibSuffix;
 		if (Util.IS_WINDOWS)
-			swtLibSuffix += "windows-";
+			swtLibSuffix = "windows-";
 		else if (Util.IS_LINUX)
-			swtLibSuffix += "linux-";
+			swtLibSuffix = "linux-";
 		else if (Util.IS_MAC_OS_X)
-			swtLibSuffix += "macosx-";
+			swtLibSuffix = "macosx-";
 		else
-			swtLibSuffix += "unknown-";
+			swtLibSuffix = "unknown-";
 		if (Util.IS_64_BIT_JVM)
 			swtLibSuffix += "64";
 		else
 			swtLibSuffix += "32";
-		File swtLibDir = new File(AppUtil.getAppDataDir(), swtLibSuffix);
+		if (swtLibDir == null)
+			swtLibDir = new File(AppUtil.getAppDataDir(), (AppUtil.isPortable() ? "lib/swt/" : "swt/") + swtLibSuffix);
+		else
+			swtLibDir = new File(swtLibDir, swtLibSuffix);
 		swtLibDir.mkdirs(); // SWT won't recognize the path if it doesn't exist
 		System.setProperty("swt.library.path", Util.getAbsPath(swtLibDir));
-
+		
 		// Load program configuration and preferences
-		File confPathOverride = null;
-		File indexPathOverride = null;
-		try {
-			Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
-			confPathOverride = toFile(pathProps, "settings");
-			indexPathOverride = toFile(pathProps, "indexes");
-		}
-		catch (IOException e1) {
-			// Ignore
-		}
 		programConfFile = loadProgramConf(confPathOverride);
 		settingsConfFile = loadSettingsConf(confPathOverride);
 		

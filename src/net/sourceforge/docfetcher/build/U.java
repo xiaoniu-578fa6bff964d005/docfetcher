@@ -97,7 +97,7 @@ final class U {
 	static void copyTextFile(	String srcPath,
 								String dstPath,
 								LineSep lineSep,
-								@Nullable String... replacements)
+								String... replacements)
 			throws Exception {
 		String contents = U.read(srcPath);
 		switch (lineSep) {
@@ -108,11 +108,12 @@ final class U {
 			contents = Util.ensureWindowsLineSep(contents);
 			break;
 		}
-		if (replacements != null)
+		if (replacements.length > 0) {
 			contents = UtilGlobal.replace(srcPath, contents, replacements);
-		if (!dstPath.endsWith(".sh") && !contents.startsWith("#!") && contents.contains("${"))
-			Util.printErr(format("Warning: File '%s' contains "
+			if (!dstPath.endsWith(".sh") && !contents.startsWith("#!") && contents.contains("${"))
+				Util.printErr(format("Warning: File '%s' contains "
 					+ "suspicious substitution pattern: ${", srcPath));
+		}
 		U.write(contents, dstPath);
 	}
 	
