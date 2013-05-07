@@ -235,6 +235,7 @@ public final class Searcher {
                 searchables[i] = new IndexSearcher(index.getLuceneDir());
             }
             catch (IOException e) {
+            	Util.printErr(e);
                 searchables[i] = new DummySearchable();
                 corrupted.add(new CorruptedIndex(index, e));
             }

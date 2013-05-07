@@ -118,6 +118,12 @@ public abstract class TreeIndex <
 	
 	@Nullable
 	public final Path getIndexDirPath() {
+		if (fileIndexDirPath == null || fileIndexDirPath.isAbsolute())
+			return fileIndexDirPath;
+		if (IndexRegistry.indexPathOverride != null && AppUtil.isPortable()) {
+			String name = new File(fileIndexDirPath.getPath()).getName();
+			return new Path(new File(IndexRegistry.indexPathOverride, name));
+		}
 		return fileIndexDirPath;
 	}
 	
@@ -126,7 +132,7 @@ public abstract class TreeIndex <
 		if (fileIndexDirPath == null)
 			return null;
 		if (indexParentDir == null) // is null after deserialization
-			indexParentDir = Util.getParentFile(fileIndexDirPath.getCanonicalFile());
+			indexParentDir = Util.getParentFile(getIndexDirPath().getCanonicalFile());
 		return indexParentDir;
 	}
 	
@@ -150,7 +156,7 @@ public abstract class TreeIndex <
 	public final Directory getLuceneDir() throws IOException {
 		if (fileIndexDirPath != null) {
 			assert ramIndexDir == null;
-			return FSDirectory.open(fileIndexDirPath.getCanonicalFile());
+			return FSDirectory.open(getIndexDirPath().getCanonicalFile());
 		}
 		if (ramIndexDir == null) // may be null after deserialization
 			ramIndexDir = new RAMDirectory();
@@ -182,7 +188,7 @@ public abstract class TreeIndex <
 	
 	private void clear(boolean removeTopLevel) {
 		if (fileIndexDirPath != null) {
-			File fileIndexDir = fileIndexDirPath.getCanonicalFile();
+			File fileIndexDir = getIndexDirPath().getCanonicalFile();
 			if (fileIndexDir.exists()) {
 				try {
 					if (removeTopLevel)

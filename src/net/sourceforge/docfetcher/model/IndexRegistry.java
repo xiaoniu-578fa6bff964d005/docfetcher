@@ -86,6 +86,9 @@ public final class IndexRegistry {
 
 	@VisibleForPackageGroup
 	public static final Analyzer analyzer = localAnalyzer();
+	
+	@Nullable
+	public static volatile File indexPathOverride = null;
 
 	private static final String SER_FILENAME = "tree-index.ser";
 

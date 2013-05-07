@@ -182,12 +182,11 @@ public final class Application {
 
 		// Path overrides
 		File confPathOverride = null;
-		File indexPathOverride = null;
 		File swtLibDir = null;
 		try {
 			Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
 			confPathOverride = toFile(pathProps, "settings");
-			indexPathOverride = toFile(pathProps, "indexes");
+			IndexRegistry.indexPathOverride = toFile(pathProps, "indexes");
 			swtLibDir = toFile(pathProps, "swt");
 		}
 		catch (IOException e1) {
@@ -236,7 +235,7 @@ public final class Application {
 		
 		// Update indexes in headless mode
 		if (args.length >= 1 && args[0].equals("--update-indexes")) {
-			loadIndexRegistryHeadless(getIndexParentDir(indexPathOverride));
+			loadIndexRegistryHeadless(getIndexParentDir(IndexRegistry.indexPathOverride));
 			return;
 		}
 
@@ -258,7 +257,7 @@ public final class Application {
 		Display display = new Display();
 		AppUtil.setDisplay(display);
 		shell = new Shell(display);
-		loadIndexRegistry(shell, getIndexParentDir(indexPathOverride));
+		loadIndexRegistry(shell, getIndexParentDir(IndexRegistry.indexPathOverride));
 
 		// Load images
 		LazyImageCache lazyImageCache = new LazyImageCache(

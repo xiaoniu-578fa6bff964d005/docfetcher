@@ -114,6 +114,10 @@ public final class Path implements Serializable {
 		return path;
 	}
 	
+	public boolean isAbsolute() {
+		return new File(path).isAbsolute();
+	}
+	
 	@NotNull
 	public Path createSubPath(@NotNull String pathPart) {
 		return new Path(Util.joinPath(path, pathPart));
