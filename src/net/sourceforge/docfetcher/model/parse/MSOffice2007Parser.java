@@ -20,6 +20,7 @@ import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.POITextExtractor;
+import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -130,7 +131,12 @@ abstract class MSOffice2007Parser extends FileParser {
 			boolean indexFormulas = ProgramConf.Bool.IndexExcelFormulas.get();
 			((XSSFExcelExtractor) extractor).setFormulasNotResults(indexFormulas);
 		}
-		return extractor.getText();
+		String text = extractor.getText();
+		if (extractor instanceof POIXMLTextExtractor) {
+			OPCPackage pkg = ((POIXMLTextExtractor) extractor).getPackage();
+			Closeables.closeQuietly(pkg);
+		}
+		return text;
 	}
 
 	protected final Collection<String> getExtensions() {
