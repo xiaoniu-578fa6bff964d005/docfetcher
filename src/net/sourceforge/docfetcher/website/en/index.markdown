@@ -46,7 +46,7 @@ Supported Document Formats
 * OpenOffice.org (odt, ods, odg, odp, ott, ots, otg, otp)
 * Portable Document Format (pdf)
 * HTML (html, xhtml, ...)
-* Plain text (customizable)
+* TXT and other plain text formats (customizable)
 * Rich Text Format (rtf)
 * AbiWord (abw, abw.gz, zabw)
 * Microsoft Compiled HTML Help (chm)
