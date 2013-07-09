@@ -1,10 +1,3 @@
-<table>
-<td align="left">
-<b>Hinweis zu Java-Sicherheitslücken</b>: Aus aktuellem Anlass möchten wir darauf hinweisen, dass es trotz der kürzlich berichteten Java-Sicherheitslücken ungefährlich ist, den Java-basierten DocFetcher zu installieren. Siehe die <a href="http://docfetcher.sourceforge.net/de/download.html">Download-Seite</a> für ausführlichere Information.
-</td>
-</table>
-<br/>
-
 Beschreibung
 ============
 DocFetcher ist ein Open Source Desktop-Suchprogramm: Es ermöglicht die Volltext-Suche in Dateien auf dem Computer &mdash; eine Art Google für den Heimrechner. Das Programm läuft auf Windows, Linux und Mac OS&nbsp;X, und ist verfügbar unter der [Eclipse Public License](http://en.wikipedia.org/wiki/Eclipse_Public_License).

@@ -1,10 +1,3 @@
-<table>
-<td align="left">
-<b>Note about Java vulnerabilities</b>: Due to current events we'd like to point out that it's safe to install DocFetcher despite the recently reported Java vulnerabilities. For more information, see the <a href="http://docfetcher.sourceforge.net/en/download.html">download page</a>.
-</td>
-</table>
-<br/>
-
 Description
 ===========
 DocFetcher is an Open Source desktop search application: It allows you to search the contents of files on your computer. &mdash; You can think of it as Google for your local files. The application runs on Windows, Linux and Mac OS&nbsp;X, and is made available under the [Eclipse Public License](http://en.wikipedia.org/wiki/Eclipse_Public_License).
