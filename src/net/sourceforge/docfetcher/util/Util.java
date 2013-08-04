@@ -761,12 +761,18 @@ public final class Util {
 			assert driveLetter != null;
 			return driveLetter + ":\\"; // the trailing slash is important here
 		}
-		try {
-			return file.getCanonicalPath();
-		}
-		catch (IOException e) {
-			return file.getAbsolutePath();
-		}
+		
+		// Calling getCanonicalPath leads to performance problems for files
+		// located on a network, so it has been disabled. See:
+		// https://sourceforge.net/p/docfetcher/discussion/702424/thread/4ed68957/
+		
+//		try {
+//			return file.getCanonicalPath();
+//		}
+//		catch (IOException e) {
+//			return file.getAbsolutePath();
+//		}
+		return file.getAbsolutePath();
 	}
 	
 	public static boolean isCanonicallyEqual(	@Nullable File file1,
