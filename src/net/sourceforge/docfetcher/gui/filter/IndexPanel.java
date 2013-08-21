@@ -642,8 +642,7 @@ public final class IndexPanel {
 			protected String getNewValue(String lastValue) {
 				FileDialog dialog = new FileDialog(shell);
 				dialog.setText(Msg.select_outlook_pst_title.get());
-				dialog.setFilterExtensions(new String[] { "*.pst" });
-				dialog.setFilterNames(new String[] { "Outlook Personal Storage Table (*.pst)" });
+				dialog.setFilterNames(new String[] { "Outlook Personal Storage Table (*.pst, *.ost, *.zdb)" });
 				if (!lastValue.equals(""))
 					dialog.setFilterPath(lastValue);
 				return dialog.open();
