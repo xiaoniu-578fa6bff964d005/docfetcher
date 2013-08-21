@@ -53,7 +53,7 @@ Was manche Leute von diesem Programm halten...
 ==============================================
 ${awards_table}
 
-DocFetcher hat zudem gute Benutzer-Wertungen auf [unserer SourceForge.net-Seite](http://sourceforge.net/projects/docfetcher/) erhalten.
+DocFetcher hat zudem gute Benutzer-Wertungen auf [unserer SourceForge.net-Seite](http://sourceforge.net/projects/docfetcher/reviews) erhalten.
 
 Vergleich mit anderen Desktop-Suchprogrammen
 ============================================

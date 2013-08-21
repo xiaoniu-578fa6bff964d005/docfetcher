@@ -53,7 +53,7 @@ What Some People Think Of This Program...
 =========================================
 ${awards_table}
 
-DocFetcher has also received favorable user ratings on [our SourceForge.net page](http://sourceforge.net/projects/docfetcher/).
+DocFetcher has also received favorable user ratings on [our SourceForge.net page](http://sourceforge.net/projects/docfetcher/reviews).
 
 Comparison To Other Desktop Search Applications
 ===============================================
