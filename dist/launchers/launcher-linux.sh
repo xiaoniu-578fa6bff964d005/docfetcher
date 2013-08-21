@@ -10,4 +10,4 @@ do
    CLASSPATH=${CLASSPATH}:${FILE}
 done
 
-java -enableassertions -Xmx256m -Xss2m -cp ".:${CLASSPATH}" -Djava.library.path="lib" ${main_class} "$@"
+java -enableassertions -Xmx512m -Xss2m -cp ".:${CLASSPATH}" -Djava.library.path="lib" ${main_class} "$@"
