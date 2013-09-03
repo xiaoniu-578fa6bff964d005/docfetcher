@@ -93,7 +93,7 @@ public final class TestParseFromZip {
 		new ZipAndRun(TestFiles.docx) {
 			protected void handleInputStream(InputStream in) throws Exception {
 				int length = ExtractorFactory.createExtractor(in).getText().length();
-				assertEquals(620, length);
+				assertEquals(659, length);
 			}
 		};
 		new ZipAndRun(TestFiles.docx) {
@@ -111,7 +111,7 @@ public final class TestParseFromZip {
 		new ZipAndRun(TestFiles.docx) {
 			protected void handleInputStream(InputStream in) throws Exception {
 				int length = ExtractorFactory.createExtractor(in).getText().length();
-				assertEquals(620, length);
+				assertEquals(659, length);
 				OPCPackage pkg = OPCPackage.open(in);
 				pkg.getPackageProperties();
 				Closeables.closeQuietly(pkg);
