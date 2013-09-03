@@ -20,13 +20,11 @@ import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.poi.POITextExtractor;
-import org.apache.poi.POIXMLTextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackageProperties;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
-
 import com.google.common.io.Closeables;
 
 /**
@@ -68,10 +66,10 @@ abstract class MSOffice2007Parser extends FileParser {
 			throws ParseException {
 		OPCPackage pkg = null;
 		try {
-			String contents = extractText(file);
-			
-			// Open up properties
 			pkg = OPCPackage.open(file.getPath(), PackageAccess.READ);
+			String contents = extractText(pkg);
+			
+			// Open properties
 			PackageProperties props = pkg.getPackageProperties();
 			
 			// Get author(s)
@@ -116,26 +114,28 @@ abstract class MSOffice2007Parser extends FileParser {
 	@Override
 	protected final String renderText(File file, String filename)
 			throws ParseException {
+		OPCPackage pkg = null;
 		try {
-			return extractText(file);
+			pkg = OPCPackage.open(file.getPath(), PackageAccess.READ);
+			return extractText(pkg);
 		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
+		finally {
+			Closeables.closeQuietly(pkg);
+		}
 	}
 	
+	// Caller is responsible for closing the given package
 	@NotNull
-	private static String extractText(@NotNull File file) throws Exception {
-		POITextExtractor extractor = ExtractorFactory.createExtractor(file);
+	private static String extractText(@NotNull OPCPackage pkg) throws Exception {
+		POITextExtractor extractor = ExtractorFactory.createExtractor(pkg);
 		if (extractor instanceof XSSFExcelExtractor) {
 			boolean indexFormulas = ProgramConf.Bool.IndexExcelFormulas.get();
 			((XSSFExcelExtractor) extractor).setFormulasNotResults(indexFormulas);
 		}
 		String text = extractor.getText();
-		if (extractor instanceof POIXMLTextExtractor) {
-			OPCPackage pkg = ((POIXMLTextExtractor) extractor).getPackage();
-			Closeables.closeQuietly(pkg);
-		}
 		return text;
 	}
 
