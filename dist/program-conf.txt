@@ -104,3 +104,10 @@ AllowIndexDeletion = true
 # obsolete index files, and if it finds any, it asks the user whether the files
 # should be deleted. You can turn this off with this setting.
 ReportObsoleteIndexFiles = true
+
+# Whether support for tar archives is disabled. If disabled, tar archives will
+# be treated as ordinary files. Set this to true if you experience tar-related
+# issues, e.g. your temporary directory filling up with tzp*.tmp files, or just
+# want to speed up indexing by completely avoiding the unpacking of tar
+# archives.
+SkipTarArchives = false

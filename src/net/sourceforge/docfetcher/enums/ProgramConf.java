@@ -56,6 +56,7 @@ public final class ProgramConf {
 		ShowAdvancedSettingsLink (true),
 		ReportObsoleteIndexFiles (true),
 		IndexExcelFormulas (true),
+		SkipTarArchives (false),
 		;
 
 		private boolean value;

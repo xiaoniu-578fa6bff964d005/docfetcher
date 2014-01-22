@@ -57,7 +57,10 @@ public class IndexingConfig implements Serializable {
 		new PatternAction(".*\\.class"),
 		new PatternAction(".*\\.pyc"));
 	
-	public static final List<String> hiddenZipExtensions = Arrays.asList(
+	/**
+	 * Don't forget the {@link #skipTarArchives} field when accessing this list!
+	 */
+	public static final List<String> tarExtensions = Arrays.asList(
 		"tar", "tar.gz", "tgz", "tar.bz2", "tb2", "tbz");
 	
 	private static final Pattern dotSlashPattern = Pattern.compile("\\.\\.?[/\\\\].*");
@@ -73,6 +76,7 @@ public class IndexingConfig implements Serializable {
 	private boolean indexFilenames = true;
 	private boolean storeRelativePaths = false;
 	private boolean watchFolders = true;
+	private boolean skipTarArchives = false;
 	
 	public final boolean isDetectExecutableArchives() {
 		return detectExecutableArchives;
@@ -260,7 +264,8 @@ public class IndexingConfig implements Serializable {
 		
 		Set<String> extensions = new LinkedHashSet<String>();
 		extensions.addAll(zipExtensions);
-		extensions.addAll(hiddenZipExtensions);
+		if (!skipTarArchives)
+			extensions.addAll(tarExtensions);
 		if (detectExecutableArchives)
 			extensions.add("exe");
 		return new TArchiveDetector(driverProvider, Util.join("|", extensions));
@@ -274,7 +279,7 @@ public class IndexingConfig implements Serializable {
 			return true;
 		if (ext.equals("7z") || ext.equals("rar"))
 			return true;
-		if (hiddenZipExtensions.contains(ext))
+		if (!skipTarArchives && tarExtensions.contains(ext))
 			return true;
 		return zipExtensions.contains(ext);
 	}
@@ -314,5 +319,13 @@ public class IndexingConfig implements Serializable {
 	}
 	
 	protected void onWatchFoldersChanged() {}
+	
+	public boolean isSkipTarArchives() {
+		return skipTarArchives;
+	}
+	
+	public void setSkipTarArchives(boolean skipTarArchives) {
+		this.skipTarArchives = skipTarArchives;
+	}
 
 }

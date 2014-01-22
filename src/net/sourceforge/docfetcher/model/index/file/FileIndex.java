@@ -88,7 +88,7 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 				config.setDetectExecutableArchives(true);
 			}
 			else if (!config.isSolidArchive(rootFile.getName())
-					&& !IndexingConfig.hiddenZipExtensions.contains(extension)) {
+					&& !IndexingConfig.tarExtensions.contains(extension)) {
 				List<String> zipExtensions = config.getZipExtensions();
 				if (!zipExtensions.contains(extension)) {
 					List<String> newZipExtensions = Util.createList(
@@ -407,8 +407,22 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 			protected void runFinally() {
 				// Delete temporary zip files
 				try {
-					if (!(dirOrZip instanceof TFile)) return;
+					if (!(dirOrZip instanceof TFile))
+						return;
 					TFile tzFile = (TFile) dirOrZip;
+					/*
+					 * We must not only unmount the directory itself, but also
+					 * all child archives, since we might have called
+					 * isFile/isDirectory on them, triggering mounting. Note
+					 * that doing this only makes sense if the directory is a
+					 * TFile, otherwise the children couldn't be TFile instances
+					 * either.
+					 */
+					for (File child : Util.listFiles(tzFile)) {
+						TFile tzChild = (TFile) child;
+						if (tzChild.isArchive() && tzChild.getEnclArchive() == null)
+							TVFS.umount(tzChild);
+					}
 					// Without the following if-clause TrueZIP would throw an
 					// exception
 					if (tzFile.isArchive() && tzFile.getEnclArchive() == null)

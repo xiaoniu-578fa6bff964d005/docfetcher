@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.model.LuceneIndex;
@@ -167,6 +168,7 @@ final class FileConfigPanel extends ConfigPanel {
 		config.setIndexFilenames(indexFilenameBt.getSelection());
 		config.setStoreRelativePaths(storeRelativePathsBt.getSelection());
 		config.setWatchFolders(watchFolderBt.getSelection());
+		config.setSkipTarArchives(ProgramConf.Bool.SkipTarArchives.get());
 		
 		return true;
 	}
