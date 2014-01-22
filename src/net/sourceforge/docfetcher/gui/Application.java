@@ -694,10 +694,15 @@ public final class Application {
 					entryNames.add("  " + entry.name());
 				String msg = Msg.entries_missing.format(confFile.getName());
 				msg += "\n" + Joiner.on("\n").join(entryNames);
-				msg += "\n\n" + Msg.entries_missing_regenerate.get();
-				int style = SWT.YES | SWT.NO | SWT.ICON_WARNING;
-				if (AppUtil.showErrorOnStart(msg, style) == SWT.YES) {
-					regenerateConfFile(confFile);
+				if (SystemConf.Bool.IsDevelopmentVersion.get()) {
+					AppUtil.showErrorOnStart(msg, false);
+				}
+				else {
+					msg += "\n\n" + Msg.entries_missing_regenerate.get();
+					int style = SWT.YES | SWT.NO | SWT.ICON_WARNING;
+					if (AppUtil.showErrorOnStart(msg, style) == SWT.YES) {
+						regenerateConfFile(confFile);
+					}
 				}
 			}
 		}
