@@ -170,6 +170,7 @@ public enum Msg {
 	filetype_svg ("Scalable Vector Graphics (svg)", Comments.filetype),
 	filetype_txt ("Plain Text", Comments.filetype),
 	filetype_flac ("FLAC (flac)", Comments.filetype),
+	filetype_epub ("EPUB (epub)", Comments.filetype),
 	
 	// Search scope context menu entries
 	create_index_from (

@@ -87,6 +87,7 @@ public final class ParseService {
 		new PdfParser(),
 		new RtfParser(),
 		new SvgParser(),
+		new EpubParser(),
 		
 		new OpenOfficeWriterParser(),
 		new OpenOfficeCalcParser(),

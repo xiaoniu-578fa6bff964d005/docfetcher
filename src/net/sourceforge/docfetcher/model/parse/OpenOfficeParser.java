@@ -96,26 +96,15 @@ abstract class OpenOfficeParser extends FileParser {
 		try {
 			// Get zip entries
 			zipFile = new ZipFile(file);
-			ZipEntry manifZipEntry = zipFile.getEntry("META-INF/manifest.xml"); //$NON-NLS-1$
-			ZipEntry metaZipEntry = zipFile.getEntry("meta.xml"); //$NON-NLS-1$
-			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
-			if (manifZipEntry == null || metaZipEntry == null || contentZipEntry == null)
-				throw new ParseException(Msg.file_corrupted.get());
-
+			
 			// Find out if file is password protected
-			InputStream manifInputStream = zipFile.getInputStream(manifZipEntry);
-			Source manifSource = new Source(manifInputStream);
-			Closeables.closeQuietly(manifInputStream);
-			manifSource.setLogger(null);
+			Source manifSource = UtilParser.getSource(zipFile, "META-INF/manifest.xml"); //$NON-NLS-1$
 			StartTag encryptTag = manifSource.getNextStartTag(0, "manifest:encryption-data"); //$NON-NLS-1$
 			if (encryptTag != null)
 				throw new ParseException(Msg.doc_pw_protected.get());
 			
 			// Get tags from meta.xml file
-			InputStream metaInputStream = zipFile.getInputStream(metaZipEntry);
-			Source metaSource = new Source(metaInputStream);
-			Closeables.closeQuietly(metaInputStream);
-			metaSource.setLogger(null);
+			Source metaSource = UtilParser.getSource(zipFile, "meta.xml"); //$NON-NLS-1$
 			String title = getElementContent(metaSource, "dc:title"); //$NON-NLS-1$
 			String author = getElementContent(metaSource, "dc:creator"); //$NON-NLS-1$
 			String description = getElementContent(metaSource, "dc:description"); //$NON-NLS-1$
@@ -124,6 +113,7 @@ abstract class OpenOfficeParser extends FileParser {
 
 			// Collect content.xml entries
 			List<ZipEntry> contentEntries = new ArrayList<ZipEntry>();
+			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
 			contentEntries.add(contentZipEntry);
 			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 			while (zipEntries.hasMoreElements()) {
@@ -142,48 +132,24 @@ abstract class OpenOfficeParser extends FileParser {
 				Element contentElement = contentSource.getNextElement(0, "office:body"); //$NON-NLS-1$
 				if (contentElement == null) // this content.xml file doesn't seem to contain text
 					continue;
-				String content = contentElement.getContent().getTextExtractor().toString();
+				String content = UtilParser.extract(contentElement);
 				sb.append(content).append(" "); //$NON-NLS-1$
 			}
 			
 			// Create and return parse result
-			ParseResult parseResult = new ParseResult(sb);
-			parseResult.setTitle(title);
-			parseResult.addAuthor(author);
-			parseResult.addMiscMetadata(description);
-			parseResult.addMiscMetadata(subject);
-			parseResult.addMiscMetadata(keyword);
-			return parseResult;
+			return new ParseResult(sb)
+				.setTitle(title)
+				.addAuthor(author)
+				.addMiscMetadata(description)
+				.addMiscMetadata(subject)
+				.addMiscMetadata(keyword);
 		}
 		catch (IOException e) {
 			throw new ParseException(e);
 		}
 		finally {
-			closeZipFile(zipFile);
+			UtilParser.closeZipFile(zipFile);
 		}
-	}
-	
-	private static void closeZipFile(@Nullable ZipFile zipFile) {
-		// We can't use Closeables.closeQuietly for ZipFiles because it doesn't
-		// implement the Closeable interface on Mac OS X.
-		if (zipFile == null)
-			return;
-		try {
-			zipFile.close();
-		}
-		catch (IOException e) {
-		}
-	}
-
-	/**
-	 * Returns the textual content inside the given HTML element from the given
-	 * HTML source. Returns null if the HTML element is not found.
-	 */
-	@Nullable
-	private String getElementContent(	@NotNull Source source,
-										@NotNull String elementName) {
-		Element el = source.getNextElement(0, elementName);
-		return el == null ? null : CharacterReference.decode(el.getContent());
 	}
 	
 	protected final String renderText(File file, ParseContext context)
@@ -207,8 +173,19 @@ abstract class OpenOfficeParser extends FileParser {
 		}
 		finally {
 			Closeables.closeQuietly(reader);
-			closeZipFile(zipFile);
+			UtilParser.closeZipFile(zipFile);
 		}
+	}
+	
+	/**
+	 * Returns the textual content inside the given HTML element from the given
+	 * HTML source. Returns null if the HTML element is not found.
+	 */
+	@Nullable
+	private static String getElementContent(@NotNull Source source,
+											@NotNull String elementName) {
+		Element el = source.getNextElement(0, elementName);
+		return el == null ? null : CharacterReference.decode(el.getContent());
 	}
 
 }
