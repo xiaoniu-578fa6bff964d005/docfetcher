@@ -25,7 +25,8 @@
 # Where the settings are stored:
 #settings=C:\\path\\to\\settings\\folder
 
-# Where the indexes are stored:
+# Where the indexes are stored. Note: The DocFetcher daemon currently ignores
+# this setting.
 #indexes=C:\\path\\to\\indexes\\folder
 
 # Where the SWT library files will be written to:
