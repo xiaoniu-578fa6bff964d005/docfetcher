@@ -26,7 +26,6 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
@@ -101,7 +100,6 @@ public final class SettingsConf {
 		Bool(boolean defaultValue) {
 			value = this.defaultValue = defaultValue;
 		}
-		@SuppressAjWarnings
 		public boolean get() {
 			return value;
 		}

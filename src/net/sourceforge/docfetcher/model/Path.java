@@ -21,8 +21,6 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.RecursiveMethod;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 
@@ -82,7 +80,6 @@ public final class Path implements Serializable {
 	}
 	
 	@NotNull
-	@SuppressAjWarnings
 	private static String getDisplayName(@NotNull File canonicalFile) {
 		return canonicalFile.getParent() == null
 			? canonicalFile.toString()

@@ -31,6 +31,8 @@ import org.apache.tika.sax.XHTMLContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import com.google.common.io.Closeables;
+
 /**
  * RTF parser
  */
@@ -48,14 +50,17 @@ public class RTFParser extends AbstractParser {
             InputStream stream, ContentHandler handler,
             Metadata metadata, ParseContext context)
         throws IOException, SAXException, TikaException {
-        TaggedInputStream tagged = new TaggedInputStream(stream);
+        TaggedInputStream tagged = null;
         try {
+        	tagged = new TaggedInputStream(stream);
             final TextExtractor ert = new TextExtractor(new XHTMLContentHandler(handler, metadata), metadata);
             ert.extract(stream);
             metadata.add(Metadata.CONTENT_TYPE, "application/rtf");
         } catch (IOException e) {
             tagged.throwIfCauseOf(e);
             throw new TikaException("Error parsing an RTF document", e);
+        } finally {
+        	Closeables.closeQuietly(tagged);
         }
     }
 }

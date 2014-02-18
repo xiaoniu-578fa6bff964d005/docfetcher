@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 /**
  * This class can be used for measuring time inside loops, which is useful for
  * finding performance bottlenecks and/or computing averaged execution times.
@@ -92,7 +90,6 @@ public class LoopTimer {
 	 * 
 	 * @see LoopTimer
 	 */
-	@SuppressAjWarnings
 	public void printTimes() {
 		System.out.println(getTimes());
 	}

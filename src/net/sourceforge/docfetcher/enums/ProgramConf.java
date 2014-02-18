@@ -20,8 +20,6 @@ import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 /**
  * This class handles the retrieval of application-wide, <em>unmodifiable</em>
  * preferences and allows type safe access to them via nested enums. The default
@@ -63,7 +61,6 @@ public final class ProgramConf {
 		Bool(boolean value) {
 			this.value = value;
 		}
-		@SuppressAjWarnings
 		public boolean get() {
 			return value;
 		}

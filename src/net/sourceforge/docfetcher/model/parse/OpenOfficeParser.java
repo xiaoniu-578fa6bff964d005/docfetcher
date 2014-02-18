@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
@@ -165,7 +163,6 @@ abstract class OpenOfficeParser extends FileParser {
 		}
 	}
 	
-	@SuppressAjWarnings
 	private static void closeZipFile(@Nullable ZipFile zipFile) {
 		// We can't use Closeables.closeQuietly for ZipFiles because it doesn't
 		// implement the Closeable interface on Mac OS X.

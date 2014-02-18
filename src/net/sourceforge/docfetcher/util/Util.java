@@ -30,7 +30,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.ThreadSafe;
 import net.sourceforge.docfetcher.util.gui.Col;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
@@ -686,7 +685,6 @@ public final class Util {
 	 * is.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static String getAbsPath(@NotNull File file) {
 		String absPath = file.getAbsolutePath();
 		if (absPath.startsWith("\\\\")) // UNC path?
@@ -726,7 +724,6 @@ public final class Util {
 	 * Equivalent to {@link java.io.File#getAbsolutePath()}.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static String getSystemAbsPath(@NotNull File file) {
 		return file.getAbsolutePath();
 	}
@@ -736,25 +733,21 @@ public final class Util {
 	 * java.io.File(path).getAbsolutePath()}.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static String getSystemAbsPath(@NotNull String path) {
 		return new File(path).getAbsolutePath();
 	}
 
 	@NotNull
-	@SuppressAjWarnings
 	public static File getCanonicalFile(@NotNull String path) {
 		return getCanonicalFile(new File(path));
 	}
 
 	@NotNull
-	@SuppressAjWarnings
 	public static File getCanonicalFile(@NotNull File file) {
 		return new File(getCanonicalPath(file));
 	}
 
 	@NotNull
-	@SuppressAjWarnings
 	public static String getCanonicalPath(@NotNull File file) {
 		if (IS_WINDOWS && isWindowsDevice(file.getPath())) {
 			String driveLetter = getDriveLetter(file.getPath());
@@ -789,7 +782,6 @@ public final class Util {
 	 * pointer.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static File[] listFiles(@NotNull File dir) {
 		File[] files = dir.listFiles();
 		return files == null ? new File[0] : files;
@@ -802,7 +794,6 @@ public final class Util {
 	 * directory is denied, an empty array is returned, not a null pointer.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static File[] listFiles(	@NotNull File dir,
 									@Nullable FilenameFilter filter) {
 		File[] files = dir.listFiles(filter);
@@ -816,7 +807,6 @@ public final class Util {
 	 * directory is denied, an empty array is returned, not a null pointer.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static File[] listFiles(	@NotNull File dir,
 									@Nullable FileFilter filter) {
 		File[] files = dir.listFiles(filter);
@@ -832,7 +822,6 @@ public final class Util {
 	 * Note: If the given file is an instance of TFile and
 	 * represents an archive entry, this method always returns false.
 	 */
-	@SuppressAjWarnings
 	public static boolean isSymLink(@NotNull File file) {
 		try {
 			/*
@@ -897,7 +886,6 @@ public final class Util {
 	 * given file was constructed with a relative path.
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static File getParentFile(@NotNull File file) {
 		Util.checkNotNull(file);
 		File parent = file.getParentFile();
@@ -917,7 +905,6 @@ public final class Util {
 	 * @see #getParentFile(File)
 	 */
 	@NotNull
-	@SuppressAjWarnings
 	public static File getParentFile(@NotNull String path) {
 		Util.checkNotNull(path);
 		File file = new File(path);
@@ -1463,7 +1450,6 @@ public final class Util {
 	 * is what usually happens on KDE-based Linux variants, which are not
 	 * supported by SWT.
 	 */
-	@SuppressAjWarnings
 	public static boolean launch(@NotNull String filename) {
 		Util.checkNotNull(filename);
 
@@ -1497,7 +1483,6 @@ public final class Util {
 	}
 
 	@NotNull
-	@SuppressAjWarnings
 	public static File createTempDir() throws IOException {
 		File dir = Files.createTempDir();
 
@@ -1540,7 +1525,6 @@ public final class Util {
 	 *
 	 * @see {@link File#createTempFile(String, String, File)}
 	 */
-	@SuppressAjWarnings
 	public static File createTempFile(	@NotNull String prefix,
 										@Nullable String suffix,
 										@Nullable File directory)
@@ -1575,7 +1559,6 @@ public final class Util {
 		);
 	}
 
-	@SuppressAjWarnings
 	public static void println(@NotNull Object... objects) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
@@ -1594,7 +1577,6 @@ public final class Util {
 	 * Equivalent to <code>System.err.println(String)</code>. This method can be
 	 * called instead to suppress AspectJ warnings.
 	 */
-	@SuppressAjWarnings
 	public static void printErr(@NotNull String message) {
 		System.err.println(message);
 	}
@@ -1603,7 +1585,6 @@ public final class Util {
 	 * Equivalent to {@link Throwable#printStackTrace()}. This method can be
 	 * called instead to suppress AspectJ warnings.
 	 */
-	@SuppressAjWarnings
 	public static void printErr(@NotNull Throwable t) {
 		t.printStackTrace();
 	}

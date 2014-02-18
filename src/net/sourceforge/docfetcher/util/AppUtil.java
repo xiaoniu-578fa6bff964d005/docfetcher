@@ -28,7 +28,6 @@ import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -474,7 +473,6 @@ public final class AppUtil {
 		showStackTrace(Display.getDefault(), throwable);
 	}
 
-	@SuppressAjWarnings
 	private static void showStackTrace(final Display display, final Throwable throwable) {
 		// Print stacktrace to System.err
 		throwable.printStackTrace();

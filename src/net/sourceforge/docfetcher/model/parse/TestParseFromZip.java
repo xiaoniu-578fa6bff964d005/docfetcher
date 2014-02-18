@@ -64,8 +64,13 @@ public final class TestParseFromZip {
 		};
 		new ZipAndRun(TestFiles.doc) {
 			protected void handleInputStream(InputStream in) throws Exception {
-				WordExtractor extractor = new WordExtractor(in);
-				extractor.getText();
+				WordExtractor extractor = null;
+				try {
+					extractor = new WordExtractor(in);
+					extractor.getText();
+				} finally {
+					Closeables.closeQuietly(extractor);
+				}
 			}
 		};
 	}
@@ -82,8 +87,13 @@ public final class TestParseFromZip {
 					}
 				}, "\005SummaryInformation"); //$NON-NLS-1$
 				reader.read(in);
-				WordExtractor extractor = new WordExtractor(in);
-				extractor.getText();
+				WordExtractor extractor = null;
+				try {
+					extractor = new WordExtractor(in);
+					extractor.getText();
+				} finally {
+					Closeables.closeQuietly(extractor);
+				}
 			}
 		};
 	}

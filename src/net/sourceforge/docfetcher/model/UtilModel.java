@@ -128,7 +128,7 @@ public final class UtilModel {
 		List<String> dstOverhang = new ArrayList<String>();
 		List<String> dstList = new ArrayList<String>();
 		boolean stillEqual = true;
-		for (int i = 0;; i++) {
+		while (true) {
 			String srcPart = null;
 			String dstPart = null;
 			if (srcIt.hasNext())

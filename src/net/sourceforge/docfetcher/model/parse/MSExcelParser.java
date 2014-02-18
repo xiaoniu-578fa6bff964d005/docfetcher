@@ -52,6 +52,8 @@ final class MSExcelParser extends MSOfficeParser {
 			try {
 				POIFSFileSystem fs = new POIFSFileSystem(in);
 				extractor = new ExcelExtractor(fs);
+				extractor.setFormulasNotResults(ProgramConf.Bool.IndexExcelFormulas.get());
+				return extractor.getText();
 			}
 			catch (OldExcelFormatException e) {
 				/*
@@ -62,8 +64,9 @@ final class MSExcelParser extends MSOfficeParser {
 				Closeables.closeQuietly(in);
 				return extractWithJexcelAPI(file);
 			}
-			extractor.setFormulasNotResults(ProgramConf.Bool.IndexExcelFormulas.get());
-			return extractor.getText();
+			finally {
+				Closeables.closeQuietly(extractor);
+			}
 		}
 		catch (IOException e) {
 			throw new ParseException(e);

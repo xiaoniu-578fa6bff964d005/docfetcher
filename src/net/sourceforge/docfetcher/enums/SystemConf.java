@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.ConfLoader.Loadable;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
@@ -50,7 +48,6 @@ public final class SystemConf {
 		Bool(boolean value) {
 			this.value = value;
 		}
-		@SuppressAjWarnings
 		public boolean get() {
 			return value;
 		}

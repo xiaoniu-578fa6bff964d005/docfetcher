@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/J7zip/J7zip_4.43_alpha2.jar" sourcepath="lib/J7zip/J7zip_4.43_alpha2_src.zip"/>
 	<classpathentry kind="lib" path="lib/junit/junit-4.8.2.jar" sourcepath="lib/junit/junit-4.8.2-src.jar"/>
 	<classpathentry kind="lib" path="lib/junrar/java-unrar-0.3.jar" sourcepath="lib/junrar/java-unrar-0.3-sources.jar"/>
@@ -42,7 +41,6 @@
 	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.7.3.jar" sourcepath="lib/truezip/truezip-file-7.7.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.7.3.jar" sourcepath="lib/truezip/truezip-kernel-7.7.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.7.3.jar" sourcepath="lib/truezip/truezip-swing-7.7.3-sources.jar"/>
-	<classpathentry kind="con" path="org.eclipse.ajdt.core.ASPECTJRT_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
@@ -68,5 +66,6 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.10-beta1-20130628.jar" sourcepath="lib/poi/poi-src-3.10-beta1-20130628-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.10-beta1-20130628.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.10-beta1-20130628.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

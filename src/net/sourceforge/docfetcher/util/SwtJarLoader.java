@@ -14,8 +14,6 @@ package net.sourceforge.docfetcher.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.aspectj.lang.annotation.SuppressAjWarnings;
-
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 /**
@@ -26,7 +24,6 @@ public final class SwtJarLoader {
 	private SwtJarLoader() {
 	}
 	
-	@SuppressAjWarnings
 	public static void loadSwtJar() throws IOException {
 		String osNamePart = getOsNamePart();
 		String osArchPart = getOsArchPart();

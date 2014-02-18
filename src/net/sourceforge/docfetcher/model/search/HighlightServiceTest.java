@@ -66,19 +66,24 @@ public final class HighlightServiceTest {
 		Query query = queryParser.parse("\"text\"");
 		FastVectorHighlighter highlighter = new FastVectorHighlighter(true, true, null, null);
 		FieldQuery fieldQuery = highlighter.getFieldQuery(query);
-		IndexSearcher searcher = new IndexSearcher(directory);
-		TopDocs docs = searcher.search(query, 10);
-		assertEquals(1, docs.scoreDocs.length);
-		int docId = docs.scoreDocs[0].doc;
-		
-		// Get phrase highlighting offsets
-		FieldTermStack fieldTermStack = new FieldTermStack(searcher.getIndexReader(), docId, "content", fieldQuery);
-		FieldPhraseList fieldPhraseList = new FieldPhraseList( fieldTermStack, fieldQuery );
-	    java.lang.reflect.Field field = fieldPhraseList.getClass().getDeclaredField("phraseList");
-	    field.setAccessible(true);
-	    LinkedList<WeightedPhraseInfo> list = (LinkedList<WeightedPhraseInfo>) field.get(fieldPhraseList);
-	    assertEquals(5, list.get(0).getStartOffset());
-	    assertEquals(9, list.get(0).getEndOffset());
+		IndexSearcher searcher = null;
+		try {
+			searcher = new IndexSearcher(directory);
+			TopDocs docs = searcher.search(query, 10);
+			assertEquals(1, docs.scoreDocs.length);
+			int docId = docs.scoreDocs[0].doc;
+			
+			// Get phrase highlighting offsets
+			FieldTermStack fieldTermStack = new FieldTermStack(searcher.getIndexReader(), docId, "content", fieldQuery);
+			FieldPhraseList fieldPhraseList = new FieldPhraseList( fieldTermStack, fieldQuery );
+		    java.lang.reflect.Field field = fieldPhraseList.getClass().getDeclaredField("phraseList");
+		    field.setAccessible(true);
+		    LinkedList<WeightedPhraseInfo> list = (LinkedList<WeightedPhraseInfo>) field.get(fieldPhraseList);
+		    assertEquals(5, list.get(0).getStartOffset());
+		    assertEquals(9, list.get(0).getEndOffset());
+		} finally {
+			Closeables.closeQuietly(searcher);
+		}
 	}
 
 }

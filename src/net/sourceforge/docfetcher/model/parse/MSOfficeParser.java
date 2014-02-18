@@ -88,7 +88,13 @@ abstract class MSOfficeParser extends FileParser {
 		}
 		protected String extractText(InputStream in)
 				throws IOException {
-			return new VisioTextExtractor(in).getText();
+			VisioTextExtractor extractor = null;
+			try {
+				extractor = new VisioTextExtractor(in);
+				return extractor.getText();
+			} finally {
+				Closeables.closeQuietly(extractor);
+			}
 		}
 	}
 	
