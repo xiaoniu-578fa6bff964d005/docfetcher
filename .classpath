@@ -35,13 +35,13 @@
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-49_1.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.7.0.jar" sourcepath="lib/pdfbox/pdfbox-1.7.0-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.7.3.jar" sourcepath="lib/truezip/truezip-driver-file-7.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.7.3.jar" sourcepath="lib/truezip/truezip-driver-tar-7.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.7.3.jar" sourcepath="lib/truezip/truezip-driver-zip-7.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.7.3.jar" sourcepath="lib/truezip/truezip-file-7.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.7.3.jar" sourcepath="lib/truezip/truezip-kernel-7.7.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.7.3.jar" sourcepath="lib/truezip/truezip-swing-7.7.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-file-7.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-tar-7.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-zip-7.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.7.5.jar" sourcepath="lib/truezip/truezip-file-7.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.7.5.jar" sourcepath="lib/truezip/truezip-kernel-7.7.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.7.5.jar" sourcepath="lib/truezip/truezip-swing-7.7.5-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
 	<classpathentry kind="lib" path="lib/chm4j/chm4j.jar">
