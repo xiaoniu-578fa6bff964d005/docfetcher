@@ -38,6 +38,7 @@ Unterstützte Datei-Formate
 * Microsoft Outlook (pst)
 * OpenOffice.org (odt, ods, odg, odp, ott, ots, otg, otp)
 * Portable Document Format (pdf)
+* EPUB (epub)
 * HTML (html, xhtml, ...)
 * Textdateien (anpassbar)
 * Rich Text Format (rtf)

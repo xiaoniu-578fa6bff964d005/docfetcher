@@ -38,6 +38,7 @@ DocFetcher ­– это приложение с открытым исходны�
 * Microsoft Outlook (pst)
 * OpenOffice.org (odt, ods, odg, odp, ott, ots, otg, otp)
 * Portable Document Format (pdf)
+* EPUB (epub)
 * HTML (html, xhtml, ...)
 * Plain text (customizable)
 * Rich Text Format (rtf)
