@@ -167,6 +167,10 @@ class HighlightingToolBarWithTextViewer {
 		
 		occField.evtValueChanged.add(new Event.Listener<Integer>() {
 			public void update(Integer eventData) {
+				if (occCount == 0) {
+					occField.setRange(0, 0);
+					return;
+				}
 				int targetOcc = Util.clamp(eventData, 1, occCount);
 				int sum = 0;
 				for (int i = 0; i < pages.size(); i++) {
