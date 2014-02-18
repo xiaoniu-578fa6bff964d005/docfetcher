@@ -25,7 +25,7 @@ SetCompressor /FINAL zlib
 !define /file VERSION "current-version.txt"
 !define PORTABLE_PATH build\DocFetcher-${VERSION}
 !define JRE_VERSION "1.6"
-!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=52252"
+!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=83383"
 !include "JREDyna_Inetc.nsh"
 
 Name "DocFetcher ${VERSION}"
