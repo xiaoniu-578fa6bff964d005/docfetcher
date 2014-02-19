@@ -24,12 +24,12 @@ Alle unten aufgeführten Downloads unterstützen sowohl 32-Bit- als auch 64-Bit-
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher_${version}_win32_setup.exe/download">docfetcher_${version}_win32_setup.exe</a> <br/> Führen Sie das Installations-Programm aus und folgen Sie den Anweisungen.</td>
-<td>Windows&nbsp;XP/Vista/7</td>
+<td>Windows&nbsp;XP/Vista/7/8</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
 </td>
-<td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 oder neuer</td>
+<td>Windows&nbsp;XP/Vista/7/8; Linux; Mac OS&nbsp;X 10.5 oder neuer</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.

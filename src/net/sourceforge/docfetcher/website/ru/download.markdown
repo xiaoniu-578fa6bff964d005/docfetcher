@@ -27,12 +27,12 @@
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher_${version}_win32_setup.exe/download">docfetcher_${version}_win32_setup.exe</a> <br/> Запустите установщик и следуйте инструкциям.</td>
-<td>Windows&nbsp;XP/Vista/7</td>
+<td>Windows&nbsp;XP/Vista/7/8</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Это портативная версия, работающая на всех поддерживаемых платформах. Установка: Распакуйте архив в произвольную папку, затем запустите DocFetcher. Убедитесь, что у вас есть права записи в конечной папке (то есть не распаковывайте в папки, подобные "C:\Program&nbsp;Files").
 </td>
-<td>Windows&nbsp;XP/Vista/7; Linux; Mac OS&nbsp;X 10.5 или выше</td>
+<td>Windows&nbsp;XP/Vista/7/8; Linux; Mac OS&nbsp;X 10.5 или выше</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Запустите DocFetcher двойным кликом по пакету.</td>
