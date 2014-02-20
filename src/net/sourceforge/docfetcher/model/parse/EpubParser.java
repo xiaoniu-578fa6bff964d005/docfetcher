@@ -119,6 +119,10 @@ public final class EpubParser extends FileParser {
 				context.getReporter().subInfo(i, spineCount);
 				Source spineSource = UtilParser.getSource(zipFile, spinePath);
 				Element bodyEl = spineSource.getNextElement(0, HTMLElementName.BODY);
+				if (bodyEl == null) {
+					// See bug #682
+					continue;
+				}
 				if (!first) {
 					contents.append("\n\n");
 				}
