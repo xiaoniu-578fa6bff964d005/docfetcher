@@ -59,9 +59,16 @@ public final class EpubParser extends FileParser {
 			String opfPath = rootfileEl.getAttributeValue("full-path");
 			Source opfSource = UtilParser.getSource(zipFile, opfPath);
 			
-			// Parse metadata
+			// Get top-level elements in OPF file
 			Element packageEl = opfSource.getFirstElement("package");
 			Element metadataEl = packageEl.getFirstElement("metadata");
+			Element manifestEl = packageEl.getFirstElement("manifest");
+			Element spineEl = packageEl.getFirstElement("spine");
+			if (packageEl == null || metadataEl == null || manifestEl == null || spineEl == null) {
+				throw new ParseException(Msg.file_corrupted.get());
+			}
+			
+			// Parse metadata
 			String title = UtilParser.extract(metadataEl.getFirstElement("dc:title"));
 			Element creatorEl = metadataEl.getFirstElement("dc:creator");
 			String creator = null;
@@ -70,7 +77,6 @@ public final class EpubParser extends FileParser {
 			}
 			
 			// Parse manifest
-			Element manifestEl = packageEl.getFirstElement("manifest");
 			Map<String, String> itemIdToRef = new HashMap<String, String>();
 			for (Element itemEl : manifestEl.getChildElements()) {
 				String id = itemEl.getAttributeValue("id");
@@ -79,7 +85,6 @@ public final class EpubParser extends FileParser {
 			}
 			
 			// Get spine paths
-			Element spineEl = packageEl.getFirstElement("spine");
 			List<String> spinePaths = new LinkedList<String>();
 			for (Element itemRefEl : spineEl.getChildElements()) {
 				String subPath = itemIdToRef.get(itemRefEl.getAttributeValue("idref"));
