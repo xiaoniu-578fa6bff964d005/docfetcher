@@ -25,6 +25,7 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 /**
  * @author Tran Nam Quang
@@ -56,17 +57,19 @@ public final class EpubParser extends FileParser {
 			zipFile = new ZipFile(file);
 			Source containerSource = UtilParser.getSource(zipFile, "META-INF/container.xml"); //$NON-NLS-1$
 			Element rootfileEl = containerSource.getNextElement(0, "rootfile"); //$NON-NLS-1$
+			maybeThrow(rootfileEl, "No rootfile element in META-INF/container.xml");
 			String opfPath = rootfileEl.getAttributeValue("full-path");
 			Source opfSource = UtilParser.getSource(zipFile, opfPath);
 			
 			// Get top-level elements in OPF file
 			Element packageEl = opfSource.getFirstElement("package");
+			maybeThrow(packageEl, "No package element in OPF file");
 			Element metadataEl = packageEl.getFirstElement("metadata");
 			Element manifestEl = packageEl.getFirstElement("manifest");
 			Element spineEl = packageEl.getFirstElement("spine");
-			if (packageEl == null || metadataEl == null || manifestEl == null || spineEl == null) {
-				throw new ParseException(Msg.file_corrupted.get());
-			}
+			maybeThrow(metadataEl, "No metadata element in OPF file");
+			maybeThrow(manifestEl, "No manifest element in OPF file");
+			maybeThrow(spineEl, "No spine element in OPF file");
 			
 			// Parse metadata
 			String title = UtilParser.extract(metadataEl.getFirstElement("dc:title"));
@@ -151,6 +154,13 @@ public final class EpubParser extends FileParser {
 		finally {
 			UtilParser.closeZipFile(zipFile);
 		}
+	}
+	
+	private static <T> T maybeThrow(@Nullable T object, String message) throws ParseException {
+		if (object == null) {
+			throw new ParseException(message);
+		}
+		return object;
 	}
 	
 	protected Collection<String> getExtensions() {

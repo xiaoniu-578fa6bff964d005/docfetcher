@@ -44,7 +44,11 @@ final class UtilParser {
 		return source;
 	}
 	
-	public static String extract(Element e) {
+	@Nullable
+	public static String extract(@Nullable Element e) {
+		if (e == null) {
+			return null;
+		}
 		return e.getContent().getTextExtractor().toString();
 	}
 	
