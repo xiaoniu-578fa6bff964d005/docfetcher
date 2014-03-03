@@ -299,12 +299,10 @@ public final class IndexPanel {
 			public void run() {
 				IndexingQueue queue = indexRegistry.getQueue();
 				IndexAction action = isUpdate
-				? IndexAction.UPDATE
+					? IndexAction.UPDATE
 					: IndexAction.REBUILD;
 				List<LuceneIndex> sel = getSelectedIndexes();
-				if (!isUpdate)
-					indexRegistry.removeIndexes(sel, false);
-
+				
 				/*
 				 * The indexing dialog must be opened *before* adding the tasks
 				 * to the queue. Otherwise, it may happen that the tasks are

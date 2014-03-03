@@ -12,11 +12,13 @@
 package net.sourceforge.docfetcher.model.index;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.PendingDeletion;
@@ -302,6 +304,11 @@ public final class IndexingQueue {
 
 		writeLock.lock();
 		try {
+			// This must be done under lock
+			if (action == IndexAction.REBUILD) {
+				indexRegistry.removeIndexes(Collections.singleton(index), false);
+			}
+			
 			assert task.cancelAction == null;
 			assert task.is(TaskState.NOT_READY) || task.is(TaskState.READY);
 			if (shutdown)
