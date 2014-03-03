@@ -23,6 +23,7 @@ import java.util.zip.ZipFile;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -62,11 +63,11 @@ public final class EpubParser extends FileParser {
 			Source opfSource = UtilParser.getSource(zipFile, opfPath);
 			
 			// Get top-level elements in OPF file
-			Element packageEl = opfSource.getFirstElement("package");
+			Element packageEl = getFirstOpfElement(opfSource, "package");
 			maybeThrow(packageEl, "No package element in OPF file");
-			Element metadataEl = packageEl.getFirstElement("metadata");
-			Element manifestEl = packageEl.getFirstElement("manifest");
-			Element spineEl = packageEl.getFirstElement("spine");
+			Element metadataEl = getFirstOpfElement(packageEl, "metadata");
+			Element manifestEl = getFirstOpfElement(packageEl, "manifest");
+			Element spineEl = getFirstOpfElement(packageEl, "spine");
 			maybeThrow(metadataEl, "No metadata element in OPF file");
 			maybeThrow(manifestEl, "No manifest element in OPF file");
 			maybeThrow(spineEl, "No spine element in OPF file");
@@ -161,6 +162,13 @@ public final class EpubParser extends FileParser {
 			throw new ParseException(message);
 		}
 		return object;
+	}
+	
+	@Nullable
+	private static Element getFirstOpfElement(Segment segment, String tagName) {
+		Element el = segment.getFirstElement(tagName);
+		if (el != null) return el;
+		return segment.getFirstElement("opf:" + tagName);
 	}
 	
 	protected Collection<String> getExtensions() {
