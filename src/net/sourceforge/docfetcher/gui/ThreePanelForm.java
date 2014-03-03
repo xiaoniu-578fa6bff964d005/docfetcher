@@ -25,6 +25,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import com.google.common.base.Joiner;
+import com.google.common.primitives.Ints;
+
 /**
  * A three-panel layout with one panel on the left, two panels on the right, and
  * layout toggle buttons in between. The right-hand panels can be either on top
@@ -220,7 +223,12 @@ public abstract class ThreePanelForm extends FixedSashForm {
 	}
 	
 	public final void setSubSashWeights(@NotNull int[] weights) {
-		sash.setWeights(weights);
+		try {
+			sash.setWeights(weights);
+		} catch (IllegalArgumentException e) {
+			String s = Joiner.on(", ").join(Ints.asList(weights));
+			throw new IllegalArgumentException("Invalid sash weights: " + s);
+		}
 	}
 	
 	@NotNull
