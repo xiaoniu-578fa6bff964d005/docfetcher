@@ -3,3 +3,4 @@ Known dependencies between the various libraries used:
 - Mime-Util depends on SLF4J
 - TrueZIP depends on Commons Compress, Tukaani XZ Utils
 - Apache POI depends on Commons Codec
+- Apache PDFBox depends on Commons Logging

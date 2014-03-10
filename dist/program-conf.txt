@@ -88,8 +88,9 @@ UnpackCacheCapacity = 20
 # split into words. The StandardAnalyzer is suitable in most cases, but the
 # SourceCodeAnalyzer may give better results for source code files (e.g. it
 # splits words containing dots, such as 'list.iterator').
-# Important: After changing this option, you must rebuild all existing indexes,
-# otherwise you might get inconsistent search results.
+# Important: After changing this option, you must restart DocFetcher and then
+# rebuild all existing indexes, otherwise you might get inconsistent search
+# results.
 Analyzer = 0
 
 # Whether the user is allowed to create, update, rebuild and remove indexes,
