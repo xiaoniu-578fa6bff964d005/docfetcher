@@ -64,6 +64,12 @@ public final class Website {
 			Files.copy(file, dstFile);
 		}
 		
+		// Deploy changelog
+		File changelogSrc = new File(websiteDir, "changelog.txt");
+		File changelogDst = new File("dist/website", "changelog.txt");
+		Files.copy(changelogSrc, changelogDst);
+		Util.println("File written: " + changelogDst.getPath());
+		
 		// Deploy PAD file
 		File padFileSrc = new File(websiteDir, "docfetcher-pad-template.xml");
 		File padFileDst = new File("dist/website", "docfetcher-pad.xml");

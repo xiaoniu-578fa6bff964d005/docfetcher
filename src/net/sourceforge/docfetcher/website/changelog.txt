@@ -1,0 +1,508 @@
+==== 2014-03-03 - DocFetcher 1.1.11 ====
+
+=== Bugfixes ===
+  * Certain EPUB files caused DocFetcher to crash.
+  * Fixed a long-standing "AssertionError" crash that occurred randomly during indexing.
+
+
+==== 2014-02-19 - DocFetcher 1.1.10 ====
+
+=== Features ===
+  * Added EPUB support.
+  * Advanced settings: New entry 'SkipTarArchives' for disabling tar archive support.
+
+=== Bugfixes ===
+  * Bug #659: Windows installer downloaded an obsolete Java runtime version.
+  * Bug #670: Crash when entering an invalid value into the occurrence field above the preview pane.
+  * Bug #573, #612 and others: Crash while indexing zip archives.
+
+=== Changes ===
+  * (For developers:) Removed AspectJ dependency.
+  * Updated Russian GUI translation.
+
+
+==== 2013-09-03 - DocFetcher 1.1.9 ====
+
+=== Bugfixes ===
+  * Critical bugfix: With some MS Office files, DocFetcher could get stuck in an infinite indexing loop, causing continuously high CPU usage (bug #566).
+
+=== Changes ===
+  * Updated POI library; this should fix a couple of MS Office related indexing errors.
+
+
+==== 2013-08-21 - DocFetcher 1.1.8 ====
+
+=== Features ===
+  * ''misc/paths.txt'' file: Customization of the SWT library path, and support for path variable ''${user.home}''.
+  * GUI translations for Simplified Chinese, French and Portuguese.
+
+=== Bugfixes ===
+  * Fixed a major network performance issue.
+  * Excel 2007 files were not properly closed after indexing.
+  * The indexes setting in misc/paths.txt was broken in portable DocFetcher.
+
+=== Changes ===
+  * The default memory limit has been raised from 256 MB to 512 MB.
+  * Outlook indexing is not restricted to PST files anymore.
+  * Upgraded TrueZIP library from 7.5.5 to 7.7.3, this should fix a zip-file related crash.
+
+
+==== 2013-04-08 - DocFetcher 1.1.7 ====
+
+=== Features ===
+  * Advanced setting 'InitialSorting' for changing the initial sorting of the results -- the sorting can now be either ascending or descending.
+  * Command-line index updating via '%%--%%update-indexes' parameter.
+  * Support for FLAC files.
+
+=== Bugfixes ===
+  * Certain MS Office files were not closed properly after indexing.
+  * Bug #462: Crash when changing the OS theme after indexing.
+  * File exclusion didn't work with UNC paths.
+  * Copying files on the result pane via Ctrl+C did not work.
+  * DocFetcher could not read RTF files created by TextMaker.
+  * DocFetcher got stuck when indexing corrupted MP3 files.
+  * Bug #487: Incorrect reference from the Windows Registry to the daemon executable.
+  * Workaround for bug #422 and others: Crash when expanding a node in the Search Scope during indexing.
+  * Bug #430: Crash when entering certain invalid queries, e.g. fuzzy query with similarity >= 1: "example~1".
+  * Bug #469: AssertionError in some MS Word documents.
+
+=== Changes ===
+  * When the indexes are loaded during startup, a loading message is shown in the Search Scope pane.
+  * Files on the result pane can now be opened by pressing Enter.
+  * Windows installer: Daemon is now installed for all users, not only for the current user.
+
+
+==== 2013-02-20 - DocFetcher 1.1.6 ====
+
+=== Features ===
+  * Support for MP3 metadata.
+  * Support for JPEG Exif metadata.
+  * On the preview pane, you can now copy the selected text via a 'Copy' menu entry (i.e. by using the mouse, rather than the keyboard).
+  * Advanced setting for customizing the initial sorting of the search results (e.g. initially sorting by last modified date rather than by score).
+  * Advanced setting for turning off the reporting of obsolete index files on startup.
+  * Advanced setting for switching between indexing formulas and formula results in Excel files.
+
+=== Bugfixes ===
+  * Bug #367: DocFetcher was unable to handle UNC paths, such as %%\\hostame\foldername%%. It erroneously converted them to something like ''C:\hostname\foldername'' and then complained that the folder doesn't exist.
+  * The metadata extraction for MS Office files was broken.
+
+=== Changes ===
+  * Upgraded POI library to v3.9, this should fix a couple of MS Office related indexing errors.
+  * When copying files from the result table, DocFetcher now puts actual files on the clipboard, rather than file paths.
+
+
+==== 2012-11-28 - DocFetcher 1.1.5 ====
+
+=== Bugfixes ===
+  * Bug #412: Mac OS X application bundle failed to launch outside the mounted disk image due to permission issues.
+
+
+==== 2012-11-12 - DocFetcher 1.1.4 ====
+
+=== Features ===
+  * The paths to the settings and indexes files can be customized through the file misc\paths.txt.
+
+=== Bugfixes ===
+  * Bug #374: IndexOutOfBoundsException crash on some Outlook PST files.
+  * Bug #369: AssertionError crash when closing the indexing dialog after indexing.
+  * Bug #397: Crash on Outlook PST files containing e-mails without last-modified field.
+  * Bug #408: Crash when trying to index archives containing files whose names contain characters that are not supported on the current platform. For example, filenames may contain the ':' character on Linux, but not on Windows.
+  * Bug #371 and #395: The "Store relative path" option on the indexing dialog was broken.
+  * Bug #390: Crash when searching in an empty folder hierarchy, i.e. a folder hierarchy containing no indexable files.
+  * Bug #3496769: Crash when trying to index an extremely deep folder hierarchy.
+  * Bug #3534802: Expanding a folder in the Search Scope area while an indexing process is running in the background sometimes crashed the program.
+  * Bug #399: Portable DocFetcher failed to launch if it was moved between 32-bit and 64-bit Windows.
+
+
+==== 2012-08-30 - DocFetcher 1.1.3 ====
+
+=== Features ===
+  * Russian translation of GUI.
+
+=== Bugfixes ===
+  * Bug #3561223: ClassCastException crash on Outlook PST files.
+  * Bug #3559892: Crash in the preview pane when trying to display Outlook emails that have no 'send date' field.
+  * Fixed broken link to bug tracker on crash window.
+  * On Windows, the uninstaller left a "lang" folder in the DocFetcher folder.
+  * DocFetcher does not crash anymore if any image files are missing.
+
+=== Changes ===
+  * Now a warning message is shown if DocFetcher was installed or unpacked on top of a previous version.
+
+
+==== 2012-08-17 - DocFetcher 1.1.2 ====
+
+=== Bugfixes ===
+  * Bug #3558268: On Windows, if the program was installed on top of a previous program version, it crashed during the indexing of archive files.
+
+
+==== 2012-08-15 - DocFetcher 1.1.1 ====
+
+=== Bugfixes ===
+  * Bug #3553412: Problem with reading certain PDF files.
+  * Bug #3557919: NullPointerException crash on OpenOffice files.
+
+
+==== 2012-08-15 - DocFetcher 1.1 ====
+
+=== Features ===
+  * German translation of GUI and manual.
+  * New website.
+  * Feature request #3519525: The error table on the indexing dialog now shows an error counter.
+  * Advanced settings: Experimental text analyzer setting for indexing source code.
+  * Feature request #3522954: One can disable certain index modifications through the advanced settings.
+  * Feature request #3519753: The error table on the indexing dialog now supports sorting via click on the column headers.
+  * Starting from now, an effort is made to preserve backward compatibility of the index files between releases. At the same time, the current index files won't be compatible with versions older than v1.1. As a consequence of this, if index files from older program versions are found, the user will be asked whether these files should be deleted.
+  * Page-wise preview for PDF files; this addresses the problem that the GUI became unresponsive when a large PDF file was loaded into the preview pane.
+  * Optionally auto-scroll to first match in preview.
+  * Preferences dialog has a hyperlink to advanced settings.
+  * Optionally minimize in System Tray instead of exiting.
+
+=== Bugfixes ===
+  * Bug #3555290: InvocationTargetException crash, apparently as a result of exceeding the memory limit.
+  * Bug #3540033: Crash when clicking a column header on the result table before any results are displayed.
+  * In earlier program versions, some internal program files were silently extracted into a .swt folder outside the usual DocFetcher-related folders, even when the portable version of DocFetcher was used.
+  * Bug #3538102: Crash when starting a search and closing the program while indexes are still being loaded in the background.
+  * The index folder is now excluded from indexing and folder watching. This prevents DocFetcher from getting stuck in an infinite loop of index updates and self-triggered file change events when the DocFetcher folder itself is indexed.
+  * Crash during indexing when encountering an encrypted file in a 7z or rar archive and the file was excluded from indexing.
+  * Bug #3519920: AssertionError: The program crashed when an index was rebuilt and an update on the same index was running in the background.
+  * Program lockup when aborting an indexing process with the "Keep" option, but *after* the indexing process has finished in the background.
+  * Bug #3536283: Crash when emails with empty subject are shown on the result table.
+  * Bug #3532164: NullPointerException crash.
+  * Bug #3537738: Crash in MS Office document with error message "IllegalArgumentException: name cannot be empty".
+  * Bug #3529070 and #3528345: ClassCastException during indexing of PDF files.
+  * Bug #3538230: Crash during indexing when some of the indexed files are deleted externally.
+  * Bug #3527251: If some indexes couldn't be loaded during startup, the program doesn't crash anymore, but shows an error message.
+  * Bug #3523251: ArrayIndexOutOfBoundsException crash during search.
+  * Bug #3536137: IllegalArgumentException crash during indexing.
+  * Bug #3514066: CharConversionException crash during indexing of archive.
+  * Bug #3541234: NegativeArraySizeException crash during indexing of Tar archive.
+
+=== Changes ===
+  * Various changes to the Windows installer.
+  * Experimental ability to move an existing DocFetcher instance to the front instead of opening another DocFetcher instance.
+  * Release now includes a Readme.txt.
+  * Various manual improvements.
+  * An error message is shown when the user tries to index the index folder itself, or any files or folders beneath it.
+  * When copying entries from the error table on the indexing dialog into the clipboard, the error messages are included in the copy.
+  * Improved filename search: In the previous version, DocFetcher did not find a file named "test.txt" when only "test" was entered.
+  * Preview pane now contains an experimental popup blocker (not sure if this actually works).
+  * Preview pane: Leading and trailing whitespace is automatically trimmed from the text.
+  * Preferences dialog: System-Tray-related preferences entries are hidden on Ubuntu Unity.
+  * Program settings are saved immediately after the OK button on the preferences dialog is clicked.
+  * Renamed configuration files so that they can be opened with the default text editor without problems (e.g. program.conf to program-conf.txt).
+  * Improved error messages for hitting the memory limit and running out of folder watches (Linux).
+  * Various library upgrades: PDFBox 1.6 -> 1.7, Guava v7 -> v12, Apache POI 3.8-beta4 -> 3.8, TrueZIP 7.4.3 -> 7.5.5.
+
+
+==== 2012-03-02 - DocFetcher 1.1 beta 6 ====
+
+=== Bugfixes ===
+  * Bugfix: Crash if some entries in a solid archive cannot be unpacked. Reported in bug #3490043 and others.
+  * Workaround for bug #3489947: Outlook indexing crash.
+  * Bug #3487214: Empty titles on the result pane.
+
+=== Changes ===
+  * Lucene library updated (3.0.3 -> 3.5.0).
+
+
+==== 2012-02-12 - DocFetcher 1.1 beta 5 ====
+
+=== Bugfixes ===
+  * Major bug: Left debugging code in the program by accident, making the program completely unusable, since a dummy error message will be shown every time the user types something into the search field.
+
+
+==== 2012-02-09 - DocFetcher 1.1 beta 4 ====
+
+=== Features ===
+  * File Types filter pane now has context menu entries for setting the check states. See feature request #3481265.
+  * Result pane now has a context menu entry for copying the selection to the clipboard.
+
+=== Bugfixes ===
+  * Fix for bug #3454306: ClassCastException during searching.
+  * On Ubuntu Unity, hiding in system tray is disabled. Workaround for bug #3457028 and #3457035.
+  * Archive-related crashes during indexing are now reported as non-fatal errors.
+  * The loading screen could cause DocFetcher to steal the focus from other applications.
+  * Preview loading screen was shown even when the preview was minimized.
+  * Bug #3475969: Outlook indexing crash.
+  * Bug #3466076: Crash when DocFetcher is placed in the root of a volume and the user tries to index a directory in that volume.
+  * Bug #3458940: Can't index two folders with the same name.
+  * If the index was a root, such as 'C:', it would show up with an empty name in the Search Scope pane.
+  * If DocFetcher is located somewhere in volume X:, trying to index X: will instead index the current working directory.
+  * Bug #3465544: Crash on fake zip archives inside solid archives.
+  * Sometimes temporary files unpacked from solid archives weren't deleted immediately.
+  * Bug #3477397: Crash when unpacking entries from a solid archive fails.
+  * Bug #3485598: Crash probably caused by indexing attempt before the GUI was fully initialized.
+  * DocFetcher's folder watching didn't work on 64-bit Linux.
+  * When running out of memory, the program now displays an error message instead of crashing.
+
+=== Changes ===
+  * TrueZIP library updated (7.3.3 -> 7.4.3). Should fix URISyntaxException crashes.
+  * Enabled assertions on the Windows launchers and raised the thread stack size on all launchers to 2 MB.
+
+
+==== 2011-12-06 - DocFetcher 1.1 beta 3 ====
+
+=== Bugfixes ===
+  * Fix for Outlook crash, see #3440130.
+  * Fix for bug #3441649: StackOverflowError when trying to print a stacktrace.
+  * Fix for bug #3443490: OutOfMemoryError when unpacking from a rar archive.
+  * Fix for bug #3443948: AssertionError on RTF files.
+  * Fixed PDF-related crashes, see bugs #3446010, #3448272, #3444887.
+  * A warning message is shown when the user enters 7z or rar in the zip extensions field. See bug #3448518.
+
+
+==== 2011-11-18 - DocFetcher 1.1 beta 2 ====
+
+=== Bugfixes ===
+  * Fixed some newline issues in the stacktrace window.
+  * Fixed numerous crashes related to MS Office documents.
+  * Fixed incorrect error messages for encrypted PDF files.
+  * Fixed problems with composed vs. decomposed path strings.
+  * Fixed various archive-related crashes.
+  * Fixed various problems with umlauts.
+
+=== Changes ===
+  * PDFBox library updated (1.5.0 -> 1.6.0).
+
+
+==== 2011-11-11 - DocFetcher 1.1 beta 1 ====
+
+Program was rewritten from scratch. See the following page for an overview of the changes: http://docfetcher.sourceforge.net/wiki/doku.php?id=changes_in_v1.1
+
+
+==== 2010-04-30 - DocFetcher 1.0.3 ====
+
+=== Features ===
+  * Preferences entry for changing the default operator to concatenate query terms (OR vs. AND).
+
+=== Bugfixes ===
+  * Non-lethal crash while parsing Excel files in the old Excel format (BIFF5 from Excel 5.0/7.0).
+  * The CHM parser could crash with a stack overflow; also, it omitted text in CHM files that had a particular format.
+  * If one of the parsers crashes badly, the user is asked to send the problematic file to docfetcher@users.sourceforge.net for debugging (bug #2948903 and #2944552).
+  * Indexing-related crash that shows a "ThreadInterruptedException" (bug #2971390 and #2953613).
+  * Crash on older Windows versions where no graphics library (GDI+) is installed (temporary fix for bug #2943966).
+  * Crash if the user clicks on the column header "Author" (bug #2956392).
+  * Crash if the user lets DocFetcher index itself and then selects "List Documents" on the created index.
+  * Fixed some minor errors in the manual.
+  * Fixed some errors in the French GUI translation.
+
+=== Changes ===
+  * PDF parser library upgraded (PDFBox 0.8.0 -> 1.0.0).
+  * Folder watching library upgraded (JNotify 0.91 -> 0.92).
+
+
+==== 2010-01-19 - DocFetcher 1.0.2 ====
+
+=== Features ===
+  * Support for the old Excel format (BIFF5 from Excel 5.0/7.0) added. Earlier versions of DocFetcher skipped them with an "Unknown file format" error message.
+  * Support for macro-enabled MS Office 2007 formats added (docm, xlsm, pptm).
+  * The highlighting in the preview panel is now fully implemented.
+  * DocFetcher now indexes some PDF files on which it used to fail with a "No permission to extract text" error message.
+  * The default search includes filenames and a searchable field "filename" has been added (e.g. filename:"dog cat").
+  * Leading wildcards (i.e. search strings starting with * or ?) are allowed.
+
+=== Bugfixes ===
+  * On Linux, there was a subtle window focus problem after the user pressed Enter in the search box.
+  * On Linux, clicking certain buttons didn't work.
+  * Crash window appears while indexing MS Office files (bug #2929639).
+  * Temporary MS Word files are now silently skipped during indexing (bug #2927439).
+  * DocFetcher was unable to display the HTML preview for HTML files (including the DocFetcher manual) if the filepath contained special characters (e.g. ! or ').
+
+=== Changes ===
+  * Deletion of documents via Search Scope context menu disabled by default. You can bring it back by setting AllowRepositoryModification=true in the user.properties file.
+  * The file chooser in the "Create Index..." menu entry now remembers the previously selected folder.
+  * Upgraded indexing library (Apache Lucene).
+
+
+==== 2010-01-06 - DocFetcher 1.0.1 ====
+
+=== Features ===
+  * French GUI translation.
+  * German manual translation.
+  * DocFetcher now runs on KDE.
+  * DocFetcher can be used as a command line text extraction tool (experimental feature). See project wiki for more info: http://sourceforge.net/apps/mediawiki/docfetcher/
+
+=== Bugfixes ===
+  * Bug #2811753: Backslashes in the custom exclusion patterns weren't correctly saved (only one backslash instead of two), thus after restart all backslashes were gone. Also, Unicode characters in the preferences weren't handled correctly.
+  * When the installed Linux version crashed, it unsuccessfully tried to write the stacktrace to /usr/share/docfetcher. This has been corrected to ~/.docfetcher.
+  * Bug #2792186: Crash because DocFetcher was trying to display a message box when there's no active shell.
+  * Bug #2791378: Crash when trying to list file extensions in a directory DocFetcher has no access to.
+  * DocFetcher crashed with an OutOfMemoryError when the progress panel contained too much text.
+  * Bug #2807587: DocFetcher freezed when there were many indexes and/or result items and the user checked or unchecked items on the left panel.
+  * The Linux launch script of the portable version was missing an executable flag.
+  * Bug #2911343 and #2924235: XPCOM error on Linux due to incompatibility between latest version of XULRunner and SWT 3.4. Fixed by upgrading to SWT 3.5.
+  * Bug #2881245 and #2925127: Random Lucene-related crash.
+  * JNotify replaced with newest version, fixes crashes on Windows that occur after removing two or more indexes.
+  * Temporary workaround for bug #2916975 and bug #2829490: DocFetcher could run out of image handles when trying to display too many file icons on the result panel.
+  * Bug #2904322: When the user selects "copy to clipboard" on the error table of the indexing dialog, but no items are selected, DocFetcher crashed.
+  * No daemon-based index updates when indexed folder is inside DocFetcher folder.
+
+=== Changes ===
+  * Feature Request #2788390: With the user.properties entry "AllowRepositoryModification" one can disable all context menu entries that modify the document repositories.
+  * Feature Request #2812668: Option to save the search history on exit.
+  * Sorting of results by title, filename and path takes numberings into account (e.g. file12 > file2).
+  * When DocFetcher crashes, a more informative stacktrace is shown.
+  * Search scope panel displays paths of indexed folders in dark grey.
+  * Default maximum heap size increased to 256 MB. This will make it less likely that DocFetcher runs out of memory during indexing.
+  * Manual updated. Parts of it were moved to the new project wiki: http://sourceforge.net/apps/mediawiki/docfetcher/
+  * All libraries updated (except Apache Lucene).
+
+
+==== 2009-05-12 - DocFetcher 1.0 ====
+
+=== Features ===
+  * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking file references. Also works on CD-ROMs.
+  * Global hotkey: Pressing a certain key combination moves DocFetcher to the front.
+  * DocFetcher can be launched by rightclicking on a folder.
+  * DocFetcher daemon watches indexed folders for changes when DocFetcher isn't running.
+  * NSIS installer internationalized.
+  * Portuguese translation.
+  * Farsi/Persian translation (GUI only).
+  * Highlight color in the preview panel can be changed.
+  * Option on preferences dialog to leave the indexing tabs open even after successful indexing.
+  * Support for SVG files.
+  * Support for MS Office 2007.
+
+=== Bugfixes ===
+  * Very large files weren't fully indexed. Lucene skipped the rest of the file after ~10,000 terms.
+  * Deleting items on the result panel caused it to jump back to the first page.
+  * "Open in external browser" button didn't send DocFetcher to the system tray.
+  * Warning message when the user tries to close the program while an indexing process is still running in the background.
+  * OpenOffice text extraction completed.
+  * Bugfix for bug report #2778204: PreviewPanel threw an IllegalArgumentException when clicking the next/previous occurrence buttons.
+
+=== Changes ===
+  * Manual and other documentation files updated.
+  * DocFetcher won't complain if it has no write permission for its files.
+  * Searches can also be started with the Enter key of the Keypad.
+  * Various GUI modifications: New buttons for changing the GUI layout (flat arrow buttons), "Minimize to system tray" button reintroduced from release 0.9.0, positions of some buttons altered.
+  * GUI optimized for dark desktop themes.
+  * When clicking on the buttons of the indexing configuration dialog to list file extensions, some suggestions are omitted (e.g. ".classpath").
+  * Various library updates.
+  * Stacktrace window displays more information; stacktrace is also written to a file.
+  * Improved look of system tray icon on Linux.
+  * Java 1.6.0 or higher required.
+  * New context menu items in the search scope panel: "Check All" and "Uncheck All".
+  * Search Scope context menu entry "Remove orphaned indexes".
+  * Much faster installation of debian package.
+  * Debian package accepts OpenJDK 6 as JRE.
+  * Windows 98 not supported anymore; references to it have been updated.
+  * Folder in Search Scope is expanded or collapsed if it has subfolders and the user doubleclicks on it.
+
+
+==== 2008-10-28 - DocFetcher 0.9.5.1 ====
+
+=== Bugfixes ===
+  * The width of the filter panel became smaller if the program was terminated in maximized state.
+  * The maximization state of the program window was not restored correctly on restart.
+  * On Linux, the system tray icon was too small and lacked transparency.
+
+=== Changes ===
+  * Some minor changes to the manual.
+  * On Windows, the GUI is much easier on the eyes now when the Windows classic theme is used.
+
+
+==== 2008-10-06 - DocFetcher 0.9.5 ====
+
+=== Features ===
+  * New squirrel mascot.
+  * File type filter panel has context menu entries "Check All", "Uncheck All" and "Invert Selection".
+  * Result tabs dropped in favor of new window layout that integrates better with the new preview window.
+  * Various file system operations can be performed on the document repository through DocFetcher.
+  * Menu item "List indexed documents" added to the context menu of the search scope panel.
+  * Preview panel added.
+  * Embedded Mozilla browser (XULRunner) available on Windows and Linux.
+  * Indexing jobs can be queued.
+  * Indexing jobs can be configured separately (e.g. regex-based file exclusion).
+  * Option to automatically send the program to the system tray after opening a file.
+  * Windows-Installer, created with NSIS.
+  * Debian package for Linux.
+  * Support for Microsoft Excel, Microsoft PowerPoint and Microsoft Visio documents added.
+  * Support for Microsoft CHM Helpfiles added.
+  * Support for AbiWord documents added.
+
+=== Bugfixes ===
+  * Moving around or renaming the program folder resulted in losing existing indexes.
+  * Linux launch script didn't work when run outside the DocFetcher folder. 
+  * Program could crash with a java.net.UnknownHostException while trying to create an index folder.
+  * Program crashed when an invalid query syntax like "roam~10" was entered.
+  * Doesn't crash anymore when running out of memory while parsing (just shows a parse error now).
+  * HTML pairing didn't work under special circumstances.
+  * Parser testbox could crash with an OutOfMemoryError.
+  * Program refused to index a folder named "foo12" if there was already a folder named "foo1" due to an oversimplified intersection detection mechanism.
+  * Some MS Word documents caused the program to crash.
+  
+=== Changes ===
+  * Manual and Readme.txt updated.
+  * All libraries updated.
+  * Website up and running: http://docfetcher.sourceforge.net
+  * On program start unused index folders will be deleted.
+  * Added some key accelerators to the Search Scope panel (e.g. F5).
+  * The items in the file type and search scope panel are deselected when these panels lose focus. 
+  * When clicking on the location bar of the browser, the entire address is selected.
+  * The embedded browser has an 'open in external browser' button.
+  * The 'go' and the 'home' button on the embedded browser have been removed.
+  * When clicking on the checkbox of an item in the search scope panel, a "deep" checking is performed instead of a "flat" checking.  
+  * Searches are performed on all existing indexes regardless of their check states.
+  * "Minimize to system tray" button removed; the shell's minimize button can be used instead.
+  * "Author" column added to the result panel.
+  * Program folder renamed from "DocFetcher x.x.x" to "DocFetcher-x.x.x".
+  * Keyboard layout changed.
+  * Layout of this file altered.
+  * Warning about invalid search strings are displayed in a message box instead of the status line.
+  * New preferences window.
+  * New Windows executable (created with Launch4J).
+  * Parse errors that occur during indexing are shown in a separate panel.
+  * Customized order and widths of result panel colums are stored when exiting the program.
+  * More feedback on running indexing processes.
+  * Parser testbox can parse HTML files.
+  * DocFetcher displays in the task bar how many indexing jobs are left.
+  * Much faster update of the result panel after changes in the filter settings.
+  * The created index folders follow a simpler naming pattern.
+  * The entries of the user.properties file are sorted alphabetically.
+  * Option to customize the location of the indexes eliminated.
+  * Deleted index folders or indexed documents won't be filtered out anymore.
+
+
+==== 2007-10-16 - DocFetcher 0.9.0 ====
+
+=== Features ===
+  * DocFetcher runs on Linux/GTK.
+  * User documentation restructured.
+  * Preference dialog added.
+  * Support for OpenDocument Calc, Draw and Impress files added (both document and template types).
+  * Support for Microsoft Word documents added.
+  * Support for Rich Text Format documents added.
+  * HTML files and their associated folders are processed as single documents.
+  * "Index New Files" operation replaced by "Update Index" operation, which includes removing missing files and reindexing files that have been modified.
+  * Automatic index update on file system events (optional, only for Windows and Linux).
+  * Indexing Box is resizable and stores its size.
+  * Basic web browser capabilities.
+  * Context menu of search area contains an "Open Directory" entry.
+  * Context menu on tabs.
+  * Context menu on result lists.
+  * The storage location of the indexes can be changed.
+  * Most textboxes in the application support the CTRL + A key to select all the text in the widget.
+  * DocFetcher can be minimized to the system tray.
+
+=== Bugfixes ===
+  * Crash when closing the indexing box via the shell's close button while an indexing process was running.
+  * Crash when searching for very generic terms like "s*".
+  * Search scope items whose underlying folders have been deleted are now filtered out.
+
+=== Changes ===
+  * ChangeLog added (this file).
+  * Higher resolution of the windows executable icon.
+  * Text on search scope context menu changed.
+  * Design of the menu items on the top right has been altered.
+  * Parser Testbox also accepts URI path strings.
+  * DocFetcher can be minimized during an indexing process by clicking on the minimize button of the indexing box.
+  * File "ScopeRegistry.ser" moved to indexes folder.
+  * File "ParserRegistry.ser" removed.
+  * The search process runs in a separate thread.
+
+
+==== 2007-08-22 - DocFetcher 0.8.0 ====
+
+First Release
