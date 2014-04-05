@@ -62,10 +62,10 @@
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/xz-utils/xz-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec/commons-codec-1.8.jar" sourcepath="lib/commons-codec/commons-codec-1.8-sources.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-3.10-beta1-20130628.jar" sourcepath="lib/poi/poi-src-3.10-beta1-20130628-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.10-beta1-20130628.jar" sourcepath="lib/poi/poi-src-3.10-beta1-20130628-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.10-beta1-20130628.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.10-beta1-20130628.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/poi/poi-3.10-FINAL-20140208.jar" sourcepath="lib/poi/poi-3.10-FINAL-20140208-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.10-FINAL-20140208.jar" sourcepath="lib/poi/poi-3.10-FINAL-20140208-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.10-FINAL-20140208.jar" sourcepath="lib/poi/poi-3.10-FINAL-20140208-src-stripped.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
