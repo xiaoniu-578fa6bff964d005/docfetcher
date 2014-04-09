@@ -31,6 +31,7 @@ public enum TestFiles {
 	html ("test.html"),
 	doc ("testWORD-Tika.doc"),
 	docx ("testWORD-Tika.docx"),
+	read_write_xls ("file-requiring-read-write-mode.xlsx"),
 	archive_zip_rar_7z ("zip-rar-7z.zip"),
 	truezip_compat_rar ("check-truezip-compatibility/test.rar.zip/test.rar"),
 	truezip_compat_7z ("check-truezip-compatibility/test.7z.zip/test.7z"),
