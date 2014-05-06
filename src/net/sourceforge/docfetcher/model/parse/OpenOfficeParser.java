@@ -114,6 +114,9 @@ abstract class OpenOfficeParser extends FileParser {
 			// Collect content.xml entries
 			List<ZipEntry> contentEntries = new ArrayList<ZipEntry>();
 			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
+			if (contentZipEntry == null) { // bug #741
+				throw new ParseException("This document contains no content.xml file.");
+			}
 			contentEntries.add(contentZipEntry);
 			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 			while (zipEntries.hasMoreElements()) {
