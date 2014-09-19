@@ -135,10 +135,8 @@ public final class IndexRegistry {
 		 * have already been loaded. */
 		if (analyzer == null) {
 			if (ProgramConf.Int.Analyzer.get() == 1) {
-				System.out.println("choosing source code analyzer");
 				analyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
 			} else {
-				System.out.println("choosing standard analyzer");
 				analyzer = new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);
 			}
 		}
