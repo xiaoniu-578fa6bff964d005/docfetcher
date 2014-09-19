@@ -202,7 +202,7 @@ public final class UtilModel {
 		QueryParser parser = new QueryParser(
 				IndexRegistry.LUCENE_VERSION,
 				Fields.CONTENT.key(),
-				IndexRegistry.analyzer
+				IndexRegistry.getAnalyzer()
 		);
 		Query queryObject = parser.parse(query);
 		TopDocs topDocs = searcher.search(queryObject, Integer.MAX_VALUE);

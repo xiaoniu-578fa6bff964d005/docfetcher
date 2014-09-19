@@ -493,7 +493,7 @@ public final class Searcher {
 	private static QueryWrapper createQuery(@NotNull String queryString)
 			throws SearchException {
 		PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
-			IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.analyzer);
+			IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
 		queryParser.setAllowLeadingWildcard(true);
 		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE;
 		queryParser.setMultiTermRewriteMethod(rewriteMethod);

@@ -41,7 +41,7 @@ public final class IndexWriterAdapter implements Closeable {
 	@NotNull private IndexWriter writer;
 
 	public IndexWriterAdapter(@NotNull Directory luceneDir) throws IOException {
-		writer = new IndexWriter(luceneDir, IndexRegistry.analyzer, MaxFieldLength.UNLIMITED);
+		writer = new IndexWriter(luceneDir, IndexRegistry.getAnalyzer(), MaxFieldLength.UNLIMITED);
 	}
 
 	// may throw OutOfMemoryError
@@ -75,7 +75,7 @@ public final class IndexWriterAdapter implements Closeable {
 		 */
 		Directory indexDir = writer.getDirectory();
 		Closeables.closeQuietly(writer);
-		writer = new IndexWriter(indexDir, IndexRegistry.analyzer, MaxFieldLength.UNLIMITED);
+		writer = new IndexWriter(indexDir, IndexRegistry.getAnalyzer(), MaxFieldLength.UNLIMITED);
 		throw new CheckedOutOfMemoryError(e);
 	}
 

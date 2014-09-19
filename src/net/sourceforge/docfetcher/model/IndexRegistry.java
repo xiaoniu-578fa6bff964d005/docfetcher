@@ -84,8 +84,7 @@ public final class IndexRegistry {
 	@VisibleForPackageGroup
 	public static final Version LUCENE_VERSION = Version.LUCENE_30;
 
-	@VisibleForPackageGroup
-	public static final Analyzer analyzer = localAnalyzer();
+	private static Analyzer analyzer = null;
 	
 	@Nullable
 	public static volatile File indexPathOverride = null;
@@ -130,11 +129,20 @@ public final class IndexRegistry {
 	private final OutlookMailFactory outlookMailFactory;
 	private final BlockingWrapper<Searcher> searcher = new BlockingWrapper<Searcher>();
 
-	private static Analyzer localAnalyzer() {
-		if (ProgramConf.Int.Analyzer.get() == 1)
-			return new SourceCodeAnalyzer(LUCENE_VERSION);
-		else
-			return new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);
+	@NotNull
+	public static Analyzer getAnalyzer() {
+		/* The analyzer is created lazily to ensure that the program settings
+		 * have already been loaded. */
+		if (analyzer == null) {
+			if (ProgramConf.Int.Analyzer.get() == 1) {
+				System.out.println("choosing source code analyzer");
+				analyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
+			} else {
+				System.out.println("choosing standard analyzer");
+				analyzer = new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);
+			}
+		}
+		return analyzer;
 	}
 
 	public IndexRegistry(	@NotNull File indexParentDir,

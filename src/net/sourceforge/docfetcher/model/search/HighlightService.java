@@ -174,7 +174,7 @@ public final class HighlightService {
 			 * This has a return value, but we ignore it since we only want the
 			 * offsets. Might throw an OutOfMemoryError.
 			 */
-			highlighter.getBestFragment(IndexRegistry.analyzer, key, text);
+			highlighter.getBestFragment(IndexRegistry.getAnalyzer(), key, text);
 		}
 		catch (OutOfMemoryError e) {
 			throw new CheckedOutOfMemoryError(e);
