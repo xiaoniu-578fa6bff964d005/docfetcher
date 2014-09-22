@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.util.Util;
@@ -264,8 +265,16 @@ final class FileExtensionChooser {
 				
 				exts.add(ext);
 			}
-			else if (file.isDirectory() && ! Util.isJunctionOrSymlink(file))
-				listExtensions(exts, file);
+			else if (file.isDirectory()) {
+				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()) {
+					if (!Util.isJunctionOrSymlink(file)) {
+						listExtensions(exts, file);
+					}
+				}
+				else {
+					listExtensions(exts, file);
+				}
+			}
 		}
 	}
 

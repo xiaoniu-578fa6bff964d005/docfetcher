@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.TreeNode;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
@@ -69,7 +70,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				if (skip(fileOrDir))
 					continue;
-				if (Util.isJunctionOrSymlink(fileOrDir))
+				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get() && Util.isJunctionOrSymlink(fileOrDir))
 					continue;
 				isFile = fileOrDir.isFile();
 			}
@@ -107,7 +108,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 			try {
 				if (Util.isSymLink(fileOrDir))
 					continue;
-				if (Util.isJunctionOrSymlink(fileOrDir))
+				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get() && Util.isJunctionOrSymlink(fileOrDir))
 					continue;
 				isFile = fileOrDir.isFile();
 			}

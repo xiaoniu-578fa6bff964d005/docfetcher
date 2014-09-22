@@ -112,3 +112,8 @@ ReportObsoleteIndexFiles = true
 # want to speed up indexing by completely avoiding the unpacking of tar
 # archives.
 SkipTarArchives = false
+
+# Whether DocFetcher should follow or ignore NTFS junctions and symlinks during
+# indexing. Normally, DocFetcher ignores them in order to avoid getting stuck
+# in circular folder structures.
+IgnoreJunctionsAndSymlinks = true
