@@ -56,6 +56,7 @@ public final class ProgramConf {
 		IndexExcelFormulas (true),
 		SkipTarArchives (false),
 		IgnoreJunctionsAndSymlinks (true),
+		SaveSettings (true),
 		;
 
 		private boolean value;

@@ -374,7 +374,7 @@ public final class Application {
 		 * Try to save the settings. This may not be possible, for example when
 		 * the user has burned the program onto a CD-ROM.
 		 */
-		if (settingsConfFile.canWrite()) {
+		if (ProgramConf.Bool.SaveSettings.get() && settingsConfFile.canWrite()) {
 			try {
 				String comment = SettingsConf.loadHeaderComment();
 				ConfLoader.save(settingsConfFile, SettingsConf.class, comment);
