@@ -50,7 +50,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/pegdown/asm-all-3.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/java-libpst/java-libpst.0.7.jar" sourcepath="lib/java-libpst/java-libpst-0.7.src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-memory-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
@@ -67,5 +66,6 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.10-FINAL-20140208.jar" sourcepath="lib/poi/poi-3.10-FINAL-20140208-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.10-FINAL-20140208.jar" sourcepath="lib/poi/poi-3.10-FINAL-20140208-src-stripped.zip"/>
+	<classpathentry kind="lib" path="lib/java-libpst/java-libpst-0.8.1.jar" sourcepath="lib/java-libpst/java-libpst-0.8.1-src-stripped.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
