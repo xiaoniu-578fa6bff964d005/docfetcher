@@ -43,6 +43,7 @@
 	- builds a Mac OS X disk image
 	- must run build.py first
 	- must be run on Linux
+	- requires program mkfs.hfsplus (try package hfsprogs on Ubuntu)
 	- output is in the "build" folder
 - build-daemon.xml:
 	- Ant file for building the DocFetcher daemon
