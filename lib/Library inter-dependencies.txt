@@ -4,3 +4,8 @@ Known dependencies between the various libraries used:
 - TrueZIP depends on Commons Compress, Tukaani XZ Utils
 - Apache POI depends on Commons Codec
 - Apache PDFBox depends on Commons Logging
+
+Additionally, PDFBox will crash with NoClassDefFoundErrors on encrypted PDF
+files when using a version of bcmail and bcprov (Bouncy Castle libraries) that
+is newer than 1.46. This is apparently due to changes in the API of bcmail and
+bcprov.

@@ -29,8 +29,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.4.1.jar" sourcepath="lib/commons-compress/commons-compress-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/guava/guava-12.0.jar" sourcepath="lib/guava/guava-12.0-sources.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk15on-147.jar"/>
-	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk15on-147.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-49_1.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-file-7.7.5-sources.jar"/>
@@ -65,5 +63,7 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.11-beta2-20140822.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.11-beta2-20140822.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.11-beta2-20140822.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk15on-1.46.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk15on-1.46.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
