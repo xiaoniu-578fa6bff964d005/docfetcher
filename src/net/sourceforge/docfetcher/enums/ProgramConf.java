@@ -106,6 +106,7 @@ public final class ProgramConf {
 
 	public static enum Str implements Loadable {
 		AppName ("DocFetcher"),
+		TextEncodingOverride (""),
 		;
 
 		private String value;

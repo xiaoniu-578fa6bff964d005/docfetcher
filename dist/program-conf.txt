@@ -120,3 +120,14 @@ SkipTarArchives = false
 # indexing. Normally, DocFetcher ignores them in order to avoid getting stuck
 # in circular folder structures.
 IgnoreJunctionsAndSymlinks = true
+
+# Plain text files (e.g. files with extension ".txt") don't contain any explicit
+# text encoding information, so when DocFetcher parses them, it has to use
+# heuristics to determine the encoding. This might not always give the correct
+# result; if that happens, you can use this setting to disable the heuristics
+# and specify the text encoding manually. For example, set this setting's value
+# to "GBK" for Simplified Chinese GBK encoding. For a list of available
+# encodings, see:
+# http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html
+# If the above link doesn't work, google for "java supported encodings".
+TextEncodingOverride =

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 
 /**
@@ -32,6 +33,7 @@ public final class TextParser extends StreamParser {
 	protected ParseResult parse(InputStream in,
 	                            ParseContext context) throws ParseException {
 		try {
+			CharsetDetectorHelper.charsetOverride = ProgramConf.Str.TextEncodingOverride.get().trim();
 			String contents = CharsetDetectorHelper.toString(in);
 			return new ParseResult(contents);
 		}

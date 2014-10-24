@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Properties;
 
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -32,6 +33,8 @@ import com.google.common.io.Files;
  * @author Tran Nam Quang
  */
 public final class CharsetDetectorHelper {
+	
+	@NotNull public static String charsetOverride = "";
 	
 	@Nullable private static UniversalDetector charsetDetector;
 	
@@ -68,6 +71,14 @@ public final class CharsetDetectorHelper {
 	@NotThreadSafe
 	public static String toString(@NotNull byte[] bytes)
 			throws IOException {
+		if (!charsetOverride.trim().isEmpty()) {
+			try {
+				return new String(bytes, charsetOverride.trim());
+			} catch (UnsupportedCharsetException e) {
+				throw new IOException("Charset not found: " + charsetOverride.trim());
+			}
+		}
+		
 		if (charsetDetector == null)
 			charsetDetector = new UniversalDetector(null);
 		
