@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.model;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -429,7 +431,11 @@ public final class IndexRegistry {
 			FileLock lock = fin.getChannel().lock(0, Long.MAX_VALUE, true);
 			LuceneIndex index;
 			try {
-				in = new ObjectInputStream(fin);
+				/*
+				 * Without this BufferedInputStream, there can be noticeable
+				 * performance problems if the index resides on a network drive.
+				 */
+				in = new ObjectInputStream(new BufferedInputStream(fin));
 				index = (LuceneIndex) in.readObject();
 			}
 			finally {
@@ -519,7 +525,11 @@ public final class IndexRegistry {
 				FileOutputStream fout = new FileOutputStream(serFile);
 				FileLock lock = fout.getChannel().lock();
 				try {
-					out = new ObjectOutputStream(fout);
+					/*
+					 * Without this BufferedOutputStream, there can be noticeable
+					 * performance problems if the index resides on a network drive.
+					 */
+					out = new ObjectOutputStream(new BufferedOutputStream(fout));
 					out.writeObject(index);
 				}
 				finally {
