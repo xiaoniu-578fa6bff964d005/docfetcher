@@ -112,7 +112,7 @@ public final class ResultPanel {
 		};
 		
 		// Open result document on double-click
-		Table table = viewer.getControl();
+		final Table table = viewer.getControl();
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				launchSelection();
@@ -125,6 +125,8 @@ public final class ResultPanel {
 					launchSelection();
 				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'c')
 					copyToClipboard();
+				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'a')
+					table.selectAll();
 			}
 		});
 		
