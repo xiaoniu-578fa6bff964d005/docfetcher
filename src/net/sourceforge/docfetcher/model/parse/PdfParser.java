@@ -25,6 +25,8 @@ import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 /**
@@ -60,6 +62,7 @@ public final class PdfParser extends StreamParser {
 				throw new ParseException(e);
 			}
 			StringWriter writer = new StringWriter();
+			final StringBuilder annotations = new StringBuilder();
 			
 			/*
 			 * If the PDF file is encrypted, the PDF stripper will automatically
@@ -74,8 +77,27 @@ public final class PdfParser extends StreamParser {
 					context.getReporter().subInfo(getCurrentPageNo(), pageCount);
 				}
 				protected void endPage(PDPage page) throws IOException {
-					if (context.getCancelable().isCanceled())
+					if (context.getCancelable().isCanceled()) {
 						setEndPage(0);
+						return;
+					}
+					for (PDAnnotation a : page.getAnnotations()) {
+						if (a instanceof PDAnnotationMarkup) {
+							PDAnnotationMarkup annot = (PDAnnotationMarkup) a;
+							String title = annot.getTitlePopup();
+							String subject = annot.getSubject();
+							String contents = annot.getContents();
+							if (title != null) {
+								annotations.append(title + " ");
+							}
+							if (subject != null) {
+								annotations.append(subject + " ");
+							}
+							if (contents != null) {
+								annotations.append(contents + " ");
+							}
+						}
+					}
 				}
 			};
 			stripper.setForceParsing(true);
@@ -90,6 +112,9 @@ public final class PdfParser extends StreamParser {
 				 */
 				throw new ParseException(e);
 			}
+			
+			writer.write(" ");
+			writer.write(annotations.toString());
 
 			return new ParseResult(writer.getBuffer()).setTitle(
 				pdInfo.getTitle())
