@@ -1,5 +1,7 @@
 @echo off
 
+cd %~dp0
+
 set libclasspath=
 
 for %%f in (.\lib\*.jar) do (call :append_classpath %%f)
