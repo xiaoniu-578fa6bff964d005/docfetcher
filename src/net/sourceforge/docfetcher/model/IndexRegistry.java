@@ -35,11 +35,13 @@ import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems.OverflowIndex;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
 import net.sourceforge.docfetcher.model.search.SourceCodeTokenizer;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.CallOnce;
@@ -354,8 +356,13 @@ public final class IndexRegistry {
 					 * 1.1 beta 1 through DocFetcher 1.1 beta 6, because the
 					 * serialization version UID was changed after 1.1 beta 6.
 					 */
-					if (!loadIndex(serFile))
-						loadingProblems.addObsoleteFile(file);
+					try {
+						if (!loadIndex(serFile)) {
+							loadingProblems.addObsoleteFile(file);
+						}
+					} catch (StackOverflowError e) {
+						loadingProblems.addOverflowIndex(new OverflowIndex(file, e));
+					}
 				}
 				else if (!serFile.exists()) {
 					/*
@@ -535,6 +542,10 @@ public final class IndexRegistry {
 				finally {
 					lock.release();
 				}
+			}
+			catch (StackOverflowError e) {
+				AppUtil.showError("Couldn't save index '" + index.getDisplayName() + "': Folder hierarchy "
+						+ "is too deep! Please reduce the folder depth and rebuild the index.", true, false);
 			}
 			catch (IOException e) {
 				Util.printErr(e); // The average user doesn't need to know

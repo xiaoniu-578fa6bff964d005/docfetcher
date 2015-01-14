@@ -46,6 +46,7 @@ import net.sourceforge.docfetcher.model.Daemon;
 import net.sourceforge.docfetcher.model.FolderWatcher;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
+import net.sourceforge.docfetcher.model.IndexLoadingProblems.OverflowIndex;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
@@ -571,6 +572,15 @@ public final class Application {
 							msg.append(Msg.index.format(indexName));
 							msg.append("\n");
 							msg.append(Msg.error.format(errorMsg));
+						}
+						AppUtil.showError(msg.toString(), true, false);
+					}
+					if (!loadingProblems.getOverflowIndexes().isEmpty()) {
+						StringBuilder msg = new StringBuilder(Msg.folder_hierarchy_too_deep_on_loading.get());
+						msg.append("\n");
+						for (OverflowIndex index : loadingProblems.getOverflowIndexes()) {
+							msg.append("\n");
+							msg.append(index.file.getName());
 						}
 						AppUtil.showError(msg.toString(), true, false);
 					}

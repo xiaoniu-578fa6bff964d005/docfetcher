@@ -27,6 +27,7 @@ public final class IndexLoadingProblems {
 	
 	private final List<File> obsoleteFiles = new LazyList<File>();
 	private final List<CorruptedIndex> corruptedIndexes = new LazyList<CorruptedIndex>();
+	private final List<OverflowIndex> overflowIndexes = new LazyList<OverflowIndex> ();
 	
 	IndexLoadingProblems() {
 	}
@@ -39,6 +40,10 @@ public final class IndexLoadingProblems {
 		corruptedIndexes.add(Util.checkNotNull(index));
 	}
 	
+	void addOverflowIndex(@NotNull OverflowIndex index) {
+		overflowIndexes.add(Util.checkNotNull(index));
+	}
+	
 	@NotNull
 	public List<File> getObsoleteFiles() {
 		return Collections.unmodifiableList(obsoleteFiles);
@@ -47,6 +52,11 @@ public final class IndexLoadingProblems {
 	@NotNull
 	public List<CorruptedIndex> getCorruptedIndexes() {
 		return Collections.unmodifiableList(corruptedIndexes);
+	}
+	
+	@NotNull
+	public List<OverflowIndex> getOverflowIndexes() {
+		return Collections.unmodifiableList(overflowIndexes);
 	}
 	
 	/**
@@ -60,6 +70,21 @@ public final class IndexLoadingProblems {
 								@NotNull IOException ioException) {
 			this.index = Util.checkNotNull(index);
 			this.ioException = Util.checkNotNull(ioException);
+		}
+	}
+	
+	/**
+	 * An index that couldn't be loaded during initialization due to a
+	 * StackOverflowError.
+	 */
+	public static final class OverflowIndex {
+		@NotNull public final File file;
+		@NotNull public final StackOverflowError error;
+		
+		public OverflowIndex(	@NotNull File file,
+								@NotNull StackOverflowError error) {
+			this.file = Util.checkNotNull(file);
+			this.error = Util.checkNotNull(error);
 		}
 	}
 

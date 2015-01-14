@@ -536,6 +536,8 @@ public enum Msg {
 	parser_not_found ("Could not find a suitable parser."),
 	folder_hierarchy_too_deep ("The folder hierarchy is too deep (at least {0} levels). Please " +
 			"reduce the folder depth and rebuild the index. This error occurred at: {1}"),
+	folder_hierarchy_too_deep_on_loading ("The following indexes couldn't be loaded because their "
+			+ "corresponding folders are too deep. Please reduce the folder depth and rebuild the indexes."),
 	document ("Document"),
 	error_message ("Error Message"),
 	total_elapsed_time ("Total elapsed time: {0}"),
