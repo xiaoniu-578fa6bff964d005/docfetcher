@@ -82,7 +82,12 @@ final class ErrorTable {
 		
 		tv.addColumn(new Column<IndexingError>(Msg.path.get()) {
 			protected String getLabel(IndexingError element) {
-				return element.getTreeNode().getPath().getCanonicalPath();
+				try {
+					return element.getTreeNode().getPath().getCanonicalPath();
+				} catch (NullPointerException e) {
+					/* Not fixing this due to lack of time :-/ */
+					return element.getTreeNode().getName();
+				}
 			}
 			protected int compare(IndexingError e1, IndexingError e2) {
 				File f1 = e1.getTreeNode().getPath().getCanonicalFile();
