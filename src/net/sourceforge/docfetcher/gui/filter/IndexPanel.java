@@ -90,8 +90,8 @@ public final class IndexPanel {
 	private final DialogFactory dialogFactory;
 	private final Set<ViewNode> nodesToBeAdded = new HashSet<ViewNode>();
 	
-	@NotNull private MenuAction updateIndexAction;
-	@NotNull private MenuAction removeIndexAction;
+	@Nullable private MenuAction updateIndexAction;
+	@Nullable private MenuAction removeIndexAction;
 
 	public IndexPanel(	@NotNull final Composite parent,
 						@NotNull final IndexRegistry indexRegistry) {
@@ -490,7 +490,7 @@ public final class IndexPanel {
 		tree.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.F5) {
-					if (updateIndexAction.isEnabled()
+					if (updateIndexAction != null && updateIndexAction.isEnabled()
 							&& ProgramConf.Bool.AllowIndexUpdate.get())
 						updateIndexAction.run();
 				}
@@ -500,7 +500,7 @@ public final class IndexPanel {
 							tree.getShell(), indexRegistry, dialogFactory);
 				}
 				else if (e.keyCode == SWT.DEL) {
-					if (removeIndexAction.isEnabled()
+					if (removeIndexAction != null && removeIndexAction.isEnabled()
 							&& ProgramConf.Bool.AllowIndexDeletion.get())
 						removeIndexAction.run();
 				}
