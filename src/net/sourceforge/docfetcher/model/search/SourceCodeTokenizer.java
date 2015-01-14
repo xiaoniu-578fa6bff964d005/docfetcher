@@ -1,12 +1,10 @@
 package net.sourceforge.docfetcher.model.search;
 
 import java.io.Reader;
+
 import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.util.Version;
 
-/**
- *
- */
 public final class SourceCodeTokenizer extends CharTokenizer {
 
 	/**
@@ -20,15 +18,13 @@ public final class SourceCodeTokenizer extends CharTokenizer {
 		super(matchVersion, in);
 	}
 
-	/** Collects only characters which do not satisfy
-	 * {@link Character#isWhitespace(int)}.
-	 *  or ='.' or ='=' ...
+	/**
+	 * Collects only characters which can be part of an identifier in typical
+	 * programming languages.
 	 */
 	@Override
 	protected boolean isTokenChar(int c) {
-		return !(Character.isWhitespace(c) || (c=='.') || (c=='=') || (c=='"') 
-				|| (c=='<') || (c=='>') || (c=='(') || (c==')')
-				|| (c=='[') || (c==']') || (c=='/') || (c=='\\')
-				|| (c=='{') || (c=='}') || (c=='+') || (c=='*'));
+	    return Character.isLetterOrDigit(c) || (c=='_');
 	}
+	
 }
