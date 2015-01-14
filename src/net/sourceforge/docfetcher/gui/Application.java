@@ -73,6 +73,7 @@ import net.sourceforge.docfetcher.util.gui.dialog.InfoDialog;
 import net.sourceforge.docfetcher.util.gui.dialog.ListConfirmDialog;
 import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
+import org.apache.lucene.index.MergePolicy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -365,6 +366,12 @@ public final class Application {
 	private static void handleCrash(@NotNull Throwable t) {
 		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(t), OutOfMemoryError.class)) {
 			UtilGui.showOutOfMemoryMessage(shell, e);
+			return;
+		}
+		if (t instanceof MergePolicy.MergeException) {
+			String msg = t.getMessage();
+			msg += "\n\nPlease ensure no other programs are accessing or locking the index files.";
+			AppUtil.showError(msg, true, false);
 			return;
 		}
 		AppUtil.showStackTrace(t);
