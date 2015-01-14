@@ -15,13 +15,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
+import net.sourceforge.docfetcher.enums.Msg;
+
 import com.drew.imaging.jpeg.JpegMetadataReader;
-import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-
-import net.sourceforge.docfetcher.enums.Msg;
 
 /**
  * @author Paulos Siahu
@@ -46,7 +45,7 @@ final class ExifParser extends StreamParser {
 					sb.append(tag.getDescription()).append("\n");
 				}
 			}
-		} catch (JpegProcessingException e) {
+		} catch (Exception e) {
 			throw new ParseException(e);
 		}
 		return new ParseResult(sb.toString());
@@ -64,7 +63,7 @@ final class ExifParser extends StreamParser {
 					sb.append("  Tag " + tag.getTagName() + " = " + tag.getDescription() + "\n");
 				}
 			}
-		} catch (JpegProcessingException e) {
+		} catch (Exception e) {
 			throw new ParseException(e);
 		}
 		return sb.toString();
