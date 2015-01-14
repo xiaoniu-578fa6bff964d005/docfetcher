@@ -55,10 +55,6 @@ InitialSorting = 0
 # OutOfMemoryError while searching.
 MaxResultsTotal = 10000
 
-# Web interface: The maximum number of search results to display on a single
-# page. (Note: The web interface is not available yet.)
-WebInterfacePageSize = 50
-
 # The height of the regex table on the indexing dialog, measured (approximately)
 # in number of visible rows.
 PatternTableHeight = 4

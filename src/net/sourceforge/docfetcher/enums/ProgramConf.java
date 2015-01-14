@@ -76,7 +76,6 @@ public final class ProgramConf {
 		MaxLinesInProgressPanel (1000, 2),
 		SearchBoxMaxWidth (200, 0),
 		MaxResultsTotal (10000, 1),
-		WebInterfacePageSize (50, 1),
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),
 		Analyzer (0, 0),
