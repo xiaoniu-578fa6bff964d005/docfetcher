@@ -264,7 +264,7 @@ public final class ResultDocument {
 						);
 					}
 					catch (CheckedOutOfMemoryError e) {
-						throw e.getOutOfMemoryError();
+						throw new OutOfMemoryError(e.getMessage());
 					}
 					pageHandler.handlePage(string);
 					if (pageHandler.isStopped()) stop();

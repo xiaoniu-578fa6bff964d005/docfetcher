@@ -53,6 +53,13 @@ public final class IndexWriterAdapter implements Closeable {
 		catch (OutOfMemoryError e) {
 			reopenWriterAndThrow(e);
 		}
+		catch (IllegalStateException e) {
+			if (e.getMessage().contains("OutOfMemoryError")) {
+				reopenWriterAndThrow(e);
+			} else {
+				throw e;
+			}
+		}
 	}
 
 	// may throw OutOfMemoryError
@@ -64,9 +71,16 @@ public final class IndexWriterAdapter implements Closeable {
 		catch (OutOfMemoryError e) {
 			reopenWriterAndThrow(e);
 		}
+		catch (IllegalStateException e) {
+			if (e.getMessage().contains("OutOfMemoryError")) {
+				reopenWriterAndThrow(e);
+			} else {
+				throw e;
+			}
+		}
 	}
 	
-	private void reopenWriterAndThrow(@NotNull OutOfMemoryError e)
+	private void reopenWriterAndThrow(@NotNull Throwable t)
 			throws IOException, CheckedOutOfMemoryError {
 		/*
 		 * According to the IndexWriter javadoc, we're supposed to immediately
@@ -76,7 +90,7 @@ public final class IndexWriterAdapter implements Closeable {
 		Directory indexDir = writer.getDirectory();
 		Closeables.closeQuietly(writer);
 		writer = new IndexWriter(indexDir, IndexRegistry.getAnalyzer(), MaxFieldLength.UNLIMITED);
-		throw new CheckedOutOfMemoryError(e);
+		throw new CheckedOutOfMemoryError(t);
 	}
 
 	public void delete(@NotNull String uid) throws IOException {

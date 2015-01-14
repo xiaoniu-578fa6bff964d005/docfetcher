@@ -19,18 +19,9 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 public final class CheckedOutOfMemoryError extends Exception {
 	
 	private static final long serialVersionUID = 1L;
-	
-	private final OutOfMemoryError e;
 
-	public CheckedOutOfMemoryError(@NotNull OutOfMemoryError e) {
-		super(e);
-		this.e = e;
-		Util.checkNotNull(e);
-	}
-	
-	@NotNull
-	public OutOfMemoryError getOutOfMemoryError() {
-		return e;
+	public CheckedOutOfMemoryError(@NotNull Throwable t) {
+		super(Util.checkNotNull(t));
 	}
 
 }
