@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/junrar/java-unrar-0.3.jar" sourcepath="lib/junrar/java-unrar-0.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/javolution/javolution-5.5.1.jar" sourcepath="lib/javolution/javolution-5.5.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/mime-util/mime-util-2.1.3.jar" sourcepath="lib/mime-util/mime-util-2.1.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging/commons-logging-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j/slf4j-nop-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/jna/jna-3.2.7.jar" sourcepath="lib/jna/jna-3.2.7-src.zip"/>
@@ -52,18 +51,19 @@
 	<classpathentry kind="lib" path="lib/metadata-extractor/metadata-extractor-2.6.4.jar"/>
 	<classpathentry kind="lib" path="lib/metadata-extractor/xmpcore.jar"/>
 	<classpathentry kind="lib" path="lib/xz-utils/xz-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec/commons-codec-1.8.jar" sourcepath="lib/commons-codec/commons-codec-1.8-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/java-libpst/java-libpst-0.8.1.jar" sourcepath="lib/java-libpst/java-libpst-0.8.1-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/pdfbox/fontbox-1.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/jempbox-1.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/pdfbox-1.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/poi/ooxml-lib/xmlbeans-2.6.0.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-3.11-beta2-20140822.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.11-beta2-20140822.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.11-beta2-20140822.jar"/>
-	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.11-beta2-20140822.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcmail-jdk15on-1.46.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/bcprov-jdk15on-1.46.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging/commons-logging-1.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.11-20141221.jar"/>
+	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.11-20141221.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
