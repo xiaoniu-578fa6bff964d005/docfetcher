@@ -35,7 +35,11 @@ final class UtilParser {
 	public static Source getSource(ZipFile file, String entryPath) throws IOException, ParseException {
 		ZipEntry entry = file.getEntry(entryPath);
 		if (entry == null) {
-			throw new ParseException(Msg.file_corrupted.get());
+			// Apparently, ZipFile.getEntry expects forward slashes even on Windows
+			entry = file.getEntry(entryPath.replace("\\", "/"));
+			if (entry == null) {
+				throw new ParseException(Msg.file_corrupted.get());
+			}
 		}
 		InputStream inputStream = file.getInputStream(entry);
 		Source source = new Source(inputStream);
