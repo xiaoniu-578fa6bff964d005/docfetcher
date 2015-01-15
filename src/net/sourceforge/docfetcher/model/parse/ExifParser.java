@@ -45,7 +45,7 @@ final class ExifParser extends StreamParser {
 					sb.append(tag.getDescription()).append("\n");
 				}
 			}
-		} catch (Exception e) {
+		} catch (Exception e) { // Catching all exceptions since library throws a lot of them
 			throw new ParseException(e);
 		}
 		return new ParseResult(sb.toString());
@@ -63,7 +63,7 @@ final class ExifParser extends StreamParser {
 					sb.append("  Tag " + tag.getTagName() + " = " + tag.getDescription() + "\n");
 				}
 			}
-		} catch (Exception e) {
+		} catch (Exception e) { // Catching all exceptions since library throws a lot of them
 			throw new ParseException(e);
 		}
 		return sb.toString();
