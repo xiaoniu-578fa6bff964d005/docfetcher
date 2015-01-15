@@ -50,12 +50,6 @@ Unterstützte Datei-Formate
 * Microsoft Visio (vsd)
 * Scalable Vector Graphics (svg)
 
-Was manche Leute von diesem Programm halten...
-==============================================
-${awards_table}
-
-DocFetcher hat zudem gute Benutzer-Wertungen auf [unserer SourceForge.net-Seite](http://sourceforge.net/projects/docfetcher/reviews) erhalten.
-
 Vergleich mit anderen Desktop-Suchprogrammen
 ============================================
 Im Vergleich zu anderen Desktop-Suchprogrammen zeichnet sich DocFetcher auf folgende Weisen aus:

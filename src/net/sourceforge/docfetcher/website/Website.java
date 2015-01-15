@@ -169,13 +169,6 @@ public final class Website {
 		
 		String html = UtilGlobal.replace(path, template, "${contents}", htmlBody);
 		
-		// Insert awards table on main page
-		if (file.getName().equals("index.markdown")) {
-			File awardsFile = new File(websiteDir, "awards.html");
-			String awardsTable = CharsetDetectorHelper.toString(awardsFile);
-			html = UtilGlobal.replace(path, html, "${awards_table}", awardsTable);
-		}
-		
 		// Insert version number; must be done after inserting the markdown
 		String versionKey = "${version}";
 		if (html.contains(versionKey))
