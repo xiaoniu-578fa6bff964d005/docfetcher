@@ -125,13 +125,19 @@ public final class EpubParser extends FileParser {
 			final int spineCount = spinePaths.size();
 			int i = 1;
 			for (String spinePath : spinePaths) {
-				context.getReporter().subInfo(i, spineCount);
-				Source spineSource = UtilParser.getSource(zipFile, spinePath);
+				final Source spineSource;
+				try {
+					spineSource = UtilParser.getSource(zipFile, spinePath);
+				} catch (ParseException e) {
+					// Ignore missing spine files
+					continue;
+				}
 				Element bodyEl = spineSource.getNextElement(0, HTMLElementName.BODY);
 				if (bodyEl == null) {
 					// See bug #682
 					continue;
 				}
+				context.getReporter().subInfo(i, spineCount);
 				if (!first) {
 					contents.append("\n\n");
 				}
