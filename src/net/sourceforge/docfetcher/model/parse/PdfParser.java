@@ -81,21 +81,30 @@ public final class PdfParser extends StreamParser {
 						setEndPage(0);
 						return;
 					}
-					for (PDAnnotation a : page.getAnnotations()) {
-						if (a instanceof PDAnnotationMarkup) {
-							PDAnnotationMarkup annot = (PDAnnotationMarkup) a;
-							String title = annot.getTitlePopup();
-							String subject = annot.getSubject();
-							String contents = annot.getContents();
-							if (title != null) {
-								annotations.append(title + " ");
+					try {
+						for (PDAnnotation a : page.getAnnotations()) {
+							if (a instanceof PDAnnotationMarkup) {
+								PDAnnotationMarkup annot = (PDAnnotationMarkup) a;
+								String title = annot.getTitlePopup();
+								String subject = annot.getSubject();
+								String contents = annot.getContents();
+								if (title != null) {
+									annotations.append(title + " ");
+								}
+								if (subject != null) {
+									annotations.append(subject + " ");
+								}
+								if (contents != null) {
+									annotations.append(contents + " ");
+								}
 							}
-							if (subject != null) {
-								annotations.append(subject + " ");
-							}
-							if (contents != null) {
-								annotations.append(contents + " ");
-							}
+						}
+					} catch (IOException e) {
+						if (e.getMessage().startsWith("Error: Unknown annotation type")) {
+							// Ignore unsupported annotations
+							System.err.println(e.getMessage());
+						} else {
+							throw e;
 						}
 					}
 				}
