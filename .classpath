@@ -30,12 +30,6 @@
 	<classpathentry kind="lib" path="lib/guava/guava-12.0.jar" sourcepath="lib/guava/guava-12.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-49_1.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-file-7.7.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-tar-7.7.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.7.5.jar" sourcepath="lib/truezip/truezip-driver-zip-7.7.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.7.5.jar" sourcepath="lib/truezip/truezip-file-7.7.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.7.5.jar" sourcepath="lib/truezip/truezip-kernel-7.7.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.7.5.jar" sourcepath="lib/truezip/truezip-swing-7.7.5-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
 	<classpathentry kind="lib" path="lib/chm4j/chm4j.jar">
@@ -65,5 +59,11 @@
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.11-20141221.jar"/>
 	<classpathentry kind="lib" path="lib/metadata-extractor/metadata-extractor-2.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/metadata-extractor/xmpcore-5.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-file-7.7.7.jar" sourcepath="lib/truezip/truezip-driver-file-7.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-tar-7.7.7.jar" sourcepath="lib/truezip/truezip-driver-tar-7.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-driver-zip-7.7.7.jar" sourcepath="lib/truezip/truezip-driver-zip-7.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-file-7.7.7.jar" sourcepath="lib/truezip/truezip-file-7.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-kernel-7.7.7.jar" sourcepath="lib/truezip/truezip-kernel-7.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/truezip/truezip-swing-7.7.7.jar" sourcepath="lib/truezip/truezip-swing-7.7.7-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
