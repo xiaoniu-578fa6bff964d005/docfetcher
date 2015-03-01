@@ -10,8 +10,6 @@ do
    CLASSPATH=${CLASSPATH}:${FILE}
 done
 
-if [ $(lsb_release -is) = "Ubuntu" ] && [ $XDG_CURRENT_DESKTOP = "Unity" ]; then
-	export SWT_GTK3=0
-fi
+export SWT_GTK3=0
 
 java -enableassertions -Xmx512m -Xss2m -cp ".:${CLASSPATH}" -Djava.library.path="lib" ${main_class} "$@"
