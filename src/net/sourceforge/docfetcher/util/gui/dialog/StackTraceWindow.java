@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class StackTraceWindow {
 	
+	public static int windowCount = 0;
+	
 	private Shell shell;
 	private Link label;
 	private Text text;
@@ -73,10 +75,12 @@ public class StackTraceWindow {
 	public void open() {
 		Util.setCenteredBounds(shell, 400, 400); // Don't store shell size
 		shell.open();
+		windowCount++;
 		while (! shell.isDisposed()) {
 			if (! shell.getDisplay().readAndDispatch())
 				shell.getDisplay().sleep();
 		}
+		windowCount--;
 	}
 
 }

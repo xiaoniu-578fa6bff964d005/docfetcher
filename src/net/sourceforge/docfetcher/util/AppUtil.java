@@ -450,9 +450,8 @@ public final class AppUtil {
 	public static void showStackTraceInOwnDisplay(Throwable throwable) {
 		checkConstInitialized();
 		ensureNoDisplay();
-		
 		Display display = new Display();
-		showStackTrace(display, throwable);
+		showStackTrace(display, throwable, null);
 		display.dispose();
 	}
 
@@ -469,11 +468,29 @@ public final class AppUtil {
 	public static void showStackTrace(Throwable throwable) {
 		checkConstInitialized();
 		ensureDisplay();
-		
-		showStackTrace(Display.getDefault(), throwable);
+		showStackTrace(Display.getDefault(), throwable, null);
+	}
+	
+	/**
+	 * Prints the stacktrace to {@link System.err} and to a stacktrace file. In
+	 * addition to that, the stacktrace is displayed in an error window. The
+	 * printouts for the file and the error window are prepended with some
+	 * useful debug information about the program.
+	 * <p>
+	 * The file argument can be used to indicate that the crash was caused by a
+	 * specific file.
+	 * <p>
+	 * It is safe to call this method from a non-GUI thread. The method should
+	 * not be called before the first display has been created. In the latter case
+	 * {@link #showStackTraceOnStart} should be used instead.
+	 */
+	public static void showStackTrace(Throwable throwable, @Nullable File file) {
+		checkConstInitialized();
+		ensureDisplay();
+		showStackTrace(Display.getDefault(), throwable, file);
 	}
 
-	private static void showStackTrace(final Display display, final Throwable throwable) {
+	private static void showStackTrace(final Display display, final Throwable throwable, @Nullable File file) {
 		// Print stacktrace to System.err
 		throwable.printStackTrace();
 
@@ -495,6 +512,9 @@ public final class AppUtil {
 		};
 		for (String key : keys)
 			sb.append(key + "=" + System.getProperty(key) + Util.LS);
+		if (file != null) {
+			sb.append("file=" + file.getPath() + Util.LS);
+		}
 
 		// Get stacktrace as string
 		StringWriter writer = new StringWriter();

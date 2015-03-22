@@ -43,12 +43,16 @@ import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeCalcPar
 import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeDrawParser;
 import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeImpressParser;
 import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeWriterParser;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.Immutable;
 import net.sourceforge.docfetcher.util.annotations.MutableCopy;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
+
+import org.eclipse.swt.widgets.Display;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
@@ -108,7 +112,7 @@ public final class ParseService {
 		if (!Util.IS_MAC_OS_X && !Util.IS_64_BIT_JVM)
 			parsers.add(new ChmParser());
 	}
-
+	
 	private ParseService() {}
 	
 	@Immutable
@@ -246,7 +250,7 @@ public final class ParseService {
 	@NotNull
 	private static ParseResult doParse(	@NotNull IndexingConfig config,
 										@NotNull Parser parser,
-										@NotNull File file,
+										@NotNull final File file,
 										@NotNull ParseContext context)
 			throws ParseException, CheckedOutOfMemoryError {
 		try {
@@ -314,6 +318,18 @@ public final class ParseService {
 			}
 			String parserName = parser.getClass().getSimpleName();
 			return result.setParserName(parserName);
+		}
+		catch (final RuntimeException e) {
+			// Show stacktrace, but keep indexing. Referencing the GUI from here
+			// is bad coding practice, but the easiest solution.
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					if (StackTraceWindow.windowCount < 1) {
+						AppUtil.showStackTrace(e, file);
+					}
+				}
+			});
+			throw new ParseException(e);
 		}
 		catch (OutOfMemoryError e) {
 			throw new CheckedOutOfMemoryError(e);
