@@ -24,6 +24,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JRuntimeException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackageProperties;
@@ -142,7 +143,13 @@ abstract class MSOffice2007Parser extends FileParser {
 			throw new ParseException(e);
 		}
 		finally {
-			Closeables.closeQuietly(pkg);
+			try {
+				Closeables.closeQuietly(pkg);
+			} catch (OpenXML4JRuntimeException e2) {
+				// Bug in POI 3.12 beta 1 and earlier, see:
+				// http://stackoverflow.com/questions/28593223/apache-poi-opcpackage-unable-to-save-jasper-report-generated-xlsx
+				// Remove this workaround once POI has been upgraded.
+			}
 		}
 	}
 	
