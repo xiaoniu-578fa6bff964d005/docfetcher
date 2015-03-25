@@ -193,6 +193,7 @@ public final class Application {
 		}
 		catch (IOException e1) {
 			// Ignore
+			e1.printStackTrace();
 		}
 		
 		/*
