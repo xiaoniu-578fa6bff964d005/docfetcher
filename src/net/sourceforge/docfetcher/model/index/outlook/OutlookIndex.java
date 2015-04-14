@@ -91,6 +91,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 		rootFolder.setError(null);
 		IndexWriterAdapter writer = null;
 		
+		PSTFile pstFile = null;
 		try {
 			/*
 			 * Return immediately if the last-modified field of the PST file
@@ -106,7 +107,7 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 			OutlookContext context = new OutlookContext(
 					getConfig(), writer, reporter, cancelable
 			);
-			PSTFile pstFile = new PSTFile(rootFile.getPath());
+			pstFile = new PSTFile(rootFile.getPath());
 			visitFolder(context, rootFolder, pstFile.getRootFolder());
 			
 			simplifiedRootFolder = new TreeRootSimplifier<MailFolder> () {
@@ -133,6 +134,9 @@ public final class OutlookIndex extends TreeIndex<MailDocument, MailFolder> {
 			report(reporter, e.getIOException());
 		}
 		finally {
+			if (pstFile != null) {
+				Closeables.closeQuietly(pstFile.getFileHandle());
+			}
 			Closeables.closeQuietly(writer);
 			reporter.setEndTime(System.currentTimeMillis());
 		}
