@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.model.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -20,6 +22,7 @@ import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import com.google.common.io.Closeables;
@@ -42,7 +45,8 @@ final class UtilParser {
 			}
 		}
 		InputStream inputStream = file.getInputStream(entry);
-		Source source = new Source(inputStream);
+		Reader reader = new StringReader(CharsetDetectorHelper.toString(inputStream));
+		Source source = new Source(reader);
 		Closeables.closeQuietly(inputStream);
 		source.setLogger(null);
 		return source;
