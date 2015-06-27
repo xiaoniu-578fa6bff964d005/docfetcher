@@ -35,6 +35,14 @@ final class UtilParser {
 	private UtilParser() {
 	}
 	
+	// does charset detection
+	// does not close the given InputStream
+	public static Source getSource(InputStream in) throws IOException {
+		Reader reader = new StringReader(CharsetDetectorHelper.toString(in));
+		Source source = new Source(reader);
+		return source;
+	}
+	
 	public static Source getSource(ZipFile file, String entryPath) throws IOException, ParseException {
 		ZipEntry entry = file.getEntry(entryPath);
 		if (entry == null) {
@@ -45,8 +53,7 @@ final class UtilParser {
 			}
 		}
 		InputStream inputStream = file.getInputStream(entry);
-		Reader reader = new StringReader(CharsetDetectorHelper.toString(inputStream));
-		Source source = new Source(reader);
+		Source source = getSource(inputStream);
 		Closeables.closeQuietly(inputStream);
 		source.setLogger(null);
 		return source;

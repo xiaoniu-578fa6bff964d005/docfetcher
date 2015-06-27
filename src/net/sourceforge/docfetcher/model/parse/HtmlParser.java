@@ -45,7 +45,7 @@ public final class HtmlParser extends StreamParser {
 	                         	ParseContext context) throws ParseException {
 		Source source;
 		try {
-			source = new Source(in);
+			source = UtilParser.getSource(in);
 		}
 		catch (IOException e) {
 			throw new ParseException(e);
@@ -95,7 +95,7 @@ public final class HtmlParser extends StreamParser {
 	protected String renderText(InputStream in, String filename)
 			throws ParseException {
 		try {
-			Source source = new Source(in);
+			Source source = UtilParser.getSource(in);
 			source.setLogger(null);
 			return source.getRenderer().setIncludeHyperlinkURLs(false).toString();
 		}
