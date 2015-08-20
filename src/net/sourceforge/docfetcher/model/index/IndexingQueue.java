@@ -269,11 +269,19 @@ public final class IndexingQueue {
 	@ThreadSafe
 	private void assertValidRegistryState(	@NotNull IndexRegistry indexRegistry,
 											@NotNull Task task) {
-		LuceneIndex luceneIndex = task.getLuceneIndex();
-		List<LuceneIndex> indexes = indexRegistry.getIndexes();
-		boolean registered = indexes.contains(luceneIndex);
-		boolean isUpdate = task.is(IndexAction.UPDATE);
-		assert registered == isUpdate;
+		/* Not sure if readLock is necessary here. Added tentatively to see if
+		 * it fixes the AssertionError in the line below. */
+		readLock.lock();
+		try {
+			LuceneIndex luceneIndex = task.getLuceneIndex();
+			List<LuceneIndex> indexes = indexRegistry.getIndexes();
+			boolean registered = indexes.contains(luceneIndex);
+			boolean isUpdate = task.is(IndexAction.UPDATE);
+			assert registered == isUpdate : registered;
+		}
+		finally {
+			readLock.unlock();
+		}
 	}
 
 	// Returns whether the task was added
