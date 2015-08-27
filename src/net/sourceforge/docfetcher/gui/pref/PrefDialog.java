@@ -146,18 +146,21 @@ public final class PrefDialog {
 
 		Label spacing2 = new Label(comp, SWT.NONE);
 		spacing2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-
-		if (ProgramConf.Bool.ShowAdvancedSettingsLink.get()) {
-			Link link = new Link(comp, SWT.NONE);
-			link.setText("<a>" + Msg.advanced_settings_link.get() + "</a>");
-			link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
-			link.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					Util.launch(programConfFile);
-				}
-			});
-		}
+		
+		Link link = new Link(comp, SWT.NONE);
+		link.setText("<a>" + Msg.advanced_settings_link.get() + "</a>");
+		link.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false));
+		link.setVisible(ProgramConf.Bool.ShowAdvancedSettingsLink.get());
+		link.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Util.launch(programConfFile);
+			}
+		});
+		
+		Label javaVersionLabel = new Label(comp, SWT.NONE);
+		javaVersionLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, true, false));
+		javaVersionLabel.setText(System.getProperty("java.version"));
+		javaVersionLabel.setVisible(SettingsConf.Bool.ShowJavaVersion.get());
 
 		return comp;
 	}

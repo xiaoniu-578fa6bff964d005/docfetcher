@@ -91,6 +91,7 @@ public final class SettingsConf {
 		AutoScrollToFirstMatch (true),
 		CloseToTray (false), // Default must be 'false' since system tray not supported on Ubuntu Unity
 		AllowOnlyOneInstance (false),
+		ShowJavaVersion (false),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();
