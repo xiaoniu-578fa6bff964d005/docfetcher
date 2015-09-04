@@ -135,6 +135,13 @@ public final class IndexingQueue {
 			}
 			if (shutdown)
 				return false;
+			
+			/* This assertion must be run while we're still holding the lock.
+			 * The assertion will fail under bad timing if it's run without the
+			 * lock or with a reacquired lock. This has to do with interactions
+			 * between user-triggered index deletions and automatic index
+			 * updating. */
+			assertValidRegistryState(indexRegistry, task);
 		}
 		catch (InterruptedException e) {
 			// Do not interrupt this thread, call Condition.signal*() instead.
@@ -143,9 +150,7 @@ public final class IndexingQueue {
 		finally {
 			writeLock.unlock();
 		}
-
-		assertValidRegistryState(indexRegistry, task);
-
+		
 		// Indexing
 		task.set(TaskState.INDEXING);
 		LuceneIndex luceneIndex = task.getLuceneIndex();
@@ -266,22 +271,14 @@ public final class IndexingQueue {
 		return null;
 	}
 
-	@ThreadSafe
+	@NotThreadSafe
 	private void assertValidRegistryState(	@NotNull IndexRegistry indexRegistry,
 											@NotNull Task task) {
-		/* Not sure if readLock is necessary here. Added tentatively to see if
-		 * it fixes the AssertionError in the line below. */
-		readLock.lock();
-		try {
-			LuceneIndex luceneIndex = task.getLuceneIndex();
-			List<LuceneIndex> indexes = indexRegistry.getIndexes();
-			boolean registered = indexes.contains(luceneIndex);
-			boolean isUpdate = task.is(IndexAction.UPDATE);
-			assert registered == isUpdate : registered;
-		}
-		finally {
-			readLock.unlock();
-		}
+		LuceneIndex luceneIndex = task.getLuceneIndex();
+		List<LuceneIndex> indexes = indexRegistry.getIndexes();
+		boolean registered = indexes.contains(luceneIndex);
+		boolean isUpdate = task.is(IndexAction.UPDATE);
+		assert registered == isUpdate : registered;
 	}
 
 	// Returns whether the task was added
