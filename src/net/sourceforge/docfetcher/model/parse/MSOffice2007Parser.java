@@ -139,6 +139,27 @@ abstract class MSOffice2007Parser extends FileParser {
 				.addMiscMetadata(keywords)
 				.addMiscMetadata(subject);
 		}
+		catch (NoSuchMethodError e) {
+			if (e.getMessage().contains("XMLEventFactory.newFactory")) {
+				/*
+				 * This crash started occuring after upgrading POI from
+				 * 3.11-beta2 to 3.11 in DocFetcher 1.1.13. The crash happens
+				 * with Java runtimes older than Java 1.6.0_18.
+				 * 
+				 * First bug report:
+				 * https://sourceforge.net/p/docfetcher/bugs/902/
+				 * 
+				 * Further discussion:
+				 * http://stackoverflow.com/questions/26866398/nosuchmethoderror
+				 * -in-main-thread-while-reading-xlsx-using-apache-poi
+				 */
+				String msg = "Outdated Java version. Please upgrade to Java 1.6.0 Update 18 or newer.";
+				throw new ParseException(msg, e);
+			}
+			else {
+				throw e;
+			}
+		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
