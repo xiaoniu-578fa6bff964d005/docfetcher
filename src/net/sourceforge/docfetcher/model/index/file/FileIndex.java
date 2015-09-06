@@ -255,8 +255,15 @@ public final class FileIndex extends TreeIndex<FileDocument, FileFolder> {
 										@NotNull final FileFolder folder,
 										@NotNull final File dirOrZip)
 			throws IndexingException {
-		assert dirOrZip.isDirectory();
 		assert !folder.hasErrors();
+		
+		/*
+		 * The user may have deleted the directory in the meantime. See for
+		 * example: https://sourceforge.net/p/docfetcher/bugs/1004
+		 */
+		if (!dirOrZip.isDirectory()) {
+			return;
+		}
 		
 		/*
 		 * The user may have indexed the DocFetcher folder; do not descend into
