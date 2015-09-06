@@ -312,9 +312,16 @@ public final class IndexPanel {
 				dialogFactory.open();
 
 				for (LuceneIndex index : sel) {
-					Rejection rejection = queue.addTask(index, action);
-					if (action == IndexAction.REBUILD)
-						assert rejection == null;
+					queue.addTask(index, action);
+					
+					/*
+					 * The following assertion is sometimes false, although it's
+					 * not exactly clear why. See for example:
+					 * http://sourceforge.net/p/docfetcher/bugs/988/
+					 */
+//					Rejection rejection = queue.addTask(index, action);
+//					if (action == IndexAction.REBUILD)
+//						assert rejection == null;
 				}
 			}
 		}
