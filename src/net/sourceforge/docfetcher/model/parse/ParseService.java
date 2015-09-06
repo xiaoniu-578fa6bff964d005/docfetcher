@@ -350,7 +350,9 @@ public final class ParseService {
 			throws ParseException, CheckedOutOfMemoryError {
 		Util.checkThat(! (file instanceof TFile));
 		if (parserName.equals(FILENAME_PARSER)) {
-			assert config.isIndexFilenames();
+			/* For whatever reason, this assertion can be false sometimes. See
+			 * for example: http://sourceforge.net/p/docfetcher/bugs/922/ */
+//			assert config.isIndexFilenames();
 			return "";
 		}
 		
