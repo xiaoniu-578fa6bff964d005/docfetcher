@@ -124,14 +124,39 @@ public final class IndexingQueue {
 	
 	// returns whether the loop should continue
 	private boolean threadLoop() {
+		List<Task> fireRemovedOrphaned = new LinkedList<Task>();
+		
 		// Wait for next task
 		Task task;
 		writeLock.lock();
 		try {
 			task = getReadyTask();
+			
+			// See comment below
+			if (task != null && task.is(IndexAction.UPDATE)
+					&& !indexRegistry.getIndexes().contains(
+						task.getLuceneIndex())) {
+				tasks.remove(task);
+				fireRemovedOrphaned.add(task);
+				task = null;
+			}
+			
 			while (task == null && !shutdown) {
 				readyTaskAvailable.await();
 				task = getReadyTask();
+				
+				/* Special case: Sometimes an index is reloaded from disk after
+				 * external changes to the tree index. If that happens, and if
+				 * the index has just been scheduled for updating, the updating
+				 * task will become "orphaned". These orphaned tasks must be
+				 * ignored, otherwise the assertion below will fail. */
+				if (task != null && task.is(IndexAction.UPDATE)
+						&& !indexRegistry.getIndexes().contains(
+							task.getLuceneIndex())) {
+					tasks.remove(task);
+					fireRemovedOrphaned.add(task);
+					task = null;
+				}
 			}
 			if (shutdown)
 				return false;
@@ -236,6 +261,10 @@ public final class IndexingQueue {
 		
 		if (fireRemoved)
 			evtRemoved.fire(task);
+		
+		for (Task task1 : fireRemovedOrphaned) {
+			evtRemoved.fire(task1);
+		}
 		
 		task.evtFinished.fire(hasErrors);
 		
