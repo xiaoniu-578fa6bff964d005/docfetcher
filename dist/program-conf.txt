@@ -50,9 +50,14 @@ SearchBoxMaxWidth = 200
 # second column, but in reversed order".
 InitialSorting = 0
 
-# Desktop interface: The maximum number of search results to return for each
-# query. If you set a value that is too high, DocFetcher may crash with an
-# OutOfMemoryError while searching.
+# The maximum number of search results to return for each query. If you set a
+# value that is too high, DocFetcher may crash with an OutOfMemoryError while
+# searching.
+# This setting is primarily used for capping memory consumption and search time
+# when dealing with very large indexes. It is not recommended to use this
+# setting for trimming down the the results, since a low value for this setting
+# will cause DocFetcher to try to pick an equal number of results from each
+# index (rather than picking the highest-scoring results across all indexes).
 MaxResultsTotal = 10000
 
 # The height of the regex table on the indexing dialog, measured (approximately)
