@@ -139,6 +139,26 @@ abstract class MSOffice2007Parser extends FileParser {
 				.addMiscMetadata(keywords)
 				.addMiscMetadata(subject);
 		}
+		catch (NoClassDefFoundError e) {
+			if (e.getMessage().contains("Could not initialize class")) {
+				/*
+				 * This crash seems to have surfaced after the crash in the next
+				 * exception handler was surpressed, starting with DocFetcher
+				 * 1.1.16. This crash is probably also related to the POI
+				 * upgrade to 3.11, and upgrading the Java runtime also fixes
+				 * it.
+				 * 
+				 * First bug reports:
+				 * https://sourceforge.net/p/docfetcher/bugs/1059/
+				 * https://sourceforge.net/p/docfetcher/bugs/1068/
+				 */
+				String msg = "Outdated Java version. Please upgrade to Java 1.6.0 Update 18 or newer.";
+				throw new ParseException(msg, e);
+			}
+			else {
+				throw e;
+			}
+		}
 		catch (NoSuchMethodError e) {
 			if (e.getMessage().contains("XMLEventFactory.newFactory")) {
 				/*
