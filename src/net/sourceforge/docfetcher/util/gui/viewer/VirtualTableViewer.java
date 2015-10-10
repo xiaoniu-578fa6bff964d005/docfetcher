@@ -186,18 +186,14 @@ public abstract class VirtualTableViewer<E> {
 	
 	@MutableCopy
 	@NotNull
-	@SuppressWarnings("unchecked")
 	public final List<E> getSelection() {
-		TableItem[] selection = table.getSelection();
-		List<E> selElements = new ArrayList<E>(selection.length);
-		for (TableItem item : selection) {
-			E element = (E) item.getData();
-			/*
-			 * Bug #3532164: Not sure why, but the item data can be null
-			 * sometimes. Possibly an SWT bug.
-			 */
-			if (element != null)
-				selElements.add(element);
+		/* Note that we must use table.getSelectionIndices here, rather than
+		 * table.getSelection, since on a virtual table some TableItems may
+		 * still be uninitialized. */
+		int[] selIndices = table.getSelectionIndices();
+		List<E> selElements = new ArrayList<E>(selIndices.length);
+		for (int index : selIndices) {
+			selElements.add(elements.get(index));
 		}
 		return selElements;
 	}
