@@ -186,7 +186,22 @@ public final class IndexPanel {
 			public void update(final FolderEvent eventData) {
 				Util.runSwtSafe(tree, new Runnable() {
 					public void run() {
-						viewer.add(eventData.parent, eventData.folder);
+						if (eventData.parent.getParent() == null) {
+							/*
+							 * Ugly hack: If a folder directly beneath a root
+							 * folder was added, the viewer.add method wants the
+							 * LuceneIndex as parent, not the parent folder.
+							 */
+							for (ViewNode elem : viewer.getElements()) {
+								if (elem instanceof LuceneIndex
+										&& ((LuceneIndex) elem).getRootFolder() == eventData.parent) {
+									viewer.add(elem, eventData.folder);
+									break;
+								}
+							}
+						} else {
+							viewer.add(eventData.parent, eventData.folder);
+						}
 						nodesToBeAdded.remove(eventData.folder);
 					}
 				});
