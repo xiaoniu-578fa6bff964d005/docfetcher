@@ -98,8 +98,15 @@ public final class UtilModel {
 		if (Util.IS_WINDOWS) {
 			String d1 = Util.getDriveLetter(Util.USER_DIR_PATH);
 			String d2 = Util.getDriveLetter(absPath);
-			if (!d1.equals(d2))
-				return absPath;
+			// If a drive letter is null on Windows, we're probably dealing with
+			// a network path.
+			if (d1 == null) {
+				if (d2 != null)
+					return absPath;
+			} else {
+				if (!d1.equals(d2))
+					return absPath;
+			}
 		}
 		return UtilModel.getRelativePath(Util.USER_DIR_PATH, absPath);
 	}
