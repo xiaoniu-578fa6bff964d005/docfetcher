@@ -462,5 +462,9 @@ public final class ParseService {
 			Closeables.closeQuietly(in);
 		}
 	}
+	
+	static org.apache.tika.parser.ParseContext tikaContext() {
+		return new org.apache.tika.parser.ParseContext();
+	}
 
 }

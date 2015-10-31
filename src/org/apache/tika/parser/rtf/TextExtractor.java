@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  * it should give better perf, by replacing the excessive
  * "else if" string compares with FSA traversal. */
 
-final public class TextExtractor {
+final class TextExtractor {
 
     private static final Charset ASCII = Charset.forName("US-ASCII");
     private static final Charset WINDOWS_1252 = getCharset("WINDOWS-1252");

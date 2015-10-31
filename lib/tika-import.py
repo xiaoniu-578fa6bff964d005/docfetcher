@@ -29,6 +29,7 @@ core_packages = """
 """
 parser_root = "tika-parsers/src/main/java/org/apache/tika"
 parser_packages = """
+	parser/mp3
 	parser/rtf
 """
 files_to_delete = """
@@ -36,10 +37,6 @@ files_to_delete = """
 	JackcessExtractor.java
 	JackcessParser.java
 	TikaActivator.java
-"""
-public_visibility = """
-	parser/rtf/RTFEmbObjHandler.java
-	parser/rtf/TextExtractor.java
 """
 
 # A stripped-down version of org.apache.tika.parser.microsoft.OfficeParser.
@@ -167,25 +164,6 @@ dst_path = osp.join(dst_root, "parser/microsoft/POIFSContainerDetector.java")
 with open(src_path, "r") as f_src:
 	with open(dst_path, "w") as f_dst:
 		f_dst.write(f_src.read())
-
-# Set class visibility to public
-for path in [x.strip() for x in public_visibility.strip().split("\n")]:
-	name = osp.splitext(osp.basename(path))[0]
-	dst_path = osp.join(dst_root, path)
-	contents = ""
-	with open(dst_path, "r") as f:
-		contents = f.read()
-	contents = contents.replace( \
-		"class " + name, \
-		"public class " + name, 1)
-	contents = contents.replace( \
-		"final class " + name, \
-		"public final class " + name, 1)
-	contents = contents.replace( \
-		"protected " + name + "(", \
-		"public " + name + "(", 1)
-	with open(dst_path, "w") as f:
-		f.write(contents)
 
 # Remove files
 delete_set = set((x.strip() for x in files_to_delete.strip().split("\n")))

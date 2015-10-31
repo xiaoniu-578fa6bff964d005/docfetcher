@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
  * with {sp {sn} {sv}} types of data.  This information
  * sometimes contains the name and even full file path of the original file.
  */
-public class RTFEmbObjHandler {
+class RTFEmbObjHandler {
 
     private static final String EMPTY_STRING = "";
     private final ContentHandler handler;
@@ -78,7 +78,7 @@ public class RTFEmbObjHandler {
     private StringBuilder sb = new StringBuilder();
     private Metadata metadata;
     private EMB_STATE state = EMB_STATE.NADA;
-    public RTFEmbObjHandler(ContentHandler handler, Metadata metadata, ParseContext context) {
+    protected RTFEmbObjHandler(ContentHandler handler, Metadata metadata, ParseContext context) {
         this.handler = handler;
         this.context = context;
         os = new ByteArrayOutputStream();

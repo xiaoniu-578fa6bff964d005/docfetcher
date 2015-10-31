@@ -1,6 +1,5 @@
 package net.sourceforge.docfetcher.model.parse;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,12 +7,12 @@ import java.util.Collection;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.mp3.Mp3Parser;
+import org.apache.tika.sax.BodyContentHandler;
+
 /**
- * <p>Based on ID3 specifications in http://id3.org
- * 
- * <p>Currently only ID3 v2.3 and v2.4 are supported.
- * 
- * @author Paulos Siahu
+ * @author Nam-Quang Tran
  */
 final class MP3Parser extends StreamParser {
 
@@ -23,74 +22,24 @@ final class MP3Parser extends StreamParser {
 	private static final Collection<String> types = Arrays.asList(
 			"audio/mpeg");
 
-	@NotNull
-	private static String extract(@NotNull InputStream in, boolean forViewing)
-			throws IOException, ParseException {
-		StringBuffer sb = new StringBuffer();
-		
-		/*
-		 * Check if the file starts with the ID3 identifier.
-		 */
-		byte[] data = new byte[10];
-		long pos = in.read(data);
-		if (Arrays.equals(Arrays.copyOfRange(data, 0, 3), new byte[] {0x49, 0x44, 0x33}) == false) { // "ID3"
-			return sb.toString();
-		}
-		long size = 0;
-		for (int i=6; i<10; i++) {
-			size = (size << 7) + data[i];  // synchsafe integer only uses 7 bits of each byte.
-		}
-		
-		for (int safeCount=0; (pos < size) && (safeCount<100); safeCount++) {
-			int bytesRead = in.read(data);
-			if (bytesRead < 0) break;
-			pos += bytesRead;
-			byte[] id = Arrays.copyOfRange(data, 0, 4);
-			if (Arrays.equals(id, new byte[] {0x0, 0x0, 0x0, 0x0})) { // End
-				break;
-			}
-			int textlength = ((data[4]&0xFF) << 24) | ((data[5]&0xFF) << 16) | ((data[6]&0xFF) << 8) | (data[7]&0xFF);
-			String tagID = new String(id);
-			if ((tagID.startsWith("T") || tagID.equals("COMM"))
-					&& (tagID.equals("TXXX") == false)) {
-				byte[] text = new byte[textlength-1];
-				bytesRead = in.read();
-				if (bytesRead < 0) break;
-				pos++;
-				bytesRead = in.read(text);
-				if (bytesRead < 0) break;
-				pos += bytesRead;
-				sb.append((forViewing ? tagID+"=" : "") + new String(text) + "\n");
-			} else {
-				pos += in.skip(textlength);
-			}
-		}
-		
-		return sb.toString();
-	}
-	
 	@Override
 	protected ParseResult parse(InputStream in, ParseContext context)
 			throws ParseException {
-		String text = "";
 		try {
-			text = extract(in, false);
+			return new ParseResult(extract(in, false));
 		} catch (Exception e) {
 			throw new ParseException(e);
 		}
-		return new ParseResult(text);
 	}
 	
 	@Override
 	protected String renderText(InputStream in, String filename)
 			throws ParseException {
-		String text = "";
 		try {
-			text = extract(in, true);
+			return extract(in, true);
 		} catch (Exception e) {
 			throw new ParseException(e);
 		}
-		return text;
 	}
 
 	@Override
@@ -107,4 +56,14 @@ final class MP3Parser extends StreamParser {
 	public String getTypeLabel() {
 		return Msg.filetype_mp3.get();
 	}
+	
+	@NotNull
+	private static String extract(@NotNull InputStream in, boolean forViewing)
+			throws Exception {
+		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
+		Metadata metadata = new Metadata();
+		new Mp3Parser().parse(in, bodyHandler, metadata, ParseService.tikaContext());
+		return bodyHandler.toString();
+	}
+	
 }

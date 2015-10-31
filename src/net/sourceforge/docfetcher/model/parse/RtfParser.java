@@ -19,10 +19,8 @@ import net.sourceforge.docfetcher.enums.Msg;
 
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
-import org.apache.tika.parser.rtf.RTFEmbObjHandler;
-import org.apache.tika.parser.rtf.TextExtractor;
+import org.apache.tika.parser.rtf.RTFParser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.sax.XHTMLContentHandler;
 
 /**
  * @author Tran Nam Quang
@@ -36,9 +34,8 @@ final class RtfParser extends StreamParser {
 			throws ParseException {
 		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
-		TextExtractor extractor = createExtractor(bodyHandler, metadata);
 		try {
-			extractor.extract(in);
+			new RTFParser().parse(in, bodyHandler, metadata, ParseService.tikaContext());
 			
 			// Use this to get a full list of available metadata:
 //			for (String name : metadata.names()) {
@@ -53,13 +50,6 @@ final class RtfParser extends StreamParser {
 				.addMiscMetadata(metadata.get(Metadata.SUBJECT)) // not equivalent to TikaCoreProperties.KEYWORDS
 				.addMiscMetadata(metadata.get(TikaCoreProperties.KEYWORDS));
 		}
-		catch (AssertionError e) {
-			/*
-			 * With the RTF parser in Tika 0.10, calling TextExtractor.extract
-			 * results in an AssertionError. See bug #3443948.
-			 */
-			throw new ParseException(e);
-		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
@@ -69,9 +59,8 @@ final class RtfParser extends StreamParser {
 			throws ParseException {
 		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
-		TextExtractor extractor = createExtractor(bodyHandler, metadata);
 		try {
-			extractor.extract(in);
+			new RTFParser().parse(in, bodyHandler, metadata, ParseService.tikaContext());
 			return bodyHandler.toString();
 		}
 		catch (Exception e) {
@@ -79,13 +68,6 @@ final class RtfParser extends StreamParser {
 		}
 	}
 	
-	private static TextExtractor createExtractor(BodyContentHandler bodyHandler, Metadata metadata) {
-		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
-		org.apache.tika.parser.ParseContext context = new org.apache.tika.parser.ParseContext();
-		RTFEmbObjHandler embObjHandler = new RTFEmbObjHandler(handler, metadata, context);
-		return new TextExtractor(handler, metadata, embObjHandler);
-	}
-
 	protected Collection<String> getExtensions() {
 		return extensions;
 	}
