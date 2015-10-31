@@ -30,11 +30,13 @@ public final class PagingPdfParserTest {
 	@Test
 	public void testParse() throws ParseException, CheckedOutOfMemoryError {
 		final List<String> pages = new ArrayList<String> (3);
-		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
-			protected void handlePage(String pageText) {
+		PageHandler handler = new PageHandler() {
+			public boolean handlePage(String pageText) {
 				pages.add(pageText);
+				return false;
 			}
-		}.run();
+		};
+		new PagingPdfParser(TestFiles.multi_page_pdf.get(), handler).run();
 		assertEquals(3, pages.size());
 		assertEquals("page 1" + Util.LS, pages.get(0));
 		assertEquals("page 2" + Util.LS, pages.get(1));
@@ -45,12 +47,13 @@ public final class PagingPdfParserTest {
 	public void testParseAndStop() throws ParseException,
 			CheckedOutOfMemoryError {
 		final List<String> pages = new ArrayList<String> (2);
-		new PagingPdfParser(TestFiles.multi_page_pdf.get()) {
-			protected void handlePage(String pageText) {
+		PageHandler handler = new PageHandler() {
+			public boolean handlePage(String pageText) {
 				pages.add(pageText);
-				if (pages.size() >= 2) stop();
+				return pages.size() >= 2;
 			}
-		}.run();
+		};
+		new PagingPdfParser(TestFiles.multi_page_pdf.get(), handler).run();
 		assertEquals(2, pages.size());
 		assertEquals("page 1" + Util.LS, pages.get(0));
 		assertEquals("page 2" + Util.LS, pages.get(1));

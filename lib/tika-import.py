@@ -29,13 +29,15 @@ core_packages = """
 """
 parser_root = "tika-parsers/src/main/java/org/apache/tika"
 parser_packages = """
+	parser/chm
 	parser/mp3
 	parser/rtf
 """
 files_to_delete = """
-	package-info.java
+	ChmParser.java
 	JackcessExtractor.java
 	JackcessParser.java
+	package-info.java
 	TikaActivator.java
 """
 

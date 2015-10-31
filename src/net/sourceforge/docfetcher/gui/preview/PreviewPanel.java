@@ -28,7 +28,7 @@ import net.sourceforge.docfetcher.model.MailResource;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.search.HighlightedString;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
-import net.sourceforge.docfetcher.model.search.ResultDocument.PdfPageHandler;
+import net.sourceforge.docfetcher.model.search.ResultDocument.PreviewPageHandler;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
@@ -164,10 +164,10 @@ public final class PreviewPanel extends Composite {
 			clearPreviews(true, false, false, true);
 			new EmailThread(doc, requestCount).start();
 		}
-		else if (doc.isPdfFile()) {
+		else if (doc.isPdfFile() || doc.isChmFile()) {
 			moveToTop(textPreview);
 			clearPreviews(true, true, true, true);
-			new PdfThread(doc, requestCount).start();
+			new PagingThread(doc, requestCount).start();
 		}
 		else if (doc.isHtmlFile()
 				&& SettingsConf.Bool.PreferHtmlPreview.get()
@@ -389,10 +389,10 @@ public final class PreviewPanel extends Composite {
 		}
 	}
 	
-	private class PdfThread extends PreviewThread {
+	private class PagingThread extends PreviewThread {
 		private volatile boolean isStopped = false;
 		
-		public PdfThread(@NotNull ResultDocument doc, long startCount) {
+		public PagingThread(@NotNull ResultDocument doc, long startCount) {
 			super(doc, startCount);
 		}
 
@@ -439,7 +439,7 @@ public final class PreviewPanel extends Composite {
 			};
 			updater.start();
 			
-			doc.readPdfPages(new PdfPageHandler() {
+			doc.readPages(new PreviewPageHandler() {
 				public void handlePage(HighlightedString pageText) {
 					queue.put(new Item(pageText, false));
 				}

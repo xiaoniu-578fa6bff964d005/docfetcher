@@ -23,7 +23,10 @@ import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
+import net.sourceforge.docfetcher.model.parse.ChmParser;
 import net.sourceforge.docfetcher.model.parse.HtmlParser;
+import net.sourceforge.docfetcher.model.parse.PageHandler;
+import net.sourceforge.docfetcher.model.parse.PagingChmParser;
 import net.sourceforge.docfetcher.model.parse.PagingPdfParser;
 import net.sourceforge.docfetcher.model.parse.ParseException;
 import net.sourceforge.docfetcher.model.parse.ParseService;
@@ -49,7 +52,7 @@ import org.apache.lucene.search.Query;
 @ThreadSafe
 public final class ResultDocument {
 	
-	public interface PdfPageHandler {
+	public interface PreviewPageHandler {
 		public void handlePage(HighlightedString pageText);
 		public boolean isStopped();
 	}
@@ -208,6 +211,10 @@ public final class ResultDocument {
 		return wasParsedBy(PdfParser.class);
 	}
 	
+	public boolean isChmFile() {
+		return wasParsedBy(ChmParser.class);
+	}
+	
 	public boolean isPlainTextFile() {
 		return wasParsedBy(TextParser.class);
 	}
@@ -246,7 +253,7 @@ public final class ResultDocument {
 	}
 	
 	// should be run in a thread
-	public void readPdfPages(@NotNull final PdfPageHandler pageHandler)
+	public void readPages(@NotNull final PreviewPageHandler pageHandler)
 			throws ParseException, FileNotFoundException,
 			CheckedOutOfMemoryError {
 		// TODO i18n of error messages
@@ -255,8 +262,8 @@ public final class ResultDocument {
 		FileResource fileResource = null;
 		try {
 			fileResource = getFileResource();
-			new PagingPdfParser(fileResource.getFile()) {
-				protected void handlePage(String pageText) {
+			PageHandler handler = new PageHandler() {
+				public boolean handlePage(String pageText) {
 					HighlightedString string;
 					try {
 						string = HighlightService.highlight(
@@ -267,9 +274,14 @@ public final class ResultDocument {
 						throw new OutOfMemoryError(e.getMessage());
 					}
 					pageHandler.handlePage(string);
-					if (pageHandler.isStopped()) stop();
+					return pageHandler.isStopped();
 				}
-			}.run();
+			};
+			if (isPdfFile()) {
+				new PagingPdfParser(fileResource.getFile(), handler).run();
+			} else if (isChmFile()) {
+				new PagingChmParser(fileResource.getFile(), handler).run();
+			}
 		}
 		catch (OutOfMemoryError e) {
 			throw new CheckedOutOfMemoryError(e);

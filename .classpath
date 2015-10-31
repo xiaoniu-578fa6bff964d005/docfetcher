@@ -32,11 +32,6 @@
 	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
-	<classpathentry kind="lib" path="lib/chm4j/chm4j.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-1.1/lib/chm4j"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/pegdown/asm-all-3.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-core-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/lucene/lucene-highlighter-3.5.0.jar" sourcepath="lib/lucene/lucene-3.5.0-src-stripped.zip"/>

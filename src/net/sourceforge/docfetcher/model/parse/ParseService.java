@@ -92,6 +92,7 @@ public final class ParseService {
 		new RtfParser(),
 		new SvgParser(),
 		new EpubParser(),
+		new ChmParser(),
 		
 		new OpenOfficeWriterParser(),
 		new OpenOfficeCalcParser(),
@@ -107,11 +108,6 @@ public final class ParseService {
 		new MSExcel2007Parser(),
 		new MSPowerPoint2007Parser()
 	);
-	
-	static {
-		if (!Util.IS_MAC_OS_X && !Util.IS_64_BIT_JVM)
-			parsers.add(new ChmParser());
-	}
 	
 	private ParseService() {}
 	

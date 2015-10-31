@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
-import net.sourceforge.docfetcher.util.Util;
-import net.sourceforge.docfetcher.util.annotations.NotNull;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -26,17 +24,18 @@ import org.apache.pdfbox.util.PDFTextStripper;
 /**
  * @author Tran Nam Quang
  */
-public abstract class PagingPdfParser {
+public final class PagingPdfParser {
 	
 	private final File file;
+	private final PageHandler handler;
 	private final StringWriter writer = new StringWriter();
-	private boolean stopped = false;
 
-	public PagingPdfParser(@NotNull File file) {
-		this.file = Util.checkNotNull(file);
+	public PagingPdfParser(File file, PageHandler handler) {
+		this.file = file;
+		this.handler = handler;
 	}
 	
-	public final void run() throws ParseException, CheckedOutOfMemoryError {
+	public void run() throws ParseException, CheckedOutOfMemoryError {
 		PDDocument doc = null;
 		try {
 			doc = PDDocument.load(file);
@@ -56,12 +55,6 @@ public abstract class PagingPdfParser {
 		}
 	}
 
-	public final void stop() {
-		stopped = true;
-	}
-	
-	protected abstract void handlePage(@NotNull String pageText);
-	
 	private class PagingStripper extends PDFTextStripper {
 		public PagingStripper() throws IOException {
 			super();
@@ -69,7 +62,7 @@ public abstract class PagingPdfParser {
 
 		protected void endPage(PDPage page) throws IOException {
 			StringBuffer buffer = writer.getBuffer();
-			handlePage(buffer.toString());
+			boolean stopped = handler.handlePage(buffer.toString());
 			buffer.delete(0, buffer.length());
 			if (stopped)
 				setEndPage(0);
