@@ -880,7 +880,7 @@ final class TextExtractor {
             // In document
             if (equals("b")) {
                 // b0
-                assert param == 0;
+                // assert param == 0;
                 if (groupState.bold) {
                     pushText();
                     if (groupState.italic) {
@@ -894,7 +894,7 @@ final class TextExtractor {
                 }
             } else if (equals("i")) {
                 // i0
-                assert param == 0;
+                // assert param == 0;
                 if (groupState.italic) {
                     pushText();
                     end("i");

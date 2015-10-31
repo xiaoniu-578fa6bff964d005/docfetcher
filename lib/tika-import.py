@@ -165,6 +165,16 @@ with open(src_path, "r") as f_src:
 	with open(dst_path, "w") as f_dst:
 		f_dst.write(f_src.read())
 
+# Fix TextExtractor: Disable assertions that would otherwise cause DocFetcher to
+# crash on some RTF files created by TextMaker.
+dst_path = osp.join(dst_root, "parser/rtf/TextExtractor.java")
+contents = ""
+with open(dst_path, "r") as f:
+	contents = f.read()
+contents = contents.replace("assert param == 0;", "// assert param == 0;")
+with open(dst_path, "w") as f:
+	f.write(contents)
+
 # Remove files
 delete_set = set((x.strip() for x in files_to_delete.strip().split("\n")))
 for root, dirs, files in os.walk(dst_root):

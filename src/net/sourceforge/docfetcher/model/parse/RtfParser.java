@@ -50,6 +50,13 @@ final class RtfParser extends StreamParser {
 				.addMiscMetadata(metadata.get(Metadata.SUBJECT)) // not equivalent to TikaCoreProperties.KEYWORDS
 				.addMiscMetadata(metadata.get(TikaCoreProperties.KEYWORDS));
 		}
+		catch (AssertionError e) {
+			/*
+			 * With the RTF parser in Tika 0.10, calling TextExtractor.extract
+			 * results in an AssertionError. See bug #3443948.
+			 */
+			throw new ParseException(e);
+		}
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
@@ -62,6 +69,13 @@ final class RtfParser extends StreamParser {
 		try {
 			new RTFParser().parse(in, bodyHandler, metadata, ParseService.tikaContext());
 			return bodyHandler.toString();
+		}
+		catch (AssertionError e) {
+			/*
+			 * With the RTF parser in Tika 0.10, calling TextExtractor.extract
+			 * results in an AssertionError. See bug #3443948.
+			 */
+			throw new ParseException(e);
 		}
 		catch (Exception e) {
 			throw new ParseException(e);

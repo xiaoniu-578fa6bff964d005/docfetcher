@@ -88,8 +88,8 @@ public final class BuildMain {
 		javac.setProject(new Project());
 		javac.setSrcdir(new Paths().addDirSet("build/tmp/src").get());
 		javac.setClasspath(new Paths().addFileSet("lib", "**/*.jar").get());
-		javac.setSource("1.6");
-		javac.setTarget("1.6");
+		javac.setSource("1.7");
+		javac.setTarget("1.7");
 		javac.setDebug(true);
 		javac.setOptimize(true);
 		javac.setFork(true); // Won't find javac executable without this
