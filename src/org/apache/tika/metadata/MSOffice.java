@@ -17,71 +17,106 @@
 package org.apache.tika.metadata;
 
 /**
- * A collection of Microsoft Office documents property names.
+ * A collection of Microsoft Office and Open Document property names.
+ * 
+ * This is being replaced with cleaner, better defined properties in
+ *  {@link Office}.
  */
 public interface MSOffice {
 
-    String KEYWORDS = "Keywords";
+    @Deprecated String KEYWORDS = "Keywords";
 
-    String COMMENTS = "Comments";
+    @Deprecated String COMMENTS = "Comments";
 
-    String LAST_AUTHOR = "Last-Author";
+    @Deprecated String LAST_AUTHOR = "Last-Author";
 
-    String APPLICATION_NAME = "Application-Name";
+    @Deprecated String AUTHOR = "Author";
 
-    String CHARACTER_COUNT = "Character Count";
+    @Deprecated String APPLICATION_NAME = "Application-Name";
 
-    String PAGE_COUNT = "Page-Count";
+    @Deprecated String REVISION_NUMBER = "Revision-Number";
 
-    String REVISION_NUMBER = "Revision-Number";
+    @Deprecated String TEMPLATE = "Template";
 
-    String WORD_COUNT = "Word-Count";
+    @Deprecated String TOTAL_TIME = "Total-Time";
 
-    String TEMPLATE = "Template";
+    @Deprecated String PRESENTATION_FORMAT = "Presentation-Format";
 
-    String AUTHOR = "Author";
+    @Deprecated String NOTES = "Notes";
 
-    String TOTAL_TIME = "Total-Time";
+    @Deprecated String MANAGER = "Manager";
 
-    String SLIDE_COUNT = "Slide-Count";
+    @Deprecated String APPLICATION_VERSION = "Application-Version";
 
-    String PRESENTATION_FORMAT = "Presentation-Format";
+    @Deprecated String VERSION = "Version";
 
-    String PARAGRAPH_COUNT = "Paragraph-Count";
+    @Deprecated String CONTENT_STATUS = "Content-Status";
 
-    String NOTES = "Notes";
+    @Deprecated String CATEGORY = "Category";
 
-    String MANAGER = "Manager";
+    @Deprecated String COMPANY = "Company";
 
-    String LINE_COUNT = "Line-Count";
+    @Deprecated String SECURITY = "Security";
 
-    String CHARACTER_COUNT_WITH_SPACES = "Character-Count-With-Spaces";
+    
+    /** The number of Slides are there in the (presentation) document */
+    @Deprecated Property SLIDE_COUNT = 
+       Property.internalInteger("Slide-Count");
+    
+    /** The number of Pages are there in the (paged) document */
+    @Deprecated Property PAGE_COUNT = 
+       Property.internalInteger("Page-Count");
 
-    String APPLICATION_VERSION = "Application-Version";
+    /** The number of individual Paragraphs in the document */ 
+    @Deprecated Property PARAGRAPH_COUNT = 
+       Property.internalInteger("Paragraph-Count");
+    
+    /** The number of lines in the document */
+    @Deprecated Property LINE_COUNT = 
+       Property.internalInteger("Line-Count");
 
-    String VERSION = "Version";
+    /** The number of Words in the document */
+    @Deprecated Property WORD_COUNT = 
+       Property.internalInteger("Word-Count");
 
-    String CONTENT_STATUS = "Content-Status";
+    /** The number of Characters in the document */
+    @Deprecated Property CHARACTER_COUNT = 
+       Property.internalInteger("Character Count");
+    
+    /** The number of Characters in the document, including spaces */
+    @Deprecated Property CHARACTER_COUNT_WITH_SPACES = 
+       Property.internalInteger("Character-Count-With-Spaces");
 
-    String CATEGORY = "Category";
+    /** The number of Tables in the document */
+    @Deprecated Property TABLE_COUNT = 
+       Property.internalInteger("Table-Count");
+    
+    /** The number of Images in the document */
+    @Deprecated Property IMAGE_COUNT = 
+       Property.internalInteger("Image-Count");
+    
+    /** 
+     * The number of Objects in the document.
+     * This is typically non-Image resources embedded in the
+     *  document, such as other documents or non-Image media. 
+     */
+    @Deprecated Property OBJECT_COUNT = 
+       Property.internalInteger("Object-Count");
 
-    String COMPANY = "Company";
-
-    String SECURITY = "Security";
-
+    
     /** How long has been spent editing the document? */ 
     String EDIT_TIME = "Edit-Time"; 
 
     /** When was the document created? */
-    Property CREATION_DATE = 
+    @Deprecated Property CREATION_DATE = 
         Property.internalDate("Creation-Date");
 
     /** When was the document last saved? */
-    Property LAST_SAVED = 
+    @Deprecated Property LAST_SAVED = 
        Property.internalDate("Last-Save-Date");
     
     /** When was the document last printed? */
-    Property LAST_PRINTED = 
+    @Deprecated Property LAST_PRINTED = 
        Property.internalDate("Last-Printed");
     
     /** 

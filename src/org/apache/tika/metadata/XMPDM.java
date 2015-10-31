@@ -16,13 +16,15 @@
  */
 package org.apache.tika.metadata;
 
+import java.util.Date;
+
 /**
  * XMP Dynamic Media schema. This is a collection of
  * {@link Property property definition} constants for the dynamic media
  * properties defined in the XMP standard.
  *
  * @since Apache Tika 0.7
- * @see <a href="http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart2.pdf"
+ * @see <a href="http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/xmp/pdfs/cc-201306/XMPSpecificationPart2.pdf"
  *        >XMP Specification, Part 2: Standard Schemas</a>
  */
 public interface XMPDM {
@@ -58,6 +60,11 @@ public interface XMPDM {
     Property ARTIST = Property.externalText("xmpDM:artist");
 
     /**
+     * "The name of the album artist or group for compilation albums."
+     */
+    Property ALBUM_ARTIST = Property.externalText("xmpDM:albumArtist");
+
+    /**
      * "The date and time when the audio was last modified."
      */
     Property AUDIO_MOD_DATE = Property.internalDate("xmpDM:audioModDate");
@@ -80,6 +87,54 @@ public interface XMPDM {
      */
     Property AUDIO_CHANNEL_TYPE = Property.internalClosedChoise(
             "xmpDM:audioChannelType", "Mono", "Stereo", "5.1", "7.1");
+    /**
+     * Converter for {@link XMPDM#AUDIO_CHANNEL_TYPE}
+     * @deprecated Experimental method, will change shortly
+     */
+    @Deprecated
+    static class ChannelTypePropertyConverter {
+       private static Property property = AUDIO_CHANNEL_TYPE;
+
+       /**
+        * How a standalone converter might work
+        */
+       public static String convert(Object value) {
+          if (value instanceof String) {
+             // Assume already done
+             return (String)value;
+          }
+          if (value instanceof Integer) {
+             int channelCount = (Integer)value;
+             if(channelCount == 1) {
+                return "Mono";
+             } else if(channelCount == 2) {
+                return "Stereo";
+             } else if(channelCount == 5) {
+                return "5.1";
+             } else if(channelCount == 7) {
+                return "7.1";
+             }
+          }
+          return null;
+       }
+       /**
+        * How convert+set might work
+        */
+       public static void convertAndSet(Metadata metadata, Object value) {
+          if (value instanceof Integer || value instanceof Long) {
+             metadata.set(property, convert(value));
+          }
+          if (value instanceof Date) {
+             // Won't happen in this case, just an example of already
+             //  converted to a type metadata.set(property) handles
+             metadata.set(property, (Date)value);
+          }
+          if (value instanceof String) {
+             // Already converted, or so we hope!
+             metadata.set(property, (String)value);
+          }
+       }
+    }
 
     /**
      * "The audio compression used. For example, MP3."
@@ -90,6 +145,11 @@ public interface XMPDM {
 //     * "Additional parameters for Beat Splice stretch mode."
 //     */
 //    Property BEAT_SPLICE_PARAMS = "xmpDM:beatSpliceParams";
+
+    /**
+     * "An album created by various artists."
+     */
+    Property COMPILATION = Property.externalInteger("xmpDM:compilation");
 
     /**
      * "The composer's name."
@@ -106,10 +166,15 @@ public interface XMPDM {
      */
     Property COPYRIGHT = Property.externalText("xmpDM:copyright");
 
-//    /**
-//     * "The duration of the media file."
-//     */
-//    Property DURATION = "xmpDM:duration";
+    /**
+     * "The disc number for part of an album set."
+     */
+    Property DISC_NUMBER = Property.externalInteger("xmpDM:discNumber");
+
+    /**
+     * "The duration of the media file."
+     */
+    Property DURATION = Property.externalReal("xmpDM:duration");
 
     /**
      * "The engineer's name."
@@ -177,7 +242,7 @@ public interface XMPDM {
 //    /**
 //     * "A reference to the project that created this file."
 //     */
-//    Property PROJECT_REF = "xmpDM:projectRef"; 
+//    Property PROJECT_REF = "xmpDM:projectRef";
 
     /**
      * "The sampling phase of film to be converted to video (pull-down)."

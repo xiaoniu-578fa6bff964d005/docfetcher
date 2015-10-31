@@ -16,11 +16,16 @@
  */
 package org.apache.tika.metadata;
 
+import static org.apache.tika.utils.DateUtils.MIDDAY;
+import static org.apache.tika.utils.DateUtils.UTC;
+import static org.apache.tika.utils.DateUtils.formatDate;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -29,10 +34,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.tika.metadata.Property.PropertyType;
+
 /**
  * A multi-valued metadata container.
  */
-public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHeaders,
+public class Metadata implements CreativeCommons, Geographic, HttpHeaders,
         Message, MSOffice, ClimateForcast, TIFF, TikaMetadataKeys, TikaMimeKeys,
         Serializable {
 
@@ -45,11 +52,42 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
     private Map<String, String[]> metadata = null;
 
     /**
-     * The ISO-8601 format string we use for Dates.
-     * All dates are represented as UTC
+     * The common delimiter used between the namespace abbreviation and the property name
      */
-    private static final DateFormat iso8601Format =
-        createDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", "UTF");
+    public static final String NAMESPACE_PREFIX_DELIMITER = ":";
+
+    /** @deprecated use TikaCoreProperties#FORMAT */
+    public static final String FORMAT = "format";
+    /** @deprecated use TikaCoreProperties#IDENTIFIER */
+    public static final String IDENTIFIER = "identifier";
+    /** @deprecated use TikaCoreProperties#MODIFIED */
+    public static final String MODIFIED = "modified";
+    /** @deprecated use TikaCoreProperties#CONTRIBUTOR */
+    public static final String CONTRIBUTOR = "contributor";
+    /** @deprecated use TikaCoreProperties#COVERAGE */
+    public static final String COVERAGE = "coverage";
+    /** @deprecated use TikaCoreProperties#CREATOR */
+    public static final String CREATOR = "creator";
+    /** @deprecated use TikaCoreProperties#CREATED */
+    public static final Property DATE = Property.internalDate("date");
+    /** @deprecated use TikaCoreProperties#DESCRIPTION */
+    public static final String DESCRIPTION = "description";
+    /** @deprecated use TikaCoreProperties#LANGUAGE */
+    public static final String LANGUAGE = "language";
+    /** @deprecated use TikaCoreProperties#PUBLISHER */
+    public static final String PUBLISHER = "publisher";
+    /** @deprecated use TikaCoreProperties#RELATION */
+    public static final String RELATION = "relation";
+    /** @deprecated use TikaCoreProperties#RIGHTS */
+    public static final String RIGHTS = "rights";
+    /** @deprecated use TikaCoreProperties#SOURCE */
+    public static final String SOURCE = "source";
+    /** @deprecated use TikaCoreProperties#KEYWORDS */
+    public static final String SUBJECT = "subject";
+    /** @deprecated use TikaCoreProperties#TITLE */
+    public static final String TITLE = "title";
+    /** @deprecated use TikaCoreProperties#TYPE */
+    public static final String TYPE = "type";
 
     /**
      * Some parsers will have the date as a ISO-8601 string
@@ -61,20 +99,23 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      */
     private static final DateFormat[] iso8601InputFormats = new DateFormat[] {
         // yyyy-mm-ddThh...
-        iso8601Format,                                       // UTC/Zulu
+        createDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", UTC),   // UTC/Zulu
         createDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", null),    // With timezone
         createDateFormat("yyyy-MM-dd'T'HH:mm:ss", null),     // Without timezone
         // yyyy-mm-dd hh...
-        createDateFormat("yyyy-MM-dd' 'HH:mm:ss'Z'", "UTF"), // UTC/Zulu
+        createDateFormat("yyyy-MM-dd' 'HH:mm:ss'Z'", UTC),   // UTC/Zulu
         createDateFormat("yyyy-MM-dd' 'HH:mm:ssZ", null),    // With timezone
         createDateFormat("yyyy-MM-dd' 'HH:mm:ss", null),     // Without timezone
+        // Date without time, set to Midday UTC
+        createDateFormat("yyyy-MM-dd", MIDDAY),              // Normal date format
+        createDateFormat("yyyy:MM:dd", MIDDAY),              // Image (IPTC/EXIF) format
     };
 
-    private static DateFormat createDateFormat(String format, String timezone) {
+    private static DateFormat createDateFormat(String format, TimeZone timezone) {
         SimpleDateFormat sdf =
             new SimpleDateFormat(format, new DateFormatSymbols(Locale.US));
         if (timezone != null) {
-            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+            sdf.setTimeZone(timezone);
         }
         return sdf;
     }
@@ -107,25 +148,23 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
     }
 
     /**
-     * Returns a ISO 8601 representation of the given date. This method is
-     * synchronized to prevent concurrent access to the thread-unsafe date
-     * formats.
-     *
-     * @see <a href="https://issues.apache.org/jira/browse/TIKA-495">TIKA-495</a>
-     * @param date given date
-     * @return ISO 8601 date string
-     */
-    private static synchronized String formatDate(Date date) {
-        return iso8601Format.format(date);
-    }
-
-    /**
      * Constructs a new, empty metadata.
      */
     public Metadata() {
         metadata = new HashMap<String, String[]>();
     }
 
+    /**
+     * Returns true if named value is multivalued.
+     * 
+     * @param property
+     *          metadata property
+     * @return true is named value is multivalued, false if single value or null
+     */
+    public boolean isMultiValued(final Property property) {
+        return metadata.get(property.getName()) != null && metadata.get(property.getName()).length > 1;
+    }
+    
     /**
      * Returns true if named value is multivalued.
      * 
@@ -182,10 +221,10 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @return property value as a Integer, or <code>null</code> if the property is not set, or not a valid Integer
      */
     public Integer getInt(Property property) {
-        if(property.getPropertyType() != Property.PropertyType.SIMPLE) {
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
             return null;
         }
-        if(property.getValueType() != Property.ValueType.INTEGER) {
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.INTEGER) {
             return null;
         }
         
@@ -208,10 +247,10 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @return property value as a Date, or <code>null</code> if the property is not set, or not a valid Date
      */
     public Date getDate(Property property) {
-        if(property.getPropertyType() != Property.PropertyType.SIMPLE) {
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
             return null;
         }
-        if(property.getValueType() != Property.ValueType.DATE) {
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.DATE) {
             return null;
         }
         
@@ -221,6 +260,17 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Get the values associated to a metadata name.
+     * 
+     * @param property
+     *          of the metadata.
+     * @return the values associated to a metadata name.
+     */
+    public String[] getValues(final Property property) {
+        return _getValues(property.getName());
     }
 
     /**
@@ -241,6 +291,13 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
         }
         return values;
     }
+    
+    private String[] appendedValues(String[] values, final String value) {
+        String[] newValues = new String[values.length + 1];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[newValues.length - 1] = value;
+        return newValues;
+    }
 
     /**
      * Add a metadata name/value mapping. Add the specified value to the list of
@@ -256,10 +313,30 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
         if (values == null) {
             set(name, value);
         } else {
-            String[] newValues = new String[values.length + 1];
-            System.arraycopy(values, 0, newValues, 0, values.length);
-            newValues[newValues.length - 1] = value;
-            metadata.put(name, newValues);
+            metadata.put(name, appendedValues(values, value));
+        }
+    }
+    
+    /**
+     * Add a metadata property/value mapping. Add the specified value to the list of
+     * values associated to the specified metadata property.
+     * 
+     * @param property
+     *          the metadata property.
+     * @param value
+     *          the metadata value.
+     */
+    public void add(final Property property, final String value) {
+        String[] values = metadata.get(property.getName());
+        if (values == null) {
+            set(property, value);
+        } else {
+             if (property.isMultiValuePermitted()) {
+                 set(property, appendedValues(values, value));
+             } else {
+                 throw new PropertyTypeException(property.getName() +
+                         " : " + property.getPropertyType());
+             }
         }
     }
 
@@ -281,16 +358,19 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
 
     /**
      * Set metadata name/value. Associate the specified value to the specified
-     * metadata name. If some previous values were associated to this name, they
-     * are removed.
-     * 
-     * @param name
-     *          the metadata name.
-     * @param value
-     *          the metadata value.
+     * metadata name. If some previous values were associated to this name,
+     * they are removed. If the given value is <code>null</code>, then the
+     * metadata entry is removed.
+     *
+     * @param name the metadata name.
+     * @param value  the metadata value, or <code>null</code>
      */
     public void set(String name, String value) {
-        metadata.put(name, new String[] { value });
+        if (value != null) {
+            metadata.put(name, new String[] { value });
+        } else {
+            metadata.remove(name);
+        }
     }
 
     /**
@@ -301,7 +381,42 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @param value    property value
      */
     public void set(Property property, String value) {
-        set(property.getName(), value);
+        if (property == null) {
+            throw new NullPointerException("property must not be null");
+        }
+        if (property.getPropertyType() == PropertyType.COMPOSITE) {
+            set(property.getPrimaryProperty(), value);
+            if (property.getSecondaryExtractProperties() != null) {
+                for (Property secondaryExtractProperty : property.getSecondaryExtractProperties()) {
+                    set(secondaryExtractProperty, value);
+                }
+            }
+        } else {
+            set(property.getName(), value);
+        }
+    }
+    
+    /**
+     * Sets the values of the identified metadata property.
+     *
+     * @since Apache Tika 1.2
+     * @param property property definition
+     * @param values    property values
+     */
+    public void set(Property property, String[] values) {
+        if (property == null) {
+            throw new NullPointerException("property must not be null");
+        }
+        if (property.getPropertyType() == PropertyType.COMPOSITE) {
+            set(property.getPrimaryProperty(), values);
+            if (property.getSecondaryExtractProperties() != null) {
+                for (Property secondaryExtractProperty : property.getSecondaryExtractProperties()) {
+                    set(secondaryExtractProperty, values);
+                }
+            }
+        } else {
+            metadata.put(property.getName(), values);
+        }
     }
 
     /**
@@ -312,13 +427,13 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @param value    property value
      */
     public void set(Property property, int value) {
-        if(property.getPropertyType() != Property.PropertyType.SIMPLE) {
-            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPropertyType());
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
+            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPrimaryProperty().getPropertyType());
         }
-        if(property.getValueType() != Property.ValueType.INTEGER) {
-            throw new PropertyTypeException(Property.ValueType.INTEGER, property.getValueType());
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.INTEGER) {
+            throw new PropertyTypeException(Property.ValueType.INTEGER, property.getPrimaryProperty().getValueType());
         }
-        set(property.getName(), Integer.toString(value));
+        set(property, Integer.toString(value));
     }
 
     /**
@@ -329,14 +444,14 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @param value    property value
      */
     public void set(Property property, double value) {
-        if(property.getPropertyType() != Property.PropertyType.SIMPLE) {
-            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPropertyType());
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
+            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPrimaryProperty().getPropertyType());
         }
-        if(property.getValueType() != Property.ValueType.REAL &&
-              property.getValueType() != Property.ValueType.RATIONAL) {
-            throw new PropertyTypeException(Property.ValueType.REAL, property.getValueType());
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.REAL &&
+              property.getPrimaryProperty().getValueType() != Property.ValueType.RATIONAL) {
+            throw new PropertyTypeException(Property.ValueType.REAL, property.getPrimaryProperty().getValueType());
         }
-        set(property.getName(), Double.toString(value));
+        set(property, Double.toString(value));
     }
 
     /**
@@ -347,13 +462,38 @@ public class Metadata implements CreativeCommons, DublinCore, Geographic, HttpHe
      * @param date     property value
      */
     public void set(Property property, Date date) {
-        if(property.getPropertyType() != Property.PropertyType.SIMPLE) {
-            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPropertyType());
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
+            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPrimaryProperty().getPropertyType());
         }
-        if(property.getValueType() != Property.ValueType.DATE) {
-            throw new PropertyTypeException(Property.ValueType.DATE, property.getValueType());
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.DATE) {
+            throw new PropertyTypeException(Property.ValueType.DATE, property.getPrimaryProperty().getValueType());
         }
-        set(property.getName(), formatDate(date));
+        String dateString = null;
+        if (date != null) {
+            dateString = formatDate(date);
+        }
+        set(property, dateString);
+    }
+
+    /**
+     * Sets the date value of the identified metadata property.
+     *
+     * @since Apache Tika 0.8
+     * @param property simple integer property definition
+     * @param date     property value
+     */
+    public void set(Property property, Calendar date) {
+        if(property.getPrimaryProperty().getPropertyType() != Property.PropertyType.SIMPLE) {
+            throw new PropertyTypeException(Property.PropertyType.SIMPLE, property.getPrimaryProperty().getPropertyType());
+        }
+        if(property.getPrimaryProperty().getValueType() != Property.ValueType.DATE) {
+            throw new PropertyTypeException(Property.ValueType.DATE, property.getPrimaryProperty().getValueType());
+        }
+        String dateString = null;
+        if (date != null) {
+            dateString = formatDate(date);
+        }
+        set(property, dateString);
     }
 
     /**

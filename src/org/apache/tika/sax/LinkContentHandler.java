@@ -42,6 +42,27 @@ public class LinkContentHandler extends DefaultHandler {
 
     /** Collected links */
     private final List<Link> links = new ArrayList<Link>();
+    
+    /** Whether to collapse whitespace in anchor text */
+    private boolean collapseWhitespaceInAnchor;
+    
+    /**
+     * Default constructor
+     */
+    public LinkContentHandler() { 
+        this(false);
+    }
+    
+    /**
+     * Default constructor
+     *
+     * @boolean collapseWhitespaceInAnchor
+     */
+    public LinkContentHandler(boolean collapseWhitespaceInAnchor) {
+      super();
+      
+      this.collapseWhitespaceInAnchor = collapseWhitespaceInAnchor;
+    }
 
     /**
      * Returns the list of collected links.
@@ -62,11 +83,13 @@ public class LinkContentHandler extends DefaultHandler {
                 LinkBuilder builder = new LinkBuilder("a");
                 builder.setURI(attributes.getValue("", "href"));
                 builder.setTitle(attributes.getValue("", "title"));
+                builder.setRel(attributes.getValue("", "rel"));
                 builderStack.addFirst(builder);
             } else if ("img".equals(local)) {
                 LinkBuilder builder = new LinkBuilder("img");
                 builder.setURI(attributes.getValue("", "src"));
                 builder.setTitle(attributes.getValue("", "title"));
+                builder.setRel(attributes.getValue("", "rel"));
                 builderStack.addFirst(builder);
 
                 String alt = attributes.getValue("", "alt");
@@ -94,7 +117,7 @@ public class LinkContentHandler extends DefaultHandler {
     public void endElement(String uri, String local, String name) {
         if (XHTML.equals(uri)) {
             if ("a".equals(local) || "img".equals(local)) {
-                links.add(builderStack.removeFirst().getLink());
+                links.add(builderStack.removeFirst().getLink(collapseWhitespaceInAnchor));
             }
         }
     }

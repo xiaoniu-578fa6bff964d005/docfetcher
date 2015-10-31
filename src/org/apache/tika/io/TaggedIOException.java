@@ -23,7 +23,6 @@ import java.io.IOException;
  * a given object reference. Both the tag and the wrapped original exception
  * can be used to determine further processing when this exception is caught.
  */
-@SuppressWarnings("serial")
 public class TaggedIOException extends IOExceptionWithCause {
 
     /**

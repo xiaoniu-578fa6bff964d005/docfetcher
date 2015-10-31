@@ -18,6 +18,8 @@ import java.util.Collections;
 import net.sourceforge.docfetcher.enums.Msg;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
+import org.apache.tika.parser.rtf.RTFEmbObjHandler;
 import org.apache.tika.parser.rtf.TextExtractor;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.XHTMLContentHandler;
@@ -34,24 +36,22 @@ final class RtfParser extends StreamParser {
 			throws ParseException {
 		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
-		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
-		TextExtractor extractor = new TextExtractor(handler, metadata);
+		TextExtractor extractor = createExtractor(bodyHandler, metadata);
 		try {
 			extractor.extract(in);
 			
-			/*
-			 * See TextExtractor#processControlWord() for a list of the
-			 * available metadata.
-			 */
+			// Use this to get a full list of available metadata:
+//			for (String name : metadata.names()) {
+//				System.out.println(name + " : " + metadata.get(name));
+//			}
+			
+			// RTF documents also have a "comments" field, but Tika's RTF parser
+			// doesn't seem to read it.
 			return new ParseResult(bodyHandler.toString())
-				.addAuthor(metadata.get(Metadata.AUTHOR))
-				.setTitle(metadata.get(Metadata.TITLE))
-				.addMiscMetadata(metadata.get(Metadata.SUBJECT))
-				.addMiscMetadata(metadata.get(Metadata.KEYWORDS))
-				.addMiscMetadata(metadata.get(Metadata.CATEGORY))
-				.addMiscMetadata(metadata.get(Metadata.COMMENT))
-				.addMiscMetadata(metadata.get(Metadata.COMPANY))
-				.addMiscMetadata(metadata.get(Metadata.MANAGER));
+				.addAuthor(metadata.get(TikaCoreProperties.CREATOR))
+				.setTitle(metadata.get(TikaCoreProperties.TITLE))
+				.addMiscMetadata(metadata.get(Metadata.SUBJECT)) // not equivalent to TikaCoreProperties.KEYWORDS
+				.addMiscMetadata(metadata.get(TikaCoreProperties.KEYWORDS));
 		}
 		catch (AssertionError e) {
 			/*
@@ -69,8 +69,7 @@ final class RtfParser extends StreamParser {
 			throws ParseException {
 		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
-		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
-		TextExtractor extractor = new TextExtractor(handler, metadata);
+		TextExtractor extractor = createExtractor(bodyHandler, metadata);
 		try {
 			extractor.extract(in);
 			return bodyHandler.toString();
@@ -78,6 +77,13 @@ final class RtfParser extends StreamParser {
 		catch (Exception e) {
 			throw new ParseException(e);
 		}
+	}
+	
+	private static TextExtractor createExtractor(BodyContentHandler bodyHandler, Metadata metadata) {
+		XHTMLContentHandler handler = new XHTMLContentHandler(bodyHandler, metadata);
+		org.apache.tika.parser.ParseContext context = new org.apache.tika.parser.ParseContext();
+		RTFEmbObjHandler embObjHandler = new RTFEmbObjHandler(handler, metadata, context);
+		return new TextExtractor(handler, metadata, embObjHandler);
 	}
 
 	protected Collection<String> getExtensions() {

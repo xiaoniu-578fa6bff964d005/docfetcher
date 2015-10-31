@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -59,7 +60,7 @@ public class XHTMLContentHandler extends SafeContentHandler {
      * skip them if they get sent to startElement/endElement by mistake.
      */
     private static final Set<String> AUTO =
-        unmodifiableSet("html", "head", "body", "frameset");
+        unmodifiableSet("html", "head", "frameset");
 
     /**
      * The elements that get prepended with the {@link #TAB} character.
@@ -89,6 +90,11 @@ public class XHTMLContentHandler extends SafeContentHandler {
     private final Metadata metadata;
 
     /**
+     * Flag to indicate whether the document has been started.
+     */
+    private boolean documentStarted = false;
+    
+    /**
      * Flags to indicate whether the document head element has been started/ended.
      */
     private boolean headStarted = false;
@@ -101,14 +107,18 @@ public class XHTMLContentHandler extends SafeContentHandler {
     }
 
     /**
-     * Starts an XHTML document by setting up the namespace mappings.
+     * Starts an XHTML document by setting up the namespace mappings 
+     * when called for the first time.
      * The standard XHTML prefix is generated lazily when the first
      * element is started.
      */
     @Override
     public void startDocument() throws SAXException {
-        super.startDocument();
-        startPrefixMapping("", XHTML);
+    	if(!documentStarted){
+    		documentStarted = true;
+            super.startDocument();
+            startPrefixMapping("", XHTML);
+    	}
     }
 
     /**
@@ -173,7 +183,7 @@ public class XHTMLContentHandler extends SafeContentHandler {
             }
             
             super.startElement(XHTML, "title", "title", EMPTY_ATTRIBUTES);
-            String title = metadata.get(Metadata.TITLE);
+            String title = metadata.get(TikaCoreProperties.TITLE);
             if (title != null && title.length() > 0) {
                 char[] titleChars = title.toCharArray();
                 super.characters(titleChars, 0, titleChars.length);
@@ -291,7 +301,9 @@ public class XHTMLContentHandler extends SafeContentHandler {
     }
 
     public void characters(String characters) throws SAXException {
-        characters(characters.toCharArray(), 0, characters.length());
+        if (characters != null && characters.length() > 0) {
+            characters(characters.toCharArray(), 0, characters.length());
+        }
     }
 
     public void newline() throws SAXException {

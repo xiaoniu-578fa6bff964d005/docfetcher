@@ -16,7 +16,6 @@
  */
 package org.apache.tika.exception;
 
-@SuppressWarnings("serial")
 public class EncryptedDocumentException extends TikaException {
     public EncryptedDocumentException() {
         super("Unable to process: document is encrypted");

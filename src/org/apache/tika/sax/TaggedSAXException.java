@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
  * a given object reference. Both the tag and the wrapped original exception
  * can be used to determine further processing when this exception is caught.
  */
-@SuppressWarnings("serial")
 public class TaggedSAXException extends SAXException {
 
     /**

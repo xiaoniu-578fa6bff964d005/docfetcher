@@ -21,6 +21,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 import org.xml.sax.ContentHandler;
@@ -90,7 +91,7 @@ public class WriteOutContentHandler extends ContentHandlerDecorator {
      * @param stream output stream
      */
     public WriteOutContentHandler(OutputStream stream) {
-        this(new OutputStreamWriter(stream));
+        this(new OutputStreamWriter(stream, Charset.defaultCharset()));
     }
 
     /**
@@ -136,6 +137,24 @@ public class WriteOutContentHandler extends ContentHandlerDecorator {
             writeCount += length;
         } else {
             super.characters(ch, start, writeLimit - writeCount);
+            writeCount = writeLimit;
+            throw new WriteLimitReachedException(
+                    "Your document contained more than " + writeLimit
+                    + " characters, and so your requested limit has been"
+                    + " reached. To receive the full text of the document,"
+                    + " increase your limit. (Text up to the limit is"
+                    + " however available).", tag);
+        }
+    }
+
+    @Override
+    public void ignorableWhitespace(char[] ch, int start, int length)
+            throws SAXException {
+        if (writeLimit == -1 || writeCount + length <= writeLimit) {
+            super.ignorableWhitespace(ch, start, length);
+            writeCount += length;
+        } else {
+            super.ignorableWhitespace(ch, start, writeLimit - writeCount);
             writeCount = writeLimit;
             throw new WriteLimitReachedException(
                     "Your document contained more than " + writeLimit

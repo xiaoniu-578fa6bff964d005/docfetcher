@@ -27,6 +27,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 /**
  * Parse context. Used to pass context information to Tika parsers.
@@ -127,19 +129,18 @@ public class ParseContext implements Serializable {
         if (factory == null) {
             factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
-            // The following was commented out to silence a compiler error. -- Nam-Quang Tran
-//            try {
-//                factory.setFeature(
-//                        XMLConstants.FEATURE_SECURE_PROCESSING, true);
-//            } catch (ParserConfigurationException e) {
-//            } catch (SAXNotSupportedException e) {
-//            } catch (SAXNotRecognizedException e) {
-//                // TIKA-271: Some XML parsers do not support the
-//                // secure-processing feature, even though it's required by
-//                // JAXP in Java 5. Ignoring the exception is fine here, as
-//                // deployments without this feature are inherently vulnerable
-//                // to XML denial-of-service attacks.
-//            }
+            try {
+                factory.setFeature(
+                        XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            } catch (ParserConfigurationException e) {
+            } catch (SAXNotSupportedException e) {
+            } catch (SAXNotRecognizedException e) {
+                // TIKA-271: Some XML parsers do not support the
+                // secure-processing feature, even though it's required by
+                // JAXP in Java 5. Ignoring the exception is fine here, as
+                // deployments without this feature are inherently vulnerable
+                // to XML denial-of-service attacks.
+            }
         }
         return factory;
     }

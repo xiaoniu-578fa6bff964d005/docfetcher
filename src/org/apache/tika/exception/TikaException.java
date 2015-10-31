@@ -17,9 +17,8 @@
 package org.apache.tika.exception;
 
 /**
- * Tika exception
+ * Tika exception 
  */
-@SuppressWarnings("serial")
 public class TikaException extends Exception {
 
     public TikaException(String msg) {
