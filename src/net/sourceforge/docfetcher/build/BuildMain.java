@@ -93,6 +93,7 @@ public final class BuildMain {
 		javac.setDebug(true);
 		javac.setOptimize(true);
 		javac.setFork(true); // Won't find javac executable without this
+		javac.setEncoding("utf8"); // Needed for some Tika source files
 		javac.execute();
 
 		recreateJarFile("", false, LineSep.WINDOWS); // Needed for NSIS script

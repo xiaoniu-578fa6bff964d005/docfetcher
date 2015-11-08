@@ -61,6 +61,7 @@ execute([
 	'-sourcepath build/tmp/src-builder',
 	'-classpath \"%s\"' % classpath_sep.join(jars),
 	'-nowarn',
+	'-encoding', 'utf8', # Needed for some Tika source files
 	' '.join(compile_paths)
 ])
 
