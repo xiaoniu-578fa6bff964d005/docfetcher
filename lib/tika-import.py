@@ -8,7 +8,7 @@ directory, with some minor processing along the way. Tested with Tika 1.11;
 newer Tika versions may require updating this script.
 
 How to use: Run this script with source and destination directory as arguments,
-e.g.: /path/to/tika-1.11 /path/to/DocFetcher-1.1/src.
+e.g.: /path/to/tika-1.11 /path/to/DocFetcher-1.1/src
 """
 
 # Configuration

@@ -29,7 +29,6 @@
 	<classpathentry kind="lib" path="lib/commons-compress/commons-compress-1.4.1.jar" sourcepath="lib/commons-compress/commons-compress-1.4.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/guava/guava-12.0.jar" sourcepath="lib/guava/guava-12.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox/icu4j-49_1.jar"/>
-	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.2.jar" sourcepath="lib/jericho-html/jericho-html-3.2-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="lib" path="lib/jexcelapi/jexcelapi-2.6.12.jar" sourcepath="lib/jexcelapi/jexcelapi-2.6.12-src.zip"/>
 	<classpathentry kind="lib" path="lib/pegdown/asm-all-3.3.1.jar"/>
@@ -61,5 +60,6 @@
 	<classpathentry kind="lib" path="lib/poi/poi-ooxml-schemas-3.13-20150929.jar"/>
 	<classpathentry kind="lib" path="lib/poi/poi-scratchpad-3.13-20150929.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io/commons-io-2.4.jar" sourcepath="lib/commons-io/commons-io-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jericho-html/jericho-html-3.4.jar" sourcepath="lib/jericho-html/jericho-html-3.4-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
