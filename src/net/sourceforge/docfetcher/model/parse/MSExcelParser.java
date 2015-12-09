@@ -19,6 +19,7 @@ import java.io.InputStream;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.WorkbookSettings;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -83,9 +84,11 @@ final class MSExcelParser extends MSOfficeParser {
 	@NotNull
 	private String extractWithJexcelAPI(@NotNull File file)
 			throws ParseException {
+		WorkbookSettings wbSettings = new WorkbookSettings();
+		wbSettings.setSuppressWarnings(true);
 		Workbook workbook = null;
 		try {
-			workbook = Workbook.getWorkbook(file);
+			workbook = Workbook.getWorkbook(file, wbSettings);
 			StringBuilder sb = new StringBuilder();
 			for (int sIndex = 0; sIndex < workbook.getNumberOfSheets(); sIndex++) {
 				Sheet sheet = workbook.getSheet(sIndex);
