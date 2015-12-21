@@ -63,7 +63,7 @@ public enum Msg {
 		"it also says that the stacktrace has been written to a file, whose " +
 		"path will be inserted at the {0} slot."),
 	program_running_launch_another (
-		"It seems {0} is already running. " +
+		"It seems an instance of {0} was not terminated cleanly or is still running. " + // translations of this string need to be updated
 		"Do you want to launch another instance?",
 		//
 		"The program has been started, and it has detected that another " +
