@@ -984,7 +984,7 @@ public final class Application {
 		CocoaUIEnhancer cocoaUIEnhancer = new CocoaUIEnhancer(ProgramConf.Str.AppName.get());
 		cocoaUIEnhancer.hookApplicationMenu(display, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				shell.close(); // Not necessary
+				shell.close(); // Bug #942
 			}
 		}, new Runnable() {
 			public void run() {

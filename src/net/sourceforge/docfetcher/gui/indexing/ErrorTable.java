@@ -159,7 +159,19 @@ final class ErrorTable {
 			public void run() {
 				MultiFileLauncher launcher = new MultiFileLauncher();
 				for (IndexingError error : tv.getSelection()) {
-					File file = error.getTreeNode().getPath().getCanonicalFile();
+					File file = null;
+					try {
+						file = error.getTreeNode().getPath().getCanonicalFile();
+					} catch (NullPointerException e) {
+						/*
+						 * User comment in bug #1128: "I was 'opening parent
+						 * folder' of files that could not be read. There were
+						 * multiple files in one folder and I had already
+						 * deleted them when I gave the command, thus the error,
+						 * the files were gone."
+						 */
+						continue;
+					}
 					File parent = Util.getParentFile(file);
 					if (parent.exists())
 						launcher.addFile(parent);
