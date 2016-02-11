@@ -22,7 +22,7 @@ Características Destacadas
 ================
 * **Versión portable**: Hay una versión portable de DocFetcher que funciona en Windows, Linux *y* OS&nbsp;X. Más adelante, en esta misma página, se explica por qué es esto útil.
 * **Soporte para 64-bit**: Están soportados los sistemas operativos de 32-bit y 64-bit.
-* **Soporte Unicode**: DocFetcher tiene un sólido soporte Unicode para los formatos más importantes, incluyendo Microsoft Office, OpenOffice.org, PDF, HTML, RTF y ficheros de texto plano. La única excepción es CHM, para el que aún no tenemos soporte Unicode.
+* **Soporte Unicode**: DocFetcher tiene un sólido soporte Unicode para los formatos más importantes, incluyendo Microsoft Office, OpenOffice.org, PDF, HTML, RTF y ficheros de texto plano.
 * **Ficheros soportados**: DocFetcher soporta los siguientes formatos de fichero: zip, 7z, rar, y toda la familia tar.*. Las extensiones de los ficheros zip se pueden modificar, permitiendo así añadir más ficheros en formato zip según sea necesario. DocFetcher también puede gestionar un número ilimitado de ficheros anidados (por ejemplo un fichero zip que contiene un fichero 7z que contiene a su vez un fichero rar....  etc.)
 * **Búsqueda en ficheros de código fuente**:  Las extensiones que DocFetcher reconoce como ficheros de texto plano se pueden modificar, por lo que puedes usar DocFetcher para buscar cualquier tipo de código fuente y otros tipos de ficheros en formtato de texto plano. (Esto funciona muy bien en combinación con las extensiones zip modificables, por ejemplo para buscar código fuente de Java dentro de ficheros .jar).
 * **Ficheros PST de Outlook**: DocFetcher permite la búsqueda de correos electrónicos de Outlook, los cuales Microsoft Outlook normalmente almacena en ficheros PST .
