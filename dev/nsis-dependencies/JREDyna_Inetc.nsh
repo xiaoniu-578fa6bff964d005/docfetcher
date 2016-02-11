@@ -56,10 +56,8 @@ downloadsuccessful:
 
 
   DetailPrint "Launching JRE setup"
-  
   ExecWait '"$TEMP\jre_setup.exe" /s REBOOT=Suppress /L \"$TEMP\jre_setup.log\"' $0
   
-jreSetupFinished:
   DetailPrint "JRE Setup finished"
   Delete "$TEMP\jre_setup.exe"
   StrCmp $0 "0" InstallVerif 0
