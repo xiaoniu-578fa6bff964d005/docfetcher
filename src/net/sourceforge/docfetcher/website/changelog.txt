@@ -1,3 +1,19 @@
+==== 2014-09-25 - DocFetcher 1.1.12 ====
+
+=== Features ===
+  * Advanced setting: Follow NTFS junctions and symlinks during indexing.
+  * Advanced setting: Disable writing the program settings to disk.
+
+=== Bugfixes ===
+  * Some MS Office files couldn't be indexed.
+  * Bug #741: Crash on OpenOffice files containing no content.xml entry.
+  * The Analyzer setting in the advanced settings couldn't be changed.
+
+=== Changes ===
+  * Upgraded POI library from 3.10 beta 1 to 3.10 FINAL, this should fix some MS-Office-related bugs.
+  * Upgraded java-libpst library from 0.7 to 0.8.1, this should fix some Outlook-related bugs.
+
+
 ==== 2014-03-03 - DocFetcher 1.1.11 ====
 
 === Bugfixes ===
