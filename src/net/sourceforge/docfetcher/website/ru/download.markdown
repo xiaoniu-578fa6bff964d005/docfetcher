@@ -8,7 +8,7 @@
 
 * для Windows: <http://java.com>
 * для Linux: В официальном репозитории вашего дистрибутива.
-* для Mac OS&nbsp;X: <http://java.com>
+* для OS&nbsp;X: <http://java.com>
 
 Новейшая версия: DocFetcher ${version}
 =====================================
@@ -29,11 +29,11 @@
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Это портативная версия, работающая на всех поддерживаемых платформах. Установка: Распакуйте архив в произвольную папку, затем запустите DocFetcher. Убедитесь, что у вас есть права записи в конечной папке (то есть не распаковывайте в папки, подобные "C:\Program&nbsp;Files").
 </td>
-<td>Windows, Linux, Mac OS&nbsp;X</td>
+<td>Windows, Linux, OS&nbsp;X</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Запустите DocFetcher двойным кликом по пакету.</td>
-<td>Mac OS&nbsp;X</td>
+<td>OS&nbsp;X</td>
 </tr>
 </table>
 

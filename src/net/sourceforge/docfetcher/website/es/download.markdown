@@ -9,7 +9,7 @@ los siguientes lugares:
 
 * Windows: <http://java.com>
 * Linux: En el repositorio oficial de su distribución.
-* Mac OS&nbsp;X: <http://java.com>
+* OS&nbsp;X: <http://java.com>
 
 Ultima Versión: DocFetcher ${version}
 =====================================
@@ -30,11 +30,11 @@ Todas las descargas soportan sistemas operativos de 32-bit y 64-bit
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Esta es la versión portable que funciona en todas las plataformas soportadas. Instalación: Descomprima el archivo en una carpeta de su elección y ejecute DocFetcher con el lanzador correspondiente a su plataforma. Asegúrese de tener permisos de escritura en el directorio de destino (por ejemplo: no lo descomprima en una carpeta como "C:\Program&nbsp;Files").
 </td>
-<td>Windows, Linux, Mac OS&nbsp;X</td>
+<td>Windows, Linux, OS&nbsp;X</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Ejecutar DocFetcher haciendo doble clic en el paquete de la aplicación.</td>
-<td>Mac OS&nbsp;X</td>
+<td>OS&nbsp;X</td>
 </tr>
 </table>
 

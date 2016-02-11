@@ -6,7 +6,7 @@ out what JRE version you have, open a command prompt and type in
 can obtain it in the following places:
 - Windows: http://java.com
 - Linux: In the official software repository of your distribution.
-- Mac OS X: http://java.com
+- OS X: http://java.com
 
 
 How to start DocFetcher
@@ -24,7 +24,7 @@ up, make sure the executable flag has been set on the DocFetcher.sh file. If
 that doesn't work either, you might see a helpful error mesage if you start
 DocFetcher.sh from the terminal.
 
-Mac OS X:
+OS X:
 Launch the program by double-clicking on the DocFetcher application bundle.
 
 

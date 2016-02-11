@@ -1,6 +1,6 @@
 Descripción
 ===========
-DocFetcher es una aplicación Open Source de búsqueda de escritorio: Permite que busques contenidos de ficheros en tu ordenador.  &mdash; Puedes verlo como una especie de Google para tus ficheros locales. La aplicación funciona en Windows, Linux y Mac OS&nbsp;X, y está disponible bajo la [Licencia Eclipse Public](http://en.wikipedia.org/wiki/Eclipse_Public_License).
+DocFetcher es una aplicación Open Source de búsqueda de escritorio: Permite que busques contenidos de ficheros en tu ordenador.  &mdash; Puedes verlo como una especie de Google para tus ficheros locales. La aplicación funciona en Windows, Linux y OS&nbsp;X, y está disponible bajo la [Licencia Eclipse Public](http://en.wikipedia.org/wiki/Eclipse_Public_License).
 
 Uso Básico
 ===========
@@ -20,7 +20,7 @@ Aunque tarda tiempo en crear el índice, sólo hay que hacerlo una vez por carpe
 
 Características Destacadas
 ================
-* **Versión portable**: Hay una versión portable de DocFetcher que funciona en Windows, Linux *y* Mac OS&nbsp;X. Más adelante, en esta misma página, se explica por qué es esto útil.
+* **Versión portable**: Hay una versión portable de DocFetcher que funciona en Windows, Linux *y* OS&nbsp;X. Más adelante, en esta misma página, se explica por qué es esto útil.
 * **Soporte para 64-bit**: Están soportados los sistemas operativos de 32-bit y 64-bit.
 * **Soporte Unicode**: DocFetcher tiene un sólido soporte Unicode para los formatos más importantes, incluyendo Microsoft Office, OpenOffice.org, PDF, HTML, RTF y ficheros de texto plano. La única excepción es CHM, para el que aún no tenemos soporte Unicode.
 * **Ficheros soportados**: DocFetcher soporta los siguientes formatos de fichero: zip, 7z, rar, y toda la familia tar.*. Las extensiones de los ficheros zip se pueden modificar, permitiendo así añadir más ficheros en formato zip según sea necesario. DocFetcher también puede gestionar un número ilimitado de ficheros anidados (por ejemplo un fichero zip que contiene un fichero 7z que contiene a su vez un fichero rar....  etc.)
@@ -56,7 +56,7 @@ En comparación con otras aplicaciones de búsqueda de escritorio, estas son las
 
 **Gratis para siempre**: Como DocFetcher es Open Source, no tienes que preocuparte porque el programa se quede obsoleto y sin soporte, ya que el código fuente estará siempre disponible. Hablando de soporte, ¿se ha enterado por las noticias de que Google Desktop, uno de los principales competidores comerciales de DocFetcher, fue discontinuado en 2011? Bien...
 
-**Multiplataforma**: A diferencia de muchos de nuestros competidores, DocFetcher no funciona sólo en Windows, sino que también lo hace en Linux y Mac OS&nbsp;X. Por lo que si en algún momento le apetece dejar Windows  y cambiar a Linux o Mac OS&nbsp;X, DocFetcher estará esperándole al otro lado.
+**Multiplataforma**: A diferencia de muchos de nuestros competidores, DocFetcher no funciona sólo en Windows, sino que también lo hace en Linux y OS&nbsp;X. Por lo que si en algún momento le apetece dejar Windows  y cambiar a Linux o OS&nbsp;X, DocFetcher estará esperándole al otro lado.
 
 **Portable**: Una de las mayores fortalezas de 
 
@@ -68,7 +68,7 @@ One of DocFetcher's outstanding features is that it is available as a portable v
 
 **Usage examples**: There are all kinds of things you can do with such a repository: You can carry it with you on a USB drive, burn it onto a CD-ROM for archiving purposes, put it in an encrypted volume (recommended: [TrueCrypt](http://www.truecrypt.org/)), synchronize it between multiple computers via a cloud storage service like [DropBox](http://www.dropbox.com/), etc. Better yet, since DocFetcher is Open Source, you can even redistribute your repository: Upload it and share it with the rest of the world if you want.
 
-**Java: Performance and portability**: One aspect some people might take issue with is that DocFetcher was written in Java, which has a reputation of being "slow". This was indeed true ten years ago, but since then Java's performance has seen much improvement, [according to Wikipedia](http://en.wikipedia.org/wiki/Java_%28software_platform%29#Performance). Anyways, the great thing about being written in Java is that the very same portable DocFetcher package can be run on Windows, Linux *and* Mac OS&nbsp;X &mdash; many other programs require using separate bundles for each platform. As a result, you can, for example, put your portable document repository on a USB drive and then access it from *any* of these operating systems, provided that a Java runtime is installed.
+**Java: Performance and portability**: One aspect some people might take issue with is that DocFetcher was written in Java, which has a reputation of being "slow". This was indeed true ten years ago, but since then Java's performance has seen much improvement, [according to Wikipedia](http://en.wikipedia.org/wiki/Java_%28software_platform%29#Performance). Anyways, the great thing about being written in Java is that the very same portable DocFetcher package can be run on Windows, Linux *and* OS&nbsp;X &mdash; many other programs require using separate bundles for each platform. As a result, you can, for example, put your portable document repository on a USB drive and then access it from *any* of these operating systems, provided that a Java runtime is installed.
 
 Cómo Funciona La Indexación
 ==================

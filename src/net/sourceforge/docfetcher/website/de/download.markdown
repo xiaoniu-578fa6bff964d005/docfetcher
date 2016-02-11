@@ -6,7 +6,7 @@ Falls Java 1.7 oder neuer nicht auf Ihrem System verfügbar ist, können Sie es 
 
 * Windows: <http://java.com>
 * Linux: Im offiziellen Software-Repository Ihrer Distribution.
-* Mac OS&nbsp;X: <http://java.com>
+* OS&nbsp;X: <http://java.com>
 
 Schritt 2: DocFetcher ${version} installieren
 ======================================
@@ -27,12 +27,12 @@ Alle unten aufgeführten Downloads unterstützen sowohl 32-Bit- als auch 64-Bit-
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/docfetcher-${version}-portable.zip/download">docfetcher-${version}-portable.zip</a> <br/> Dies ist die portable Version, die auf allen unterstützten Betriebssystemen läuft. Installation: Entpacken Sie das Archiv in einen Ordner Ihrer Wahl, und starten Sie dann DocFetcher mittels Doppelklick auf die passende Datei für Ihr Betriebssystem. Stellen Sie sicher, dass Sie über Schreibrechte für den Ordner verfügen, in den DocFetcher entpackt wurde (d.&nbsp;h., dass DocFetcher nicht in einen Ordner wie bspw. "C:\Program&nbsp;Files" entpackt werden sollte).
 </td>
-<td>Windows, Linux, Mac OS&nbsp;X</td>
+<td>Windows, Linux, OS&nbsp;X</td>
 </tr>
 <tr>
 <td align="left"><a href="http://sourceforge.net/projects/docfetcher/files/docfetcher/${version}/DocFetcher-${version}.dmg/download">DocFetcher-${version}.dmg</a> <br/> Starten Sie DocFetcher mittels Doppelklick auf das Application Bundle.
 </td>
-<td>Mac OS&nbsp;X</td>
+<td>OS&nbsp;X</td>
 </tr>
 </table>
 
