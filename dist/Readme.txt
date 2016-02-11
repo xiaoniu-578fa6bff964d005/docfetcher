@@ -1,12 +1,12 @@
 Requirements
 ========================================
-A Java Runtime Environment (JRE), version 1.6.0 or higher, is required. To find
+A Java Runtime Environment (JRE), version 1.7 or higher, is required. To find
 out what JRE version you have, open a command prompt and type in
-"java -version". If Java 1.6.0 or higher is not available on your system, you
+"java -version". If Java 1.7 or higher is not available on your system, you
 can obtain it in the following places:
 - Windows: http://java.com
 - Linux: In the official software repository of your distribution.
-- Mac OS X: http://www.apple.com/support/
+- Mac OS X: http://java.com
 
 
 How to start DocFetcher
