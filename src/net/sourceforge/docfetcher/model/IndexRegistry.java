@@ -629,7 +629,11 @@ public final class IndexRegistry {
 	 */
 	private static String loadIndexName(Path indexPath) throws IOException {
 		File f = new File(indexPath + "/" + NAME_FILENAME);
-		return CharsetDetectorHelper.toString(f).split("\\r?\\n")[0];
+		if(f.exists()) {
+			return CharsetDetectorHelper.toString(f).split("\\r?\\n")[0];
+		}
+		
+		return null;
 	}
 	
 	private boolean saveIndexName(File nameFile, String indexName) {
