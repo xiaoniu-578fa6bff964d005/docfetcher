@@ -13,16 +13,16 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +46,7 @@ import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
 import net.sourceforge.docfetcher.model.search.Searcher;
 import net.sourceforge.docfetcher.model.search.SourceCodeTokenizer;
 import net.sourceforge.docfetcher.util.AppUtil;
+import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.CallOnce;
@@ -98,8 +99,8 @@ public final class IndexRegistry {
 	public static volatile File indexPathOverride = null;
 
 	private static final String SER_FILENAME = "tree-index.ser";
-	private static final String NAME_FILENAME = "index.name";
-
+	private static final String NAME_FILENAME = "index-name.txt";
+	
 	/*
 	 * This setting prevents errors that would otherwise occur if the user
 	 * enters generic search terms like "*?".
@@ -563,7 +564,7 @@ public final class IndexRegistry {
 			
 			//If saving the index succeeded, save the indexName in a separate file
 			if (!saveIndexName(new File(indexDir, NAME_FILENAME), index.getRootFolder().getDisplayName()))
-				AppUtil.showError(Msg.saving_name_failed.get(), true, false);
+				AppUtil.showError(Msg.rename_index_failed.get(), true, false);
 
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());
@@ -622,37 +623,24 @@ public final class IndexRegistry {
 	}
 	
 	/**
-	 * Get the name of the index by reading the index.name file
+	 * Get the name of the index by reading the index-name.txt file
 	 * @param indexPath
 	 * @return indexName
 	 */
-	private String loadIndexName(Path indexPath) {
-		Util.printErr("LOADINGFILE");
+	private static String loadIndexName(Path indexPath) throws IOException {
 		File f = new File(indexPath + "/" + NAME_FILENAME);
-		if(f.exists() && !f.isDirectory()) { 
-		    try {
-				BufferedReader bfr = new BufferedReader(new FileReader(f));
-				String name =  bfr.readLine();
-				bfr.close();
-				return name;
-			} catch (IOException e) {
-				Util.printErr(e);
-				return null;
-			}
-		}	
-		
-		return null;
+		return CharsetDetectorHelper.toString(f).split("\\r?\\n")[0];
 	}
 	
 	private boolean saveIndexName(File nameFile, String indexName) {
-		// If the nameFile exists be is write protected
+		// Check if the nameFile exists but is write protected
 		if (nameFile.exists() && !nameFile.canWrite())
 			return false;
 		
 		try {
-			FileWriter fw = new FileWriter(nameFile);
-			fw.write(indexName);
-			fw.close();
+			Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nameFile), "utf-8"));
+			w.write(indexName);
+			w.close();
 		}
 		catch (IOException e){
 			Util.printErr(e);

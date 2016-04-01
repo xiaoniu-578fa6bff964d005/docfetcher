@@ -33,7 +33,6 @@ import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.ViewNode;
-import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.IndexingQueue;
 import net.sourceforge.docfetcher.model.index.IndexingQueue.Rejection;
 import net.sourceforge.docfetcher.model.index.Task.IndexAction;
@@ -305,33 +304,35 @@ public final class IndexPanel {
 			});
 		}
 		
-		class ChangeIndexNameAction extends MenuAction {
-			private String indexName;
-			public ChangeIndexNameAction(String label) {
+		class RenameIndexAction extends MenuAction {
+			public RenameIndexAction(String label) {
 				super(label);
 			}
 			
 			public boolean isEnabled() {
-				return onlyOneIndexSelected();
+				return viewer.getSelection().size() == 1;
 			}
 			
 			public void run() { 
 				List<LuceneIndex> sel = getSelectedIndexes();
 				LuceneIndex index = sel.get(0);
-				IndexingConfig config = index.getConfig();
 				TextInputDialog dlg = new TextInputDialog(tree.getShell(), 
-												  Msg.change_indexname_title.get(), 
-												  Msg.change_indexname_msg.get(),
-												  "");
+												  Msg.rename_index_title.get(), 
+												  Msg.rename_index_msg.get(),
+												  index.getRootFolder().getDisplayName());
 				
-				indexName = dlg.open();
-				
+				String indexName = dlg.open();
 				
 				if (indexName != null) {
-					index.getRootFolder().setDisplayName(indexName);
-					//config.setIndexName(indexName);
-					indexRegistry.save(index);
-					viewer.update();
+					if (indexName.trim().isEmpty()) {
+						String msg = Msg.empty_name.get();
+						AppUtil.showError(msg,  true, true);
+						renameIndexAction.run();
+					} else {
+						index.getRootFolder().setDisplayName(indexName);
+						indexRegistry.save(index);
+						viewer.update();
+					}
 				}
 			}
 		}
@@ -385,10 +386,9 @@ public final class IndexPanel {
 				menuManager.add(new UpdateOrRebuildAction(Msg.rebuild_index.get(), false));
 		}
 		
-		renameIndexAction = new ChangeIndexNameAction(Msg.change_indexname_context.get());
+		renameIndexAction = new RenameIndexAction(Msg.rename_index_context.get());
 		if (ProgramConf.Bool.AllowIndexUpdate.get() || ProgramConf.Bool.AllowIndexRebuild.get()) {
 			menuManager.addSeparatorIfNonEmpty();
-			
 			menuManager.add(renameIndexAction);
 		}
 		
@@ -557,7 +557,6 @@ public final class IndexPanel {
 							&& ProgramConf.Bool.AllowIndexUpdate.get())
 						updateIndexAction.run();
 				}
-				
 				else if (e.keyCode == SWT.F2) {
 					if (renameIndexAction != null && renameIndexAction.isEnabled()
 							&& ProgramConf.Bool.AllowIndexUpdate.get())
@@ -585,17 +584,6 @@ public final class IndexPanel {
 		for (ViewNode viewNode : selection)
 			if (!viewNode.isIndex())
 				return false;
-		return true;
-	}
-	
-	private boolean onlyOneIndexSelected() {
-		List<ViewNode> selection = viewer.getSelection();
-		if (selection.isEmpty())
-			return false;
-		
-		if (selection.size() != 1)
-			return false;
-		
 		return true;
 	}
 	

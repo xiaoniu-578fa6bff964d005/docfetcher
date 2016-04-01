@@ -127,18 +127,14 @@ public enum Msg {
 		"An error message that is shown during startup if it seems as if the " +
 		"user has installed or unpacked multiple DocFetcher instances on top " +
 		"of one another."),
-	change_indexname_context (
-		"Change Index Name\tF2"	
-			),
-	change_indexname_title (
-			"Change Index Name"	
-				),
-	change_indexname_msg (
-			"Please insert a new index name:"	
-				),
-	saving_name_failed (
-			"Saving the index name failed. File or folder could be write-protected"
-				),
+	rename_index_context (
+		"Rename Index\tF2"),
+	rename_index_title (
+		"Rename Index"),
+	rename_index_msg (
+		"Please enter a new index name:"),
+	rename_index_failed (
+		"Saving the index name failed. Index files might be write-protected."),
 	
 	// Filter panel
 	min_max_filesize (
@@ -416,9 +412,8 @@ public enum Msg {
 	
 	// Indexing dialog: Options
 	index_name (
-		"Index name:",
-		"Label for a text field setting the name of the index"
-			),
+		"Index name",
+		"Label for a text field setting the name of the index."),
 	file_extensions (
 		"File extensions",
 		"Label for a group of controls. The latter allow the user to specify " +
@@ -517,8 +512,7 @@ public enum Msg {
 		"document formats such as *.doc or *.odt. The user's zip extensions " +
 		"will be inserted into the {0} slot."),
 	empty_name (
-		"You haven't entered a index name"	
-			),
+		"Empty index names are not allowed."),
 	
 	// Indexing dialog: Pattern table
 	pattern_regex ("Pattern (regex)"),

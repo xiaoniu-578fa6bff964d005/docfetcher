@@ -133,13 +133,13 @@ final class FileConfigPanel extends ConfigPanel {
 	}
 	
 	protected boolean writeToConfig() {
-		
 		String indexName = indexGroupWrapper.getName();
-		if (indexName.isEmpty()) {
+		if (indexName.trim().isEmpty()) {
 			String msg = Msg.empty_name.get();
 			AppUtil.showError(msg,  true, true);
 			return false;
 		}
+		
 		// Validate the regexes
 		List<PatternAction> patternActions = patternTable.getPatternActions();
 		for (PatternAction patternAction : patternActions) {

@@ -1,18 +1,19 @@
 /*******************************************************************************
- * Copyright (c) 2008 Tran Nam Quang.
+ * Copyright (c) 2016 Roy van Lamoen.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Tran Nam Quang - initial API and implementation
+ *    Roy van Lamoen - initial API and implementation
  *******************************************************************************/
 
 package net.sourceforge.docfetcher.util.gui.dialog;
 
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Util;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
 import org.eclipse.swt.SWT;
@@ -123,6 +124,7 @@ public class TextInputDialog {
 	 * Opens the dialog and returns the input string or null if the dialog was
 	 * canceled.
 	 */
+	@Nullable
 	public String open() {
 		Util.setCenteredMinBounds(shell, 300, 150);
 		shell.open();
