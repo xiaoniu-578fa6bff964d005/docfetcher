@@ -506,6 +506,13 @@ public final class Util {
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		return text;
 	}
+	
+	@NotNull
+	public static Text createUnlabeledGridText(	@NotNull Composite parent) {
+		Text text = new Text(parent, SWT.BORDER | SWT.SINGLE);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		return text;
+	}
 
 	@NotNull
 	public static StyledText createLabeledGridStyledText(	@NotNull Composite parent,
@@ -1794,5 +1801,16 @@ public final class Util {
         }
         return false;
 	}
+	
+	/**
+	 * Return the original index name, which is based on the
+	 * root folder of the index
+	 */
+	public static String getDefaultIndexName(File rootFile){
+		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
+		return (Util.truncate(nameOrLetter));
+	}
+	
+	
 
 }

@@ -350,8 +350,7 @@ public final class IndexingDialog implements Dialog {
 		LuceneIndex index = task.getLuceneIndex();
 		
 		File rootFile = index.getCanonicalRootFile();
-		String nameOrLetter = Util.getNameOrLetter(rootFile, ":\\");
-		tabItem.setText(Util.truncate(nameOrLetter));
+		tabItem.setText(Util.getDefaultIndexName(rootFile));
 		tabItem.setToolTipText(Util.getSystemAbsPath(rootFile));
 		
 		if (task.is(TaskState.READY))

@@ -13,9 +13,12 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -33,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems.CorruptedIndex;
 import net.sourceforge.docfetcher.model.IndexLoadingProblems.OverflowIndex;
@@ -94,6 +98,7 @@ public final class IndexRegistry {
 	public static volatile File indexPathOverride = null;
 
 	private static final String SER_FILENAME = "tree-index.ser";
+	private static final String NAME_FILENAME = "index.name";
 
 	/*
 	 * This setting prevents errors that would otherwise occur if the user
@@ -448,6 +453,8 @@ public final class IndexRegistry {
 			finally {
 				lock.release();
 			}
+			//If index can be loaded, load the index name from file
+			index.getRootFolder().setDisplayName(loadIndexName(index.getIndexDirPath()));
 			addIndex(index, serFile.lastModified());
 			return true;
 		}
@@ -553,6 +560,10 @@ public final class IndexRegistry {
 			finally {
 				Closeables.closeQuietly(out);
 			}
+			
+			//If saving the index succeeded, save the indexName in a separate file
+			if (!saveIndexName(new File(indexDir, NAME_FILENAME), index.getRootFolder().getDisplayName()))
+				AppUtil.showError(Msg.saving_name_failed.get(), true, false);
 
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());
@@ -608,6 +619,47 @@ public final class IndexRegistry {
 		    //sink = new SourceCodeTokenFilter(matchVersion, sink);
 			return new TokenStreamComponents(source, sink);
 		}
+	}
+	
+	/**
+	 * Get the name of the index by reading the index.name file
+	 * @param indexPath
+	 * @return indexName
+	 */
+	private String loadIndexName(Path indexPath) {
+		Util.printErr("LOADINGFILE");
+		File f = new File(indexPath + "/" + NAME_FILENAME);
+		if(f.exists() && !f.isDirectory()) { 
+		    try {
+				BufferedReader bfr = new BufferedReader(new FileReader(f));
+				String name =  bfr.readLine();
+				bfr.close();
+				return name;
+			} catch (IOException e) {
+				Util.printErr(e);
+				return null;
+			}
+		}	
+		
+		return null;
+	}
+	
+	private boolean saveIndexName(File nameFile, String indexName) {
+		// If the nameFile exists be is write protected
+		if (nameFile.exists() && !nameFile.canWrite())
+			return false;
+		
+		try {
+			FileWriter fw = new FileWriter(nameFile);
+			fw.write(indexName);
+			fw.close();
+		}
+		catch (IOException e){
+			Util.printErr(e);
+			return false;
+		}
+		
+		return true;
 	}
 
 }

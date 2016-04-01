@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Group;
  * @author Tran Nam Quang
  */
 final class FileConfigPanel extends ConfigPanel {
-	
+	@NotNull private IndexNameGroupWrapper indexGroupWrapper;
 	@NotNull private FileExtensionGroupWrapper extGroupWrapper;
 	@NotNull private PatternTable patternTable;
 	@NotNull private Button htmlPairingBt;
@@ -59,6 +59,8 @@ final class FileConfigPanel extends ConfigPanel {
 	protected Control createContents(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
 		
+		indexGroupWrapper = new IndexNameGroupWrapper(comp, index);
+				
 		extGroupWrapper = new FileExtensionGroupWrapper(comp, index);
 		Group extGroup = extGroupWrapper.getGroup();
 		
@@ -131,6 +133,13 @@ final class FileConfigPanel extends ConfigPanel {
 	}
 	
 	protected boolean writeToConfig() {
+		
+		String indexName = indexGroupWrapper.getName();
+		if (indexName.isEmpty()) {
+			String msg = Msg.empty_name.get();
+			AppUtil.showError(msg,  true, true);
+			return false;
+		}
 		// Validate the regexes
 		List<PatternAction> patternActions = patternTable.getPatternActions();
 		for (PatternAction patternAction : patternActions) {
@@ -159,6 +168,7 @@ final class FileConfigPanel extends ConfigPanel {
 		
 		IndexingConfig config = index.getConfig();
 		
+		index.getRootFolder().setDisplayName(indexName);
 		config.setTextExtensions(textExtensions);
 		config.setZipExtensions(zipExtensions);
 		config.setPatternActions(patternActions);
@@ -203,7 +213,8 @@ final class FileConfigPanel extends ConfigPanel {
 	
 	protected void restoreDefaults() {
 		IndexingConfig config = index.getConfig();
-		
+			
+		indexGroupWrapper.setName(Util.getDefaultIndexName(index.getCanonicalRootFile()));
 		extGroupWrapper.setTextExtensions(config.getTextExtensions());
 		extGroupWrapper.setZipExtensions(config.getZipExtensions());
 		patternTable.restoreDefaults();

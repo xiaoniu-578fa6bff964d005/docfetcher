@@ -40,7 +40,7 @@ public abstract class TreeNode implements Serializable {
 	 * application might be enormous, so it's important to avoid wasting RAM
 	 * here.)
 	 */
-	@Nullable private final String displayName;
+	@Nullable private String displayName;
 	
 	/**
 	 * The indexing errors that occurred on this tree node the last time the
@@ -66,6 +66,11 @@ public abstract class TreeNode implements Serializable {
 	@NotNull
 	public final String getDisplayName() {
 		return displayName == null ? name : displayName;
+	}
+	
+	@NotNull
+	public final void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 	
 	@NotNull
