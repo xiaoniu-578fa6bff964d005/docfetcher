@@ -9,6 +9,9 @@
 # The text to display in the title bar of the main window and in the task bar.
 # This setting might be useful for rebranding and for using multiple instances
 # of DocFetcher.
+# You can also rename the main help files (by default "DocFetcher_Manual.html")
+# and their associated HTML folders if you want. If you do the latter, you'll
+# have to update the hyperlinks in the HTML files.
 AppName = DocFetcher
 
 # Whether to show a link to this file on the preferences dialog. Disable this

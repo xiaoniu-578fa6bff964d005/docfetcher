@@ -242,6 +242,9 @@ public final class FolderWatcher {
 				}
 				catch (Exception e) {
 					String url = ManualLocator.getManualSubpageUrl("Watch_Limit.html");
+					if (url == null) {
+						url = "???";
+					}
 					String msg = Msg.install_watch_failed.format(
 						index.getDisplayName(), url, e.getMessage());
 					evtWatchLimitError.fire(msg);

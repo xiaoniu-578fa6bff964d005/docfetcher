@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.gui;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.Locale;
 
@@ -25,8 +26,6 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
  * @author Tran Nam Quang
  */
 public final class ManualLocator {
-	
-	public static final String manualFilename = "DocFetcher_Manual.html";
 	
 	private ManualLocator() {}
 	
@@ -49,26 +48,46 @@ public final class ManualLocator {
 		if (manualParentDir == null)
 			return null;
 		
-		return new File(manualParentDir, manualFilename);
+		File[] htmlFiles = Util.listFiles(manualParentDir, new FileFilter() {
+			public boolean accept(File file) {
+				return file.isFile() &&
+						Util.hasExtension(file.getName(), "html", "htm");
+			}
+		});
+		if (htmlFiles.length == 0)
+			return null;
+		
+		return htmlFiles[0];
 	}
 	
-	@NotNull
+	@Nullable
 	public static File getManualSubpageFile(@NotNull String htmlFilename) {
 		File manFile = getManualFile();
 		if (manFile == null)
-			return new File(""); // TODO post-release-1.1: Show error message instead
-		String parentPath = Util.getParentFile(manFile).getPath();
-		String path = Util.joinPath(parentPath, "DocFetcher_Manual_files/" + htmlFilename);
-		return new File(path);
+			return null;
+		File parent = Util.getParentFile(manFile);
+		File[] dirs = Util.listFiles(parent, new FileFilter() {
+			public boolean accept(File file) {
+				return file.isDirectory();
+			}
+		});
+		if (dirs.length == 0) {
+			return null;
+		}
+		return new File(dirs[0], htmlFilename);
 	}
 	
-	@NotNull
+	@Nullable
 	public static String getManualSubpageUrl(@NotNull String htmlFilename) {
 		try {
-			return getManualSubpageFile(htmlFilename).toURI().toURL().toString();
+			File file = getManualSubpageFile(htmlFilename);
+			if (file == null) {
+				return null;
+			}
+			return file.toURI().toURL().toString();
 		}
 		catch (MalformedURLException e) {
-			return ""; // TODO post-release-1.1: Show error message instead
+			return null;
 		}
 	}
 	

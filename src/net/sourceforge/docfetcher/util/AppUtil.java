@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher.util;
 
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,14 +20,14 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.awt.AWTException;
-import java.awt.Robot;
 
+import net.sourceforge.docfetcher.enums.ProgramConf;
+import net.sourceforge.docfetcher.enums.SettingsConf;
+import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
-import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
-import net.sourceforge.docfetcher.enums.SettingsConf;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.swt.SWT;
@@ -265,7 +267,7 @@ public final class AppUtil {
 				Shell shell = new Shell(display);
 				MessageBox msgBox = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
 				msgBox.setText(Messages.confirm_operation.value);
-				msgBox.setMessage(Messages.program_running_launch_another.format(Const.PROGRAM_NAME.value));
+				msgBox.setMessage(Messages.program_running_launch_another.format(ProgramConf.Str.AppName.get()));
 				int ans = msgBox.open();
 				display.dispose();
 				if(ans != SWT.OK) {

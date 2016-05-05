@@ -627,6 +627,7 @@ public final class IndexRegistry {
 	 * @param indexPath
 	 * @return indexName
 	 */
+	@Nullable
 	private static String loadIndexName(Path indexPath) throws IOException {
 		File f = new File(indexPath + "/" + NAME_FILENAME);
 		if(f.exists()) {
@@ -636,7 +637,7 @@ public final class IndexRegistry {
 		return null;
 	}
 	
-	private boolean saveIndexName(File nameFile, String indexName) {
+	private static boolean saveIndexName(File nameFile, String indexName) {
 		// Check if the nameFile exists but is write protected
 		if (nameFile.exists() && !nameFile.canWrite())
 			return false;

@@ -111,7 +111,13 @@ abstract class ConfigPanel {
 		
 		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Util.launch(ManualLocator.getManualSubpageFile("Indexing_Options.html"));
+				File file = ManualLocator.getManualSubpageFile("Indexing_Options.html");
+				if (file == null) {
+					AppUtil.showError(Msg.file_not_found.get() + "\n" +
+							"Indexing_Options.html", true, false);
+				} else {
+					Util.launch(file);
+				}
 			}
 		});
 		

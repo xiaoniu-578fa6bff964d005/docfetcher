@@ -22,6 +22,7 @@ import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.ManualLocator;
 import net.sourceforge.docfetcher.gui.UtilGui;
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -171,7 +172,13 @@ public final class PrefDialog {
 
 		Button helpBt = Util.createPushButton(comp, Msg.help.get(), new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Util.launch(ManualLocator.getManualSubpageFile("Preferences.html"));
+				File file = ManualLocator.getManualSubpageFile("Preferences.html");
+				if (file == null) {
+					AppUtil.showError(Msg.file_not_found.get() + "\n" +
+							"Preferences.html", true, false);
+				} else {
+					Util.launch(file);
+				}
 			}
 		});
 
