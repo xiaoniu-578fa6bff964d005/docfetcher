@@ -44,8 +44,6 @@ public final class ProgramConf {
 
 	public static enum Bool implements Loadable {
 		FixWindowSizes (false),
-		CurvyTabs (false),
-		ColoredTabs (false),
 		DryRun (false),
 		AllowIndexCreation (true),
 		AllowIndexUpdate (true),

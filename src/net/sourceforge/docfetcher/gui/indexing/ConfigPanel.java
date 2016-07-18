@@ -54,7 +54,7 @@ abstract class ConfigPanel {
 		this.index = index;
 		
 		comp = new Composite(parent, SWT.NONE);
-		comp.setLayout(Util.createGridLayout(1, false, 0, 0));
+		comp.setLayout(Util.createGridLayout(1, false, 5, 0));
 		
 		Composite targetComp = new Composite(comp, SWT.NONE);
 		UtilGui.setGridData(targetComp, false);

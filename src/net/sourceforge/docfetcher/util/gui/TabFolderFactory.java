@@ -24,7 +24,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
@@ -57,13 +56,6 @@ public final class TabFolderFactory {
 			tabFolder = new CTabFolder(parent, style);
 			tabFolder.setRenderer(new CustomRenderer(tabFolder, coloredTabs));
 		}
-		
-		// Increase tab height
-		Display display = tabFolder.getDisplay();
-		GC gc = new GC(display);
-		int fontHeight = gc.getFontMetrics().getHeight();
-		tabFolder.setTabHeight(fontHeight * 2);
-		gc.dispose();
 		
 		return tabFolder;
 	}

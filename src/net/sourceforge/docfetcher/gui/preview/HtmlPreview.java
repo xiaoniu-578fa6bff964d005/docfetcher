@@ -176,7 +176,7 @@ final class HtmlPreview extends ToolBarForm {
 					}
 				}
 				locationBar.setText(path);
-	            
+				
 				/*
 				 * The appropriate color is 'LIST_BACKGROUND', not 'WHITE',
 				 * because the user might have chosen a dark theme.

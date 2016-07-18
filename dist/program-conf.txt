@@ -23,12 +23,6 @@ ShowAdvancedSettingsLink = true
 # saved sizes on startup.
 FixWindowSizes = false
 
-# Whether to use curvy or rectangular tabs.
-CurvyTabs = false
-
-# Whether to use colored tabs.
-ColoredTabs = true
-
 # HTML file extensions. This setting will affect detection of HTML files and
 # DocFetcher's HTML pairing mechanism.
 HtmlExtensions = html;htm;xhtml;shtml;shtm;php;asp;jsp

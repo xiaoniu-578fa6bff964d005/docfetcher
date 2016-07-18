@@ -16,7 +16,6 @@ import java.util.List;
 
 import net.sourceforge.docfetcher.enums.Img;
 import net.sourceforge.docfetcher.enums.Msg;
-import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
 import net.sourceforge.docfetcher.gui.indexing.SingletonDialogFactory.Dialog;
@@ -100,9 +99,7 @@ public final class IndexingDialog implements Dialog {
 		SettingsConf.ShellBounds.IndexingDialog.bind(shell);
 		
 		// Create tabfolder
-		boolean curvyTabs = ProgramConf.Bool.CurvyTabs.get();
-		boolean coloredTabs = ProgramConf.Bool.ColoredTabs.get();
-		tabFolder = TabFolderFactory.create(shell, true, curvyTabs, coloredTabs);
+		tabFolder = TabFolderFactory.create(shell, true, true, false);
 		
 		// Create tabfolder toolbar
 		ToolBar toolBar = new ToolBar(tabFolder, SWT.FLAT);
