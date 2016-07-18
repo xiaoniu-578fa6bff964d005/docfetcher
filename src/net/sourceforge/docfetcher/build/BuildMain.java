@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sourceforge.docfetcher.Main;
 import net.sourceforge.docfetcher.TestFiles;
@@ -335,6 +336,10 @@ public final class BuildMain {
 
 	private static void runTests() {
 		Util.println("Running tests...");
+		
+		Logger logger = Logger.getLogger("org.apache.pdfbox.pdfparser.PDFParser");
+		logger.setLevel(java.util.logging.Level.OFF);
+		
 		final List<String> classNames = new ArrayList<String>();
 		new FileWalker() {
 			protected void handleFile(File file) {
