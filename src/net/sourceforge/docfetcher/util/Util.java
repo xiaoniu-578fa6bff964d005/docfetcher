@@ -1453,18 +1453,12 @@ public final class Util {
 	 * Launches the given filename or filepath, and returns whether the file was
 	 * successfully launched. This method first tries to launch the file via the
 	 * SWT method {@link Program#launch(String)}. If this fails and the
-	 * application is running on Linux, this method tries to call xdg-open. This
-	 * is what usually happens on KDE-based Linux variants, which are not
-	 * supported by SWT.
+	 * application is running on Linux, this method tries to call xdg-open.
 	 */
 	public static boolean launch(@NotNull String filename) {
 		Util.checkNotNull(filename);
-
-		/*
-		 * On KDE with SWT 3.7, calling Program.launch will throw an
-		 * UnsatisfiedLinkError, so don't do that and only try xdg-open.
-		 */
-		if (!IS_LINUX_KDE && Program.launch(filename))
+		
+		if (Program.launch(filename))
 			return true;
 
 		if (!IS_LINUX)
