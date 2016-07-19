@@ -1,7 +1,7 @@
 # In this configuration file you can customize the paths where DocFetcher will
-# look for its settings and index files. Important: This file should only be
-# edited in the *portable* version of DocFetcher; doing so in the
-# *non-portable* version will lead to errors.
+# look for its settings and index files. These settings apply only to the
+# *portable* version of DocFetcher; in the non-portable version they are
+# ignored.
 # 
 # This file follows the conventions of the Java Properties format. In
 # particular, the following rules apply:
