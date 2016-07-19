@@ -534,10 +534,19 @@ public final class AppUtil {
 		catch (IOException e) {
 			e.printStackTrace(); // We'll give up here
 		}
-
+		
 		// Show stacktrace in error window
 		Util.runSwtSafe(display, new Runnable() {
 			public void run() {
+				/*
+				 * We don't want to fill up the user's workspace with hundreds
+				 * of crash windows. Note that this check only works if it's run
+				 * inside the SWT thread.
+				 */
+				if (StackTraceWindow.windowCount >= 5) {
+					return;
+				}
+				
 				StackTraceWindow window = new StackTraceWindow(display);
 				window.setTitle(throwable.getClass().getSimpleName());
 				String path = Util.getSystemAbsPath(traceFile);
