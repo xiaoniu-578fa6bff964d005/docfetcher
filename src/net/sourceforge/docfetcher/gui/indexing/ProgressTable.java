@@ -90,6 +90,15 @@ final class ProgressTable {
 		
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
+				if (event.index < 0 || event.index >= tableItems.size()) {
+					/*
+					 * On some systems, event.index can be -1. Seen with SWT 4.6
+					 * on CentOS 7 64-Bit with SWT_GTK3 enabled. Returning here
+					 * doesn't solve the problem completely, as it will cause
+					 * the progress table to remain visually empty.
+					 */
+					return;
+				}
 				TableItem item = (TableItem) event.item;
 				item.setText(tableItems.get(event.index));
 			}
