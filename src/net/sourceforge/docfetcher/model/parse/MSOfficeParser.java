@@ -128,8 +128,12 @@ abstract class MSOfficeParser extends FileParser {
 			try {
 				reader.read(in);
 			}
-			catch (IllegalArgumentException e) {
-				// Bug #3537738: "IllegalArgumentException: name cannot be empty"
+			catch (RuntimeException e) {
+				/*
+				 * POI can throw a variety of RuntimeExceptions, including for
+				 * instance IndexOutOfBoundsException with POI 3.13, as reported
+				 * here: https://sourceforge.net/p/docfetcher/bugs/1200/
+				 */
 				throw new ParseException(e);
 			}
 			
