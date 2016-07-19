@@ -242,6 +242,14 @@ public final class IndexPanel {
 				Util.runAsyncExec(tree, new Runnable() {
 					public void run() {
 						viewer.addRoot(eventData);
+						
+						/*
+						 * Special case: If a new index is added, the tree
+						 * filter must be updated, otherwise matches from the
+						 * new index won't be shown until the user changes the
+						 * tree filter or restarts the program.
+						 */
+						evtCheckStatesChanged.fire(null);
 					}
 				});
 			}
