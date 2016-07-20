@@ -179,9 +179,19 @@ public final class BuildMain {
 		String dstMainJar = U.format("%s/lib/%s", releaseDir, jarName);
 		U.copyBinaryFile(tmpMainJar.getPath(), dstMainJar);
 
-		String linuxLauncher = U.format("%s/%s.sh", releaseDir, appName);
+		// Linux launchers
+		String linuxLauncherGtk2 = U.format("%s/%s-GTK2.sh", releaseDir, appName);
 		U.copyTextFile(
-			"dist/launchers/launcher-linux.sh", linuxLauncher, LineSep.UNIX,
+			"dist/launchers/launcher-linux-gtk2.sh",
+			linuxLauncherGtk2,
+			LineSep.UNIX,
+			"${main_class}", Main.class.getName()
+		);
+		String linuxLauncherGtk3 = U.format("%s/%s-GTK3.sh", releaseDir, appName);
+		U.copyTextFile(
+			"dist/launchers/launcher-linux-gtk3.sh",
+			linuxLauncherGtk3,
+			LineSep.UNIX,
 			"${main_class}", Main.class.getName()
 		);
 
@@ -201,7 +211,7 @@ public final class BuildMain {
 
 		makeExecutable(
 			"Cannot make the portable launcher shell scripts executable.",
-			linuxLauncher, macOsXLauncher);
+			linuxLauncherGtk2, linuxLauncherGtk3, macOsXLauncher);
 
 		String exeLauncher = U.format("%s/%s.exe", releaseDir, appName);
 		U.copyBinaryFile("dist/launchers/DocFetcher-512.exe", exeLauncher);
