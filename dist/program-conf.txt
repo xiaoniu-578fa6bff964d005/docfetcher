@@ -1,10 +1,17 @@
-# General program settings
+#===============================================================================
+#	ADVANCED SETTINGS
+#===============================================================================
 #
-# Some tips:
+# Notes on editing this file:
 # * Use the '#' character at the beginning of a line to comment it out.
 # * Changes will take effect after the program is restarted.
 # * To restore the defaults, simply delete this file. It will be recreated the
 #   next time the program is started.
+
+
+#===============================================================================
+#	General
+#===============================================================================
 
 # The text to display in the title bar of the main window and in the task bar.
 # This setting might be useful for rebranding and for using multiple instances
@@ -14,18 +21,43 @@
 # have to update the hyperlinks in the HTML files.
 AppName = DocFetcher
 
+# By default, when DocFetcher starts up it checks the index folder for any
+# obsolete index files, and if it finds any, it asks the user whether the files
+# should be deleted. You can turn this off with this setting.
+ReportObsoleteIndexFiles = true
+
 # Whether to show a link to this file on the preferences dialog. Disable this
 # setting to prevent users from mucking around in this file.
 ShowAdvancedSettingsLink = true
+
+# Whether the user is allowed to create, update, rebuild and remove indexes,
+# respectively. Disabling any of these setings will hide the respective context
+# menu entries in the Search Scope pane.
+AllowIndexCreation = true
+AllowIndexUpdate = true
+AllowIndexRebuild = true
+AllowIndexDeletion = true
 
 # If this is true, the program will not store changes made by the user to the
 # sizes of the various program windows. Instead, it will always reload the last
 # saved sizes on startup.
 FixWindowSizes = false
 
+# Whether any changes to the program settings should be written to disk.
+SaveSettings = true
+
+
+#===============================================================================
+#	Indexing
+#===============================================================================
+
 # HTML file extensions. This setting will affect detection of HTML files and
 # DocFetcher's HTML pairing mechanism.
 HtmlExtensions = html;htm;xhtml;shtml;shtm;php;asp;jsp
+
+# The height of the regex table on the indexing dialog, measured (approximately)
+# in number of visible rows.
+PatternTableHeight = 4
 
 # The maximum number of lines to display in the indexing progress panel. When
 # the number of lines exceeds this limit, lines at the top will be discarded.
@@ -33,12 +65,64 @@ HtmlExtensions = html;htm;xhtml;shtml;shtm;php;asp;jsp
 # OutOfMemoryError.
 MaxLinesInProgressPanel = 1000
 
-# The size limit of the search history, which can be accessed through the
-# drop-down menu next to the search text field.
-SearchHistorySize = 20
+# If this is set to true, all text extraction during indexing will be disabled.
+# Mainly useful for debugging.
+DryRun = false
+
+# The type of analyzer used during indexing.
+# 0 = StandardAnalyzer
+# 1 = SourceCodeAnalyzer
+# Among other things, this option has an effect on how the raw document text is
+# split into words. The StandardAnalyzer is suitable in most cases, but the
+# SourceCodeAnalyzer may give better results for source code files (e.g. it
+# splits words containing dots, such as 'list.iterator').
+# Important: After changing this option, you must restart DocFetcher and then
+# rebuild all existing indexes, otherwise you might get inconsistent search
+# results.
+Analyzer = 0
+
+# Whether support for tar archives is disabled. If disabled, tar archives will
+# be treated as ordinary files. Set this to true if you experience tar-related
+# issues, e.g. your temporary directory filling up with tzp*.tmp files, or just
+# want to speed up indexing by completely avoiding the unpacking of tar
+# archives.
+SkipTarArchives = false
+
+# Whether DocFetcher should follow or ignore NTFS junctions and symlinks during
+# indexing. Normally, DocFetcher ignores them in order to avoid getting stuck
+# in circular folder structures.
+IgnoreJunctionsAndSymlinks = true
+
+# This setting determines whether DocFetcher indexes a formula in an MS Excel
+# file as is, or whether it indexes the formula's result instead. For example,
+# if a cell contains the formula "=2+2", DocFetcher will either literally
+# extract "=2+2" from the cell, or "4", depending on this setting's value.
+# Changes to this setting will immediately affect the preview pane, but not the
+# indexes, so you'll have to rebuild the latter after the change.
+IndexExcelFormulas = true
+
+# Plain text files (e.g. files with extension ".txt") don't contain any explicit
+# text encoding information, so when DocFetcher parses them, it has to use
+# heuristics to determine the encoding. This might not always give the correct
+# result; if that happens, you can use this setting to disable the heuristics
+# and specify the text encoding manually. For example, set this setting's value
+# to "GBK" for Simplified Chinese GBK encoding. For a list of available
+# encodings, see:
+# http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html
+# If the above link doesn't work, google for "java supported encodings".
+TextEncodingOverride =
+
+
+#===============================================================================
+#	Searching, results and preview
+#===============================================================================
 
 # The maximum width of the search text field in pixels.
 SearchBoxMaxWidth = 500
+
+# The size limit of the search history, which can be accessed through the
+# drop-down menu next to the search text field.
+SearchHistorySize = 20
 
 # By default, DocFetcher initially sorts the results by score. To change the
 # initial sorting criterion, specify the number of the column to sort by here.
@@ -57,75 +141,8 @@ InitialSorting = 0
 # index (rather than picking the highest-scoring results across all indexes).
 MaxResultsTotal = 10000
 
-# The height of the regex table on the indexing dialog, measured (approximately)
-# in number of visible rows.
-PatternTableHeight = 4
-
-# This setting determines whether DocFetcher indexes a formula in an MS Excel
-# file as is, or whether it indexes the formula's result instead. For example,
-# if a cell contains the formula "=2+2", DocFetcher will either literally
-# extract "=2+2" from the cell, or "4", depending on this setting's value.
-# Changes to this setting will immediately affect the preview pane, but not the
-# indexes, so you'll have to rebuild the latter after the change.
-IndexExcelFormulas = true
-
-# If this is set to true, all text extraction during indexing will be disabled.
-# Mainly useful for debugging.
-DryRun = false
-
 # The capacity of the unpack cache. The latter holds archive entries that were
 # unpacked for display in the preview pane and makes sure they won't get deleted
 # immediately. The oldest entries are deleted first when this capacity limit
 # is reached. The cache is cleared when the program terminates.
 UnpackCacheCapacity = 20
-
-# The type of analyzer used during indexing.
-# 0 = StandardAnalyzer
-# 1 = SourceCodeAnalyzer
-# Among other things, this option has an effect on how the raw document text is
-# split into words. The StandardAnalyzer is suitable in most cases, but the
-# SourceCodeAnalyzer may give better results for source code files (e.g. it
-# splits words containing dots, such as 'list.iterator').
-# Important: After changing this option, you must restart DocFetcher and then
-# rebuild all existing indexes, otherwise you might get inconsistent search
-# results.
-Analyzer = 0
-
-# Whether the user is allowed to create, update, rebuild and remove indexes,
-# respectively. Disabling any of these setings will hide the respective context
-# menu entries in the Search Scope pane.
-AllowIndexCreation = true
-AllowIndexUpdate = true
-AllowIndexRebuild = true
-AllowIndexDeletion = true
-
-# By default, when DocFetcher starts up it checks the index folder for any
-# obsolete index files, and if it finds any, it asks the user whether the files
-# should be deleted. You can turn this off with this setting.
-ReportObsoleteIndexFiles = true
-
-# Whether any changes to the program settings should be written to disk.
-SaveSettings = true
-
-# Whether support for tar archives is disabled. If disabled, tar archives will
-# be treated as ordinary files. Set this to true if you experience tar-related
-# issues, e.g. your temporary directory filling up with tzp*.tmp files, or just
-# want to speed up indexing by completely avoiding the unpacking of tar
-# archives.
-SkipTarArchives = false
-
-# Whether DocFetcher should follow or ignore NTFS junctions and symlinks during
-# indexing. Normally, DocFetcher ignores them in order to avoid getting stuck
-# in circular folder structures.
-IgnoreJunctionsAndSymlinks = true
-
-# Plain text files (e.g. files with extension ".txt") don't contain any explicit
-# text encoding information, so when DocFetcher parses them, it has to use
-# heuristics to determine the encoding. This might not always give the correct
-# result; if that happens, you can use this setting to disable the heuristics
-# and specify the text encoding manually. For example, set this setting's value
-# to "GBK" for Simplified Chinese GBK encoding. For a list of available
-# encodings, see:
-# http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html
-# If the above link doesn't work, google for "java supported encodings".
-TextEncodingOverride =
