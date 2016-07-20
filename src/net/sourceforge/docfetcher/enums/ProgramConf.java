@@ -72,7 +72,7 @@ public final class ProgramConf {
 	public static enum Int implements Loadable {
 		SearchHistorySize (20, 1),
 		MaxLinesInProgressPanel (1000, 2),
-		SearchBoxMaxWidth (200, 0),
+		SearchBoxMaxWidth (500, 0),
 		MaxResultsTotal (10000, 1),
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),

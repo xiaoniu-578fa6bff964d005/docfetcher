@@ -38,7 +38,7 @@ MaxLinesInProgressPanel = 1000
 SearchHistorySize = 20
 
 # The maximum width of the search text field in pixels.
-SearchBoxMaxWidth = 200
+SearchBoxMaxWidth = 500
 
 # By default, DocFetcher initially sorts the results by score. To change the
 # initial sorting criterion, specify the number of the column to sort by here.
