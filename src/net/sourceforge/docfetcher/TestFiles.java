@@ -28,6 +28,7 @@ public enum TestFiles {
 	archive_entry_zip_zip ("zip.zip/test.zip/test.txt"),
 	multi_page_pdf ("multi-page.pdf"),
 	encrypted_pdf ("encrypted-(password='docfetcher').pdf"),
+	encrypted_odt ("encrypted-(password='docfetcher').odt"),
 	html ("test.html"),
 	doc ("testWORD-Tika.doc"),
 	docx ("testWORD-Tika.docx"),

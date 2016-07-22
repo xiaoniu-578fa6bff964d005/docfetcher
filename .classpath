@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="lib/jna/jna-platform-3.2.7.jar" sourcepath="lib/jna/jna-3.2.7-src.zip"/>
 	<classpathentry kind="lib" path="lib/ant/ant-1.8.2.jar" sourcepath="lib/ant/ant-1.8.2-src-stripped.zip"/>
 	<classpathentry kind="lib" path="lib/juniversalchardet/juniversalchardet-1.0.3.jar" sourcepath="lib/juniversalchardet/juniversalchardet-1.0.3-src-stripped.zip"/>
-	<classpathentry kind="lib" path="lib/odf-utils/odf-utils-20051129.jar"/>
 	<classpathentry kind="lib" path="lib/pegdown/parboiled-core-1.0.2.jar" sourcepath="lib/pegdown/parboiled-core-1.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pegdown/parboiled-java-1.0.2.jar" sourcepath="lib/pegdown/parboiled-java-1.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/pegdown/pegdown-1.1.0.jar" sourcepath="lib/pegdown/pegdown-1.1.0-sources.jar"/>

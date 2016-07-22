@@ -31,7 +31,9 @@ parser_root = "tika-parsers/src/main/java/org/apache/tika"
 parser_packages = """
 	parser/chm
 	parser/mp3
+	parser/odf
 	parser/rtf
+	parser/xml
 """
 files_to_delete = """
 	ChmParser.java
@@ -168,7 +170,8 @@ with open(src_path, "r") as f_src:
 		f_dst.write(f_src.read())
 
 # Fix TextExtractor: Disable assertions that would otherwise cause DocFetcher to
-# crash on some RTF files created by TextMaker.
+# crash on some RTF files created by TextMaker. See:
+# http://sourceforge.net/p/docfetcher/discussion/702424/thread/8a3dd4f6/
 dst_path = osp.join(dst_root, "parser/rtf/TextExtractor.java")
 contents = ""
 with open(dst_path, "r") as f:

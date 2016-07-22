@@ -11,36 +11,26 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipException;
 
-import net.htmlparser.jericho.CharacterReference;
-import net.htmlparser.jericho.Element;
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.StartTag;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
-import net.sourceforge.docfetcher.util.annotations.Nullable;
 
-import com.catcode.odf.OpenDocumentTextInputStream;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
+import org.apache.tika.parser.odf.OpenDocumentParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
 
 /**
  * @author Tran Nam Quang
  */
-abstract class OpenOfficeParser extends FileParser {
+abstract class OpenOfficeParser extends StreamParser {
 	
 	public static final class OpenOfficeWriterParser extends OpenOfficeParser {
 		public OpenOfficeWriterParser() {
@@ -89,106 +79,39 @@ abstract class OpenOfficeParser extends FileParser {
 	}
 	
 	@Override
-	protected final ParseResult parse(	@NotNull File file,
+	protected final ParseResult parse(	@NotNull InputStream in,
 										@NotNull ParseContext context)
 			throws ParseException {
-		ZipFile zipFile = null;
+		OpenDocumentParser tikaParser = new OpenDocumentParser();
+		BodyContentHandler contentHandler = new BodyContentHandler(-1);
+		Metadata metadata = new Metadata();
 		try {
-			// Get zip entries
-			zipFile = new ZipFile(file);
-			
-			// Find out if file is password protected
-			Source manifSource = UtilParser.getSource(zipFile, "META-INF/manifest.xml"); //$NON-NLS-1$
-			StartTag encryptTag = manifSource.getNextStartTag(0, "manifest:encryption-data"); //$NON-NLS-1$
-			if (encryptTag != null)
+			tikaParser.parse(in, contentHandler, metadata, ParseService.tikaContext());
+			ParseResult result = new ParseResult(contentHandler.toString())
+				.setTitle(metadata.get(TikaCoreProperties.TITLE))
+				.addAuthor(metadata.get(TikaCoreProperties.CREATOR))
+				.addMiscMetadata(metadata.get(TikaCoreProperties.DESCRIPTION))
+				.addMiscMetadata(metadata.get(TikaCoreProperties.TRANSITION_SUBJECT_TO_OO_SUBJECT))
+				.addMiscMetadata(metadata.get(TikaCoreProperties.KEYWORDS));
+			for (String name : metadata.names()) {
+				if (name.startsWith("custom:")) {
+					result.addMiscMetadata(metadata.get(name));
+				}
+			}
+			return result;
+		}
+		catch (ZipException e) {
+			String msg = "only DEFLATED entries can have EXT descriptor";
+			if (e.getMessage().equals(msg)) {
 				throw new ParseException(Msg.doc_pw_protected.get());
-			
-			// Get tags from meta.xml file
-			Source metaSource = UtilParser.getSource(zipFile, "meta.xml"); //$NON-NLS-1$
-			String title = getElementContent(metaSource, "dc:title"); //$NON-NLS-1$
-			String author = getElementContent(metaSource, "dc:creator"); //$NON-NLS-1$
-			String description = getElementContent(metaSource, "dc:description"); //$NON-NLS-1$
-			String subject = getElementContent(metaSource, "dc:subject"); //$NON-NLS-1$
-			String keyword = getElementContent(metaSource, "meta:keyword"); //$NON-NLS-1$
-
-			// Collect content.xml entries
-			List<ZipEntry> contentEntries = new ArrayList<ZipEntry>();
-			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
-			if (contentZipEntry == null) { // bug #741
-				throw new ParseException("This document contains no content.xml file.");
 			}
-			contentEntries.add(contentZipEntry);
-			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				ZipEntry entry = zipEntries.nextElement();
-				if (entry.getName().endsWith("/content.xml")) //$NON-NLS-1$
-					contentEntries.add(entry);
+			else {
+				throw new ParseException(e);
 			}
-			
-			// Get contents from the content.xml entries
-			StringBuilder sb = new StringBuilder();
-			for (ZipEntry entry : contentEntries) {
-				InputStream contentInputStream = zipFile.getInputStream(entry);
-				Source contentSource = new Source(contentInputStream);
-				Closeables.closeQuietly(contentInputStream);
-				contentSource.setLogger(null);
-				Element contentElement = contentSource.getNextElement(0, "office:body"); //$NON-NLS-1$
-				if (contentElement == null) // this content.xml file doesn't seem to contain text
-					continue;
-				String content = UtilParser.extract(contentElement);
-				sb.append(content).append(" "); //$NON-NLS-1$
-			}
-			
-			// Create and return parse result
-			return new ParseResult(sb)
-				.setTitle(title)
-				.addAuthor(author)
-				.addMiscMetadata(description)
-				.addMiscMetadata(subject)
-				.addMiscMetadata(keyword);
 		}
-		catch (IOException e) {
+		catch (IOException | SAXException | TikaException e) {
 			throw new ParseException(e);
 		}
-		finally {
-			UtilParser.closeZipFile(zipFile);
-		}
-	}
-	
-	protected final String renderText(File file, ParseContext context)
-			throws ParseException {
-		ZipFile zipFile = null;
-		Reader reader = null;
-		try {
-			zipFile = new ZipFile(file);
-			ZipEntry contentZipEntry = zipFile.getEntry("content.xml"); //$NON-NLS-1$
-			if (contentZipEntry == null)
-				throw new ParseException(Msg.file_corrupted.get());
-			
-			InputStream in = zipFile.getInputStream(contentZipEntry);
-			in = new OpenDocumentTextInputStream(in);
-			reader = new BufferedReader(new InputStreamReader(in, "utf8"));
-			
-			return CharStreams.toString(reader);
-		}
-		catch (IOException e) {
-			throw new ParseException(e);
-		}
-		finally {
-			Closeables.closeQuietly(reader);
-			UtilParser.closeZipFile(zipFile);
-		}
-	}
-	
-	/**
-	 * Returns the textual content inside the given HTML element from the given
-	 * HTML source. Returns null if the HTML element is not found.
-	 */
-	@Nullable
-	private static String getElementContent(@NotNull Source source,
-											@NotNull String elementName) {
-		Element el = source.getNextElement(0, elementName);
-		return el == null ? null : CharacterReference.decode(el.getContent());
 	}
 
 }
