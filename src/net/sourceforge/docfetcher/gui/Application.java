@@ -185,17 +185,15 @@ public final class Application {
 		// Path overrides; only supported in portable version
 		File confPathOverride = null;
 		File swtLibDir = null;
-		if (SystemConf.Bool.IsPortable.get()) {
-			try {
-				Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
-				confPathOverride = toFile(pathProps, "settings");
-				IndexRegistry.indexPathOverride = toFile(pathProps, "indexes");
-				swtLibDir = toFile(pathProps, "swt");
-			}
-			catch (IOException e1) {
-				// Ignore
-				e1.printStackTrace();
-			}
+		try {
+			Properties pathProps = CharsetDetectorHelper.load(new File("misc", "paths.txt"));
+			confPathOverride = toFile(pathProps, "settings");
+			IndexRegistry.indexPathOverride = toFile(pathProps, "indexes");
+			swtLibDir = toFile(pathProps, "swt");
+		}
+		catch (IOException e1) {
+			// Ignore
+			e1.printStackTrace();
 		}
 		
 		/*

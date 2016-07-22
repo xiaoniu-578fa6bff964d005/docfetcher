@@ -118,9 +118,9 @@ public abstract class TreeIndex <
 	
 	@Nullable
 	public final Path getIndexDirPath() {
-		if (fileIndexDirPath == null || fileIndexDirPath.isAbsolute())
-			return fileIndexDirPath;
-		if (IndexRegistry.indexPathOverride != null && AppUtil.isPortable()) {
+		if (fileIndexDirPath == null)
+			return null;
+		if (IndexRegistry.indexPathOverride != null) {
 			String name = new File(fileIndexDirPath.getPath()).getName();
 			return new Path(new File(IndexRegistry.indexPathOverride, name));
 		}
