@@ -257,7 +257,7 @@ public final class SettingsConf {
 			"\r\n# y < 0, the window is centered relative to the screen or to" +
 			"\r\n# its parent window.")
 	public static enum ShellBounds implements Storable {
-		MainWindow (-1, -1, 640, 480),
+		MainWindow (-1, -1, 800, 600),
 		IndexingDialog (-1, -1, 450, 500),
 		FileExtensionChooser (-1, -1, 300, 450),
 		PreferencesDialog (-1, -1, 500, 400),

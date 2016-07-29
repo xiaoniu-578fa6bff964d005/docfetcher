@@ -69,7 +69,12 @@ Although the boost factor must be positive, it can be less than 1 (e.g. 0.2). If
 
 Field Searches
 --------------
-By default, DocFetcher will search in all the textual data it is capable of extracting, i.e. the contents, the filenames and the metadata of the documents. However, you can also restrict your searches to the filename and/or certain metadata fields. For example, to search for documents whose titles contain `wikipedia`, enter: `title:wikipedia`. This may be combined with phrase search, e.g. `title:"dog cat"`, or with parentheses, e.g. `title:(dog cat)`. In fact, if you omit the quotes and parentheses, only `dog` will be matched against the title, not `cat`.
+By default, DocFetcher will search in all the textual data it is capable of extracting, i.e. the contents, the filenames and the metadata of the documents. However, you can also restrict your searches to the filename and/or certain metadata fields. For example, to search for documents whose titles contain `wikipedia`, enter: `title:wikipedia`.
+
+Field search can be combined with other search constructs, e.g.:
+
+* Phrase search using quotes, e.g. `title:"dog cat"`, or using parentheses, e.g. `title:(dog cat)`. If you omit the quotes and parentheses, only `dog` will be matched against the title, not `cat`.
+* Wildcards: `title:dog*` will, for instance, match occurrences of `doggy` in the title.
 
 Which fields are available generally depends on the document format, but you can use this as a rule of thumb:
 

@@ -70,7 +70,12 @@ Derartige Gewichte müssen positiv sein, können aber kleiner als 1 sein (z.&nbs
 
 Feld-Suche
 ----------
-Standardmäßig sucht DocFetcher in jeglichem Text aus einer Datei, den es zu extrahieren imstande war. Dazu zählen der "eigentliche" Datei-Inhalt, der Dateiname, sowie Meta-Daten. Stattdessen können Sie die Suche aber auch auf den Dateinamen und/oder bestimmte Meta-Daten-Felder einschränken. Um bspw. nach Dateien zu suchen, deren Titel `wikipedia` enthält, können Sie eingeben: `title:wikipedia`. Dies kann mit Phrasen-Suche kombiniert werden, z.&nbsp;B. `title:"dog cat"`, oder auch mit Klammern, z.&nbsp;B. `title:(dog cat)`. Wenn Sie übrigens die Anführungszeichen und Klammern in den zwei vorherigen Beispielen auslassen, wird nur der Begriff `dog` auf den Datei-Titel eingeschränkt, aber nicht `cat`.
+Standardmäßig sucht DocFetcher in jeglichem Text aus einer Datei, den es zu extrahieren imstande war. Dazu zählen der "eigentliche" Datei-Inhalt, der Dateiname, sowie Meta-Daten. Stattdessen können Sie die Suche aber auch auf den Dateinamen und/oder bestimmte Meta-Daten-Felder einschränken. Um bspw. nach Dateien zu suchen, deren Titel `wikipedia` enthält, können Sie eingeben: `title:wikipedia`.
+
+Feld-Suche kann mit anderen Suchkonstrukten kombiniert werden, z.&nbsp;B.:
+
+* Phrasen-Suche mit Anführungszeichen, z.&nbsp;B. `title:"dog cat"`, oder mit Klammern, z.&nbsp;B. `title:(dog cat)`. Wenn Sie die Anführungszeichen und Klammern in den zwei vorherigen Beispielen auslassen, wird nur der Begriff `dog` auf den Datei-Titel eingeschränkt, aber nicht `cat`.
+* Wildcards: `title:dog*` liefert bspw. Treffer mit `doggy` im Titel.
 
 Welche Felder verfügbar sind, hängt zwar im Allgemeinen vom jeweiligen Dateityp ab, aber Sie können von folgender Daumenregel ausgehen:
 

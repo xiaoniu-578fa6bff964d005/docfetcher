@@ -319,7 +319,7 @@ public final class Searcher {
 		 * so when the Lucene jar is upgraded to 4.0, this workaround may be
 		 * removed.
 		 */
-		if (e.getMessage().contains("numHits must be > 0"))
+		if (e.getMessage() != null && e.getMessage().contains("numHits must be > 0"))
 			return new SearchException("No files were indexed."); // not internationalized
 		else
 			throw e;

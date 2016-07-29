@@ -21,10 +21,10 @@ folder for which you don't have write permissions, e.g. into "C:\Program Files".
 Linux:
 Launch the program by double-clicking on DocFetcher-GTK2.sh or
 DocFetcher-GTK3.sh. The difference between these two scripts is that
-DocFetcher's user interface will be based either on GTK2 or on GTK3. On some
-Linux distributions, only GTK2 works, while on some other Linux distributions,
-only GTK3 works. Thus, you'll have to try one script, and if DocFetcher doesn't
-start or the GUI behaves strangely, you'll have to try the other one.
+DocFetcher's user interface will be based either on GTK2 or on GTK3. With some
+desktop environments, only GTK2 works, while with some others, only GTK3 works.
+Thus, you'll have to try one script, and if DocFetcher doesn't start or the GUI
+is behaving strangely, you'll have to try the other script.
 If with either script DocFetcher doesn't start or a text editor shows up, make
 sure the executable flag has been set on the respective file. If that doesn't
 work either, you might see a helpful error mesage if you start the script from

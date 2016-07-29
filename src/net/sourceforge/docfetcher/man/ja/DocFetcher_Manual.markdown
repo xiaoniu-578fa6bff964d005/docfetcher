@@ -39,6 +39,10 @@ DocFetcher はオープンソースのデスクトップ検索アプリケーシ
 
 **問合せ構文**: DocFetcherを使うと、単純な単語での検索よりもはるかに多くのことができます。たとえば、  `wiki*` のように始まりが共通な単語を検索するにはワイルドカードを使用することができます。特定のフレーズを検索するには (すなわち特定の順番の単語の並び)、引用符でフレーズを囲みます。: `"the quick brown fox"`. しかしそれは序の口に過ぎません。サポートされている全ての構文については次を参照してください。 [問合せ構文セクション](DocFetcher_Manual_files/Query_Syntax.html).
 
+<!-- In need of translation:
+**Preferences**: On the top right of the user interface, you'll find an icon depicting two cogwheels. Click on it to open the Preferences dialog. Additional settings for more advanced usage can be accessed via the "Advanced Settings" link at the lower left of the Preferences dialog.
+-->
+
 **携帯文書リポジトリ**: DocFetcherのポータブル版は、あなたの文書と関連するインデックス、そしてDocFetcherをひとまとめにすることができます。そしてこれらを自由に移動することができます。 &mdash; あるオペレーションシステムから別のものにすら、すなわち、WindowsからLinuxまたはその逆へ。 ポータブル版を使用する際に覚えておくべき重要な点は、インデックスが*相対パス*を使用して作成されなければならないということです。 携帯文書リポジトリについて詳細な情報は [こちら](DocFetcher_Manual_files/Portable_Repositories.html) をクリック。 ところで、あなたがDocFetcher の1.0.3 以前を使用していたとしたら、もうDocFetcherフォルダに文書を置く必要がないことに注意してください。
 
 **インデックスの設定オプション**: インデックス作成の設定ウィンドウ上のすべてのこれらのオプションの詳細な議論については、 [here](DocFetcher_Manual_files/Indexing_Options.html)をクリック。 また設定ウインドウから直接マニュアルを開くにはウィンドウの下部にある `ヘルプ` ボタンをクリックしてください。おそらくとても興味深いの設定オプションがあります: 
