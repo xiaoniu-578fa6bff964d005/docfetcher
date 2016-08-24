@@ -139,7 +139,7 @@ InitialSorting = 0
 # setting for trimming down the the results, since a low value for this setting
 # will cause DocFetcher to try to pick an equal number of results from each
 # index (rather than picking the highest-scoring results across all indexes).
-MaxResultsTotal = 10000
+MaxResultsTotal = 100000
 
 # The capacity of the unpack cache. The latter holds archive entries that were
 # unpacked for display in the preview pane and makes sure they won't get deleted
