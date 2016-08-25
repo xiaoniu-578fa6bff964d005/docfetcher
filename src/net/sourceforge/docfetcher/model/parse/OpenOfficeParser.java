@@ -11,26 +11,31 @@
 
 package net.sourceforge.docfetcher.model.parse;
 
+import java.io.CharConversionException;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.zip.ZipException;
 
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
+import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.odf.OpenDocumentParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
+import com.google.common.io.Closeables;
+
 /**
  * @author Tran Nam Quang
  */
-abstract class OpenOfficeParser extends StreamParser {
+abstract class OpenOfficeParser extends FileParser {
 	
 	public static final class OpenOfficeWriterParser extends OpenOfficeParser {
 		public OpenOfficeWriterParser() {
@@ -79,13 +84,27 @@ abstract class OpenOfficeParser extends StreamParser {
 	}
 	
 	@Override
-	protected final ParseResult parse(	@NotNull InputStream in,
+	protected final ParseResult parse(	@NotNull File file,
 										@NotNull ParseContext context)
 			throws ParseException {
 		OpenDocumentParser tikaParser = new OpenDocumentParser();
 		BodyContentHandler contentHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
+		TikaInputStream in = null;
 		try {
+			/*
+			 * Bug #1224 and others: Feeding the input file directly as an
+			 * InputStream into the Tika parser will make the latter use a
+			 * ZipInputStream, which crashes on some OpenDocument email
+			 * attachments in Outlook PST files. As a workaround, make Tika use
+			 * ZipFile instead by wrapping the input file in a TikaInputStream.
+			 * See: https://sourceforge.net/p/docfetcher/bugs/1224/
+			 * 
+			 * Note that we're using Paths.get(...) instead of the simpler
+			 * file.toPath(), since the latter is not implemented for TFile
+			 * objects.
+			 */
+			in = TikaInputStream.get(Paths.get(file.getPath()));
 			tikaParser.parse(in, contentHandler, metadata, ParseService.tikaContext());
 			ParseResult result = new ParseResult(contentHandler.toString())
 				.setTitle(metadata.get(TikaCoreProperties.TITLE))
@@ -100,9 +119,8 @@ abstract class OpenOfficeParser extends StreamParser {
 			}
 			return result;
 		}
-		catch (ZipException e) {
-			String msg = "only DEFLATED entries can have EXT descriptor";
-			if (e.getMessage().equals(msg)) {
+		catch (CharConversionException e) {
+			if (matchesPasswordErrorMessage(e.getMessage())) {
 				throw new ParseException(Msg.doc_pw_protected.get());
 			}
 			else {
@@ -112,6 +130,21 @@ abstract class OpenOfficeParser extends StreamParser {
 		catch (IOException | SAXException | TikaException e) {
 			throw new ParseException(e);
 		}
+		finally {
+			Closeables.closeQuietly(in);
+		}
+	}
+	
+	private static boolean matchesPasswordErrorMessage(@Nullable String msg) {
+		/*
+		 * Expected error messages:
+		 * - "Invalid byte 1 of 1-byte UTF-8 sequence."
+		 * - "Invalid byte 2 of 2-byte UTF-8 sequence."
+		 * - "Invalid byte 2 of 3-byte UTF-8 sequence."
+		 * - etc.
+		 */
+		return msg != null && msg.startsWith("Invalid byte ")
+				&& msg.endsWith("-byte UTF-8 sequence.");
 	}
 
 }

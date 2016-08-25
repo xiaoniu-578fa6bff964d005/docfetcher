@@ -12,8 +12,6 @@
 package net.sourceforge.docfetcher.model.parse;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -21,28 +19,32 @@ import net.sourceforge.docfetcher.model.parse.OpenOfficeParser.OpenOfficeWriterP
 
 import org.junit.Test;
 
-import com.google.common.io.Closeables;
+import de.schlichtherle.truezip.file.TFile;
 
 public class OpenOfficeParserTest {
 	
 	@Test
 	public void testPasswordProtected() throws Exception {
-		StreamParser parser = new OpenOfficeWriterParser();
+		FileParser parser = new OpenOfficeWriterParser();
 		File file = TestFiles.encrypted_odt.get();
-		InputStream in = null;
 		try {
-			in = new FileInputStream(file);
-			parser.parse(in, new ParseContext(file.getName()));
+			parser.parse(file, new ParseContext(file.getName()));
 		}
 		catch (ParseException e) {
 			if (e.getMessage().equals(Msg.doc_pw_protected.get())) {
 				return;
 			}
 		}
-		finally {
-			Closeables.closeQuietly(in);
-		}
 		throw new IllegalStateException();
+	}
+	
+	@Test
+	public void testNotPasswordProtected() throws Exception {
+		FileParser parser = new OpenOfficeWriterParser();
+		File file = TestFiles.lorem_ipsum_odt.get();
+		parser.parse(file, new ParseContext(file.getName()));
+		File tFile = new TFile(TestFiles.lorem_ipsum_odt.get());
+		parser.parse(tFile, new ParseContext(file.getName()));
 	}
 
 }
