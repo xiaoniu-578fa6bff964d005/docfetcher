@@ -29,6 +29,7 @@ public enum TestFiles {
 	multi_page_pdf ("multi-page.pdf"),
 	encrypted_pdf ("encrypted-(password='docfetcher').pdf"),
 	encrypted_odt ("encrypted-(password='docfetcher').odt"),
+	missing_meta_xml_entry ("missing-meta.xml-entry.odt"),
 	html ("test.html"),
 	doc ("testWORD-Tika.doc"),
 	docx ("testWORD-Tika.docx"),

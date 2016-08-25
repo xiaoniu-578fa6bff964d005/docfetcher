@@ -41,10 +41,28 @@ public class OpenOfficeParserTest {
 	@Test
 	public void testNotPasswordProtected() throws Exception {
 		FileParser parser = new OpenOfficeWriterParser();
-		File file = TestFiles.lorem_ipsum_odt.get();
-		parser.parse(file, new ParseContext(file.getName()));
-		File tFile = new TFile(TestFiles.lorem_ipsum_odt.get());
-		parser.parse(tFile, new ParseContext(file.getName()));
+		File[] files = new File[] {
+			TestFiles.lorem_ipsum_odt.get(),
+			new TFile(TestFiles.lorem_ipsum_odt.get())
+		};
+		for (File file : files) {
+			parser.parse(file, new ParseContext(file.getName()));
+		}
+	}
+	
+	@Test
+	public void testMetaXmlMissing() throws Exception {
+		FileParser parser = new OpenOfficeWriterParser();
+		File file = TestFiles.missing_meta_xml_entry.get();
+		try {
+			parser.parse(file, new ParseContext(file.getName()));
+		}
+		catch (ParseException e) {
+			if ("entry".equals(e.getCause().getMessage())) {
+				return;
+			}
+		}
+		throw new IllegalStateException();
 	}
 
 }
