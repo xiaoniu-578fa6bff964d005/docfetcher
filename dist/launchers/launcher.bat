@@ -1,3 +1,5 @@
+@echo off
+
 rem  Note: This file is an alternative launcher for DocFetcher. How to use it:
 rem  1) Modify this file as needed.
 rem  2) Move this file one level up into the DocFetcher folder.
@@ -9,8 +11,6 @@ rem  Java executable.
 rem  2) Give DocFetcher more memory with the setting -Xmx..m in the last line.
 rem  For example, with -Xmx512m, DocFetcher will use up to 512 MB of memory.
 rem  Using more memory than about 1 GB requires a 64-bit Java runtime.
-
-@echo off
 
 cd %~dp0
 
