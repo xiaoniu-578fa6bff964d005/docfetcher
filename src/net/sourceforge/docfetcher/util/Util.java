@@ -871,10 +871,13 @@ public final class Util {
 	 * false if the platform is not Windows, if the file doesn't exists or if an
 	 * IOException occured.
 	 * <p>
-	 * Note: If the given file is an instance of TFile and
-	 * represents an archive entry, this method always returns false.
+	 * Note: If the given file is an instance of TFile and represents an archive
+	 * entry, this method always returns false.
+	 * <p>
+	 * Important: This method will incorrectly identify files with very long
+	 * paths as symlinks, so it should only be called on directories.
 	 */
-	public static boolean isJunctionOrSymlink(@NotNull File file) {
+	public static boolean isJunctionOrSymlinkDir(@NotNull File file) {
 		if (! IS_WINDOWS)
 			return false;
 		try {

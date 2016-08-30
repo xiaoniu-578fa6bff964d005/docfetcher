@@ -267,7 +267,7 @@ final class FileExtensionChooser {
 			}
 			else if (file.isDirectory()) {
 				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()) {
-					if (!Util.isJunctionOrSymlink(file)) {
+					if (!Util.isJunctionOrSymlinkDir(file)) {
 						listExtensions(exts, file);
 					}
 				}

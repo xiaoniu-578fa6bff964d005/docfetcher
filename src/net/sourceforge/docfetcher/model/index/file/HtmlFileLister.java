@@ -70,9 +70,10 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				if (skip(fileOrDir))
 					continue;
-				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get() && Util.isJunctionOrSymlink(fileOrDir))
-					continue;
 				isFile = fileOrDir.isFile();
+				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()
+						&& !isFile && Util.isJunctionOrSymlinkDir(fileOrDir))
+					continue;
 			}
 			catch (Throwable t) {
 				handleFileException(t, fileOrDir);
@@ -108,9 +109,10 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 			try {
 				if (Util.isSymLink(fileOrDir))
 					continue;
-				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get() && Util.isJunctionOrSymlink(fileOrDir))
-					continue;
 				isFile = fileOrDir.isFile();
+				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()
+						&& !isFile && Util.isJunctionOrSymlinkDir(fileOrDir))
+					continue;
 			}
 			catch (Throwable t) {
 				handleFileException(t, fileOrDir);

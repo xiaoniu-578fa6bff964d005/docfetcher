@@ -19,7 +19,7 @@
 #===========================================================
 #	Building DocFetcher from the console
 #===========================================================
-- Requirements: Python and JDK 6.0+
+- Requirements: Python and JDK 7.0+
 - current-version.txt:
 	- this file contains the version number used by all build scripts below
 	- this file must not contain any extra whitespace or newlines
