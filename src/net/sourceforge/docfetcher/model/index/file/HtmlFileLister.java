@@ -72,7 +72,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				isFile = fileOrDir.isFile();
 				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()
-						&& !isFile && Util.isJunctionOrSymlinkDir(fileOrDir))
+						&& !isFile && Util.isJunctionOrSymlink(fileOrDir))
 					continue;
 			}
 			catch (Throwable t) {
@@ -111,7 +111,7 @@ abstract class HtmlFileLister<T extends Throwable> extends Stoppable<T> {
 					continue;
 				isFile = fileOrDir.isFile();
 				if (ProgramConf.Bool.IgnoreJunctionsAndSymlinks.get()
-						&& !isFile && Util.isJunctionOrSymlinkDir(fileOrDir))
+						&& !isFile && Util.isJunctionOrSymlink(fileOrDir))
 					continue;
 			}
 			catch (Throwable t) {

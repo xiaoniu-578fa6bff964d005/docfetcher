@@ -863,7 +863,22 @@ public final class Util {
 				lib = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
 			}
 		}
-		return lib.GetFileAttributesW(new WString(getCanonicalPath(file)));
+		/*
+		 * It's important here to use the canonical path, because: (1)
+		 * Non-canonical paths can be made arbitrarily long using "..", like
+		 * this: "C:/Test/../Test/../Test/../Test". (2) GetFileAttributesW will
+		 * return -1 if the path is as long as or longer than 260 characters.
+		 * This can cause directories and files to be incorrectly identified as
+		 * NTFS junctions, for example.
+		 */
+		String path;
+		try {
+			path = file.getCanonicalPath();
+		}
+		catch (IOException e) {
+			path = file.getAbsolutePath();
+		}
+		return lib.GetFileAttributesW(new WString(path));
 	}
 
 	/**
@@ -871,13 +886,15 @@ public final class Util {
 	 * false if the platform is not Windows, if the file doesn't exists or if an
 	 * IOException occured.
 	 * <p>
-	 * Note: If the given file is an instance of TFile and represents an archive
-	 * entry, this method always returns false.
-	 * <p>
-	 * Important: This method will incorrectly identify files with very long
-	 * paths as symlinks, so it should only be called on directories.
+	 * Notes:
+	 * <ul>
+	 * <li>If the given file is an instance of TFile and represents an archive
+	 * entry, this method always returns false.</li>
+	 * <li>This method requires file system access, which can cause latencies if
+	 * the file is accessed over a network.</li>
+	 * </ul>
 	 */
-	public static boolean isJunctionOrSymlinkDir(@NotNull File file) {
+	public static boolean isJunctionOrSymlink(@NotNull File file) {
 		if (! IS_WINDOWS)
 			return false;
 		try {
