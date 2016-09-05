@@ -312,8 +312,15 @@ public final class Application {
 			File file = ManualLocator.getManualFile();
 			if (file == null) {
 				showManualHint = false;
-				String msg = Msg.file_not_found.get() + "\n" + SystemConf.Str.ProgramName.get() + "_Manual.html";
-				AppUtil.showError(msg, true, true);
+				/*
+				 * In the development version, don't show the following warning
+				 * message, as the manual under dist/help may not have been
+				 * generated yet.
+				 */
+				if (!SystemConf.Bool.IsDevelopmentVersion.get()) {
+					String msg = Msg.file_not_found.get() + "\n" + SystemConf.Str.ProgramName.get() + "_Manual.html";
+					AppUtil.showError(msg, true, true);
+				}
 			}
 			else if (previewPanel.setHtmlFile(file)) {
 				showManualHint = false;
