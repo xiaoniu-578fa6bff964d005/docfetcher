@@ -119,18 +119,6 @@ abstract class OpenOfficeParser extends FileParser {
 			}
 			return result;
 		}
-		catch (NullPointerException e) {
-			if ("entry".equals(e.getMessage())) {
-				/*
-				 * This happens with OpenDocument files in which the meta.xml is
-				 * missing. Ideally, Tika should parse the file nonetheless, but
-				 * doesn't, as of version 1.11.
-				 */
-				throw new ParseException(e);
-			} else {
-				throw e;
-			}
-		}
 		catch (CharConversionException e) {
 			if (matchesPasswordErrorMessage(e.getMessage())) {
 				throw new ParseException(Msg.doc_pw_protected.get());

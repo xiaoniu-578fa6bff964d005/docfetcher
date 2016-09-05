@@ -14,21 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tika.metadata;
+package org.apache.tika.detect;
+
+import java.io.InputStream;
+import java.io.IOException;
+
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 
 /**
- * Contains keys to properties in Metadata instances.
+ * Detector to identify zero length files as application/x-zerovalue
  */
-public interface TikaMetadataKeys {
-
-    String RESOURCE_NAME_KEY = "resourceName";
-
-    String PROTECTED = "protected";
-
-    String EMBEDDED_RELATIONSHIP_ID = "embeddedRelationshipId";
-
-    String EMBEDDED_STORAGE_CLASS_ID = "embeddedStorageClassId";
-
-    String EMBEDDED_RESOURCE_TYPE = "embeddedResourceType";
-
+public class ZeroSizeFileDetector implements Detector
+{
+	public MediaType detect(InputStream stream, Metadata metadata) throws IOException
+	{
+        if (stream != null) {
+            try {
+                stream.mark(1);
+                if (stream.read() == -1) {
+                    return MediaType.EMPTY;
+                }
+            }
+            finally {
+                stream.reset();
+            }
+        }
+        return MediaType.OCTET_STREAM;
+	}
 }

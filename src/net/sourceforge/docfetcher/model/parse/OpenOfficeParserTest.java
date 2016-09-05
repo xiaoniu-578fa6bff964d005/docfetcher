@@ -54,15 +54,7 @@ public class OpenOfficeParserTest {
 	public void testMetaXmlMissing() throws Exception {
 		FileParser parser = new OpenOfficeWriterParser();
 		File file = TestFiles.missing_meta_xml_entry.get();
-		try {
-			parser.parse(file, new ParseContext(file.getName()));
-		}
-		catch (ParseException e) {
-			if ("entry".equals(e.getCause().getMessage())) {
-				return;
-			}
-		}
-		throw new IllegalStateException();
+		parser.parse(file, new ParseContext(file.getName()));
 	}
 
 }

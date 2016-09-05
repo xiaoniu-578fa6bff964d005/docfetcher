@@ -4,7 +4,7 @@ import sys, os.path as osp, shutil, os
 
 """
 This script copies some of Tika's source files into the DocFetcher source
-directory, with some minor processing along the way. Tested with Tika 1.11;
+directory, with some minor processing along the way. Tested with Tika 1.13;
 newer Tika versions may require updating this script.
 
 How to use: Run this script with source and destination directory as arguments,

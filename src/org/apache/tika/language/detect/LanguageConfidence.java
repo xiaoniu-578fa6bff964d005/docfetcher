@@ -14,21 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tika.metadata;
+package org.apache.tika.language.detect;
 
-/**
- * Contains keys to properties in Metadata instances.
- */
-public interface TikaMetadataKeys {
+public enum LanguageConfidence {
 
-    String RESOURCE_NAME_KEY = "resourceName";
-
-    String PROTECTED = "protected";
-
-    String EMBEDDED_RELATIONSHIP_ID = "embeddedRelationshipId";
-
-    String EMBEDDED_STORAGE_CLASS_ID = "embeddedStorageClassId";
-
-    String EMBEDDED_RESOURCE_TYPE = "embeddedResourceType";
-
+	HIGH,
+	MEDIUM,
+	LOW,
+	NONE		// Special value when no language is detected
 }
