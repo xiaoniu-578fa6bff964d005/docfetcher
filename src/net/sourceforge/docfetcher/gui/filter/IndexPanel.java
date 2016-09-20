@@ -395,7 +395,7 @@ public final class IndexPanel {
 		}
 		
 		renameIndexAction = new RenameIndexAction(Msg.rename_index_context.get());
-		if (ProgramConf.Bool.AllowIndexUpdate.get() || ProgramConf.Bool.AllowIndexRebuild.get()) {
+		if (ProgramConf.Bool.AllowIndexRenaming.get()) {
 			menuManager.addSeparatorIfNonEmpty();
 			menuManager.add(renameIndexAction);
 		}

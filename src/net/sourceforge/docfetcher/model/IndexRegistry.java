@@ -562,9 +562,12 @@ public final class IndexRegistry {
 				Closeables.closeQuietly(out);
 			}
 			
-			//If saving the index succeeded, save the indexName in a separate file
-			if (!saveIndexName(new File(indexDir, NAME_FILENAME), index.getRootFolder().getDisplayName()))
-				AppUtil.showError(Msg.rename_index_failed.get(), true, false);
+			if (ProgramConf.Bool.AllowIndexRenaming.get()) {
+				// If saving the index succeeded, save the indexName in a separate file
+				if (!saveIndexName(new File(indexDir, NAME_FILENAME), index.getRootFolder().getDisplayName())) {
+					AppUtil.showError(Msg.rename_index_failed.get(), true, false);
+				}
+			}
 
 			// Update cached last-modified value of index
 			indexes.put(index, serFile.lastModified());

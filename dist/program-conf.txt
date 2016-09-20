@@ -30,11 +30,12 @@ ReportObsoleteIndexFiles = true
 # setting to prevent users from mucking around in this file.
 ShowAdvancedSettingsLink = true
 
-# Whether the user is allowed to create, update, rebuild and remove indexes,
-# respectively. Disabling any of these setings will hide the respective context
-# menu entries in the Search Scope pane.
+# Whether the user is allowed to create, update, rename, rebuild or remove
+# indexes, respectively. Disabling any of these setings will hide the respective
+# context menu entries in the Search Scope pane.
 AllowIndexCreation = true
 AllowIndexUpdate = true
+AllowIndexRenaming = true
 AllowIndexRebuild = true
 AllowIndexDeletion = true
 
@@ -139,7 +140,7 @@ InitialSorting = 0
 # setting for trimming down the the results, since a low value for this setting
 # will cause DocFetcher to try to pick an equal number of results from each
 # index (rather than picking the highest-scoring results across all indexes).
-MaxResultsTotal = 100000
+MaxResultsTotal = 10000
 
 # The capacity of the unpack cache. The latter holds archive entries that were
 # unpacked for display in the preview pane and makes sure they won't get deleted

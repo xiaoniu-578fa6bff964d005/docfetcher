@@ -47,6 +47,7 @@ public final class ProgramConf {
 		DryRun (false),
 		AllowIndexCreation (true),
 		AllowIndexUpdate (true),
+		AllowIndexRenaming (true),
 		AllowIndexRebuild (true),
 		AllowIndexDeletion (true),
 		ShowAdvancedSettingsLink (true),
