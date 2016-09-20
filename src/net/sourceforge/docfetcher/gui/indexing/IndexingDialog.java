@@ -59,6 +59,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -363,7 +364,14 @@ public final class IndexingDialog implements Dialog {
 		 */
 		tabItem.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				tabItem.getControl().dispose();
+				Control control = tabItem.getControl();
+				/*
+				 * For some reason, the control can in very rare cases be null
+				 * here. See: https://sourceforge.net/p/docfetcher/bugs/1236/
+				 */
+				if (control != null) {
+					control.dispose();
+				}
 			}
 		});
 
