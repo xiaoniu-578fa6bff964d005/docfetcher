@@ -52,7 +52,8 @@ public enum TestFiles {
 			.replaceAll("%s", "\u00E4\u00F6\u00FC\u00DF")),
 	fake_zip_file_inside_solid ("fake-zip-file-inside-solid.7z"),
 	textmaker_rtf ("textmaker-rtf"),
-			
+	rtf_with_image ("rtf-with-image.rtf"),
+	
 	encrypted_7z ("7z-encrypted-(password='docfetcher').7z"),
 	encrypted_7z_filenames ("7z-encrypted-including-filenames-(password='docfetcher').7z"),
 	

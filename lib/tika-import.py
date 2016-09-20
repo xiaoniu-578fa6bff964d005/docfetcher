@@ -42,6 +42,7 @@ files_to_delete = """
 	package-info.java
 	TikaActivator.java
 """
+mimetypes_path = "tika-core/src/main/resources/org/apache/tika/mime/tika-mimetypes.xml"
 
 # A stripped-down version of org.apache.tika.parser.microsoft.OfficeParser.
 # We're using this one instead of the original to avoid dragging half of Tika
@@ -123,6 +124,7 @@ public class OfficeParser {
 if len(sys.argv) <= 2:
 	msg = "Expected source path (e.g. /path/to/tika-1.11) " + \
 		"and destination path (e.g. DocFetcher-1.1/src)."
+	print(msg)
 	exit(0)
 src_root = sys.argv[1]
 dst_root = sys.argv[2]
@@ -152,6 +154,14 @@ for package_root, packages in d.items():
 # Copy Tika.java
 src_path = osp.join(src_root, core_root, "Tika.java")
 dst_path = osp.join(dst_root, "Tika.java")
+shutil.copyfile(src_path, dst_path)
+
+# Copy mimetypes file
+# Needed by RTF parser. Without this file, the parser will crash on RTF files
+# containing images. See:
+# https://sourceforge.net/p/docfetcher/bugs/1230/
+src_path = osp.join(src_root, mimetypes_path)
+dst_path = osp.join(dst_root, "mime", "tika-mimetypes.xml")
 shutil.copyfile(src_path, dst_path)
 
 # Write OfficeParser -- dependency of Tika's RTF parser

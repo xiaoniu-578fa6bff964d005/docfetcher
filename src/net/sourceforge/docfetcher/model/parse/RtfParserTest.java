@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.model.parse;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.model.Cancelable;
@@ -48,6 +49,16 @@ public final class RtfParserTest {
 			}
 		};
 		index.update(reporter, Cancelable.nullCancelable);
+	}
+	
+	@Test
+	public void testRtfWithImage() throws Exception {
+		File file = TestFiles.rtf_with_image.get();
+		RtfParser parser = new RtfParser();
+		ParseContext context = new ParseContext(file.getName());
+		FileInputStream in = new FileInputStream(file);
+		parser.parse(in, context);
+		in.close();
 	}
 
 }

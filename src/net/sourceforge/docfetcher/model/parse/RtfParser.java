@@ -12,11 +12,13 @@
 package net.sourceforge.docfetcher.model.parse;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 
 import net.sourceforge.docfetcher.enums.Msg;
 
+import org.apache.tika.config.TikaConfig;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.rtf.RTFParser;
@@ -35,7 +37,25 @@ final class RtfParser extends StreamParser {
 		BodyContentHandler bodyHandler = new BodyContentHandler(-1);
 		Metadata metadata = new Metadata();
 		try {
-			new RTFParser().parse(in, bodyHandler, metadata, ParseService.tikaContext());
+			/*
+			 * Bug #1230: If the RTF file contains an image, the RTF parser will
+			 * look for Tika parsers that can parse the image. This involves
+			 * reading the tika-mimetypes.xml file, which cannot be found
+			 * without the following custom class loader, due to the fact that
+			 * we're running Tika outside its expected environment.
+			 */
+			org.apache.tika.parser.ParseContext tikaContext = ParseService.tikaContext();
+			TikaConfig tikaConfig = new TikaConfig(new ClassLoader() {
+				protected URL findResource(String name) {
+					if ("tika-mimetypes.xml".equals(name)) {
+						return getResource("org/apache/tika/tika-mimetypes.xml");
+					}
+			        return null;
+			    }
+			});
+			tikaContext.set(TikaConfig.class, tikaConfig);
+			
+			new RTFParser().parse(in, bodyHandler, metadata, tikaContext);
 			
 			// Use this to get a full list of available metadata:
 //			for (String name : metadata.names()) {
