@@ -211,6 +211,14 @@ public final class SettingsConf {
 		}
 		public void load(String str) {
 			value = Util.toIntArray(str, value);
+			/*
+			 * Bug #1223 and others: For unknown reasons sometimes we get a
+			 * wrong number of sash weights from the settings file. If that
+			 * happens, use the default values.
+			 */
+			if (value.length != defaultValue.length) {
+				value = defaultValue;
+			}
 		}
 		public String valueToString() {
 			return Ints.join(", ", value);
