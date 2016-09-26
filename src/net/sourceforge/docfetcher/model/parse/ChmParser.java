@@ -23,6 +23,7 @@ import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
+import org.apache.tika.parser.chm.accessor.ChmDirectoryListingSet;
 import org.apache.tika.parser.chm.accessor.DirectoryListingEntry;
 import org.apache.tika.parser.chm.core.ChmExtractor;
 
@@ -45,7 +46,11 @@ public final class ChmParser extends StreamParser {
 		}
 
 		List<DirectoryListingEntry> htmlEntries = new ArrayList<DirectoryListingEntry>();
-		for (DirectoryListingEntry entry : chmExtractor.getChmDirList().getDirectoryListingEntryList()) {
+		ChmDirectoryListingSet chmDirList = chmExtractor.getChmDirList();
+		if (chmDirList == null) { // Bug #1232
+			throw new ParseException("Failed to list entries.");
+		}
+		for (DirectoryListingEntry entry : chmDirList.getDirectoryListingEntryList()) {
 			String entryName = entry.getName().toLowerCase();
 			if (entryName.endsWith(".html") || entryName.endsWith(".htm")) {
 				htmlEntries.add(entry);
