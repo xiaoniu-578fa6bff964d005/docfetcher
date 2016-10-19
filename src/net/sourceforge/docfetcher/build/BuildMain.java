@@ -216,7 +216,7 @@ public final class BuildMain {
 		String exeLauncher = U.format("%s/%s.exe", releaseDir, appName);
 		U.copyBinaryFile("dist/launchers/DocFetcher-512.exe", exeLauncher);
 
-		for (int heapSize : new int[] {256, 512, 768, 1024}) {
+		for (int heapSize : new int[] {256, 512, 768, 1024, 2048, 4096, 8192}) {
 			String exeName = U.format("%s-%d.exe", appName, heapSize);
 			exeLauncher = U.format("%s/misc/%s", releaseDir, exeName);
 			U.copyBinaryFile("dist/launchers/" + exeName, exeLauncher);
