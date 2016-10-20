@@ -56,6 +56,7 @@ public final class ProgramConf {
 		SkipTarArchives (false),
 		IgnoreJunctionsAndSymlinks (true),
 		SaveSettings (true),
+		TextPreviewEnabled (true),
 		;
 
 		private boolean value;

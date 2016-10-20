@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sourceforge.docfetcher.enums.Msg;
+import net.sourceforge.docfetcher.enums.ProgramConf;
 import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.UtilGui;
 import net.sourceforge.docfetcher.gui.preview.DelayedOverlay.Hider;
@@ -317,6 +318,9 @@ public final class PreviewPanel extends Composite {
 		return runSafely(requestCount, textPreview, new Runnable() {
 			public void run() {
 				textPreview.setUseMonoFont(isPlainTextFile);
+				if (!ProgramConf.Bool.TextPreviewEnabled.get()) {
+					return;
+				}
 				if (append) {
 					for (HighlightedString string : strings)
 						textPreview.appendPage(string);

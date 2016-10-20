@@ -147,3 +147,7 @@ MaxResultsTotal = 10000
 # immediately. The oldest entries are deleted first when this capacity limit
 # is reached. The cache is cleared when the program terminates.
 UnpackCacheCapacity = 20
+
+# Whether the text-only preview is enabled. Setting this to false is useful when
+# the GUI is slowed down by large files being displayed in the preview pane.
+TextPreviewEnabled = true
