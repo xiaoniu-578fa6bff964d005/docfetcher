@@ -189,6 +189,10 @@ class HighlightingToolBarWithTextViewer {
 				}
 			}
 		});
+		
+		// Ensure that all toolbar buttons are initially disabled. See:
+		// https://sourceforge.net/p/docfetcher/bugs/1252/
+		clear(false);
 	}
 	
     private void moveSelection(boolean isDownBt) {
@@ -335,7 +339,8 @@ class HighlightingToolBarWithTextViewer {
 		pageIndex = null;
 		pages.clear();
 		
-		textViewer.clear();
+		if (textViewer != null)
+			textViewer.clear();
 		updatePageToolbar(showPageToolbar);
 		occField.clear();
 		upBt.setEnabled(false);
