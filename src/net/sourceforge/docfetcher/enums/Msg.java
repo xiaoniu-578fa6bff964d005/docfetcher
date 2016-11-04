@@ -15,6 +15,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.ClassPathHack;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
@@ -748,10 +749,13 @@ public enum Msg {
 	public static void loadFromDisk() {
 		try {
 			final File langDir;
-			if (SystemConf.Bool.IsDevelopmentVersion.get())
+			if (SystemConf.Bool.IsDevelopmentVersion.get()) {
 				langDir = new File("dist/lang");
-			else
+			} else if (Util.IS_MAC_OS_X && !AppUtil.isPortable()) {
+				langDir = new File("../Resources/lang");
+			} else {
 				langDir = new File("lang");
+			}
 			ClassPathHack.addFile(langDir);
 			
 			/*
