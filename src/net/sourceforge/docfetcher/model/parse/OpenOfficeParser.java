@@ -130,6 +130,13 @@ abstract class OpenOfficeParser extends FileParser {
 		catch (IOException | SAXException | TikaException e) {
 			throw new ParseException(e);
 		}
+		catch (RuntimeException e) {
+			/*
+			 * Tika throws an IllegalArgumentException if we give it an ordinary
+			 * zip archive rather than an OpenDocument file.
+			 */
+			throw new ParseException(e);
+		}
 		finally {
 			Closeables.closeQuietly(in);
 		}
