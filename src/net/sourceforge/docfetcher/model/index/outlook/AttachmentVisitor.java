@@ -78,13 +78,10 @@ abstract class AttachmentVisitor {
 				int bufferSize = 8176;
 				byte[] buffer = new byte[bufferSize];
 				int count = in.read(buffer);
-				while (count == bufferSize) {
-					out.write(buffer);
+				while (count > 0) {
+					out.write(buffer, 0, count);
 					count = in.read(buffer);
 				}
-				byte[] endBuffer = new byte[count];
-				System.arraycopy(buffer, 0, endBuffer, 0, count);
-				out.write(endBuffer);
 				Closeables.closeQuietly(out);
 				Closeables.closeQuietly(in);
 
