@@ -318,7 +318,7 @@ public final class IndexPanel {
 			}
 			
 			public boolean isEnabled() {
-				return viewer.getSelection().size() == 1;
+				return viewer.getSelection().size() == 1 && isOnlyIndexesSelected();
 			}
 			
 			public void run() { 
