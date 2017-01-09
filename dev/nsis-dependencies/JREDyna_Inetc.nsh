@@ -111,15 +111,35 @@ Function DetectJRE
 
 		; stack is now:  r3, r2, r1, r0
 
-  ; first, check for an installed JRE
+  ; check for an installed JRE (32-bit)
+  SetRegView 32
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   StrCmp $1 "" DetectTry2
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "JavaHome"
   StrCmp $2 "" DetectTry2
   Goto GetJRE
- 
+
 DetectTry2:
-  ; next, check for an installed JDK
+  ; check for an installed JRE (64-bit)
+  SetRegView 64
+  ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+  StrCmp $1 "" DetectTry3
+  ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "JavaHome"
+  StrCmp $2 "" DetectTry3
+  Goto GetJRE
+
+DetectTry3:
+  ; check for an installed JDK (32-bit)
+  SetRegView 32
+  ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Development Kit" "CurrentVersion"
+  StrCmp $1 "" DetectTry4
+  ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Development Kit\$1" "JavaHome"
+  StrCmp $2 "" DetectTry4
+  Goto GetJRE
+
+DetectTry4:
+  ; check for an installed JDK (64-bit)
+  SetRegView 64
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Development Kit" "CurrentVersion"
   StrCmp $1 "" NoFound
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Development Kit\$1" "JavaHome"
