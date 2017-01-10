@@ -85,8 +85,9 @@ public abstract class VirtualTableViewer<E> {
 		table.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				// Bug #3523251: event.index can be -1 sometimes, looks like a
-				// bug in SWT
-				if (event.index < 0)
+				// bug in SWT.
+				// Bug #1298 and others: Sometimes event.index == elements.size().
+				if (event.index < 0 || event.index >= elements.size())
 					return;
 				Util.checkThat(!columns.isEmpty());
 				TableItem item = (TableItem) event.item;
