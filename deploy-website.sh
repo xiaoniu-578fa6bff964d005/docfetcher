@@ -9,4 +9,4 @@ die () {
 
 ./build-website.py
 
-rsync -avP -e ssh dist/website/ $1,DocFetcher@web.sourceforge.net:/home/project-web/docfetcher/htdocs
+rsync -avP -e ssh dist/website/ $1@web.sourceforge.net:/home/project-web/docfetcher/htdocs
