@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.model.TreeIndex.IndexingResult;
 import net.sourceforge.docfetcher.model.UtilModel;
 import net.sourceforge.docfetcher.model.index.IndexingError;
 import net.sourceforge.docfetcher.model.index.IndexingInfo;
@@ -293,6 +294,13 @@ public final class FileIndexTest {
 		CountingReporter countingReporter = new CountingReporter();
 		index.update(countingReporter, null);
 		assertEquals(0, countingReporter.extractCount);
+	}
+	
+	@Test
+	public void testIndexEncryptedZipArchive() {
+		File archive = TestFiles.encrypted_zip.get();
+		FileIndex index = new FileIndex(null, archive);
+		assertEquals(index.update(null, null), IndexingResult.SUCCESS_CHANGED);
 	}
 	
 	@Test

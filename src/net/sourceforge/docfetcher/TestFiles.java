@@ -54,6 +54,7 @@ public enum TestFiles {
 	textmaker_rtf ("textmaker-rtf"),
 	rtf_with_image ("rtf-with-image.rtf"),
 	
+	encrypted_zip ("zip-encrypted-(password='123').zip"),
 	encrypted_7z ("7z-encrypted-(password='docfetcher').7z"),
 	encrypted_7z_filenames ("7z-encrypted-including-filenames-(password='docfetcher').7z"),
 	

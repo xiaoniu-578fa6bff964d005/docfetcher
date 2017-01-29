@@ -240,14 +240,15 @@ public final class UtilModel {
 	}
 
 	/**
-	 * Tries to unpack the given zip archive entry. Returns null if the given
-	 * file is not a zip archive entry.
+	 * Tries to unpack the given zip archive entry. Throws an IOException if the
+	 * entry is password-protected. Returns null if the given file is not a zip
+	 * archive entry.
 	 */
 	@Nullable
 	@VisibleForPackageGroup
 	public static File maybeUnpackZipEntry(	@NotNull IndexingConfig config,
 											@NotNull File file)
-			throws DiskSpaceException, IndexingException {
+			throws DiskSpaceException, IOException, IndexingException {
 		if (! (file instanceof TFile))
 			return null;
 		TFile tzFile = (TFile) file;
@@ -256,12 +257,9 @@ public final class UtilModel {
 		long requiredSpace = tzFile.length();
 		config.checkDiskSpaceInTempDir(requiredSpace);
 		File unpackedFile = config.createDerivedTempFile(file.getName());
-		try {
-			tzFile.cp(unpackedFile);
-			return unpackedFile;
-		} catch (IOException e) {
-			throw new IndexingException(e);
-		}
+		/* This throws an IOException if the zip entry is password-protected. */
+		tzFile.cp(unpackedFile);
+		return unpackedFile;
 	}
 	
 	public static boolean isUnmodifiedArchive(	@NotNull Folder<?, ?> folder,
