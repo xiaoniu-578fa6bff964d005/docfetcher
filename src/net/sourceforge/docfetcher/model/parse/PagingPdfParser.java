@@ -15,10 +15,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 /**
@@ -39,13 +41,27 @@ public final class PagingPdfParser {
 		PDDocument doc = null;
 		try {
 			doc = PDDocument.load(file);
+			
+			if (doc.isEncrypted()) {
+				try {
+					// Try empty password
+					doc.openProtection(new StandardDecryptionMaterial(""));
+				} catch (Exception e) {
+					throw new ParseException(Msg.doc_pw_protected.get());
+				}
+			}
+			
 			PagingStripper stripper = new PagingStripper();
 			stripper.setForceParsing(true);
 			stripper.setSortByPosition(true);
 			stripper.writeText(doc, writer);
 		}
 		catch (Exception e) {
-			throw new ParseException(e);
+			if (e instanceof ParseException) {
+				throw (ParseException) e;
+			} else {
+				throw new ParseException(e);
+			}
 		}
 		catch (OutOfMemoryError e) {
 			throw new CheckedOutOfMemoryError(e);

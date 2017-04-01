@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.model.parse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import net.sourceforge.docfetcher.TestFiles;
 import net.sourceforge.docfetcher.enums.Msg;
@@ -28,6 +29,8 @@ public final class PdfParserTest {
 	
 	@Test
 	public void testEncryptedPdf() throws Exception {
+		Logger logger = Logger.getLogger("org.apache.pdfbox.pdfparser.PDFParser");
+		logger.setLevel(java.util.logging.Level.OFF);
 		try {
 			File file = TestFiles.encrypted_pdf.get();
 			ParseService.renderText(

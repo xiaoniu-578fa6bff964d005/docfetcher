@@ -12,11 +12,14 @@
 package net.sourceforge.docfetcher.model.parse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sourceforge.docfetcher.TestFiles;
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.CheckedOutOfMemoryError;
 import net.sourceforge.docfetcher.util.Util;
 
@@ -57,6 +60,24 @@ public final class PagingPdfParserTest {
 		assertEquals(2, pages.size());
 		assertEquals("page 1" + Util.LS, pages.get(0));
 		assertEquals("page 2" + Util.LS, pages.get(1));
+	}
+	
+	@Test
+	public void testEncryptedPdf() throws Exception {
+		Logger logger = Logger.getLogger("org.apache.pdfbox.pdfparser.PDFParser");
+		logger.setLevel(java.util.logging.Level.OFF);
+		try {
+			PageHandler handler = new PageHandler() {
+				public boolean handlePage(String pageText) {
+					return false;
+				}
+			};
+			new PagingPdfParser(TestFiles.encrypted_pdf.get(), handler).run();
+			assertTrue(false);
+		}
+		catch (ParseException e) {
+			assertTrue(e.getMessage().equals(Msg.doc_pw_protected.get()));
+		}
 	}
 
 }

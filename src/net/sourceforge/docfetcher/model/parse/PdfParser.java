@@ -21,10 +21,10 @@ import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
-import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationMarkup;
 import org.apache.pdfbox.util.PDFTextStripper;
@@ -51,6 +51,16 @@ public final class PdfParser extends StreamParser {
 			 * number of parsed PDF files
 			 */
 			pdfDoc = PDDocument.load(in, true);
+			
+			if (pdfDoc.isEncrypted()) {
+				try {
+					// Try empty password
+					pdfDoc.openProtection(new StandardDecryptionMaterial(""));
+				} catch (Exception e) {
+					throw new ParseException(Msg.doc_pw_protected.get());
+				}
+			}
+			
 			PDDocumentInformation pdInfo;
 			final int pageCount;
 			try {
@@ -132,8 +142,6 @@ public final class PdfParser extends StreamParser {
 					.addMiscMetadata(pdInfo.getKeywords());
 		}
 		catch (IOException e) {
-			if (e.getCause() instanceof CryptographyException)
-				throw new ParseException(Msg.doc_pw_protected.get());
 			throw new ParseException(e);
 		}
 		finally {
