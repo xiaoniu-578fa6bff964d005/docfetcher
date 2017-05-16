@@ -24,6 +24,9 @@
 #	Building DocFetcher from the console
 #===========================================================
 - Requirements: Python and JDK 7.0+
+- The bin folder of your JDK installation containing the various JDK binaries
+  (javac, java, jar) has to be on your PATH variable. See:
+  https://www.java.com/en/download/help/path.xml
 - current-version.txt:
 	- this file contains the version number used by all build scripts below
 	- this file must not contain any extra whitespace or newlines

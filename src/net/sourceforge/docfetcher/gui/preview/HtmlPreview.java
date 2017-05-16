@@ -198,7 +198,18 @@ final class HtmlPreview extends ToolBarForm {
 	public void setFile(@NotNull File file, boolean allowSwitchingToTextPreview) {
 		String path = Util.getSystemAbsPath(file);
 		try {
-			String url = file.toURI().toURL().toString();
+			String url;
+			if (path.startsWith("\\\\")) {
+				/*
+				 * Bug #1351: Extra weirdness on Windows: If the file is given
+				 * by a UNC path, do not convert the path to a URL, otherwise
+				 * the URL will be percent-encoded twice. This will cause spaces
+				 * to be replaced with "%2520", rather than "%20", for instance.
+				 */
+				url = path;
+			} else {
+				url = file.toURI().toURL().toString();
+			}
 			browser.setUrl(url);
 		}
 		catch (MalformedURLException e) {
