@@ -68,7 +68,9 @@ final class AbiWordParser extends StreamParser {
 		
 		// Find all top level elements, excluding the metadata element
 		List<Element> topLevelNonMetaElements = new ArrayList<Element>();
-		int pos = source.getNextElement(0, "metadata").getEnd(); //$NON-NLS-1$
+		Element metaElement = source.getNextElement(0, "metadata"); //$NON-NLS-1$
+		// Bug #1358: Metadata element might be missing
+		int pos = metaElement == null ? 0 : metaElement.getEnd(); 
 		while (pos < source.length()) {
 			Element next = source.getNextElement(pos);
 			if (next == null)
