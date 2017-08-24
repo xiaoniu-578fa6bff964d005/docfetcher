@@ -79,5 +79,16 @@ public final class SolidArchiveTreeTest {
 				Closeables.closeQuietly(archive);
 		}
 	}
+	
+	@Test
+	public void test7zEntryWithoutName() throws Exception {
+		File file = TestFiles.entry_without_name_7z.get();
+		SevenZipTree archive = null;
+		try {
+			archive = new SevenZipTree(file, new IndexingConfig(), null, null);
+		} finally {
+			Closeables.closeQuietly(archive);
+		}
+	}
 
 }

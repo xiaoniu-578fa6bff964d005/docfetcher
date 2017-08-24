@@ -51,6 +51,7 @@ public enum TestFiles {
 	umlauts ("umlauts.7z/umlauts-%s/archive-%s.rar/archive-%s.7z/archive-%s.zip/file-%s.txt"
 			.replaceAll("%s", "\u00E4\u00F6\u00FC\u00DF")),
 	fake_zip_file_inside_solid ("fake-zip-file-inside-solid.7z"),
+	entry_without_name_7z ("entry-without-name.7z"),
 	textmaker_rtf ("textmaker-rtf"),
 	rtf_with_image ("rtf-with-image.rtf"),
 	

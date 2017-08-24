@@ -81,6 +81,7 @@ abstract class SolidArchiveTree<E> implements Closeable {
 		 * the forward slashes as separator and does not start with a separator. In
 		 * other words, it should always look like this: path/to/entry
 		 */
+		@Nullable
 		public String getInnerPath(E entry);
 		public boolean isDirectory(E entry);
 		public long getLastModified(E entry);
@@ -174,6 +175,9 @@ abstract class SolidArchiveTree<E> implements Closeable {
 			E entry = archiveIt.next();
 			FileFolder parent = archiveFolder;
 			final String innerPath = entryReader.getInnerPath(entry);
+			if (innerPath == null) {
+				continue; 
+			}
 			
 			Iterator<String> it = Util.splitPath(innerPath).iterator();
 			while (it.hasNext()) { // iterate over inner path parts

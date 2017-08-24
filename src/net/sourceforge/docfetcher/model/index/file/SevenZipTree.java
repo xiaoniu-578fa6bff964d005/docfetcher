@@ -121,13 +121,18 @@ final class SevenZipTree extends SolidArchiveTree <SevenZipEntry> {
 	private static final class SevenZipEntryReader implements
 			ArchiveEntryReader<SevenZipEntry> {
 		private static final SevenZipEntryReader instance = new SevenZipEntryReader();
+		@Nullable
 		public String getInnerPath(SevenZipEntry entry) {
 			/*
 			 * This should return a path relative to the archive root that
 			 * always uses forward slashes as separators, even on Windows.
+			 * 
+			 * Bug #1369: Entry name is null if the entry was created from
+			 * standard input. Example on Linux:
+			 * echo "Hello World" | 7za a -si test.7z
 			 */
 			String path = entry.getName();
-			assert ! path.contains("\\") && ! path.startsWith("/");
+			assert path == null || (! path.contains("\\") && ! path.startsWith("/"));
 			return path;
 		}
 		public long getLastModified(SevenZipEntry entry) {
