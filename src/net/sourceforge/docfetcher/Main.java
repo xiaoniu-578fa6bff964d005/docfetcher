@@ -15,21 +15,35 @@ import java.lang.reflect.Method;
 
 import net.sourceforge.docfetcher.util.SwtJarLoader;
 
+import py4j.GatewayServer;
+
 /**
  * @author Tran Nam Quang
  */
 public final class Main {
-	
+
 	private Main() {
 	}
 
+	private static GatewayServer server = new GatewayServer(new Main(), 28834);
+	private static void open_gatewayserver(){
+		Main.server.start();
+	}
+	private static void shutdown_gatewayserver(){
+		Main.server.shutdown();
+	}
+
 	public static void main(String[] args) throws Exception {
+		open_gatewayserver();
+
 		SwtJarLoader.loadSwtJar();
 		String appClassName = "net.sourceforge.docfetcher.gui.Application";
 		Class<?> appClass = Class.forName(appClassName);
 		Class<?>[] paramTypes = new Class<?>[] {String[].class};
 		Method launchMethod = appClass.getMethod("main", paramTypes);
 		launchMethod.invoke(null, new Object[] {args});
+
+		shutdown_gatewayserver();
 	}
 
 }
