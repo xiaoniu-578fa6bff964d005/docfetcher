@@ -113,7 +113,7 @@ public final class Application {
 
 	private static FilesizePanel filesizePanel;
 	private static FileTypePanel fileTypePanel;
-	private static IndexPanel indexPanel;
+	public static IndexPanel indexPanel;
 
 	private static volatile Shell shell;
 	private static ThreePanelForm threePanelForm;
