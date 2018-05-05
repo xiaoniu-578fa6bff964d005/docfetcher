@@ -77,7 +77,9 @@ public final class SearchBar {
 				if(!query.isEmpty()){
 					if (Util.isEnterKey(e.keyCode))
 						evtSearch.fire(query);
-					else if(! Util.isSpecialStateMask(e.stateMask) && Util.isTypeAheadAccept(e.character))
+					else if(SettingsConf.Bool.UseTypeAheadSearch.get() &&
+							!Util.isSpecialStateMask(e.stateMask) &&
+							Util.isTypeAheadAccept(e.character))
 						evtSearch_typeahead.fire(query);
 				}
 			}
