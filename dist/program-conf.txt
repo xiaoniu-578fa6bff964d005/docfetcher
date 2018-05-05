@@ -151,3 +151,16 @@ UnpackCacheCapacity = 20
 # Whether the text-only preview is enabled. Setting this to false is useful when
 # the GUI is slowed down by large files being displayed in the preview pane.
 TextPreviewEnabled = true
+
+
+#===============================================================================
+#	Python Access -- Unsafe
+#===============================================================================
+
+# Whether the program should start a py4j gateway server in docfetcher to enable
+# python3 access to the docfetcher.
+# This setting can be used for invoke docfetcher search procedure in other software.
+# Using py4j can be dangerous because py4j runs a TCP server, by default on localhost,
+# which is subject to both local and (potential) remote code execution exploits.
+OpenPy4jGatewayServer  = false
+Py4jPort=28834

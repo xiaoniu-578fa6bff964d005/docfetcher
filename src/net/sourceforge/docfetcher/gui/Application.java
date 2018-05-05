@@ -56,6 +56,7 @@ import net.sourceforge.docfetcher.model.index.Task.IndexAction;
 import net.sourceforge.docfetcher.model.parse.ParseService;
 import net.sourceforge.docfetcher.model.parse.Parser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
+import net.sourceforge.docfetcher.python.Py4jHandler;
 import net.sourceforge.docfetcher.util.AppUtil;
 import net.sourceforge.docfetcher.util.CharsetDetectorHelper;
 import net.sourceforge.docfetcher.util.ConfLoader;
@@ -331,6 +332,10 @@ public final class Application {
 			statusBar.getLeftPart().setContents(Img.HELP.get(), msg);
 		}
 
+		// Open Py4j Gateway Server
+		if(ProgramConf.Bool.OpenPy4jGatewayServer.get())
+            Py4jHandler.openGatewayServer();
+
 		shell.addShellListener(new ShellAdapter() {
 			public void shellClosed(final ShellEvent e) {
 				handleShellClosed(e);
@@ -347,6 +352,10 @@ public final class Application {
 				handleCrash(t);
 			}
 		}
+
+		// Close Py4j Gateway Server
+		if(ProgramConf.Bool.OpenPy4jGatewayServer.get())
+			Py4jHandler.shutdownGatewayServer();
 
 		/*
 		 * Do not set this to null; the index registry loading thread must be

@@ -57,6 +57,7 @@ public final class ProgramConf {
 		IgnoreJunctionsAndSymlinks (true),
 		SaveSettings (true),
 		TextPreviewEnabled (true),
+		OpenPy4jGatewayServer (false),
 		;
 
 		private boolean value;
@@ -79,7 +80,8 @@ public final class ProgramConf {
 		PatternTableHeight (4, 1),
 		UnpackCacheCapacity (20, 1),
 		Analyzer (0, 0),
-		InitialSorting (0, Integer.MIN_VALUE),
+		InitialSorting (0),
+		Py4jPort (28834),
 		;
 
 		private int value;
@@ -93,6 +95,9 @@ public final class ProgramConf {
 		}
 		Int(int value, int min) {
 			this(value, min, Integer.MAX_VALUE);
+		}
+		Int(int value) {
+			this(value, Integer.MIN_VALUE, Integer.MAX_VALUE);
 		}
 
 		public int get() {
