@@ -147,9 +147,9 @@ public final class SearchQueue {
 					} catch (ParseException e) {
 						return;
 					}
-					queue.add(GuiEvent.SEARCH_OR_LIST);
-					queue.add(GuiEvent.TYPE_AHEAD);
-					queueNotEmpty.signal();
+                    queue.add(GuiEvent.SEARCH_OR_LIST);
+                    queue.add(GuiEvent.TYPE_AHEAD);
+                    queueNotEmpty.signal();
 				}
 				finally {
 					lock.unlock();
@@ -347,9 +347,9 @@ public final class SearchQueue {
 				if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST) && ! queueCopy.contains(GuiEvent.TYPE_AHEAD))
 					resultPanel.getControl().setFocus();
 				updateResultStatus(); // Must be done *after* setting the results
-				if (! queueCopy.contains(GuiEvent.TYPE_AHEAD)) {
-					searchBar.setEnabled(true);
+                searchBar.setEnabled(true);
 
+				if (! queueCopy.contains(GuiEvent.TYPE_AHEAD)) {
 					if (query != null)
 						searchBar.addToSearchHistory(query);
 				}
