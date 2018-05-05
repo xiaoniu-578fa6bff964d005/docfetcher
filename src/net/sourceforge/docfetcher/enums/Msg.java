@@ -631,6 +631,10 @@ public enum Msg {
 		"Clear search history on exit",
 		Comments.prefOption + "Whether the search history (i.e. the list of " +
 		"recently entered queries) should be cleared when the program exits."),
+	pref_use_type_ahead_search (
+        "Use type-ahead search",
+        Comments.prefOption + "Whether the program should carry out a search " +
+        "while user is typing in the search bar."),
 	pref_highlight_color (
 		"Highlight color:",
 		Comments.prefOption + "The color to use for highlighting matches in " +
