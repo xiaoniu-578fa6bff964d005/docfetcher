@@ -6,3 +6,13 @@ One demo search command line tool which is written in Python can be found at [de
 You don't have to reinstall the whole docfetcher to enjoy the python interface. Just copy `py4j0.10.7-py3.jar` and replace `net.sourceforge.docfetcher_1.1.19_xxxxxxxx-xxxx.jar` in `lib` directory in original docfetch release.
 
 The python interface is only available when docfetcher main process rather than `docfetcher-daemon` is running.
+
+## Warning
+
+Using py4j without TLS can be dangerous because py4j runs a TCP server, by default on localhost, which is subject to both local and (potential) remote code execution exploits.
+
+The py4j is disabled by default. In order to enable it manually, append code below to `conf/program-conf.txt`.
+
+    OpenPy4jGatewayServer  = true
+    Py4jPort=28834
+
