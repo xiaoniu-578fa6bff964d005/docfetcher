@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://$MODULE_DIR$/lib/J7zip/J7zip_4.43_alpha2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/junit/junit-4.8.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/junrar/java-unrar-0.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/javolution/javolution-5.5.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/mime-util/mime-util-2.1.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/slf4j/slf4j-api-1.6.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/slf4j/slf4j-nop-1.6.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jna/jna-3.2.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jna/jna-platform-3.2.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/ant/ant-1.8.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/juniversalchardet/juniversalchardet-1.0.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pegdown/parboiled-core-1.0.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pegdown/parboiled-java-1.0.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pegdown/pegdown-1.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jxgrabkey/JXGrabKey-0.3.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jintellitype/jintellitype-1.3.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-compress/commons-compress-1.4.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/guava/guava-12.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/icu4j-49_1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/fontbox-1.8.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/jempbox-1.8.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/pdfbox-1.8.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jexcelapi/jexcelapi-2.6.12.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pegdown/asm-all-3.3.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/lucene/lucene-core-3.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/lucene/lucene-highlighter-3.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/lucene/lucene-memory-3.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/lucene/lucene-queries-3.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/xz-utils/xz-1.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/java-libpst/java-libpst-0.8.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/poi/ooxml-lib/xmlbeans-2.6.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/bcmail-jdk15on-1.46.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/pdfbox/bcprov-jdk15on-1.46.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-codec/commons-codec-1.9.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-logging/commons-logging-1.1.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/metadata-extractor/metadata-extractor-2.7.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/metadata-extractor/xmpcore-5.1.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-driver-file-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-driver-tar-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-driver-zip-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-file-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-kernel-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/truezip/truezip-swing-7.7.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/poi/poi-3.13-20150929.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/poi/poi-ooxml-3.13-20150929.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/poi/poi-ooxml-schemas-3.13-20150929.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/poi/poi-scratchpad-3.13-20150929.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-io/commons-io-2.4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jericho-html/jericho-html-3.4.jar!/" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="J7zip_4.43_alpha2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/J7zip/J7zip_4.43_alpha2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/J7zip/J7zip_4.43_alpha2_src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="junit-4.8.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/junit/junit-4.8.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/junit/junit-4.8.2-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="java-unrar-0.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/junrar/java-unrar-0.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/junrar/java-unrar-0.3-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="javolution-5.5.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/javolution/javolution-5.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/javolution/javolution-5.5.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mime-util-2.1.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/mime-util/mime-util-2.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/mime-util/mime-util-2.1.3-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="slf4j-api-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/slf4j/slf4j-api-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="slf4j-nop-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/slf4j/slf4j-nop-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jna-3.2.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jna/jna-3.2.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jna/jna-3.2.7-src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jna-platform-3.2.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jna/jna-platform-3.2.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jna/jna-3.2.7-src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ant-1.8.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/ant/ant-1.8.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/ant/ant-1.8.2-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="juniversalchardet-1.0.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/juniversalchardet/juniversalchardet-1.0.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/juniversalchardet/juniversalchardet-1.0.3-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="parboiled-core-1.0.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/parboiled-core-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/parboiled-core-1.0.2-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="parboiled-java-1.0.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/parboiled-java-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/parboiled-java-1.0.2-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="pegdown-1.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/pegdown-1.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/pegdown-1.1.0-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="JXGrabKey-0.3.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jxgrabkey/JXGrabKey-0.3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jxgrabkey/JXGrabKey-0.3.2-src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jintellitype-1.3.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jintellitype/jintellitype-1.3.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jintellitype/jintellitype-1.3.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-compress-1.4.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/commons-compress/commons-compress-1.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/commons-compress/commons-compress-1.4.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="guava-12.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/guava/guava-12.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/guava/guava-12.0-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="icu4j-49_1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/icu4j-49_1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="fontbox-1.8.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/fontbox-1.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jempbox-1.8.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/jempbox-1.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="pdfbox-1.8.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/pdfbox-1.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jexcelapi-2.6.12.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jexcelapi/jexcelapi-2.6.12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jexcelapi/jexcelapi-2.6.12-src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="asm-all-3.3.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pegdown/asm-all-3.3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-core-3.5.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-core-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-3.5.0-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-highlighter-3.5.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-highlighter-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-3.5.0-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-memory-3.5.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-memory-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-3.5.0-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-queries-3.5.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-queries-3.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/lucene/lucene-3.5.0-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xz-1.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/xz-utils/xz-1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="module-library">
+      <library name="java-libpst-0.8.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java-libpst/java-libpst-0.8.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-libpst/java-libpst-0.8.1-src-stripped.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xmlbeans-2.6.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/poi/ooxml-lib/xmlbeans-2.6.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bcmail-jdk15on-1.46.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/bcmail-jdk15on-1.46.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bcprov-jdk15on-1.46.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/pdfbox/bcprov-jdk15on-1.46.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-codec-1.9.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/commons-codec/commons-codec-1.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-1.1.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/commons-logging/commons-logging-1.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="metadata-extractor-2.7.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/metadata-extractor/metadata-extractor-2.7.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xmpcore-5.1.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/metadata-extractor/xmpcore-5.1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-driver-file-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-file-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-file-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-driver-tar-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-tar-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-tar-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-driver-zip-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-zip-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-driver-zip-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-file-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-file-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-file-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-kernel-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-kernel-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-kernel-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-swing-7.7.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-swing-7.7.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/truezip/truezip-swing-7.7.7-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-3.13-20150929.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/poi/poi-3.13-20150929.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-ooxml-3.13-20150929.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/poi/poi-ooxml-3.13-20150929.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-ooxml-schemas-3.13-20150929.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/poi/poi-ooxml-schemas-3.13-20150929.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-scratchpad-3.13-20150929.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/poi/poi-scratchpad-3.13-20150929.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/commons-io/commons-io-2.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/commons-io/commons-io-2.4-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jericho-html-3.4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jericho-html/jericho-html-3.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/jericho-html/jericho-html-3.4-src.zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="swt-4.6-win32-win32-x86_64" level="application" />
+    <orderEntry type="library" name="py4j0.10.7-py3" level="application" />
+  </component>
+</module>
