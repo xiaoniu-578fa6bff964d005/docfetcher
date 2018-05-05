@@ -1785,6 +1785,27 @@ public final class Util {
 		return keyCode == SWT.CR || keyCode == SWT.KEYPAD_CR;
 	}
 
+	/**
+	 * Returns whether the given stateMask is a special function key.
+	 */
+	public static boolean isSpecialStateMask(int stateMask){
+		return (stateMask & (SWT.CTRL | SWT.ALT | SWT.SHIFT | SWT.COMMAND)) != 0;
+	}
+
+	/**
+	 * Returns whether the given keyCode is a character or a number.
+	 */
+	public static boolean isAlphaNumeric(int keyCode){
+		return (keyCode >=97 && keyCode <=122) || (keyCode >=48 && keyCode <=57);
+	}
+
+	/**
+	 * Returns whether the given keyCode is a valid key to trigger type-ahead search.
+	 */
+	public static boolean isTypeAheadAccept(char character){
+		return character>=32 || character == SWT.BS ;
+	}
+
 	// Any of the given resources may be null
 	public static void disposeWith(	@NotNull Widget widget,
 									@NotNull final Resource... resources) {

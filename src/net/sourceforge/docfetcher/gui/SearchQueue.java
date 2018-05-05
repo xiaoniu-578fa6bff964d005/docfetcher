@@ -26,10 +26,12 @@ import net.sourceforge.docfetcher.gui.ResultPanel.HeaderMode;
 import net.sourceforge.docfetcher.gui.filter.FileTypePanel;
 import net.sourceforge.docfetcher.gui.filter.FilesizePanel;
 import net.sourceforge.docfetcher.gui.filter.IndexPanel;
+import net.sourceforge.docfetcher.model.Fields;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.TreeCheckState;
 import net.sourceforge.docfetcher.model.parse.Parser;
+import net.sourceforge.docfetcher.model.search.PhraseDetectingQueryParser;
 import net.sourceforge.docfetcher.model.search.ResultDocument;
 import net.sourceforge.docfetcher.model.search.SearchException;
 import net.sourceforge.docfetcher.model.search.Searcher;
@@ -42,6 +44,8 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.Query;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 
@@ -54,7 +58,7 @@ import com.google.common.collect.Sets;
 public final class SearchQueue {
 	
 	private static enum GuiEvent {
-		SEARCH_OR_LIST, SIZE, TYPE, LOCATION
+		SEARCH_OR_LIST, SIZE, TYPE, LOCATION, TYPE_AHEAD,
 	}
 	
 	private static final String spaces = Strings.repeat(" ", 5);
@@ -130,7 +134,29 @@ public final class SearchQueue {
 				}
 			}
 		});
-		
+
+		searchBar.evtSearch_typeahead.add(new Event.Listener<String>() {
+			public void update(String eventData) {
+				lock.lock();
+				try {
+					query = eventData+'*';
+					try {
+						PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
+								IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
+						Query temp_query = queryParser.parse(query);
+					} catch (ParseException e) {
+						return;
+					}
+					queue.add(GuiEvent.SEARCH_OR_LIST);
+					queue.add(GuiEvent.TYPE_AHEAD);
+					queueNotEmpty.signal();
+				}
+				finally {
+					lock.unlock();
+				}
+			}
+		});
+
 		filesizePanel.evtValuesChanged.add(new Event.Listener<Void>() {
 			public void update(Void eventData) {
 				lock.lock();
@@ -210,7 +236,7 @@ public final class SearchQueue {
 		}
 		
 		IndexRegistry indexRegistry = indexPanel.getIndexRegistry();
-		
+
 		// Run search
 		if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST)) {
 			try {
@@ -318,16 +344,18 @@ public final class SearchQueue {
 			public void run() {
 				resultPanel.setResults(visibleResults, mode);
 				resultPanel.sortByColumn(ProgramConf.Int.InitialSorting.get());
-				if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST))
+				if (queueCopy.contains(GuiEvent.SEARCH_OR_LIST) && ! queueCopy.contains(GuiEvent.TYPE_AHEAD))
 					resultPanel.getControl().setFocus();
 				updateResultStatus(); // Must be done *after* setting the results
-				searchBar.setEnabled(true);
-				
-				if (query != null)
-					searchBar.addToSearchHistory(query);
+				if (! queueCopy.contains(GuiEvent.TYPE_AHEAD)) {
+					searchBar.setEnabled(true);
+
+					if (query != null)
+						searchBar.addToSearchHistory(query);
+				}
 			}
 		});
-		
+
 		return true;
 	}
 
