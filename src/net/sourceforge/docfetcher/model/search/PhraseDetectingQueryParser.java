@@ -15,7 +15,7 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
@@ -64,14 +64,6 @@ public final class PhraseDetectingQueryParser extends QueryParser {
 	protected Query newPrefixQuery(Term prefix) {
 		isPhraseQuery = false;
 		return super.newPrefixQuery(prefix);
-	}
-
-	protected Query newRangeQuery(	String field,
-									String part1,
-									String part2,
-									boolean inclusive) {
-		isPhraseQuery = false;
-		return super.newRangeQuery(field, part1, part2, inclusive);
 	}
 
 	protected Query newWildcardQuery(org.apache.lucene.index.Term t) {

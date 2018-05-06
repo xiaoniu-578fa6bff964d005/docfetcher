@@ -21,12 +21,14 @@ import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Field.TermVector;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -53,7 +55,7 @@ public final class HighlightServiceTest {
 		Directory directory = new RAMDirectory();
 		Analyzer analyzer = new StandardAnalyzer(
 				IndexRegistry.LUCENE_VERSION,
-				Collections.EMPTY_SET
+				CharArraySet.EMPTY_SET
 		);
 		IndexWriterAdapter writer = new IndexWriterAdapter(directory);
 		Document doc = new Document();
@@ -68,7 +70,8 @@ public final class HighlightServiceTest {
 		FieldQuery fieldQuery = highlighter.getFieldQuery(query);
 		IndexSearcher searcher = null;
 		try {
-			searcher = new IndexSearcher(directory);
+
+			searcher = new IndexSearcher(DirectoryReader.open(directory));
 			TopDocs docs = searcher.search(query, 10);
 			assertEquals(1, docs.scoreDocs.length);
 			int docId = docs.scoreDocs[0].doc;
@@ -82,7 +85,7 @@ public final class HighlightServiceTest {
 		    assertEquals(5, list.get(0).getStartOffset());
 		    assertEquals(9, list.get(0).getEndOffset());
 		} finally {
-			Closeables.closeQuietly(searcher);
+			Closeables.closeQuietly(searcher.getIndexReader());
 		}
 	}
 

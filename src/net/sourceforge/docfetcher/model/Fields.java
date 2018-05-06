@@ -19,7 +19,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Field.TermVector;
-import org.apache.lucene.document.NumericField;
+import org.apache.lucene.document.LongField;
 
 /**
  * @author Tran Nam Quang
@@ -89,8 +89,8 @@ public enum Fields {
 	
 	// The field is always indexed
 	@NotNull
-	public NumericField create(long fieldValue) {
-		return new NumericField(key, store, true).setLongValue(fieldValue);
+	public LongField create(long fieldValue) {
+		return new LongField(key, fieldValue, store);
 	}
 	
 	// Will create a tokenized and indexed field that is not stored if the given

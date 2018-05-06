@@ -61,13 +61,14 @@ import net.sourceforge.docfetcher.util.concurrent.BlockingWrapper;
 import net.sourceforge.docfetcher.util.concurrent.DelayedExecutor;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.ReusableAnalyzerBase;
-import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.util.Version;
 
@@ -91,7 +92,7 @@ public final class IndexRegistry {
 	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsewhere.
 	 */
 	@VisibleForPackageGroup
-	public static final Version LUCENE_VERSION = Version.LUCENE_30;
+	public static final Version LUCENE_VERSION = Version.LUCENE_40;
 
 	private static Analyzer analyzer = null;
 	
@@ -147,7 +148,7 @@ public final class IndexRegistry {
 			if (ProgramConf.Int.Analyzer.get() == 1) {
 				analyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
 			} else {
-				analyzer = new StandardAnalyzer(LUCENE_VERSION, Collections.EMPTY_SET);
+				analyzer = new StandardAnalyzer(LUCENE_VERSION, CharArraySet.EMPTY_SET);
 			}
 		}
 		return analyzer;
@@ -607,7 +608,7 @@ public final class IndexRegistry {
 		}
 	}
 
-	private static class SourceCodeAnalyzer extends ReusableAnalyzerBase {
+	private static class SourceCodeAnalyzer extends Analyzer {
 		private Version matchVersion;
 
 		public SourceCodeAnalyzer(Version matchVersion) {
@@ -619,7 +620,7 @@ public final class IndexRegistry {
 			final Tokenizer source = new SourceCodeTokenizer(matchVersion, reader);
 			TokenStream sink = new StandardFilter(matchVersion, source);
 			sink = new LowerCaseFilter(matchVersion, sink);
-		    sink = new StopFilter(matchVersion, sink, Collections.EMPTY_SET, false);
+		    sink = new StopFilter(matchVersion, sink, CharArraySet.EMPTY_SET );
 		    //sink = new SourceCodeTokenFilter(matchVersion, sink);
 			return new TokenStreamComponents(source, sink);
 		}
