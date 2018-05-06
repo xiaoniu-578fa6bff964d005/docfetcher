@@ -92,7 +92,7 @@ public final class IndexRegistry {
 	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsewhere.
 	 */
 	@VisibleForPackageGroup
-	public static final Version LUCENE_VERSION = Version.LUCENE_40;
+	public static final Version LUCENE_VERSION = Version.LATEST;
 
 	private static Analyzer analyzer = null;
 	
@@ -148,7 +148,7 @@ public final class IndexRegistry {
 			if (ProgramConf.Int.Analyzer.get() == 1) {
 				analyzer = new SourceCodeAnalyzer(LUCENE_VERSION);
 			} else {
-				analyzer = new StandardAnalyzer(LUCENE_VERSION, CharArraySet.EMPTY_SET);
+				analyzer = new StandardAnalyzer(CharArraySet.EMPTY_SET);
 			}
 		}
 		return analyzer;
@@ -616,11 +616,11 @@ public final class IndexRegistry {
 		}
 
 		@Override
-		protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-			final Tokenizer source = new SourceCodeTokenizer(matchVersion, reader);
-			TokenStream sink = new StandardFilter(matchVersion, source);
-			sink = new LowerCaseFilter(matchVersion, sink);
-		    sink = new StopFilter(matchVersion, sink, CharArraySet.EMPTY_SET );
+		protected TokenStreamComponents createComponents(String fieldName) {
+			final Tokenizer source = new SourceCodeTokenizer();
+			TokenStream sink = new StandardFilter(source);
+			sink = new LowerCaseFilter(sink);
+		    sink = new StopFilter(sink, CharArraySet.EMPTY_SET );
 		    //sink = new SourceCodeTokenFilter(matchVersion, sink);
 			return new TokenStreamComponents(source, sink);
 		}

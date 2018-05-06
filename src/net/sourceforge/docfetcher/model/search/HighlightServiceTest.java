@@ -53,10 +53,7 @@ public final class HighlightServiceTest {
 	public void testPhraseHighlighter() throws Exception {
 		// Create index
 		Directory directory = new RAMDirectory();
-		Analyzer analyzer = new StandardAnalyzer(
-				IndexRegistry.LUCENE_VERSION,
-				CharArraySet.EMPTY_SET
-		);
+		Analyzer analyzer = new StandardAnalyzer( CharArraySet.EMPTY_SET );
 		IndexWriterAdapter writer = new IndexWriterAdapter(directory);
 		Document doc = new Document();
 		doc.add(new Field("content", "some text", Store.NO, Index.ANALYZED, TermVector.WITH_POSITIONS_OFFSETS));
@@ -64,7 +61,7 @@ public final class HighlightServiceTest {
 		Closeables.closeQuietly(writer); // flush unwritten documents into index
 		
 		// Perform phrase search
-		QueryParser queryParser = new QueryParser(IndexRegistry.LUCENE_VERSION, "content", analyzer);
+		QueryParser queryParser = new QueryParser("content", analyzer);
 		Query query = queryParser.parse("\"text\"");
 		FastVectorHighlighter highlighter = new FastVectorHighlighter(true, true, null, null);
 		FieldQuery fieldQuery = highlighter.getFieldQuery(query);

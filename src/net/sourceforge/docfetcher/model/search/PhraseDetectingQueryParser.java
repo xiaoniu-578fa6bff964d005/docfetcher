@@ -34,10 +34,9 @@ public final class PhraseDetectingQueryParser extends QueryParser {
 	
 	private boolean isPhraseQuery = true;
 	
-	public PhraseDetectingQueryParser(	Version luceneVersion,
-										String defaultField,
-										Analyzer analyzer) {
-		super(luceneVersion, defaultField, analyzer);
+	public PhraseDetectingQueryParser(  String defaultField,
+                                        Analyzer analyzer) {
+		super( defaultField, analyzer);
 	}
 	
 	public boolean isPhraseQuery() {

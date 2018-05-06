@@ -14,8 +14,8 @@ public final class SourceCodeTokenizer extends CharTokenizer {
 	 * @param in
 	 *          the input to split up into tokens
 	 */
-	public SourceCodeTokenizer(Version matchVersion, Reader in) {
-		super(matchVersion, in);
+	public SourceCodeTokenizer() {
+		super();
 	}
 
 	/**

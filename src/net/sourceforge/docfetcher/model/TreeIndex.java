@@ -156,7 +156,7 @@ public abstract class TreeIndex <
 	public final Directory getLuceneDir() throws IOException {
 		if (fileIndexDirPath != null) {
 			assert ramIndexDir == null;
-			return FSDirectory.open(getIndexDirPath().getCanonicalFile());
+			return FSDirectory.open(getIndexDirPath().getCanonicalFile().toPath());
 		}
 		if (ramIndexDir == null) // may be null after deserialization
 			ramIndexDir = new RAMDirectory();
