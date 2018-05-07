@@ -395,8 +395,8 @@ public final class Searcher {
 		// Add size filter to filter chain
 		if (webQuery.minSize != null || webQuery.maxSize != null) {
 			builder.add(
-                NumericRangeQuery.newLongRange(
-                    Fields.SIZE.key(), webQuery.minSize, webQuery.maxSize, true, true),
+                LegacyNumericRangeQuery.newLongRange(
+						Fields.SIZE.key(), webQuery.minSize, webQuery.maxSize, true, true),
                 BooleanClause.Occur.FILTER
 			);
 		}
@@ -489,7 +489,7 @@ public final class Searcher {
 		PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
 			Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
 		queryParser.setAllowLeadingWildcard(true);
-		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE;
+		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_REWRITE;
 		queryParser.setMultiTermRewriteMethod(rewriteMethod);
 		if (!SettingsConf.Bool.UseOrOperator.get())
 			queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);

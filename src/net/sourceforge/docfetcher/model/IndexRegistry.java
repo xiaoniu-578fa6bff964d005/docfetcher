@@ -92,7 +92,7 @@ public final class IndexRegistry {
 	 * Analyzer+ elsewhere, don't call setMaxClauseCount elsewhere.
 	 */
 	@VisibleForPackageGroup
-	public static final Version LUCENE_VERSION = Version.LATEST;
+	public static final Version LUCENE_VERSION = Version.LUCENE_6_6_3;
 
 	private static Analyzer analyzer = null;
 	

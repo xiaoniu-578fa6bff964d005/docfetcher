@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import net.sourceforge.docfetcher.model.FieldTypes;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 
@@ -24,9 +25,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -56,7 +54,7 @@ public final class HighlightServiceTest {
 		Analyzer analyzer = new StandardAnalyzer( CharArraySet.EMPTY_SET );
 		IndexWriterAdapter writer = new IndexWriterAdapter(directory);
 		Document doc = new Document();
-		doc.add(new Field("content", "some text", Store.NO, Index.ANALYZED, TermVector.WITH_POSITIONS_OFFSETS));
+		doc.add(new Field("content", "some text", FieldTypes.TYPE_TEXT_WITH_POSITIONS_OFFSETS_NOT_STORED));
 		writer.add(doc);
 		Closeables.closeQuietly(writer); // flush unwritten documents into index
 		

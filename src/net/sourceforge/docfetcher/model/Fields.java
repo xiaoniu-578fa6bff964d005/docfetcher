@@ -16,17 +16,19 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.Field.TermVector;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.LegacyLongField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+
+import java.awt.*;
 
 /**
  * @author Tran Nam Quang
  */
 @VisibleForPackageGroup
 public enum Fields {
-	
+
 	// TODO pre-release: check correctness of usage of Store.XXX, Index.XXX options
 	// TODO pre-release: check if storing the file extension is necessary
 	// TODO pre-release: some enums here are not used yet
@@ -42,40 +44,37 @@ public enum Fields {
 	 */
 	
 	// Fields available for files and emails
-	UID (Store.YES, Index.NOT_ANALYZED), // Index.NO will cause deletions to fail
-	CONTENT (Store.NO, Index.ANALYZED),
-	TYPE (Store.YES, Index.NO), // file extension or email type (outlook, imap, etc.)
+	UID (StringField.TYPE_STORED), // Index.NO will cause deletions to fail
+	CONTENT (TextField.TYPE_NOT_STORED),
+	CONTENT_WITH_OFFSET (FieldTypes.TYPE_TEXT_WITH_POSITIONS_OFFSETS_STORED),
+	TYPE (StringField.TYPE_STORED), // file extension or email type (outlook, imap, etc.)
 	// The following must be stored as a numeric field in order to enable
 	// filtering and sorting for the web interface
-	SIZE (Store.YES, Index.ANALYZED_NO_NORMS),
-	PARSER (Store.YES, Index.NO), // Use constant EMAIL_PARSER for emails
-	
+	SIZE (LegacyLongField.TYPE_STORED),
+	PARSER (StringField.TYPE_STORED), // Use constant EMAIL_PARSER for emails
+
 	// Fields available for files
-	FILENAME (Store.YES, Index.ANALYZED),
-	TITLE (Store.YES, Index.ANALYZED),
-	AUTHOR (Store.YES, Index.ANALYZED),
-	LAST_MODIFIED (Store.YES, Index.NO),
-	
+	FILENAME (TextField.TYPE_STORED),
+	TITLE (TextField.TYPE_STORED),
+	AUTHOR (TextField.TYPE_STORED),
+	LAST_MODIFIED (StringField.TYPE_STORED),
+
 	// Fields available for emails
-	SUBJECT (Store.YES, Index.ANALYZED),
-	SENDER (Store.YES, Index.ANALYZED),
-	RECIPIENTS (Store.YES, Index.ANALYZED), // TODO post-release-1.1: show this field on results panel in "email mode"
-	DATE (Store.YES, Index.NO), // this field is optional
+	SUBJECT (TextField.TYPE_STORED),
+	SENDER (TextField.TYPE_STORED),
+	RECIPIENTS (TextField.TYPE_STORED), // TODO post-release-1.1: show this field on results panel in "email mode"
+	DATE (StringField.TYPE_STORED), // this field is optional
 	;
-	
 	public static final String EMAIL_PARSER = "EmailParser";
 	
 	@NotNull private final String key;
-	@NotNull private final Store store;
-	@NotNull private final Index index;
-	
-	private Fields(	@NotNull Store store,
-					@NotNull Index index) {
+	@NotNull private final FieldType type;
+
+	private Fields(	@NotNull FieldType type) {
 		this.key = this.name().toLowerCase();
-		this.store = store;
-		this.index = index;
+		this.type=type;
 	}
-	
+
 	@NotNull
 	public String key() {
 		return key;
@@ -84,15 +83,19 @@ public enum Fields {
 	// For long values, use create(long) instead
 	@NotNull
 	public Field create(@NotNull String fieldValue) {
-		return new Field(key, fieldValue, store, index);
+		return new Field(key, fieldValue, type);
 	}
 	
-	// The field is always indexed
 	@NotNull
-	public LongField create(long fieldValue) {
-		return new LongField(key, fieldValue, store);
+	public LegacyLongField create(long fieldValue) {
+		return new LegacyLongField(key, fieldValue, type);
 	}
-	
+
+	@NotNull
+	private Field create(CharSequenceReader charSequenceReader) {
+		return new Field(key,charSequenceReader,type);
+	}
+
 	// Will create a tokenized and indexed field that is not stored if the given
 	// fieldValue is not a String
 	// does not store token positions and offsets
@@ -104,19 +107,17 @@ public enum Fields {
 	@NotNull
 	public static Field createContent(	@NotNull CharSequence fieldValue,
 										boolean withOffsets) {
-		// TermVector.WITH_POSITIONS_OFFSETS is required by the fast-vector
-		// highlighter
-		TermVector termVector = withOffsets
-			? TermVector.WITH_POSITIONS_OFFSETS
-			: TermVector.NO;
+		// WITH_POSITIONS_OFFSETS is required by the fast-vector highlighter
 		if (fieldValue instanceof String) {
-			return new Field(
-				CONTENT.key, (String) fieldValue, CONTENT.store, CONTENT.index,
-				termVector);
+			if(withOffsets)
+                return CONTENT_WITH_OFFSET.create((String) fieldValue);
+			else
+				return CONTENT.create((String) fieldValue);
 		}
-		return new Field(
-			CONTENT.key, new CharSequenceReader().setInput(fieldValue),
-			termVector);
+		if(withOffsets)
+			return CONTENT_WITH_OFFSET.create(new CharSequenceReader().setInput(fieldValue));
+		else
+			return CONTENT.create(new CharSequenceReader().setInput(fieldValue));
 	}
 
 }

@@ -55,11 +55,6 @@ public final class PhraseDetectingQueryParser extends QueryParser {
 		return super.newMatchAllDocsQuery();
 	}
 
-	protected MultiPhraseQuery newMultiPhraseQuery() {
-		isPhraseQuery = false;
-		return super.newMultiPhraseQuery();
-	}
-
 	protected Query newPrefixQuery(Term prefix) {
 		isPhraseQuery = false;
 		return super.newPrefixQuery(prefix);
