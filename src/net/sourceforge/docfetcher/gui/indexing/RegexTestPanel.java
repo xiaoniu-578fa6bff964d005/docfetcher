@@ -31,6 +31,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -53,7 +55,7 @@ final class RegexTestPanel extends Composite {
 		super(parent, SWT.NONE);
 		Util.checkNotNull(index);
 		label = new Label(this, SWT.NONE);
-		label.setText(Msg.sel_regex_matches_file_no.get());
+		label.setText("");
 		fileBox = new Text(this, SWT.BORDER | SWT.SINGLE);
 		
 		Button fileChooserBt = Util.createPushButton(this, "...", new SelectionAdapter() {
@@ -70,12 +72,16 @@ final class RegexTestPanel extends Composite {
 			}
 		});
 		
-		fileBox.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				updateLabel();
+		fileBox.addKeyListener(new KeyAdapter(){
+			public void keyReleased(KeyEvent e) {
+				if (Util.isEnterKey(e.keyCode))
+                    updateLabel();
+				else
+					clearLable();
 			}
 		});
-		
+
+
 		setLayout(Util.createGridLayout(2, false, 0, 0));
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 2, 1));
 		fileBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -102,6 +108,14 @@ final class RegexTestPanel extends Composite {
 	}
 	
 	private void updateLabel() {
+		fileBox.setText(new Path(fileBox.getText()).getPath());
+		fileBox.setSelection(fileBox.getText().length());
+
+		if(fileBox.getText().isEmpty()){
+			clearLable();
+			return;
+		}
+
 		try {
 			label.setText(matches()
 				? Msg.sel_regex_matches_file_yes.get()
@@ -111,7 +125,10 @@ final class RegexTestPanel extends Composite {
 			label.setText(Msg.sel_regex_malformed.get());
 		}
 	}
-	
+	private void clearLable() {
+		label.setText("");
+	}
+
 	private boolean matches() throws PatternSyntaxException {
 		if (patternActions.isEmpty())
 			return false;
