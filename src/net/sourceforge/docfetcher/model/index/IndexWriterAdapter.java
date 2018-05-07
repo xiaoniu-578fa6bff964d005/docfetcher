@@ -22,11 +22,12 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 
 import com.google.common.io.Closeables;
+import org.apache.lucene.util.Version;
 
 /**
  * Wrapper for Lucene's IndexWriter that adds some functionality.
@@ -41,7 +42,9 @@ public final class IndexWriterAdapter implements Closeable {
 	@NotNull private IndexWriter writer;
 
 	public IndexWriterAdapter(@NotNull Directory luceneDir) throws IOException {
-		writer = new IndexWriter(luceneDir, IndexRegistry.getAnalyzer(), MaxFieldLength.UNLIMITED);
+		IndexWriterConfig config
+				= new IndexWriterConfig(IndexRegistry.getAnalyzer());
+		writer = new IndexWriter(luceneDir, config);
 	}
 
 	// may throw OutOfMemoryError
@@ -66,7 +69,7 @@ public final class IndexWriterAdapter implements Closeable {
 	public void update(@NotNull String uid, @NotNull Document document)
 			throws IOException, CheckedOutOfMemoryError {
 		try {
-			writer.updateDocument(idTerm.createTerm(uid), document);
+			writer.updateDocument(new Term(idTerm.field(), uid), document);
 		}
 		catch (OutOfMemoryError e) {
 			reopenWriterAndThrow(e);
@@ -89,12 +92,14 @@ public final class IndexWriterAdapter implements Closeable {
 		 */
 		Directory indexDir = writer.getDirectory();
 		Closeables.closeQuietly(writer);
-		writer = new IndexWriter(indexDir, IndexRegistry.getAnalyzer(), MaxFieldLength.UNLIMITED);
+		IndexWriterConfig config
+				= new IndexWriterConfig(IndexRegistry.getAnalyzer());
+		writer = new IndexWriter(indexDir, config);
 		throw new CheckedOutOfMemoryError(t);
 	}
 
 	public void delete(@NotNull String uid) throws IOException {
-		writer.deleteDocuments(idTerm.createTerm(uid));
+		writer.deleteDocuments(new Term(idTerm.field(),uid));
 	}
 	
 	public void close() throws IOException {

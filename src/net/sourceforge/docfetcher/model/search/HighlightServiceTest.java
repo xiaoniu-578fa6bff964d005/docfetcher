@@ -16,17 +16,17 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import net.sourceforge.docfetcher.model.FieldTypes;
 import net.sourceforge.docfetcher.model.IndexRegistry;
 import net.sourceforge.docfetcher.model.index.IndexWriterAdapter;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.Field.TermVector;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -51,24 +51,22 @@ public final class HighlightServiceTest {
 	public void testPhraseHighlighter() throws Exception {
 		// Create index
 		Directory directory = new RAMDirectory();
-		Analyzer analyzer = new StandardAnalyzer(
-				IndexRegistry.LUCENE_VERSION,
-				Collections.EMPTY_SET
-		);
+		Analyzer analyzer = new StandardAnalyzer( CharArraySet.EMPTY_SET );
 		IndexWriterAdapter writer = new IndexWriterAdapter(directory);
 		Document doc = new Document();
-		doc.add(new Field("content", "some text", Store.NO, Index.ANALYZED, TermVector.WITH_POSITIONS_OFFSETS));
+		doc.add(new Field("content", "some text", FieldTypes.TYPE_TEXT_WITH_POSITIONS_OFFSETS_NOT_STORED));
 		writer.add(doc);
 		Closeables.closeQuietly(writer); // flush unwritten documents into index
 		
 		// Perform phrase search
-		QueryParser queryParser = new QueryParser(IndexRegistry.LUCENE_VERSION, "content", analyzer);
+		QueryParser queryParser = new QueryParser("content", analyzer);
 		Query query = queryParser.parse("\"text\"");
 		FastVectorHighlighter highlighter = new FastVectorHighlighter(true, true, null, null);
 		FieldQuery fieldQuery = highlighter.getFieldQuery(query);
 		IndexSearcher searcher = null;
 		try {
-			searcher = new IndexSearcher(directory);
+
+			searcher = new IndexSearcher(DirectoryReader.open(directory));
 			TopDocs docs = searcher.search(query, 10);
 			assertEquals(1, docs.scoreDocs.length);
 			int docId = docs.scoreDocs[0].doc;
@@ -82,7 +80,7 @@ public final class HighlightServiceTest {
 		    assertEquals(5, list.get(0).getStartOffset());
 		    assertEquals(9, list.get(0).getEndOffset());
 		} finally {
-			Closeables.closeQuietly(searcher);
+			Closeables.closeQuietly(searcher.getIndexReader());
 		}
 	}
 
