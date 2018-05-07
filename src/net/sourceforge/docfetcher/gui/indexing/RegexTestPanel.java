@@ -124,6 +124,7 @@ final class RegexTestPanel extends Composite {
 		catch (PatternSyntaxException e) {
 			label.setText(Msg.sel_regex_malformed.get());
 		}
+		layout();
 	}
 	private void clearLable() {
 		label.setText("");
