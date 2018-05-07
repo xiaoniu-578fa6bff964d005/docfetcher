@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.sun.org.apache.xerces.internal.impl.io.MalformedByteSequenceException;
 import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
@@ -120,7 +121,7 @@ abstract class OpenOfficeParser extends FileParser {
 			return result;
 		}
 		catch (CharConversionException e) {
-			if (matchesPasswordErrorMessage(e.getMessage())) {
+			if (matchesPasswordError(e)) {
 				throw new ParseException(Msg.doc_pw_protected.get());
 			}
 			else {
@@ -142,7 +143,7 @@ abstract class OpenOfficeParser extends FileParser {
 		}
 	}
 	
-	private static boolean matchesPasswordErrorMessage(@Nullable String msg) {
+	private static boolean matchesPasswordError(@Nullable Exception e) {
 		/*
 		 * Expected error messages:
 		 * - "Invalid byte 1 of 1-byte UTF-8 sequence."
@@ -150,8 +151,7 @@ abstract class OpenOfficeParser extends FileParser {
 		 * - "Invalid byte 2 of 3-byte UTF-8 sequence."
 		 * - etc.
 		 */
-		return msg != null && msg.startsWith("Invalid byte ")
-				&& msg.endsWith("-byte UTF-8 sequence.");
+		return e != null && e instanceof MalformedByteSequenceException;
 	}
 
 }
