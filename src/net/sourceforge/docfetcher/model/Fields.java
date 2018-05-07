@@ -46,7 +46,7 @@ public enum Fields {
 	// Fields available for files and emails
 	UID (StringField.TYPE_STORED), // Index.NO will cause deletions to fail
 	CONTENT (TextField.TYPE_NOT_STORED),
-	CONTENT_WITH_OFFSET (FieldTypes.TYPE_TEXT_WITH_POSITIONS_OFFSETS_STORED),
+	CONTENT_WITH_OFFSET (FieldTypes.TYPE_TEXT_WITH_POSITIONS_OFFSETS_STORED,Fields.CONTENT.name()),
 	TYPE (StringField.TYPE_STORED), // file extension or email type (outlook, imap, etc.)
 	// The following must be stored as a numeric field in order to enable
 	// filtering and sorting for the web interface
@@ -72,6 +72,12 @@ public enum Fields {
 
 	private Fields(	@NotNull FieldType type) {
 		this.key = this.name().toLowerCase();
+		this.type=type;
+	}
+
+
+	private Fields(@NotNull FieldType type, String name) {
+		this.key = name.toLowerCase();
 		this.type=type;
 	}
 
