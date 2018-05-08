@@ -154,6 +154,7 @@ public final class BuildMain {
 
 	// Must be run before updating the version numbers in the manual pages
 	private static void rebuildManuals() throws Exception {
+		Util.deleteContents(new File("dist/help/"));
 		for (File dir : Util.listFiles(new File(Manual.manDir))) {
 			if (!dir.isDirectory() || dir.getName().equals("all"))
 				continue;
