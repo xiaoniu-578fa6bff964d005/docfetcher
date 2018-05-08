@@ -73,7 +73,7 @@ public final class Manual {
 		String langId = args[0];
 		
 		File srcDir = new File(manDir + "/" + langId);
-		String dstDirName = new Locale(langId).getDisplayName();
+		String dstDirName = new Locale(langId).getDisplayName(Locale.ENGLISH);
 		File dstDir = new File("dist/help/" + dstDirName);
 		dstDir.mkdirs();
 		Util.deleteContents(dstDir);
