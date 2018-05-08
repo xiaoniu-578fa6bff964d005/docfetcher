@@ -9,7 +9,7 @@ DocFetcher是一个免费开源且跨平台的桌面文档内容搜索工具：�
 
 **搜索**: 在搜索栏输入要搜索的内容并敲击回车即可查询。
 
-*如果您正在阅读DocFetcher内的本手册，按照下一段中的说明将使手册消失。要恢复它，点击右上角的''？'`按钮。您也可以通过点击该窗格正上方的“在外部浏览器中打开”按钮，在默认网页浏览器中打开该手册。*
+*如果您正在阅读DocFetcher内的本手册，按照下一段中的说明将使手册消失。要恢复它，点击右上角的`？`按钮。您也可以通过点击该窗格正上方的“在外部浏览器中打开”按钮，在默认网页浏览器中打开该手册。*
 
 **结果窗口和预览窗口**: 在结果窗格下方（或者在其右侧，取决于当前的GUI布局），您可以找到预览窗格。如果您在结果窗格中选择一个文件，预览窗格将显示文件内容的纯文本预览。预览窗口具有下面功能：
 
@@ -18,7 +18,7 @@ DocFetcher是一个免费开源且跨平台的桌面文档内容搜索工具：�
 
 一些快捷操作: 按下“Ctrl + F”或“Alt + F”将焦点移回搜索字段。要在外部程序中打开文件，请在结果窗格中双击该文件。
 
-**排序**: 您可以通过单击任何结果窗格的列标题来更改结果的排序。例如，要按文件名对结果进行排序，请单击“文件名”标题。单击相同的标题两次将按相反的顺序排序。您也可以通过拖放操作来更改列的顺序：例如，如果您希望将“Filename”作为第一列，只需将“Filename”列标题拖到左侧即可。
+**排序**: 您可以通过单击任何结果窗格的列标题来更改结果的排序。例如，要按文件名对结果进行排序，请单击“文件名”标题。单击相同的标题两次将按相反的顺序排序。您也可以通过拖放操作来更改列的顺序：例如，如果您希望将“文件名”作为第一列，只需将“文件名”列标题拖到左侧即可。
 
 **过滤**: 在GUI的左侧，您可以看到用于过滤结果的各种控件：（1）您可以在“最小/最大文件大小”控件中指定最小和/或最大文件大小。 （2）“文档类型”列表允许您按类型过滤结果。 （3）通过取消选中“搜索范围”区域中的项目，可以按位置过滤结果。
 
@@ -27,8 +27,8 @@ DocFetcher是一个免费开源且跨平台的桌面文档内容搜索工具：�
 1. ***DocFetcher 主程序***: 如果DocFetcher正在运行，并且启用了`监视文件夹中文件的变化`，则DocFetcher会检测更改并立即更新其索引。
 2. ***DocFetcher 守护程序***: 如果DocFetcher未运行，则更改将由在后台运行的小型守护程序记录;受影响的索引将在下次DocFetcher启动时更新。 （注意：不幸的是，守护进程目前在Mac OS X上不可用。）
 
-一些注意事项：如果您使用DocFetcher的可移植版本并希望运行守护程序，则必须通过将守护程序可执行文件添加到操作系统的启动程序列表中来手动安装它。另外，DocFetcher和守护进程都不能检测网络共享上的变化。
-因此，在索引无法自动更新的情况下，您必须自己完成：在“搜索范围”区域中，选择一个或多个要更新的索引，然后单击“更新索引” '搜索范围'上下文菜单，或者按'F5`键。
+一些注意事项：如果您使用DocFetcher的可移植版本并希望运行守护程序，则必须通过将守护程序可执行文件添加到操作系统的启动程序列表中来手动安装它。另外，DocFetcher和守护进程都不能检测网络共享上的变化。<!-- this line should end with two spaces -->  
+因此，在索引无法自动更新的情况下，您必须自己完成：在“搜索范围”区域中，选择一个或多个要更新的索引，右键菜单中点击`更新索引`，或者按'F5`键。
 
 * * *
 
@@ -37,60 +37,60 @@ DocFetcher是一个免费开源且跨平台的桌面文档内容搜索工具：�
 高级用法
 ==============
 
-**查询语法**: 借助DocFetcher，您可以做的不仅仅是简单的单词查询。例如，您可以使用通配符搜索具有共同开始的单词，如下所示：`wiki*`。要搜索某个短语（即按特定顺序排列的单词序列），请用引号括住该短语：`"the quick brown fox"`。但这仅仅是一个开始。有关所有受支持的构造的概述，请参见[查询语法部分]（DocFetcher_Manual_files / Query_Syntax.html）。
+**查询语法**: 借助DocFetcher，您可以做的不仅仅是简单的单词查询。例如，您可以使用通配符搜索具有共同开始的单词，如下所示：`wiki*`。要搜索某个短语（即按特定顺序排列的单词序列），请用引号括住该短语：`"the quick brown fox"`。但这仅仅是一个开始。有关所有受支持的构造的概述，请参见[查询语法部分](DocFetcher_Manual_files/Query_Syntax.html)。
 
 **首选项**: 在用户界面的右上角，您会看到一个描绘两个齿轮的图标。点击它打开首选项对话框。可以通过首选项对话框左下角的“高级设置”链接访问更高级用法的其他设置。
 
-**Portable document repository**: The portable version of DocFetcher allows you create a bundle containing DocFetcher, your documents and the associated indexes, and then freely move this bundle around &mdash; even from one operating system to another, e.g. from Windows to Linux and vice versa. One important thing to keep in mind when using the portable version is that the indexes must be created with *relative paths*. Click [here](DocFetcher_Manual_files/Portable_Repositories.html) for more information about portable document repositories. By the way, if you've been using DocFetcher 1.0.3 and earlier, note that you're not required to put your documents into the DocFetcher folder anymore.
+**可移植文档库**: DocFetcher的可移植版本允许您创建一个包含DocFetcher，您的文档和相关索引的捆绑包，然后自由移动此捆绑包&mdash;甚至从一个操作系统到另一个操作系统从Windows到Linux，反之亦然。使用可移植版本时需要牢记的一点是索引必须使用*相对路径*来创建。单击[here](DocFetcher_Manual_files/Portable_Repositories.html)以获取有关可移植文档存储库的更多信息。如果您一直使用DocFetcher 1.0.3及更早的版本，请注意，您不需要将文档放入DocFetcher文件夹中。
 
-**Indexing configuration options**: For a detailed discussion of all those options on the indexing configuration window, click [here](DocFetcher_Manual_files/Indexing_Options.html). You can also reach this manual page directly from the configuration window by clicking on the `Help` button at the bottom of the window. Perhaps the most interesting configuration options are:
+**索引配置选项**:有关索引配置窗口中所有这些选项的详细讨论，请单击[here](DocFetcher_Manual_files/Indexing_Options.html)。您也可以通过单击窗口底部的“帮助”按钮直接从配置窗口访问此手册页。也许最有趣的配置选项是：
 
-* ***Customizable file extensions***: The file extensions for plain text files and zip archives are fully customizable. This is particularly useful for indexing source code files.
-* ***File exclusion***: You can exclude certain files from indexing based on regular expressions.
-* ***Mime type detection***: Without mime type detection, DocFetcher will just look at a file's extension (e.g. `'.doc'`) to determine its file type. With mime type detection, DocFetcher will also peek into the file's contents to see if it can find any better type info. This is slower than just checking the file extension, but it's useful for files that have the wrong file extension.
-* ***HTML pairing***: By default, DocFetcher treats an HTML file and its associated folder (e.g. a file `foo.html` and a folder `foo_files`) as a single document. The main purpose of this is to make all the "clutter" inside the HTML folders disappear from the search results.
+* ***可自定义的文件扩展名***：纯文本文件和zip文件的文件扩展名完全可自定义。这对索引源代码文件特别有用。
+* ***文件排除***：您可以根据正则表达式从索引中排除某些文件。
+* ***Mime类型检测***：如果没有MIME类型检测，DocFetcher只会查看文件的扩展名（例如`'.doc'`）来确定其文件类型。通过MIME类型检测，DocFetcher还可以查看文件内容以查看是否可以找到更好的类型信息。这比检查文件扩展名要慢，但对于文件扩展名错误的文件很有用。
+* ***HTML配对***：默认情况下，DocFetcher将HTML文件及其关联文件夹（例如文件`foo.html`和文件夹`foo_files`）视为单个文档。这样做的主要目的是使HTML文件夹内的所有“混乱”从搜索结果中消失。
 
-**Regular expressions**: Both the file exclusion and the mime type detection rely on so-called *regular expressions*. These are user-defined patterns that DocFetcher will match against filenames or filepaths. For example, to exclude all files starting with the word "journal", you can use this regular expression: `journal.*`. Note that this is slightly different from DocFetcher's query syntax, where you would omit the dot: `journal*`. If you want to know more about regular expressions, read this [brief introduction](DocFetcher_Manual_files/Regular_Expressions.html).
+**正则表达式**：文件排除和MIME类型检测均依赖于所谓的*正则表达式*。这些是DocFetcher将与文件名或文件路径匹配的用户定义模式。例如，要排除以"journal"开头的所有文件，可以使用以下正则表达式：`journal.*`。请注意，这与DocFetcher的查询语法略有不同，您可能会忽略`'.'`：`journal*`。如果您想了解更多关于正则表达式的知识，请阅读[简介](DocFetcher_Manual_files/Regular_Expressions.html)。
 
-**Release notification**: DocFetcher does not (and should not?) automatically check for updates. If you *do* wish to be notified of new releases, there are [a couple of ways](DocFetcher_Manual_files/Release_Notification.html) to set this up.
+**发布通知**：DocFetcher不会（也不应该）自动检查更新。如果您希望收到新版本的通知，可以通过[方法](DocFetcher_Manual_files/Release_Notification.html)进行设置。
 
 * * *
 
 <a name="Caveats"></a> <!-- Do not translate this line, just copy it verbatim. -->
 
-Caveats and Common Gotchas
+警告和常见问题
 ==========================
 
-**Raising the memory limit**: DocFetcher, like all Java programs, has a fixed limit on how much memory it's allowed to use, known as the *Java heap size*. This memory limit must be set on startup, and DocFetcher currently chooses a default value of 256&nbsp;MB. If you try to index a very, very large number of files, and/or if some of the indexed files are really huge (which is not uncommon with PDF files), then chances are DocFetcher will hit that memory limit. If this ever happens, you might want to [raise the memory limit](DocFetcher_Manual_files/Memory_Limit.html).
+**提高内存限制**：与所有Java程序一样，DocFetcher对允许使用多少内存有一个固定限制，称为*Java堆大小*。此内存限制必须在启动时设置，DocFetcher当前选择默认值256 MB。如果您尝试索引非常大量的文件，或者某些索引文件非常庞大（PDF文件并不罕见），那么DocFetcher可能会达到该内存限制。如果发生这种情况，您可能需要[提高内存限制](DocFetcher_Manual_files/Memory_Limit.html)。
 
-**Don't index system folders**: In contrast to other desktop search applications, DocFetcher was not designed for indexing system folders such as `C:`or `C:\Windows`. Doing so is discouraged for the following reasons:
+**不索引系统文件夹**：与其他桌面搜索应用程序相比，DocFetcher并非专门用于索引系统文件夹，如`C:`或`C:\Windows`。由于以下原因，不鼓励这样做：
 
-1. ***Slowdown***: The files in system folders tend to be modified very frequently. If the folder watching is turned on, this will cause DocFetcher to update its indexes all the time, slowing down your computer.
-2. ***Memory issues***: DocFetcher needs to keep tiny representations of your files in memory. Because of this, and because system folders usually contain a very large number of files, DocFetcher will be more likely to run out of memory if you index system folders.
-3. ***Waste of resources, worse search results***: Apart from these technical reasons, indexing system folders is most likely a waste of indexing time and disk space, and it will also pollute your search results with unneeded system files. So, for the best results in the least amount of time, just index what you need.
+1. ***变慢***：系统文件夹中的文件往往会被非常频繁地修改。如果打开文件夹观看功能，这将导致DocFetcher始终更新其索引，从而减慢计算机速度。
+2. ***内存问题***：DocFetcher需要将文件的微小表示保存在内存中。因此，并且由于系统文件夹通常包含大量文件，因此如果您为系统文件夹编制索引，则DocFetcher将更有可能耗尽内存。
+3. ***资源浪费，搜索结果更差***：除了这些技术原因外，索引系统文件夹很可能浪费索引时间和磁盘空间，并且还会用不需要的系统文件污染您的搜索结果。因此，为了在最短的时间内取得最好的结果，只需索引你所需要的。
 
-**Unicode support**: DocFetcher has full Unicode support for all document formats. In case of plain text files, DocFetcher has to use [certain heuristics](http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html) to guess the correct encoding, since plain text files don't contain any explicit encoding information.
+**Unicode支持**：DocFetcher对所有文档格式都有完全的Unicode支持。对于纯文本文件，DocFetcher必须使用[某些启发式方法](http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html)来猜测正确的编码，因为纯文本文件不包含任何明确的编码信息。
 
-**Archive support**: DocFetcher currently supports the following archive formats: zip and derived formats, 7z, rar and the whole tar.* family. Additionally, executable zip and 7z archives are supported as well, but not executable rar archives. DocFetcher will treat all archives as if they were ordinary folders, and it can also handle an arbitrarily deep nesting of archives (e.g. a zip archive containing a 7z archive containing a rar archive...).<!-- this line should end with two spaces -->  
-With that said, it should be noted that support for zip and 7z archives is best in terms of robustness and speed. On the other hand, indexing of tar.gz, tar.bz2 and similar formats tends to be less efficient. This is due to the fact that these formats don't have an internal "summary" of the archive contents, which forces DocFetcher to unpack the entire archive rather than only individual archive entries. Bottom line: If you have the choice, compress your files either as zip or 7z archives for maximum compatibility with DocFetcher.
+**压缩文件支持**：DocFetcher目前支持以下存档格式：zip和衍生格式，7z,rar和整个tar.*系列。此外，还支持可执行的zip和7z压缩文件，但不支持可执行的rar压缩文件。 DocFetcher会将所有存档视为普通文件夹，并且还可以处理任意深度的存档嵌套（例如，包含包含rar存档的7z存档的zip存档...）。<!-- this line should end with two spaces -->  
+虽然Docfetcher支持多种压缩格式，应该指出的是，对于zip和7z压缩文件的支持在稳健性和速度方面是最好的。另一方面，tar.gz，tar.bz2和类似格式的索引往往效率较低。这是由于这些格式没有归档内容的内部“摘要”，这迫使DocFetcher解压缩整个归档文件而不是单个归档条目。所以如果您有选择，请将文件压缩为zip或7z存档，以最大程度地兼容DocFetcher。
 
-**The DocFetcher daemon is innocent**: If you suspect that the DocFetcher daemon is slowing down your computer or causing crashes, you're probably wrong. As a matter of fact, the daemon is a very simple program with low memory footprint and CPU usage, and it doesn't do much besides watching folders. If you're still not convinced, just rename the daemon executables so they won't start automatically, or try the portable version of DocFetcher, where the daemon is deactivated by default.
+**DocFetcher守护进程并不增加系统负担**：如果您怀疑DocFetcher守护进程正在减慢计算机速度或导致崩溃，那么您可能是错误的。事实上，守护进程是一个非常简单的程序，它占用的内存很少，CPU使用率也很低，除了监视文件夹之外，它并没有太多的工作。如果您仍然不确定，只需重命名守护程序可执行文件，以免它们自动启动，或尝试DocFetcher的可移植版本，默认情况下会禁用守护程序。
 
 * * *
 
 <a name="Subpages"></a> <!-- Do not translate this line, just copy it verbatim. -->
 
-Manual Subpages
+手册子页面
 ===============
-* [Query syntax](DocFetcher_Manual_files/Query_Syntax.html)
-* [Portable document repositories](DocFetcher_Manual_files/Portable_Repositories.html)
-* [Indexing options](DocFetcher_Manual_files/Indexing_Options.html)
-* [Regular expressions](DocFetcher_Manual_files/Regular_Expressions.html)
-* [Release notification](DocFetcher_Manual_files/Release_Notification.html)
-* [How to raise the memory limit](DocFetcher_Manual_files/Memory_Limit.html)
-* [How to raise the folder watch limit (Linux)](DocFetcher_Manual_files/Watch_Limit.html)
-* [Preferences](DocFetcher_Manual_files/Preferences.html)
+* [搜索语法](DocFetcher_Manual_files/Query_Syntax.html)
+* [可移植文档仓库](DocFetcher_Manual_files/Portable_Repositories.html)
+* [索引设置](DocFetcher_Manual_files/Indexing_Options.html)
+* [正则表达式](DocFetcher_Manual_files/Regular_Expressions.html)
+* [新版本通知](DocFetcher_Manual_files/Release_Notification.html)
+* [如何提高内存限制](DocFetcher_Manual_files/Memory_Limit.html)
+* [如何提高文件夹的watch limit (Linux)](DocFetcher_Manual_files/Watch_Limit.html)
+* [首选项](DocFetcher_Manual_files/Preferences.html)
 
-Further Information
+更多
 ===================
-For more information, have a look at our [wiki](http://docfetcher.sourceforge.net/wiki/doku.php). If you have any questions, feel free to visit our [forum](http://sourceforge.net/projects/docfetcher/forums/forum/702424). Bug reports can be submitted on our [bug tracker](http://sourceforge.net/tracker/?group_id=197779&atid=962834).
+有关更多信息，请查看我们的[wiki](http://docfetcher.sourceforge.net/wiki/doku.php)。如果您有任何问题，请随时访问我们的[论坛](http://sourceforge.net/projects/docfetcher/forums/forum/702424)。错误报告可以在我们的[bug跟踪器](http://sourceforge.net/tracker/?group_id=197779&atid=962834)上提交。
