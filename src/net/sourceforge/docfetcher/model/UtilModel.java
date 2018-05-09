@@ -33,8 +33,9 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -196,7 +197,7 @@ public final class UtilModel {
 	@VisibleForPackageGroup
 	public static void assertDocCount(	Directory luceneDir,
 										int expectedCount) throws Exception {
-		IndexReader reader = IndexReader.open(luceneDir);
+		IndexReader reader = DirectoryReader.open(luceneDir);
 		assertEquals(expectedCount, reader.numDocs());
 		Closeables.closeQuietly(reader);
 	}
@@ -205,16 +206,15 @@ public final class UtilModel {
 	public static void assertResultCount(	Directory luceneDir,
 											String query,
 											int expectedCount) throws Exception {
-		IndexSearcher searcher = new IndexSearcher(luceneDir, true);
+		IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(luceneDir));
 		QueryParser parser = new QueryParser(
-				IndexRegistry.LUCENE_VERSION,
 				Fields.CONTENT.key(),
 				IndexRegistry.getAnalyzer()
 		);
 		Query queryObject = parser.parse(query);
 		TopDocs topDocs = searcher.search(queryObject, Integer.MAX_VALUE);
 		assertEquals(expectedCount, topDocs.totalHits);
-		Closeables.closeQuietly(searcher);
+		Closeables.closeQuietly(searcher.getIndexReader());
 	}
 
 	/**

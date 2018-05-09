@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.util.annotations.VisibleForPackageGroup;
 
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Formatter;
@@ -112,7 +113,7 @@ public final class HighlightService {
 			doc.add(Fields.createContent(text, true)); // must store token positions and offsets
 			writer.add(doc);
 			Closeables.closeQuietly(writer); // flush unwritten documents into index
-			IndexReader indexReader = IndexReader.open(directory);
+			IndexReader indexReader = DirectoryReader.open(directory);
 			
 			// This might throw an OutOfMemoryError
 			FieldTermStack fieldTermStack = new FieldTermStack(

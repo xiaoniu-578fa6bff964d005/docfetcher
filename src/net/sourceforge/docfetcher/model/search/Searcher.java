@@ -32,6 +32,7 @@ import net.sourceforge.docfetcher.model.IndexRegistry.ExistingIndexesHandler;
 import net.sourceforge.docfetcher.model.LuceneIndex;
 import net.sourceforge.docfetcher.model.Path;
 import net.sourceforge.docfetcher.model.PendingDeletion;
+import net.sourceforge.docfetcher.model.index.DecoratedMultiReader;
 import net.sourceforge.docfetcher.model.index.IndexingConfig;
 import net.sourceforge.docfetcher.model.index.file.FileFactory;
 import net.sourceforge.docfetcher.model.index.outlook.OutlookMailFactory;
@@ -49,23 +50,14 @@ import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.collect.LazyList;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.ChainedFilter;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.MultiTermQuery;
+import org.apache.lucene.queries.TermsQuery;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.MultiTermQuery.RewriteMethod;
-import org.apache.lucene.search.NumericRangeFilter;
-import org.apache.lucene.search.PrefixFilter;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Searchable;
-import org.apache.lucene.search.TermsFilter;
-import org.apache.lucene.search.TopDocs;
 
 import com.google.common.io.Closeables;
 
@@ -121,7 +113,7 @@ public final class Searcher {
 	private final BlockingQueue<List<PendingDeletion>> deletionQueue = new LinkedBlockingQueue<List<PendingDeletion>>(); // guarded by 'this' lock
 	private final Thread deletionThread; // guarded by 'this' lock
 	
-	@NotNull private MultiSearcher luceneSearcher; // guarded by read-write lock
+	@NotNull private IndexSearcher luceneSearcher; // guarded by read-write lock
 	@NotNull private List<LuceneIndex> indexes; // guarded by read-write lock
 	@Nullable private volatile IOException ioException;
 	
@@ -210,7 +202,7 @@ public final class Searcher {
 	public void replaceLuceneSearcher() {
 		writeLock.lock();
 		try {
-			Closeables.close(luceneSearcher, false);
+			Closeables.close(luceneSearcher.getIndexReader(), false);
 			setLuceneSearcher(indexRegistry.getIndexes());
 		}
 		catch (IOException e) {
@@ -227,20 +219,19 @@ public final class Searcher {
 	private List<CorruptedIndex> setLuceneSearcher(@NotNull List<LuceneIndex> indexes)
 			throws IOException {
 		this.indexes = Util.checkNotNull(indexes);
-        Searchable[] searchables = new Searchable[indexes.size()];
+		ArrayList<IndexReader> readers = new ArrayList<IndexReader>(indexes.size());
         LazyList<CorruptedIndex> corrupted = new LazyList<CorruptedIndex>();
 		for (int i = 0; i < indexes.size(); i++) {
 			LuceneIndex index = indexes.get(i);
             try {
-                searchables[i] = new IndexSearcher(index.getLuceneDir());
+				readers.add(DirectoryReader.open(index.getLuceneDir()));
             }
             catch (IOException e) {
             	Util.printErr(e);
-                searchables[i] = new DummySearchable();
                 corrupted.add(new CorruptedIndex(index, e));
             }
         }
-        luceneSearcher = new MultiSearcher(searchables);
+        luceneSearcher = new IndexSearcher(new DecoratedMultiReader(readers.toArray(new IndexReader[readers.size()])));
         return corrupted;
 	}
 	
@@ -286,7 +277,7 @@ public final class Searcher {
 			for (int i = 0; i < scoreDocs.length; i++) {
 				Document doc = luceneSearcher.doc(scoreDocs[i].doc);
 				float score = scoreDocs[i].score;
-				LuceneIndex index = indexes.get(luceneSearcher.subSearcher(i));
+				LuceneIndex index = indexes.get(((DecoratedMultiReader) luceneSearcher.getIndexReader()).decoratedReaderIndex(i));
 				IndexingConfig config = index.getConfig();
 				results[i] = new ResultDocument(
 					doc, score, query, isPhraseQuery, config, fileFactory,
@@ -331,10 +322,13 @@ public final class Searcher {
 	public List<ResultDocument> list(@NotNull Set<String> uids)
 			throws SearchException, CheckedOutOfMemoryError {
 		// Construct a filter that only matches documents with the given UIDs
-		TermsFilter uidFilter = new TermsFilter();
+		BooleanQuery.Builder builder=new BooleanQuery.Builder();
+		ArrayList<Term> terms=new ArrayList<Term>(uids.size());
 		String fieldName = Fields.UID.key();
 		for (String uid : uids)
-			uidFilter.addTerm(new Term(fieldName, uid));
+			terms.add(new Term(fieldName, uid));
+		TermsQuery uidQuery = new TermsQuery(terms);
+		builder.add(uidQuery,BooleanClause.Occur.FILTER);
 		
 		Query query = new MatchAllDocsQuery();
 		
@@ -343,14 +337,15 @@ public final class Searcher {
 			checkIndexesExist();
 			
 			// Perform search; might throw OutOfMemoryError
-			ScoreDoc[] scoreDocs = luceneSearcher.search(query, uidFilter, MAX_RESULTS).scoreDocs;
+			builder.add(query,BooleanClause.Occur.MUST);
+			ScoreDoc[] scoreDocs = luceneSearcher.search(builder.build(), MAX_RESULTS).scoreDocs;
 			
 			// Create result documents
 			ResultDocument[] results = new ResultDocument[scoreDocs.length];
 			for (int i = 0; i < results.length; i++) {
 				Document doc = luceneSearcher.doc(scoreDocs[i].doc);
 				float score = scoreDocs[i].score;
-				LuceneIndex index = indexes.get(luceneSearcher.subSearcher(i));
+				LuceneIndex index = indexes.get(((DecoratedMultiReader) luceneSearcher.getIndexReader()).decoratedReaderIndex(i));
 				IndexingConfig config = index.getConfig();
 				results[i] = new ResultDocument(
 					doc, score, query, true, config, fileFactory,
@@ -395,44 +390,42 @@ public final class Searcher {
 		if (ioException != null)
 			throw ioException;
 		
-		List<Filter> filters = new ArrayList<Filter>(3);
+		BooleanQuery.Builder builder=new BooleanQuery.Builder();
 		
 		// Add size filter to filter chain
 		if (webQuery.minSize != null || webQuery.maxSize != null) {
-			filters.add(NumericRangeFilter.newLongRange(
-				Fields.SIZE.key(), webQuery.minSize, webQuery.maxSize, true,
-				true));
+			builder.add(
+                LegacyNumericRangeQuery.newLongRange(
+						Fields.SIZE.key(), webQuery.minSize, webQuery.maxSize, true, true),
+                BooleanClause.Occur.FILTER
+			);
 		}
 		
 		// Add type filter to filter chain
 		if (webQuery.parsers != null) {
-			TermsFilter typeFilter = new TermsFilter();
+			TermsQuery typequery = new TermsQuery();
+			ArrayList<Term> terms=new ArrayList<Term>(webQuery.parsers.size()+1);
 			String fieldName = Fields.PARSER.key();
-			typeFilter.addTerm(new Term(fieldName, Fields.EMAIL_PARSER));
+			terms.add(new Term(fieldName, Fields.EMAIL_PARSER));
 			for (Parser parser : webQuery.parsers) {
 				String parserName = parser.getClass().getSimpleName();
-				typeFilter.addTerm(new Term(fieldName, parserName));
+				terms.add(new Term(fieldName, parserName));
 			}
-			filters.add(typeFilter);
+			builder.add( new TermsQuery(terms), BooleanClause.Occur.FILTER );
 		}
 		
 		// Add location filter to filter chain
 		if (webQuery.indexes != null) {
-			Filter[] indexFilters = new Filter[webQuery.indexes.size()];
-			int i = 0;
+			BooleanQuery.Builder locationQueryBuilder=new BooleanQuery.Builder();
 			for (LuceneIndex index : webQuery.indexes) {
 				Path path = index.getRootFolder().getPath();
 				String uid = index.getDocumentType().createUniqueId(path);
 				Term prefix = new Term(Fields.UID.key(), uid + "/");
-				indexFilters[i++] = new PrefixFilter(prefix);
+				locationQueryBuilder.add(new PrefixQuery(prefix),BooleanClause.Occur.SHOULD);
 			}
-			filters.add(new ChainedFilter(indexFilters, ChainedFilter.OR));
+			builder.add( locationQueryBuilder.build(), BooleanClause.Occur.FILTER );
 		}
-		
-		// Construct filter chain
-		Filter filter = filters.size() == 0 ? null : new ChainedFilter(
-			filters.toArray(new Filter[filters.size()]), ChainedFilter.AND);
-		
+
 		// Create query
 		QueryWrapper queryWrapper = createQuery(webQuery.query);
 		Query query = queryWrapper.query;
@@ -444,7 +437,8 @@ public final class Searcher {
 			
 			// Perform search; might throw OutOfMemoryError
 			int maxResults = (webQuery.pageIndex + 1) * PAGE_SIZE;
-			TopDocs topDocs = luceneSearcher.search(query, filter, maxResults);
+			builder.add(query, BooleanClause.Occur.MUST);
+			TopDocs topDocs = luceneSearcher.search(builder.build(), maxResults);
 			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
 			
 			// Compute start and end indices of returned page
@@ -463,7 +457,7 @@ public final class Searcher {
 			for (int i = start; i < end; i++) {
 				Document doc = luceneSearcher.doc(scoreDocs[i].doc);
 				float score = scoreDocs[i].score;
-				LuceneIndex index = indexes.get(luceneSearcher.subSearcher(i));
+				LuceneIndex index = indexes.get(((DecoratedMultiReader) luceneSearcher.getIndexReader()).decoratedReaderIndex(i));
 				IndexingConfig config = index.getConfig();
 				results[i - start] = new ResultDocument(
 					doc, score, query, isPhraseQuery, config, fileFactory,
@@ -493,9 +487,9 @@ public final class Searcher {
 	private static QueryWrapper createQuery(@NotNull String queryString)
 			throws SearchException {
 		PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
-			IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
+			Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
 		queryParser.setAllowLeadingWildcard(true);
-		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE;
+		RewriteMethod rewriteMethod = MultiTermQuery.SCORING_BOOLEAN_REWRITE;
 		queryParser.setMultiTermRewriteMethod(rewriteMethod);
 		if (!SettingsConf.Bool.UseOrOperator.get())
 			queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
@@ -573,7 +567,7 @@ public final class Searcher {
 		writeLock.lock();
 		try {
 			indexRegistry.removeListeners(addedListener, null);
-			Closeables.closeQuietly(luceneSearcher);
+			Closeables.closeQuietly(luceneSearcher.getIndexReader());
 		}
 		finally {
 			writeLock.unlock();

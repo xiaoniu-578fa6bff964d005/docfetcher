@@ -20,7 +20,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.IndexableField;
 
 /**
  * @author Tran Nam Quang
@@ -40,7 +40,7 @@ final class AppendingDocWriter extends LuceneDocWriter {
 		if (this.luceneDoc == null)
 			this.luceneDoc = luceneDoc;
 		else
-			for (Fieldable field : luceneDoc.getFields(Fields.CONTENT.key()))
+			for (IndexableField field : luceneDoc.getFields(Fields.CONTENT.key()))
 				this.luceneDoc.add(field);
 	}
 
