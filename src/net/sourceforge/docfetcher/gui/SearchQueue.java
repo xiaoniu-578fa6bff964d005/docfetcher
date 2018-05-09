@@ -44,7 +44,7 @@ import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.ListMap;
 import net.sourceforge.docfetcher.util.collect.ListMap.Entry;
 
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -142,7 +142,7 @@ public final class SearchQueue {
 					query = eventData+'*';
 					try {
 						PhraseDetectingQueryParser queryParser = new PhraseDetectingQueryParser(
-								IndexRegistry.LUCENE_VERSION, Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
+								Fields.CONTENT.key(), IndexRegistry.getAnalyzer());
 						Query temp_query = queryParser.parse(query);
 					} catch (ParseException e) {
 						return;
