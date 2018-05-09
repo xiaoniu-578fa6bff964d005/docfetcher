@@ -120,6 +120,8 @@ public final class Searcher {
 	private final Lock readLock;
 	private final Lock writeLock;
 
+	volatile Boolean stopped;
+
 	/**
 	 * This method should not be called by clients. Use
 	 * {@link IndexRegistry#getSearcher()} instead.
@@ -191,6 +193,8 @@ public final class Searcher {
 			}
 		};
 		deletionThread.start();
+
+		this.stopped = true;
 	}
 	
 	/**
@@ -234,7 +238,10 @@ public final class Searcher {
         luceneSearcher = new IndexSearcher(new DecoratedMultiReader(readers.toArray(new IndexReader[readers.size()])));
         return corrupted;
 	}
-	
+
+	private class StoppedSearcherException extends RuntimeException{
+	}
+
 	@ImmutableCopy
 	@NotNull
 	@ThreadSafe
@@ -246,6 +253,7 @@ public final class Searcher {
 		 * allows the user to re-check the unchecked indexes and see previously
 		 * hidden results without starting another search.
 		 */
+		stopped =false;
 		
 		// Create Lucene query
 		QueryWrapper queryWrapper = createQuery(queryString);
@@ -270,7 +278,21 @@ public final class Searcher {
 			checkIndexesExist();
 			
 			// Perform search; might throw OutOfMemoryError
-			ScoreDoc[] scoreDocs = luceneSearcher.search(query, MAX_RESULTS).scoreDocs;
+			DelegatingCollector collector= new DelegatingCollector(){
+				@Override
+				public void collect(int doc) throws IOException {
+					leafDelegate.collect(doc);
+					if(stopped){
+						throw new StoppedSearcherException();
+					}
+				}
+			};
+			collector.setDelegate(TopScoreDocCollector.create(MAX_RESULTS, null));
+			try{
+				luceneSearcher.search(query, collector);
+			}
+			catch (StoppedSearcherException e){}
+			ScoreDoc[] scoreDocs = ((TopScoreDocCollector)collector.getDelegate()).topDocs().scoreDocs;
 
 			// Create result documents
 			ResultDocument[] results = new ResultDocument[scoreDocs.length];
@@ -298,8 +320,13 @@ public final class Searcher {
 			readLock.unlock();
 		}
 	}
-	
-	@NotNull
+
+	@ThreadSafe
+	public void stopSearch(){
+		stopped =true;
+	}
+
+		@NotNull
 	private static SearchException wrapEmptyIndexException(@NotNull IllegalArgumentException e)
 			throws SearchException {
 		/*
