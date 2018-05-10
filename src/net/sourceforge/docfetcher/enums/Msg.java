@@ -63,6 +63,9 @@ public enum Msg {
 		"message contains a link to our bug tracker at sourceforge.net, and " +
 		"it also says that the stacktrace has been written to a file, whose " +
 		"path will be inserted at the {0} slot."),
+	report_bug_online ("Tell developer about the bug so they can fix it.",
+        "This message is shown when the program crashes. If this box is checked, the Docfetcher Crash Reporter will send a summary of the crash to developers. Deselect this box if you don't want to send the report. "
+	),
 	program_running_launch_another (
 		"It seems an instance of {0} was not terminated cleanly or is still running. " + // translations of this string need to be updated
 		"Do you want to launch another instance?",

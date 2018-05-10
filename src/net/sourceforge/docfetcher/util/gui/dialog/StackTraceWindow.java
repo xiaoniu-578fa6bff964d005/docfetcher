@@ -11,8 +11,10 @@
 
 package net.sourceforge.docfetcher.util.gui.dialog;
 
+import net.sourceforge.docfetcher.enums.Msg;
 import net.sourceforge.docfetcher.util.Util;
 import net.sourceforge.docfetcher.util.AppUtil.Messages;
+import net.sourceforge.docfetcher.util.errorreport.SentryHandler;
 import net.sourceforge.docfetcher.util.gui.Col;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 
@@ -21,10 +23,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 
 public class StackTraceWindow {
 	
@@ -33,7 +32,12 @@ public class StackTraceWindow {
 	private Shell shell;
 	private Link label;
 	private Text text;
-	
+	private Button button;
+
+	private boolean reportOnline;
+
+	private Throwable throwable;
+
 	public StackTraceWindow(Display display) {
 		shell = new Shell(display, SWT.PRIMARY_MODAL | SWT.SHELL_TRIM | SWT.RESIZE);
 		shell.setText(Messages.system_error.get()); // Default shell title
@@ -49,11 +53,25 @@ public class StackTraceWindow {
 		text.setBackground(Col.WHITE.get());
 		text.setForeground(Col.RED.get());
 		text.setFocus();
-		
+
+		button = new Button(shell, SWT.CHECK);
+		button.setText(Msg.report_bug_online.get());
+		button.setSelection(true);
+
 		shell.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.margin(10).left().right().top().applyTo(label);
-		fdf.top(label).bottom().applyTo(text);
+		fdf.reset().left().right().bottom().applyTo(button);
+		fdf.top(label).bottom(button).applyTo(text);
+
+		shell.addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				reportOnline=button.getSelection();
+
+				if(reportOnline && throwable!=null)
+                    SentryHandler.capture(throwable);
+			}
+		});
 	}
 	
 	public void setTitle(String title) {
@@ -81,6 +99,14 @@ public class StackTraceWindow {
 				shell.getDisplay().sleep();
 		}
 		windowCount--;
+	}
+
+	public boolean isReportOnline() {
+		return reportOnline;
+	}
+
+	public void setThrowable(Throwable throwable) {
+		this.throwable = throwable;
 	}
 
 }
