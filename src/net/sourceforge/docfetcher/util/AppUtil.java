@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.enums.SettingsConf;
 import net.sourceforge.docfetcher.gui.KeyCodeTranslator;
 import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
+import net.sourceforge.docfetcher.util.errorreport.SentryHandler;
 import net.sourceforge.docfetcher.util.gui.dialog.StackTraceWindow;
 
 import org.apache.commons.codec.binary.Base64;
@@ -62,7 +63,7 @@ public final class AppUtil {
 		IS_DEVELOPMENT_VERSION,
 		;
 		
-		private String value;
+		public String value;
 		
 		@Nullable public String get() {
 			return value;
@@ -82,7 +83,7 @@ public final class AppUtil {
 			set(String.valueOf(b));
 		}
 		
-		private boolean asBoolean() {
+		public boolean asBoolean() {
 			return Boolean.parseBoolean(value);
 		}
 		
@@ -451,6 +452,8 @@ public final class AppUtil {
 	 */
 	public static void showStackTraceInOwnDisplay(Throwable throwable) {
 		checkConstInitialized();
+		// Online Report
+		SentryHandler.capture(throwable);
 		ensureNoDisplay();
 		Display display = new Display();
 		showStackTrace(display, throwable, null);
@@ -563,8 +566,10 @@ public final class AppUtil {
 				 * to use Linux newlines in the stacktrace window.
 				 */
 				window.setStackTrace(Util.ensureLinuxLineSep(trace));
-				
+				window.setThrowable(throwable);
+
 				window.open();
+
 			}
 		});
 	}

@@ -67,6 +67,7 @@ import net.sourceforge.docfetcher.util.annotations.NotNull;
 import net.sourceforge.docfetcher.util.annotations.Nullable;
 import net.sourceforge.docfetcher.util.collect.AlphanumComparator;
 import net.sourceforge.docfetcher.util.collect.ListMap;
+import net.sourceforge.docfetcher.util.errorreport.SentryHandler;
 import net.sourceforge.docfetcher.util.gui.CocoaUIEnhancer;
 import net.sourceforge.docfetcher.util.gui.FormDataFactory;
 import net.sourceforge.docfetcher.util.gui.LazyImageCache;
@@ -182,6 +183,9 @@ public final class Application {
 		AppUtil.Messages.cancel.set(Msg.cancel.get());
 		Msg.setCheckEnabled(true);
 		AppUtil.Messages.checkInitialized();
+
+		// init online report
+		SentryHandler.init();
 
 		// Path overrides; only supported in portable version
 		File confPathOverride = null;
@@ -380,18 +384,18 @@ public final class Application {
 		return Util.getCanonicalFile(value);
 	}
 	
-	private static void handleCrash(@NotNull Throwable t) {
-		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(t), OutOfMemoryError.class)) {
+	private static void handleCrash(@NotNull Throwable throwable) {
+		for (OutOfMemoryError e : Iterables.filter(Throwables.getCausalChain(throwable), OutOfMemoryError.class)) {
 			UtilGui.showOutOfMemoryMessage(shell, e);
 			return;
 		}
-		if (t instanceof MergePolicy.MergeException) {
-			String msg = t.getMessage();
+		if (throwable instanceof MergePolicy.MergeException) {
+			String msg = throwable.getMessage();
 			msg += "\n\nPlease ensure no other programs are accessing or locking the index files.";
 			AppUtil.showError(msg, true, false);
 			return;
 		}
-		AppUtil.showStackTrace(t);
+		AppUtil.showStackTrace(throwable);
 	}
 
 	private static void saveSettingsConfFile() {

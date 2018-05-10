@@ -524,5 +524,6 @@
     <orderEntry type="library" name="lucene-6.6.3" level="project" />
     <orderEntry type="library" name="ansj_lucene6_plug-5.1.2.0" level="project" />
     <orderEntry type="library" name="log4j-2.11.0" level="project" />
+    <orderEntry type="library" name="sentry-1.7.4" level="project" />
   </component>
 </module>
