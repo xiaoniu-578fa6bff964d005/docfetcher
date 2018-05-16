@@ -19,7 +19,7 @@ public final class SentryHandler {
 
     private static SentryClient sentry;
     public static void init(){
-        Sentry.init("https://6d2e21d50ec54f3e90d182f135acea84@sentry.io/1204219");
+        Sentry.init("https://fabe30b042cb46078e3ec7b5d6618d64:eee51dfb00b240f89fe6747126dbadf4@sentry.xiaoniu.edu.eu.org/2");
         sentry = SentryClientFactory.sentryClient();
 
         sentry.setRelease(AppUtil.Const.PROGRAM_VERSION.value);
