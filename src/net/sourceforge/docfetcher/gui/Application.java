@@ -75,13 +75,7 @@ import net.sourceforge.docfetcher.util.gui.dialog.MultipleChoiceDialog;
 
 import org.apache.lucene.index.MergePolicy;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormLayout;
@@ -336,6 +330,16 @@ public final class Application {
 				handleShellClosed(e);
 			}
 		});
+
+		display.addFilter(SWT.KeyUp, new Listener() {
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				if((event.stateMask & (SWT.SHIFT|SWT.ALT|SWT.CTRL|SWT.COMMAND)) == 0 && event.keyCode==SWT.ESC){
+					shell.close();
+				}
+			}
+		});
+
 
 		shell.open();
 		while (!shell.isDisposed()) {
