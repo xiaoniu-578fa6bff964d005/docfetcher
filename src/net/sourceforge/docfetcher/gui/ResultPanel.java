@@ -50,6 +50,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -94,7 +96,8 @@ public final class ResultPanel {
 	
 	public final Event<List<ResultDocument>> evtSelection = new Event<List<ResultDocument>> ();
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
-	
+	public final Event<Void> evtTraverse = new Event<Void>();
+
 	private final VirtualTableViewer<ResultDocument> viewer;
 	private final FileIconCache iconCache;
 	private HeaderMode presetHeaderMode = HeaderMode.FILES; // externally suggested header mode
@@ -127,6 +130,15 @@ public final class ResultPanel {
 					copyToClipboard();
 				else if (e.stateMask == SWT.MOD1 && e.keyCode == 'a')
 					table.selectAll();
+			}
+		});
+
+		table.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_TAB_PREVIOUS) {
+					e.doit = false;
+					evtTraverse.fire(null);
+				}
 			}
 		});
 		
