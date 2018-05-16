@@ -31,6 +31,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -51,6 +53,7 @@ public final class SearchBar {
 	public final Event<Void> evtHideInSystemTray = new Event<Void>();
 	public final Event<Void> evtOpenManual = new Event<Void>();
 	public final Event<Void> evtOKClicked = new Event<Void> ();
+	public final Event<Void> evtTraverse = new Event<Void> ();
 
 	private final Composite comp;
 	private final Combo searchBox;
@@ -73,6 +76,14 @@ public final class SearchBar {
 				String query = searchBox.getText().trim();
 				if (!query.isEmpty() && Util.isEnterKey(e.keyCode))
 					evtSearch.fire(query);
+			}
+		});
+		searchBox.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_TAB_PREVIOUS) {
+					e.doit = false;
+					evtTraverse.fire(null);
+				}
 			}
 		});
 

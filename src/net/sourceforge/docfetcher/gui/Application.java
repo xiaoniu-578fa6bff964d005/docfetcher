@@ -901,7 +901,19 @@ public final class Application {
 		    	saveSettingsConfFile();
 		    }
 		});
+		searchBar.evtTraverse.add(new Event.Listener<Void> () {
+			@Override
+			public void update(Void eventData) {
+				resultPanel.getControl().setFocus();
+			}
+		});
 		resultPanel = new ResultPanel(comp);
+		resultPanel.evtTraverse.add(new Event.Listener<Void>() {
+			@Override
+			public void update(Void eventData) {
+				searchBar.getControl().setFocus();
+			}
+		});
 
 		comp.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
